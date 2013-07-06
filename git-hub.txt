@@ -45,6 +45,16 @@ Here is a basic config:
 
 You can edit this file by hand or use the `git hub config` command.
 
+AUTHENTICATION
+--------------
+
+One easy way to get an authentication token is to visit
+[this page](https://github.com/settings/applications).
+
+Note that auth tokens have **scopes**. Various scopes are required for various
+GitHub API operations. Make sure your token has the scopes turned on for the
+things you want to do.
+
 STATUS
 ------
 
