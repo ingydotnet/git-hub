@@ -1,0 +1,51 @@
+git-hub(1)
+==========
+
+NAME
+----
+git-hub - Use the GitHub v3 API commands from git
+
+SYNOPSIS
+--------
+
+    git hub repos-list [<user-name>]    # List recent repositories
+    git hub repos-create <repo-name>    # Create a new repository
+    git hub repos-delete <repo-name>    # Delete a repository
+
+    git hub config [ <key> [<value>]]   # Manipulate `git hub` config
+
+DESCRIPTION
+-----------
+
+The *hub* subcommand for git, allows you do perform many of the operations
+made available by GitHub's v3 REST API, from the `git` commandline command.
+
+INSTALLATION
+------------
+
+Just run:
+
+    make install
+
+That will install `git-hub` next to your other `git` commands.
+
+NOTE: Will probably require `sudo` permissions.
+
+CONFIG
+------
+
+Many `git hub` subcommands require values such as `api-token`. These values
+are stored in a `git` config file called `$HOME/.githubconfig`.
+
+Here is a basic config:
+
+    [github]
+            api-token = <oauth2-api-token**********************>
+            user-name = <your-github-id>
+
+You can edit this file by hand or use the `git hub config` command.
+
+STATUS
+------
+
+This command is very new. Use at your own risk.
