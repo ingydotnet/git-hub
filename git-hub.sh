@@ -146,7 +146,7 @@ require-value() {
 fetch-value() {
 	local key=$1
 	local var=${key//-/_}
-	local env=GIT_HUB_${var^^*}
+	local env=GIT_HUB_${var^^}
 	eval $var="$2"
 	[ -n "$(eval echo \$$var)" ] && return
 	eval $var=\"\$$env\"
