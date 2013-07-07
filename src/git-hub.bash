@@ -10,6 +10,7 @@ OPTIONS_SPEC="\
 git hub repos-list [<user-name>]
 git hub repos-create <repo-name>
 git hub repos-delete [<username>/]<repo-name>
+git hub collaborator-add <collaborator-list>
 git hub config [(api-token|user-name) [<new-value>]]
 --
 u,user=     GitHub user or organization
@@ -75,6 +76,10 @@ github-repos-delete() {
 	else
 		die "Repository deletion failed."
 	fi
+}
+
+github-collaborator-add() {
+	true
 }
 
 #------------------------------------------------------------------------------
@@ -226,6 +231,9 @@ get-options() {
 		config)
 			[ $# -gt 0 ] && config_key="$1" && shift
 			[ $# -gt 0 ] && config_value="$1" && shift
+			;;
+		collaborator-add)
+			[ $# -eq 0 ] && die "$command requires collaborator list"
 			;;
 		*) die "Unknown 'git hub' command: '$command'"
 	esac

@@ -1,0 +1,4 @@
+- Add success and failure functions
+- Add json.sh support
+- Add bash-tap support
+- Detect config
