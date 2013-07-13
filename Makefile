@@ -42,15 +42,22 @@ uninstall:
 	rm -f $(GIT_INSTALL_LIB)/$(CMD)
 
 clean purge:
-	rm -fr ./$(CMD) $(TMP)
+	rm -fr ./$(CMD) $(TMP) /tmp/git-hub-*
 
 ##
 # Build rules:
-git-hub: src/git-hub.bash
-	cp $< ./$@
+git-hub: src/git-hub.bash ext/JSON.sh/JSON.sh
+	cat $< > $@
 	chmod +x $@
+
+ext/JSON.sh/JSON.sh:
+	git submodule update --init
+	if [ ! -f "$@" ]; then \
+	    echo "Failed to create '$@'"; \
+	    exit 1; \
+	fi
 
 ##
 # Undocumented dev rules
 install-link: build uninstall
-	ln -s $(PWD)/$(CMD) $(GIT_INSTALL_LIB)/$(CMD)
+	ln -s $$PWD/$(CMD) $(GIT_INSTALL_LIB)/$(CMD)
