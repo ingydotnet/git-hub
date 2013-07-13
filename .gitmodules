@@ -1,0 +1,3 @@
+[submodule "ext/JSON.sh"]
+	path = ext/JSON.sh
+	url = git@github.com:ingydotnet/JSON.sh.git
