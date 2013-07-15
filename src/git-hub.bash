@@ -31,7 +31,7 @@ h,help      Show this help
 q,quiet     Show minimal output
 v,verbose   Show verbose output
 d,dryrun    Don't run the API command
-T,token     Show API token in the verbose output
+T           Show API token in the verbose output
 
 x           dev - Turn on Bash trace output
 R           dev - Repeat last command without contacting server
@@ -55,7 +55,7 @@ main() {
 		else
 			say ${message_success:="'git hub $command' successful"}
 		fi
-	elif callable "github-$command-$status_code"; then
+	elif [ -n "$status_code" ] && callable "github-$command-$status_code"; then
 		"github-$command-$status_code"
 	elif [ -n "$(eval "echo \$message_$status_code")" ]; then
 		say $(eval "echo \$message_$status_code")
@@ -90,6 +90,12 @@ github-repo-list-success() {
 		[ -z "$name" ] && break
 		printf "%3d) (%s)  %-30s %s\n" $(($i+1)) $pushed $name "$desc"
 	done
+}
+
+github-repo-info() {
+	require-value repo-name "$repo"
+	require-value user-name "$user"
+	api-get "repos/$user_name/$repo_name"
 }
 
 github-repo-create() {
@@ -161,7 +167,7 @@ api-call() {
 		local token=$([ -n "$show_token" ] && echo "$api_token" || echo '********')
 		say "curl -s -S -X$action -H \"Authorization: token $token\" $GIT_HUB_API_URI/$url $data -D \"$GIT_HUB_HEADER\" > $GIT_HUB_OUTPUT 2> $GIT_HUB_ERROR"
 	fi
-	[ -n "$dryrun" ] && exit 0
+	[ -n "$dry_run" ] && exit 0
 	curl -s -S -X$action -H "Authorization: token $api_token" \
 		$GIT_HUB_API_URI/$url $data \
 		-D "$GIT_HUB_HEADER" > $GIT_HUB_OUTPUT 2> $GIT_HUB_ERROR
@@ -300,16 +306,18 @@ get-options() {
 	NONGIT_OK=1 source git-sh-setup
 
 	GIT_QUIET=; GIT_VERBOSE=;
-	user=; repo=; dryrun=; show_token=; list_count=10
+	user=; repo=; dry_run=; show_token=; list_count=10
 	while [ $# -gt 0 ]; do
 		local option="$1"; shift
 		case "$option" in
 			-h) usage ;;
-			-u) user="$1"; shift ;;
-			-r) repo="$1"; shift ;;
-			-t) token="$1"; shift ;;
+			--user) user="$1"; shift ;;
+			--owner) owner="$1"; shift ;;
+			--org) org="$1"; shift ;;
+			--repo) repo="$1"; shift ;;
+			--token) token="$1"; shift ;;
 			-c)	list_count=$1; shift ;;
-			-d) dryrun="1" ;;
+			-d) dry_run="1" ;;
 			-T) show_token="1" ;;
 			-q) GIT_QUIET=1 ;;
 			-v) GIT_VERBOSE="1" ;;
@@ -323,11 +331,14 @@ get-options() {
 			*) die "Unexpected option: $option" ;;
 		esac
 	done
+
     command="$1"; shift
 	[ "$command" = "user" ] && command="user-info"
+	[ "$command" = "repo" ] && command="repo-info"
+
 	case "$command" in
 		auth-list) ;;
-		repo-create|repo-delete)
+		repo-info|repo-create|repo-delete)
 			[ $# -gt 0 ] && repo="$1" && shift
 			;;
 		repo-list)
@@ -367,8 +378,8 @@ setup-env() {
 	else
 		rm -f $GIT_HUB_TMP_PREFIX-*
 	fi
-	[ -n "$dryrun" ] &&
-		say '*** NOTE: This is a dryrun only. ***'
+	[ -n "$dry_run" ] &&
+		say '*** NOTE: This is a dry run only. ***'
 	true
     # require_work_tree
 }
