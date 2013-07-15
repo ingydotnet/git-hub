@@ -12,7 +12,7 @@ git hub <command> <options> <arguments>
 Commands:
   auth-list, auth-info, auth-create, auth-update, auth-delete
   repo-list, repo-info, repo-create, repo-delete
-  user-info, user-update
+  user, user-info, user-update
   collab-add, collab-remove
   config
 
@@ -35,6 +35,8 @@ T,token     Show API token in the verbose output
 
 x           dev - Turn on Bash trace output
 R           dev - Repeat last command without contacting server
+O           dev - Show response output
+J           dev - Show parsed JSON response
 "
 
 main() {
@@ -43,6 +45,9 @@ main() {
 	setup-env
 
 	github-"$command"
+	[ -n "$show_output" ] && cat $GIT_HUB_OUTPUT
+	[ -s $GIT_HUB_OUTPUT ] && json-load-cache "$(cat $GIT_HUB_OUTPUT)"
+	[ -n "$show_json" ] && echo "$json_load_data_cache"
 
 	if OK; then
 		if callable "github-$command-success"; then
@@ -77,15 +82,14 @@ github-repo-list() {
 }
 
 github-repo-list-success() {
-	echo "Repository list:"
-	regex_name='"name": +"(.*)"'
-	regex_pushed_at='"pushed_at": +"(.*)"'
-	while read line; do
-		[[ $line =~ $regex_name ]] &&
-			echo "- name: ${BASH_REMATCH[1]}"
-		[[ $line =~ $regex_pushed_at ]] &&
-			echo "  pushed_at: ${BASH_REMATCH[1]}"
-	done < $GIT_HUB_OUTPUT
+	for ((i=0; i < $list_count; i++)); do
+		name=$(json-get "/$i/name")
+		pushed=$(json-get "/$i/pushed_at")
+		pushed=${pushed/T*/}
+		desc=$(json-get "/$i/description")
+		[ -z "$name" ] && break
+		printf "%3d) (%s)  %-30s %s\n" $(($i+1)) $pushed $name "$desc"
+	done
 }
 
 github-repo-create() {
@@ -111,15 +115,13 @@ github-user-info() {
 }
 
 github-user-info-success() {
-	json-load-cache "$(cat $GIT_HUB_OUTPUT)"
-
 	for field in ${info_fields:-$(github-user-info-fields)}; do
 		report-value $field
 	done
 }
 
 github-user-info-fields() {
-	echo login name email blog location company
+	echo login type name email blog location company
 	echo followers following public_repos public_gists
 }
 
@@ -145,6 +147,7 @@ github-config() {
 api-get() { api-call GET $*; }
 api-post() { api-call POST $*; }
 api-put() { api-call PUT $*; }
+api-patch() { api-call PATCH $*; }
 api-delete() { api-call DELETE $*; }
 
 api-call() {
@@ -241,7 +244,7 @@ json-load-cache() {
 }
 
 json-get() {
-	local key="\[\"$1\"\]"
+	local key="^$1\s"
 	local data="$2"
 	[ -z "$data" ] && data="$json_load_data_cache"
 	value=$(echo "$data" | egrep $key | cut -f2)
@@ -254,20 +257,20 @@ json-get() {
 
 #------------------------------------------------------------------------------
 report-value() {
-	local value=$(json-get $1)
+	local value=$(json-get "/$1")
 	local label=$(eval echo \$label_$1)
 	if [ -z "$label" ]; then
 		label=$(echo "$1" | tr '_' ' ')
 		label=$(for word in $label; do title=`echo "${word:0:1}" | tr a-z A-Z`${word:1}; echo -n "$title "; done)
 	fi
 	if [ -n "$label" -a -n "$value" ]; then
-		printf "%-20s %s\n" "$label" "$value"
+		printf "%-15s %s\n" "$label" "$value"
 	fi
 }
 
-label_login='Login ID'
-label_name='Full Name'
+label_login='ID'
 label_email='Email Address'
+label_blog='Web Site'
 
 #------------------------------------------------------------------------------
 assert-env() {
@@ -297,7 +300,7 @@ get-options() {
 	NONGIT_OK=1 source git-sh-setup
 
 	GIT_QUIET=; GIT_VERBOSE=;
-	user=; repo=; dryrun=; show_token=;
+	user=; repo=; dryrun=; show_token=; list_count=10
 	while [ $# -gt 0 ]; do
 		local option="$1"; shift
 		case "$option" in
@@ -305,6 +308,7 @@ get-options() {
 			-u) user="$1"; shift ;;
 			-r) repo="$1"; shift ;;
 			-t) token="$1"; shift ;;
+			-c)	list_count=$1; shift ;;
 			-d) dryrun="1" ;;
 			-T) show_token="1" ;;
 			-q) GIT_QUIET=1 ;;
@@ -313,18 +317,21 @@ get-options() {
 			# Dev options:
 			-x) set -x ;;
 			-R) repeat_command="1" ;;
+			-O) show_output="1" ;;
+			-J) show_json="1" ;;
 
 			*) die "Unexpected option: $option" ;;
 		esac
 	done
     command="$1"; shift
+	[ "$command" = "user" ] && command="user-info"
 	case "$command" in
 		auth-list) ;;
 		repo-create|repo-delete)
 			[ $# -gt 0 ] && repo="$1" && shift
 			;;
 		repo-list)
-			[ $# -gt 0 ] && user="$1" && shift
+			[ $# -gt 0 ] && user_name="$1" && shift
 			;;
 		user-info)
 			[ $# -gt 0 ] && user="$1" && shift
