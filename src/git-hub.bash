@@ -67,7 +67,7 @@ github-auth-list() {
 	cat $GIT_HUB_OUTPUT
 }
 
-github-repos-list() {
+github-repo-list() {
 	local options='sort=pushed'
 	if [ -n "$user_name" ]; then
 		api-get "users/$user_name/repos?$options"
@@ -76,7 +76,7 @@ github-repos-list() {
 	fi
 }
 
-github-repos-list-success() {
+github-repo-list-success() {
 	echo "Repository list:"
 	regex_name='"name": +"(.*)"'
 	regex_pushed_at='"pushed_at": +"(.*)"'
@@ -88,9 +88,9 @@ github-repos-list-success() {
 	done < $GIT_HUB_OUTPUT
 }
 
-github-repos-create() {
+github-repo-create() {
 	require-value repo-name "$repo"
-	local json=$(json-object \
+	local json=$(json-dump \
 		'name' $repo_name \
 	)
 	api-post 'user/repos' $json
@@ -98,7 +98,7 @@ github-repos-create() {
 	message_422="Repository name '$repo_name' already exists."
 }
 
-github-repos-delete() {
+github-repo-delete() {
 	require-value repo-name "$repo"
 	require-value user-name "$user"
 	api-delete "repos/$user_name/$repo_name"
@@ -111,7 +111,16 @@ github-user-info() {
 }
 
 github-user-info-success() {
-	cat $GIT_HUB_OUTPUT
+	json-load-cache "$(cat $GIT_HUB_OUTPUT)"
+
+	for field in ${info_fields:-$(github-user-info-fields)}; do
+		report-value $field
+	done
+}
+
+github-user-info-fields() {
+	echo login name email blog location company
+	echo followers following public_repos public_gists
 }
 
 github-collab-add() {
@@ -122,7 +131,6 @@ github-collab-add() {
 	message_success="Added '$collab_name' as a collaborator to the '$repo_name' repository"
 }
 
-#------------------------------------------------------------------------------
 github-config() {
 	if [ -z "$config_key" ]; then
 		cat $config_file
@@ -140,7 +148,7 @@ api-put() { api-call PUT $*; }
 api-delete() { api-call DELETE $*; }
 
 api-call() {
-	[ -n "$GIT_HUB_REPEAT_COMMAND" ] && api-repeat && return
+	[ -n "$repeat_command" ] && api-repeat && return
 	require-value api-token "$token"
 	local action=$1
 	local url=$2
@@ -215,7 +223,7 @@ fetch-value() {
 
 #------------------------------------------------------------------------------
 # Format a JSON string from an input list of key/value pairs.
-json-object() {
+json-dump() {
 	local json='{'
 	while [ $# -gt 0 ]; do
 		json="$json\"$1\":\"$2\""
@@ -227,6 +235,39 @@ json-object() {
 	json="$json}"
 	echo $json
 }
+
+json-load-cache() {
+	json_load_data_cache=$(echo "$1" | tokenize | parse)
+}
+
+json-get() {
+	local key="\[\"$1\"\]"
+	local data="$2"
+	[ -z "$data" ] && data="$json_load_data_cache"
+	value=$(echo "$data" | egrep $key | cut -f2)
+	if [ "$value" = 'null' ]; then
+		echo ''
+	else
+		echo ${value//\"/}
+	fi
+}
+
+#------------------------------------------------------------------------------
+report-value() {
+	local value=$(json-get $1)
+	local label=$(eval echo \$label_$1)
+	if [ -z "$label" ]; then
+		label=$(echo "$1" | tr '_' ' ')
+		label=$(for word in $label; do title=`echo "${word:0:1}" | tr a-z A-Z`${word:1}; echo -n "$title "; done)
+	fi
+	if [ -n "$label" -a -n "$value" ]; then
+		printf "%-20s %s\n" "$label" "$value"
+	fi
+}
+
+label_login='Login ID'
+label_name='Full Name'
+label_email='Email Address'
 
 #------------------------------------------------------------------------------
 assert-env() {
@@ -241,7 +282,7 @@ assert-env() {
 	GIT_HUB_ERROR=$GIT_HUB_TMP_PREFIX-err-$$
 	GIT_HUB_HEADER=$GIT_HUB_TMP_PREFIX-head-$$
 	local cmd
-	for cmd in git curl; do
+	for cmd in git curl tr egrep head cut; do
 		[ -z "$(which $cmd)" ] &&
 			echo "Required command not found: '$cmd'" && exit 1
 	done
@@ -267,9 +308,12 @@ get-options() {
 			-d) dryrun="1" ;;
 			-T) show_token="1" ;;
 			-q) GIT_QUIET=1 ;;
-			-v) GIT_VERBOSE="1"; ;;
-			-x) set -x ;;
+			-v) GIT_VERBOSE="1" ;;
 			--) break ;;
+			# Dev options:
+			-x) set -x ;;
+			-R) repeat_command="1" ;;
+
 			*) die "Unexpected option: $option" ;;
 		esac
 	done
@@ -284,6 +328,8 @@ get-options() {
 			;;
 		user-info)
 			[ $# -gt 0 ] && user="$1" && shift
+			info_fields="$*"
+			set --
 			;;
 		config)
 			[ $# -gt 0 ] && config_key="$1" && shift
@@ -300,7 +346,9 @@ get-options() {
 }
 
 setup-env() {
-    if [ -n "$GIT_HUB_REPEAT_COMMAND" ]; then
+    source "$GIT_CORE_PATH/lib/core.bash"
+    source "$GIT_CORE_PATH/lib/json.bash"
+    if [ -n "$repeat_command" ]; then
 		[ -f $GIT_HUB_TMP_PREFIX-out-* ] ||
 			die "No previous 'git hub' command to repeat"
 		local old_output=$(echo $GIT_HUB_TMP_PREFIX-out-*)
@@ -316,11 +364,6 @@ setup-env() {
 		say '*** NOTE: This is a dryrun only. ***'
 	true
     # require_work_tree
-}
-
-#------------------------------------------------------------------------------
-callable() {
-	[ -n "$(type $1 2> /dev/null)" ]
 }
 
 #------------------------------------------------------------------------------

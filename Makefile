@@ -29,26 +29,43 @@ help:
 	@echo 'uninstall  Uninstall $(CMD)'
 	@echo 'clean      Remove build/test files'
 
-build: git-hub
+build: git-hub lib/core.bash lib/json.bash
 
 test: build
 	@# prove -e bash test
 	bash test/repos-create.t
 
-install: build uninstall
-	cp ./$(CMD) $(GIT_INSTALL_LIB)/
+install: build uninstall $(GIT_INSTALL_LIB)/lib/
+	cp $(CMD) $(GIT_INSTALL_LIB)/
+	cp lib/core.bash $(GIT_INSTALL_LIB)/lib/core.bash
+	cp lib/json.bash $(GIT_INSTALL_LIB)/lib/json.bash
 
 uninstall:
 	rm -f $(GIT_INSTALL_LIB)/$(CMD)
+	rm -f $(GIT_INSTALL_LIB)/lib/core.bash
+	rm -f $(GIT_INSTALL_LIB)/lib/json.bash
+
+$(GIT_INSTALL_LIB)/lib/:
+	mkdir -p $@
 
 clean purge:
-	rm -fr ./$(CMD) $(TMP) /tmp/git-hub-*
+	rm -fr $(CMD) lib $(TMP) /tmp/git-hub-*
 
 ##
 # Build rules:
-git-hub: src/git-hub.bash ext/JSON.sh/JSON.sh
-	cat $< > $@
+git-hub: src/git-hub.bash
+	cp $< $@
 	chmod +x $@
+
+lib/core.bash: src/core.bash lib
+	cp $< $@
+
+lib/json.bash: ext/JSON.sh/JSON.sh lib
+	cp $< $@
+	chmod -x $@
+
+lib:
+	mkdir $@
 
 ext/JSON.sh/JSON.sh:
 	git submodule update --init
@@ -59,5 +76,7 @@ ext/JSON.sh/JSON.sh:
 
 ##
 # Undocumented dev rules
-install-link: build uninstall
+install-link: build uninstall $(GIT_INSTALL_LIB)/lib/
 	ln -s $$PWD/$(CMD) $(GIT_INSTALL_LIB)/$(CMD)
+	ln -s $$PWD/lib/core.bash $(GIT_INSTALL_LIB)/lib/core.bash
+	ln -s $$PWD/lib/json.bash $(GIT_INSTALL_LIB)/lib/json.bash

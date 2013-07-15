@@ -1,9 +1,8 @@
-- parse json with JSON.sh
-
-
-+ Add success and failure functions
-- Add json.sh support
+- Install man page like git-subtree
 - Add bash-tap support
 - Detect config
 
 
++ Add json.sh support
++ Add success and failure functions
++ parse json with JSON.sh
