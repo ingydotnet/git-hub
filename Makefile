@@ -1,4 +1,4 @@
-.PHONY: default help build test install
+.PHONY: default help build build-doc test install install-all install-exe install-doc
 
 ##
 # Make sure we have 'git' and it works OK.
@@ -10,6 +10,8 @@ GIT_INSTALL_LIB ?= $(shell git --exec-path)
 ifeq ($(GIT_INSTALL_LIB),)
     $(error Cannot determine location of git commands)
 endif
+MAN1DIR ?= /usr/local/share/man/man1/
+GITVER ?= $(word 3,$(shell git --version))
 
 ##
 # Define common variables
@@ -29,16 +31,24 @@ help:
 	@echo 'uninstall  Uninstall $(CMD)'
 	@echo 'clean      Remove build/test files'
 
-build: git-hub lib/core.bash lib/json.bash
+build: $(CMD) lib/core.bash lib/json.bash
+build-doc: $(CMD).1
 
 test: build
 	@# prove -e bash test
 	bash test/repos-create.t
 
-install: build uninstall $(GIT_INSTALL_LIB)/lib/
+install: uninstall install-exe
+
+install-all: uninstall install-exe install-doc
+
+install-exe: build $(GIT_INSTALL_LIB)/lib/
 	cp $(CMD) $(GIT_INSTALL_LIB)/
 	cp lib/core.bash $(GIT_INSTALL_LIB)/lib/core.bash
 	cp lib/json.bash $(GIT_INSTALL_LIB)/lib/json.bash
+
+install-doc: build-doc
+	cp $(CMD).1 $(MAN1DIR)/
 
 uninstall:
 	rm -f $(GIT_INSTALL_LIB)/$(CMD)
@@ -49,11 +59,11 @@ $(GIT_INSTALL_LIB)/lib/:
 	mkdir -p $@
 
 clean purge:
-	rm -fr $(CMD) lib $(TMP) /tmp/git-hub-*
+	rm -fr $(CMD) $(CMD).* lib $(TMP) /tmp/$(CMD)-*
 
 ##
 # Build rules:
-git-hub: src/git-hub.bash
+$(CMD): src/$(CMD).bash
 	cp $< $@
 	chmod +x $@
 
@@ -63,6 +73,16 @@ lib/core.bash: src/core.bash lib
 lib/json.bash: ext/JSON.sh/JSON.sh lib
 	cp $< $@
 	chmod -x $@
+
+$(CMD).txt: README.asc
+	cp $< $@
+
+%.1: %.xml
+	xmlto -m doc/manpage-normal.xsl  man $^
+
+%.xml: %.txt
+	asciidoc -b docbook -d manpage -f doc/asciidoc.conf \
+		-agit_version=$(GITVER) $^
 
 lib:
 	mkdir $@

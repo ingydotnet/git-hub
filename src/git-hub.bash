@@ -98,6 +98,19 @@ github-repo-info() {
 	api-get "repos/$user_name/$repo_name"
 }
 
+github-repo-info-success() {
+	for field in ${info_fields:-$(github-repo-info-fields)}; do
+		report-value $field
+	done
+}
+
+github-repo-info-fields() {
+	echo full_name description homepage language
+	echo pushed_at
+	echo url ssh_url
+	echo forks watchers
+}
+
 github-repo-create() {
 	require-value repo-name "$repo"
 	local json=$(json-dump \
@@ -209,8 +222,31 @@ require-value() {
 	local key=$1
 	local var=${key//-/_}
 	fetch-value "$@"
-	[ -n "$(eval echo \$$var)" ] && return
-	die "Can't find value for '$var'"
+	if [ -z "$(eval echo \$$var)" ]; then
+		[ "$var" = "api_token" ] && die_need_api_token
+		die "Can't find value for '$var'"
+	fi
+	true
+}
+
+die_need_api_token() {
+	cat <<eos
+
+Can't determine your API Access Token. Usually this means you haven't set up
+your ~/.githubconfig file yet.
+
+First go to https://github.com/settings/applications and retrieve or create a
+Personal API Access Token. This is a 40 digit hexadecimal character string.
+
+Next, run these commands:
+
+	git hub config api-token <your-personal-api-access-token>
+	git hub config user-name <your-github-login-id>
+
+Now you should be set up to run most commands. Some commands require that you
+add certain 'scopes' to your token.
+eos
+	die
 }
 
 # Usage: fetch-value variable-name "possible-user-value"
@@ -228,6 +264,7 @@ fetch-value() {
 	[ -n "$(eval echo \$$var)" ] && return
 	eval $var=$(git config --file=$config_file github.$key || echo '')
 	[ -n "$(eval echo \$$var)" ] && return
+	true
 }
 
 #------------------------------------------------------------------------------
@@ -267,6 +304,8 @@ report-value() {
 	local label=$(eval echo \$label_$1)
 	if [ -z "$label" ]; then
 		label=$(echo "$1" | tr '_' ' ')
+		label=${label//ssh/SSH}
+		label=${label//url/URL}
 		label=$(for word in $label; do title=`echo "${word:0:1}" | tr a-z A-Z`${word:1}; echo -n "$title "; done)
 	fi
 	if [ -n "$label" -a -n "$value" ]; then
@@ -335,11 +374,13 @@ get-options() {
     command="$1"; shift
 	[ "$command" = "user" ] && command="user-info"
 	[ "$command" = "repo" ] && command="repo-info"
+	[ "$command" = "repos" ] && command="repo-list"
 
 	case "$command" in
 		auth-list) ;;
 		repo-info|repo-create|repo-delete)
 			[ $# -gt 0 ] && repo="$1" && shift
+			[[ $repo =~ "/" ]] && user-repo ${repo/\// }
 			;;
 		repo-list)
 			[ $# -gt 0 ] && user_name="$1" && shift
@@ -354,7 +395,6 @@ get-options() {
 			[ $# -gt 0 ] && config_value="$1" && shift
 			;;
 		collab-add)
-			[ $# -gt 0 ] && repo="$1" && shift
 			[ $# -gt 0 ] && collab="$1" && shift
 			;;
 		*) die "Unknown 'git hub' command: '$command'"
@@ -382,6 +422,11 @@ setup-env() {
 		say '*** NOTE: This is a dry run only. ***'
 	true
     # require_work_tree
+}
+
+user-repo() {
+	user=$1
+	repo=$2
 }
 
 #------------------------------------------------------------------------------
