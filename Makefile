@@ -1,4 +1,4 @@
-.PHONY: default help build build-doc test install install-all install-exe install-doc
+.PHONY: default help build build-doc doc test install install-all install-exe install-doc
 
 ##
 # Make sure we have 'git' and it works OK.
@@ -32,7 +32,7 @@ help:
 	@echo 'clean      Remove build/test files'
 
 build: $(CMD) lib/core.bash lib/json.bash
-build-doc: $(CMD).1
+build-doc doc: $(CMD).1
 
 test: build
 	@# prove -e bash test
@@ -48,7 +48,8 @@ install-exe: build $(GIT_INSTALL_LIB)/lib/
 	cp lib/json.bash $(GIT_INSTALL_LIB)/lib/json.bash
 
 install-doc: build-doc
-	cp $(CMD).1 $(MAN1DIR)/
+	install -c -d -m 0755 $(MAN1DIR)
+	install -c -m 0644 $(CMD).1 $(MAN1DIR)
 
 uninstall:
 	rm -f $(GIT_INSTALL_LIB)/$(CMD)

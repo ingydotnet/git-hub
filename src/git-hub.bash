@@ -21,8 +21,6 @@ See 'git help hub' for complete documentation and usage of each command.
 Options:
 --
 user=       GitHub user name
-owner=      GitHub user who owns a repository
-org=        GitHub organization name
 repo=       GitHub repository name
 token=      GitHub v3 API Authentication Token
 c,count=    Number of items to process
@@ -351,8 +349,6 @@ get-options() {
 		case "$option" in
 			-h) usage ;;
 			--user) user="$1"; shift ;;
-			--owner) owner="$1"; shift ;;
-			--org) org="$1"; shift ;;
 			--repo) repo="$1"; shift ;;
 			--token) token="$1"; shift ;;
 			-c)	list_count=$1; shift ;;
