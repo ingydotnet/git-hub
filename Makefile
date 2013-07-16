@@ -10,7 +10,7 @@ GIT_INSTALL_LIB ?= $(shell git --exec-path)
 ifeq ($(GIT_INSTALL_LIB),)
     $(error Cannot determine location of git commands)
 endif
-MAN1DIR ?= /usr/local/share/man/man1/
+MAN1DIR ?= /usr/local/share/man/man1
 GITVER ?= $(word 3,$(shell git --version))
 
 ##
@@ -78,7 +78,7 @@ $(CMD).txt: README.asc
 	cp $< $@
 
 %.1: %.xml
-	xmlto -m doc/manpage-normal.xsl  man $^
+	xmlto -m doc/manpage-normal.xsl man $^
 
 %.xml: %.txt
 	asciidoc -b docbook -d manpage -f doc/asciidoc.conf \
