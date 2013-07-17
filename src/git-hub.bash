@@ -45,7 +45,7 @@ main() {
 
 	github-"$command"
 	[ -n "$show_output" ] && cat $GIT_HUB_OUTPUT
-	[ -s $GIT_HUB_OUTPUT ] && json-load-cache "$(cat $GIT_HUB_OUTPUT)"
+	[ -s $GIT_HUB_OUTPUT ] && json-load-cache "$(< $GIT_HUB_OUTPUT)"
 	[ -n "$show_json" ] && echo "$json_load_data_cache"
 
 	if OK; then
@@ -229,11 +229,11 @@ api-repeat() {
 get-next-page() {
     local callback=$1
 	regexp='Link: <(https:.+?)>; rel="next"'
-	[[ "$(cat $GIT_HUB_HEADER)" =~ $regexp ]] || return
+	[[ "$(< $GIT_HUB_HEADER)" =~ $regexp ]] || return
 	local link=${BASH_REMATCH[1]}
 	api-get "$link"
 	if OK; then
-		json-load-cache "$(cat $GIT_HUB_OUTPUT)"
+		json-load-cache "$(< $GIT_HUB_OUTPUT)"
 		$callback
 	fi
 }
@@ -376,10 +376,16 @@ get-options() {
 			--repo) repo="$1"; shift ;;
 			--token) token="$1"; shift ;;
 			-c)	list_count=$1; shift ;;
-			-d) dry_run="1" ;;
+			-d) dry_run="1"
+				GIT_VERBOSE="1"
+				;;
 			-T) show_token="1" ;;
-			-q) GIT_QUIET=1 ;;
-			-v) GIT_VERBOSE="1" ;;
+			-q) GIT_QUIET="1"
+				GIT_VERBOSE=
+				;;
+			-v) GIT_VERBOSE="1"
+				GIT_QUIET=
+				;;
 			--) break ;;
 			# Dev options:
 			-x) set -x ;;
