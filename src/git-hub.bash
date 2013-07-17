@@ -11,8 +11,8 @@ git hub <command> <options> <arguments>
 
 Commands:
   auth-list, auth-info, auth-create, auth-update, auth-delete
-  repo-list, repo-info, repo-create, repo-delete
-  user, user-info, user-update
+  repo-list, repo-info, repo-create, repo-delete, repo-get, repo-set
+  user, user-info, user-update, user-get, user-set
   collab-add, collab-remove
   config
 
@@ -71,23 +71,29 @@ github-auth-list() {
 }
 
 github-repo-list() {
-	local options='sort=pushed'
+	page_size=100
+	per_page=$list_count
+	[ $per_page -gt $page_size ] && per_page=$page_size
+	local options="sort=pushed;per_page=$per_page"
 	if [ -n "$user_name" ]; then
 		api-get "users/$user_name/repos?$options"
 	else
 		api-get "user/repos?$options"
 	fi
+	counter=1
 }
 
 github-repo-list-success() {
-	for ((i=0; i < $list_count; i++)); do
-		name=$(json-get "/$i/name")
-		pushed=$(json-get "/$i/pushed_at")
+	for ((ii=0; ii < $page_size; ii++)); do
+		[ $counter -le $list_count ] || return
+		name=$(json-get "/$ii/full_name")
+		pushed=$(json-get "/$ii/pushed_at")
 		pushed=${pushed/T*/}
-		desc=$(json-get "/$i/description")
+		desc=$(json-get "/$ii/description")
 		[ -z "$name" ] && break
-		printf "%3d) (%s)  %-30s %s\n" $(($i+1)) $pushed $name "$desc"
+		printf "%3d) (%s)  %-30s %s\n" $((counter++)) $pushed $name "$desc"
 	done
+	get-next-page github-repo-list-success
 }
 
 github-repo-info() {
@@ -173,14 +179,15 @@ api-call() {
 	local action=$1
 	local url=$2
 	local data=$3
+	local regex="^https?:"
+	[[ "$url" =~ $regex ]] || url="$GIT_HUB_API_URI/$url"
 	[ -n "$data" ] && data="-d $data"
 	if [ $GIT_VERBOSE ]; then
 		local token=$([ -n "$show_token" ] && echo "$api_token" || echo '********')
-		say "curl -s -S -X$action -H \"Authorization: token $token\" $GIT_HUB_API_URI/$url $data -D \"$GIT_HUB_HEADER\" > $GIT_HUB_OUTPUT 2> $GIT_HUB_ERROR"
+		say "curl -s -S -X$action -H \"Authorization: token $token\" $url $data -D \"$GIT_HUB_HEADER\" > $GIT_HUB_OUTPUT 2> $GIT_HUB_ERROR"
 	fi
 	[ -n "$dry_run" ] && exit 0
-	curl -s -S -X$action -H "Authorization: token $api_token" \
-		$GIT_HUB_API_URI/$url $data \
+	curl -s -S -X$action -H "Authorization: token $api_token" $url $data \
 		-D "$GIT_HUB_HEADER" > $GIT_HUB_OUTPUT 2> $GIT_HUB_ERROR
 	check-api-call-status $?
 }
@@ -214,6 +221,18 @@ api-repeat() {
 }
 
 #------------------------------------------------------------------------------
+get-next-page() {
+    local callback=$1
+	regexp='Link: <(https:.+?)>; rel="next"'
+	[[ "$(cat $GIT_HUB_HEADER)" =~ $regexp ]] || return
+	local link=${BASH_REMATCH[1]}
+	api-get "$link"
+	if OK; then
+		json-load-cache "$(cat $GIT_HUB_OUTPUT)"
+		$callback
+	fi
+}
+
 # Usage: require-value variable-name "possible-user-value"
 #   Fetch $variable_name or die
 require-value() {
@@ -224,6 +243,24 @@ require-value() {
 		[ "$var" = "api_token" ] && die_need_api_token
 		die "Can't find value for '$var'"
 	fi
+	true
+}
+
+# Usage: fetch-value variable-name "possible-user-value"
+#   Sets $variable_name to the first of:
+#   - possible-user-value
+#   - $GIT_HUB_VARIABLE_NAME
+#   - git config github.variable-name
+fetch-value() {
+	local key=$1
+	local var=${key//-/_}
+	local env=GIT_HUB_$(echo $var | tr 'a-z' 'A-Z')
+	eval $var="$2"
+	[ -n "$(eval echo \$$var)" ] && return
+	eval $var=\"\$$env\"
+	[ -n "$(eval echo \$$var)" ] && return
+	eval $var=$(git config --file=$config_file github.$key || echo '')
+	[ -n "$(eval echo \$$var)" ] && return
 	true
 }
 
@@ -245,24 +282,6 @@ Now you should be set up to run most commands. Some commands require that you
 add certain 'scopes' to your token.
 eos
 	die
-}
-
-# Usage: fetch-value variable-name "possible-user-value"
-#   Sets $variable_name to the first of:
-#   - possible-user-value
-#   - $GIT_HUB_VARIABLE_NAME
-#   - git config github.variable-name
-fetch-value() {
-	local key=$1
-	local var=${key//-/_}
-	local env=GIT_HUB_$(echo $var | tr 'a-z' 'A-Z')
-	eval $var="$2"
-	[ -n "$(eval echo \$$var)" ] && return
-	eval $var=\"\$$env\"
-	[ -n "$(eval echo \$$var)" ] && return
-	eval $var=$(git config --file=$config_file github.$key || echo '')
-	[ -n "$(eval echo \$$var)" ] && return
-	true
 }
 
 #------------------------------------------------------------------------------

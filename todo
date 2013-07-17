@@ -1,8 +1,14 @@
-- Install man page like git-subtree
+- Add --user-agent=git-hub-v0.0.1
+- Actions to support
+  - followers
+  - following
+
 - Add bash-tap support
 - Detect config
 
 
++ Get more pages for lists
++ Install man page like git-subtree
 + Add json.sh support
 + Add success and failure functions
 + parse json with JSON.sh
