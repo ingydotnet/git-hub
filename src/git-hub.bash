@@ -10,11 +10,11 @@ OPTIONS_SPEC="\
 git hub <command> <options> <arguments>
 
 Commands:
-  auth-list, auth-info, auth-create, auth-update, auth-delete
-  repo-list, repo-info, repo-create, repo-delete, repo-get, repo-set
-  user, user-info, user-update, user-get, user-set
-  collab-add, collab-remove
   config
+  user, user-info, user-get, user-set
+  repo-list, repo-info, repo-create, repo-delete, repo-get, repo-set
+  collab-add, collab-remove
+  auth-list, auth-info, auth-create, auth-update, auth-delete
 
 See 'git help hub' for complete documentation and usage of each command.
 
@@ -31,10 +31,11 @@ v,verbose   Show verbose output
 d,dryrun    Don't run the API command
 T           Show API token in the verbose output
 
-x           dev - Turn on Bash trace output
-R           dev - Repeat last command without contacting server
 O           dev - Show response output
+H			dev - Show reponse headers
 J           dev - Show parsed JSON response
+x           dev - Turn on Bash trace (set -x) output
+R           dev - Repeat last command without contacting server
 "
 
 main() {
@@ -65,9 +66,39 @@ main() {
 }
 
 #------------------------------------------------------------------------------
-github-auth-list() {
-	api-get 'authorizations'
-	cat $GIT_HUB_OUTPUT
+github-config() {
+	if [ -z "$config_key" ]; then
+		cat $config_file
+	elif [ -z "$config_value" ]; then
+		git config -f $config_file github.$config_key
+	else
+		git config -f $config_file github.$config_key "$config_value"
+	fi
+	OK=$?
+}
+
+github-user-info() {
+	require-value user-name "$user"
+	api-get "users/$user_name"
+}
+
+github-user-info-success() {
+	for field in \
+		login type name email blog location company \
+		followers following public_repos public_gists
+	do
+		report-value $field
+	done
+}
+
+github-user-update() {
+	require-value user-name "$user"
+	[ -z "$field_key" ] || die "Field key required"
+	if [ -z "$field_value" ]; then
+		api-get "users/$user_name"
+	else
+		api-patch 'user' $(json-dump $field_key $field_value)
+	fi
 }
 
 github-repo-list() {
@@ -103,24 +134,19 @@ github-repo-info() {
 }
 
 github-repo-info-success() {
-	for field in ${info_fields:-$(github-repo-info-fields)}; do
+	for field in \
+		full_name description homepage language \
+		pushed_at \
+		url ssh_url \
+		forks watchers
+	do
 		report-value $field
 	done
 }
 
-github-repo-info-fields() {
-	echo full_name description homepage language
-	echo pushed_at
-	echo url ssh_url
-	echo forks watchers
-}
-
 github-repo-create() {
 	require-value repo-name "$repo"
-	local json=$(json-dump \
-		'name' $repo_name \
-	)
-	api-post 'user/repos' $json
+	api-post 'user/repos' $(json-dump 'name' $repo_name)
 	message_success="Repository '$repo_name' created."
 	message_422="Repository name '$repo_name' already exists."
 }
@@ -132,22 +158,6 @@ github-repo-delete() {
 	message_success="Repository '$repo_name' deleted"
 }
 
-github-user-info() {
-	require-value user-name "$user"
-	api-get "users/$user_name"
-}
-
-github-user-info-success() {
-	for field in ${info_fields:-$(github-user-info-fields)}; do
-		report-value $field
-	done
-}
-
-github-user-info-fields() {
-	echo login type name email blog location company
-	echo followers following public_repos public_gists
-}
-
 github-collab-add() {
 	require-value repo-name "$repo"
 	require-value user-name "$user"
@@ -156,14 +166,9 @@ github-collab-add() {
 	message_success="Added '$collab_name' as a collaborator to the '$repo_name' repository"
 }
 
-github-config() {
-	if [ -z "$config_key" ]; then
-		cat $config_file
-	elif [ -z "$config_value" ]; then
-		git config -f $config_file github.$config_key
-	else
-		git config -f $config_file github.$config_key "$config_value"
-	fi
+github-auth-list() {
+	api-get 'authorizations'
+	cat $GIT_HUB_OUTPUT
 }
 
 #------------------------------------------------------------------------------
@@ -392,26 +397,28 @@ get-options() {
 	[ "$command" = "repos" ] && command="repo-list"
 
 	case "$command" in
-		auth-list) ;;
-		repo-info|repo-create|repo-delete)
-			[ $# -gt 0 ] && repo="$1" && shift
-			[[ $repo =~ "/" ]] && user-repo ${repo/\// }
-			;;
-		repo-list)
-			[ $# -gt 0 ] && user_name="$1" && shift
-			;;
-		user-info)
-			[ $# -gt 0 ] && user="$1" && shift
-			info_fields="$*"
-			set --
-			;;
 		config)
 			[ $# -gt 0 ] && config_key="$1" && shift
 			[ $# -gt 0 ] && config_value="$1" && shift
 			;;
+		user-info)
+			[ $# -gt 0 ] && user="$1" && shift
+			;;
+		user-field)
+			[ $# -gt 0 ] && field_key="$1" && shift
+			[ $# -gt 0 ] && field_value="$1" && shift
+			;;
+		repo-list)
+			[ $# -gt 0 ] && user_name="$1" && shift
+			;;
+		repo-info|repo-create|repo-delete)
+			[ $# -gt 0 ] && repo="$1" && shift
+			[[ $repo =~ "/" ]] && user-repo ${repo/\// }
+			;;
 		collab-add)
 			[ $# -gt 0 ] && collab="$1" && shift
 			;;
+		auth-list) ;;
 		*) die "Unknown 'git hub' command: '$command'"
 	esac
 	[ $# -gt 0 ] && die "Unknown arguments: $*"
