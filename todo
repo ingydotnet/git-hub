@@ -2,6 +2,7 @@
 - Actions to support
   - followers
   - following
+- switch github-foo-success to success-github-foo
 
 - Add bash-tap support
 - Detect config

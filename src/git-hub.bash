@@ -43,7 +43,9 @@ main() {
 	get-options "$@"
 	setup-env
 
-	github-"$command"
+	! callable github-"$command" &&
+		die "Unknown 'git hub' command: '$command'"
+	github-"$command" "$@"
 	[ -n "$show_output" ] && cat $GIT_HUB_OUTPUT
 	[ -s $GIT_HUB_OUTPUT ] && json-load-cache "$(< $GIT_HUB_OUTPUT)"
 	[ -n "$show_json" ] && echo "$json_load_data_cache"
@@ -66,18 +68,37 @@ main() {
 }
 
 #------------------------------------------------------------------------------
+
+# 	case "$command" in
+# 		repo-list)
+# 			[ $# -gt 0 ] && user_name="$1" && shift
+# 			;;
+# 		repo-info|repo-create|repo-delete)
+# 			[ $# -gt 0 ] && repo="$1" && shift
+# 			[[ $repo =~ "/" ]] && user-repo ${repo/\// }
+# 			;;
+# 		collab-add)
+# 			[ $# -gt 0 ] && collab="$1" && shift
+# 			;;
+# 		auth-list) ;;
+# 		*) die "Unknown 'git hub' command: '$command'"
+# 	esac
+
 github-config() {
+    get-args config_key config_value
 	if [ -z "$config_key" ]; then
 		cat $config_file
 	elif [ -z "$config_value" ]; then
-		git config -f $config_file github.$config_key
+		message_success=$(git config -f $config_file github.$config_key)
 	else
 		git config -f $config_file github.$config_key "$config_value"
+		message_success="$config_key=$config_value"
 	fi
 	OK=$?
 }
 
 github-user-info() {
+    get-args user
 	require-value user-name "$user"
 	api-get "users/$user_name"
 }
@@ -92,13 +113,9 @@ github-user-info-success() {
 }
 
 github-user-update() {
-	require-value user-name "$user"
-	[ -z "$field_key" ] || die "Field key required"
-	if [ -z "$field_value" ]; then
-		api-get "users/$user_name"
-	else
-		api-patch 'user' $(json-dump $field_key $field_value)
-	fi
+	get-args *key_value_pairs
+# 	die "$(json-dump-object-pairs)"
+	api-patch 'user' "$(json-dump-object-pairs)"
 }
 
 github-repo-list() {
@@ -146,7 +163,7 @@ github-repo-info-success() {
 
 github-repo-create() {
 	require-value repo-name "$repo"
-	api-post 'user/repos' $(json-dump 'name' $repo_name)
+	api-post 'user/repos' $(json-dump-object 'name' $repo_name)
 	message_success="Repository '$repo_name' created."
 	message_422="Repository name '$repo_name' already exists."
 }
@@ -175,7 +192,7 @@ github-auth-list() {
 api-get() { api-call GET $*; }
 api-post() { api-call POST $*; }
 api-put() { api-call PUT $*; }
-api-patch() { api-call PATCH $*; }
+api-patch() { api-call PATCH "$1" "$2"; }
 api-delete() { api-call DELETE $*; }
 
 api-call() {
@@ -186,14 +203,14 @@ api-call() {
 	local data=$3
 	local regex="^https?:"
 	[[ "$url" =~ $regex ]] || url="$GIT_HUB_API_URI/$url"
-	[ -n "$data" ] && data="-d $data"
+	local data_args
+	[ -n "$data" ] && data_args=("-d $data")
 	if [ $GIT_VERBOSE ]; then
 		local token=$([ -n "$show_token" ] && echo "$api_token" || echo '********')
-		say "curl -s -S -X$action -H \"Authorization: token $token\" $url $data -D \"$GIT_HUB_HEADER\" > $GIT_HUB_OUTPUT 2> $GIT_HUB_ERROR"
+		say "curl -s -S -X$action -H \"Authorization: token $token\" $url "${data_args[@]}" -D \"$GIT_HUB_HEADER\" > $GIT_HUB_OUTPUT 2> $GIT_HUB_ERROR"
 	fi
 	[ -n "$dry_run" ] && exit 0
-	curl -s -S -X$action -H "Authorization: token $api_token" $url $data \
-		-D "$GIT_HUB_HEADER" > $GIT_HUB_OUTPUT 2> $GIT_HUB_ERROR
+	curl -s -S -X$action -H "Authorization: token $api_token" $url "${data_args[@]}" -D "$GIT_HUB_HEADER" > $GIT_HUB_OUTPUT 2> $GIT_HUB_ERROR
 	check-api-call-status $?
 }
 
@@ -226,6 +243,27 @@ api-repeat() {
 }
 
 #------------------------------------------------------------------------------
+get-args() {
+	local slurp_index=0
+    local slurp_re='^\*'
+	for arg in "${command_arguments[@]}"; do
+		if [ $slurp_index -gt 0 ]; then
+			eval ${1/\*/}[$slurp_index]=\"$arg\"
+			: $((slurp_index++))
+		elif [ $# -gt 0 ]; then
+			if [[ $1 =~ $slurp_re ]]; then
+				eval ${1/\*/}[$slurp_index]=\"$arg\"
+				: $((slurp_index++))
+			else
+				eval $1="$arg"
+				shift
+			fi
+		else
+			die "Unknown argument: $arg"
+		fi
+	done
+}
+
 get-next-page() {
     local callback=$1
 	regexp='Link: <(https:.+?)>; rel="next"'
@@ -290,13 +328,27 @@ eos
 }
 
 #------------------------------------------------------------------------------
-# Format a JSON string from an input list of key/value pairs.
-json-dump() {
+# Format a JSON object from an input list of key/value pairs.
+json-dump-object() {
 	local json='{'
 	while [ $# -gt 0 ]; do
 		json="$json\"$1\":\"$2\""
 		shift; shift
 		if [ $# -gt 0 ]; then
+			json="$json,"
+		fi
+	done
+	json="$json}"
+	echo $json
+}
+
+# Format a JSON object from an array.
+json-dump-object-pairs() {
+	local json='{'
+	for ((i = 0; i < ${#key_value_pairs[@]}; i = i+2)); do
+		local value=${key_value_pairs[$((i+1))]}
+		json="$json\"${key_value_pairs[$i]}\":\"$value\""
+		if [ $((${#key_value_pairs[@]} - $i)) -gt 2 ]; then
 			json="$json,"
 		fi
 	done
@@ -366,32 +418,35 @@ get-options() {
 	[ $# -eq 0 ] && set -- --help
 	NONGIT_OK=1 source git-sh-setup
 
-	GIT_QUIET=; GIT_VERBOSE=;
-	user=; repo=; dry_run=; show_token=; list_count=10
+	user=; repo=; token=; list_count=10
+	GIT_QUIET=; GIT_VERBOSE=; show_token=
+	user=; repo=; dry_run=;
 	while [ $# -gt 0 ]; do
 		local option="$1"; shift
 		case "$option" in
-			-h) usage ;;
 			--user) user="$1"; shift ;;
 			--repo) repo="$1"; shift ;;
 			--token) token="$1"; shift ;;
 			-c)	list_count=$1; shift ;;
-			-d) dry_run="1"
-				GIT_VERBOSE="1"
-				;;
-			-T) show_token="1" ;;
+
+			-h) usage ;;
 			-q) GIT_QUIET="1"
 				GIT_VERBOSE=
 				;;
 			-v) GIT_VERBOSE="1"
 				GIT_QUIET=
 				;;
+			-d) dry_run="1" ;;
+			-T) show_token="1" ;;
+
 			--) break ;;
+
 			# Dev options:
+			-O) show_output="1" ;;
+			-H) show_headers="1" ;;
+			-J) show_json="1" ;;
 			-x) set -x ;;
 			-R) repeat_command="1" ;;
-			-O) show_output="1" ;;
-			-J) show_json="1" ;;
 
 			*) die "Unexpected option: $option" ;;
 		esac
@@ -402,32 +457,11 @@ get-options() {
 	[ "$command" = "repo" ] && command="repo-info"
 	[ "$command" = "repos" ] && command="repo-list"
 
-	case "$command" in
-		config)
-			[ $# -gt 0 ] && config_key="$1" && shift
-			[ $# -gt 0 ] && config_value="$1" && shift
-			;;
-		user-info)
-			[ $# -gt 0 ] && user="$1" && shift
-			;;
-		user-field)
-			[ $# -gt 0 ] && field_key="$1" && shift
-			[ $# -gt 0 ] && field_value="$1" && shift
-			;;
-		repo-list)
-			[ $# -gt 0 ] && user_name="$1" && shift
-			;;
-		repo-info|repo-create|repo-delete)
-			[ $# -gt 0 ] && repo="$1" && shift
-			[[ $repo =~ "/" ]] && user-repo ${repo/\// }
-			;;
-		collab-add)
-			[ $# -gt 0 ] && collab="$1" && shift
-			;;
-		auth-list) ;;
-		*) die "Unknown 'git hub' command: '$command'"
-	esac
-	[ $# -gt 0 ] && die "Unknown arguments: $*"
+	# TODO find better idiom than 'eval'
+	for ((i = 0; i < $#; i++)); do
+		eval command_arguments[$i]=\$$((i+1))
+	done
+
 	true
 }
 
