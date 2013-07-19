@@ -36,7 +36,8 @@ build-doc doc: $(CMD).1
 
 test: build
 	@# prove -e bash test
-	bash test/repos-create.t
+	@#bash test/repos-create.t
+	bash test/all_commands.t
 
 install: uninstall install-exe
 

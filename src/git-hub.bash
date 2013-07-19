@@ -11,10 +11,14 @@ git hub <command> <options> <arguments>
 
 Commands:
   config
-  user, user-info, user-get, user-set
-  repo-list, repo-info, repo-create, repo-delete, repo-get, repo-set
-  collab-add, collab-remove
-  auth-list, auth-info, auth-create, auth-update, auth-delete
+  user-info, user-update
+  repo-list, repo-info, repo-create, repo-edit, repo-delete
+  collab-list, collab-add, collab-remove
+
+Aliases:
+  user == user-info
+  repos == repo-list
+  repo == repo-info
 
 See 'git help hub' for complete documentation and usage of each command.
 
@@ -30,14 +34,15 @@ q,quiet     Show minimal output
 v,verbose   Show verbose output
 d,dryrun    Don't run the API command
 T           Show API token in the verbose output
-
+ 
 O           dev - Show response output
-H			dev - Show reponse headers
+H           dev - Show reponse headers
 J           dev - Show parsed JSON response
 x           dev - Turn on Bash trace (set -x) output
 R           dev - Repeat last command without contacting server
 "
 
+#------------------------------------------------------------------------------
 main() {
 	assert-env
 	get-options "$@"
@@ -46,44 +51,36 @@ main() {
 	! callable github-"$command" &&
 		die "Unknown 'git hub' command: '$command'"
 	github-"$command" "$@"
+	[ -n "$show_headers" ] && cat $GIT_HUB_HEADER
 	[ -n "$show_output" ] && cat $GIT_HUB_OUTPUT
 	[ -s $GIT_HUB_OUTPUT ] && json-load-cache "$(< $GIT_HUB_OUTPUT)"
 	[ -n "$show_json" ] && echo "$json_load_data_cache"
 
 	if OK; then
-		if callable "github-$command-success"; then
-			"github-$command-success"
+		if callable "success-github-$command"; then
+			"success-github-$command"
 		else
-			say ${message_success:="'git hub $command' successful"}
+			say ${message_success:-"'git hub $command' successful"}
 		fi
-	elif [ -n "$status_code" ] && callable "github-$command-$status_code"; then
-		"github-$command-$status_code"
+		exit 0
+	elif [ -n "$status_code" ] && callable "status-$status_code-github-$command"; then
+		"status-$status_code-github-$command"
+		exit 1
 	elif [ -n "$(eval "echo \$message_$status_code")" ]; then
 		say $(eval "echo \$message_$status_code")
-	elif callable "github-$command-failure"; then
-		"github-$command-failure"
+		exit 1
+	elif callable "failure-github-$command"; then
+		"failure-github-$command"
+		exit 1
 	else
 		say ${message_failure:="'git hub $command' failed: $status_code $ERROR"}
+		exit 1
 	fi
 }
 
 #------------------------------------------------------------------------------
-
-# 	case "$command" in
-# 		repo-list)
-# 			[ $# -gt 0 ] && user_name="$1" && shift
-# 			;;
-# 		repo-info|repo-create|repo-delete)
-# 			[ $# -gt 0 ] && repo="$1" && shift
-# 			[[ $repo =~ "/" ]] && user-repo ${repo/\// }
-# 			;;
-# 		collab-add)
-# 			[ $# -gt 0 ] && collab="$1" && shift
-# 			;;
-# 		auth-list) ;;
-# 		*) die "Unknown 'git hub' command: '$command'"
-# 	esac
-
+# `git hub` command functions:
+#------------------------------------------------------------------------------
 github-config() {
     get-args config_key config_value
 	if [ -z "$config_key" ]; then
@@ -100,10 +97,10 @@ github-config() {
 github-user-info() {
     get-args user
 	require-value user-name "$user"
-	api-get "users/$user_name"
+	api-get "/users/$user_name"
 }
 
-github-user-info-success() {
+success-github-user-info() {
 	for field in \
 		login type name email blog location company \
 		followers following public_repos public_gists
@@ -114,26 +111,22 @@ github-user-info-success() {
 
 github-user-update() {
 	get-args *key_value_pairs
-# 	die "$(json-dump-object-pairs)"
-	api-patch 'user' "$(json-dump-object-pairs)"
+	api-patch "/user" "$(json-dump-object-pairs)"
 }
 
 github-repo-list() {
+    get-args user
+	require-value user-name "$user"
 	page_size=100
 	per_page=$list_count
 	[ $per_page -gt $page_size ] && per_page=$page_size
-	local options="sort=pushed;per_page=$per_page"
-	if [ -n "$user_name" ]; then
-		api-get "users/$user_name/repos?$options"
-	else
-		api-get "user/repos?$options"
-	fi
+	api-get "/users/$user_name/repos?sort=pushed;per_page=$per_page"
 	counter=1
 }
 
-github-repo-list-success() {
+success-github-repo-list() {
 	for ((ii=0; ii < $page_size; ii++)); do
-		[ $counter -le $list_count ] || return
+		[ $counter -le $list_count ] || return 0
 		name=$(json-get "/$ii/full_name")
 		pushed=$(json-get "/$ii/pushed_at")
 		pushed=${pushed/T*/}
@@ -141,16 +134,20 @@ github-repo-list-success() {
 		[ -z "$name" ] && break
 		printf "%3d) (%s)  %-30s %s\n" $((counter++)) $pushed $name "$desc"
 	done
-	get-next-page github-repo-list-success
+	if [ $ii -ge $page_size ]; then
+		get-next-page success-github-repo-list
+	fi
 }
 
 github-repo-info() {
+	get-args repo
+	check-user-repo "$repo"
 	require-value repo-name "$repo"
 	require-value user-name "$user"
-	api-get "repos/$user_name/$repo_name"
+	api-get "/repos/$user_name/$repo_name"
 }
 
-github-repo-info-success() {
+success-github-repo-info() {
 	for field in \
 		full_name description homepage language \
 		pushed_at \
@@ -162,38 +159,79 @@ github-repo-info-success() {
 }
 
 github-repo-create() {
+	get-args repo
 	require-value repo-name "$repo"
-	api-post 'user/repos' $(json-dump-object 'name' $repo_name)
+	api-post "/user/repos" $(json-dump-object 'name' $repo_name)
 	message_success="Repository '$repo_name' created."
 	message_422="Repository name '$repo_name' already exists."
 }
 
-github-repo-delete() {
+github-repo-edit() {
+	get-args *key_value_pairs
 	require-value repo-name "$repo"
 	require-value user-name "$user"
-	api-delete "repos/$user_name/$repo_name"
+	key_value_pairs+=(name "$repo_name")
+	api-patch "/repos/$user_name/$repo_name" "$(json-dump-object-pairs)"
+}
+
+github-repo-delete() {
+	get-args repo
+	check-user-repo "$repo"
+	require-value repo-name "$repo"
+	require-value user-name "$user"
+	api-delete "/repos/$user_name/$repo_name"
 	message_success="Repository '$repo_name' deleted"
 }
 
-github-collab-add() {
+github-collab-list() {
+	get-args user-repo
 	require-value repo-name "$repo"
 	require-value user-name "$user"
-	require-value collab-name "$collab"
-	api-put "repos/$user_name/$repo_name/collabs/$collab_name"
-	message_success="Added '$collab_name' as a collaborator to the '$repo_name' repository"
+	page_size=100
+	per_page=$list_count
+	[ $per_page -gt $page_size ] && per_page=$page_size
+	api-get "/repos/$user_name/$repo_name/collaborators?per_page=$per_page"
+	counter=1
 }
 
-github-auth-list() {
-	api-get 'authorizations'
-	cat $GIT_HUB_OUTPUT
+success-github-collab-list() {
+	for ((ii=0; ii < $page_size; ii++)); do
+		[ $counter -le $list_count ] || return 0
+		name=$(json-get "/$ii/login")
+		[ -z "$name" ] && break
+		printf "%3d) %s\n" $((counter++)) $name
+	done
+	if [ $ii -ge $page_size ]; then
+		get-next-page success-github-collab-list
+	fi
 }
 
+github-collab-add() {
+	say "*** NOTE *** Can't get collab-add working yet. Patches welcome."
+	get-args user-repo *collaborators
+	require-value repo-name "$repo"
+	require-value user-name "$user"
+	for collab_name in ${collaborators[@]}; do
+		api-put "/repos/$user_name/$repo_name/collaborators/$collab_name"
+	done
+}
+
+github-collab-remove() {
+	get-args user-repo *collaborators
+	require-value repo-name "$repo"
+	require-value user-name "$user"
+	for collab_name in ${collaborators[@]}; do
+		api-delete "/repos/$user_name/$repo_name/collaborators/$collab_name"
+	done
+}
 #------------------------------------------------------------------------------
-api-get() { api-call GET $*; }
-api-post() { api-call POST $*; }
-api-put() { api-call PUT $*; }
+# API calling functions:
+#------------------------------------------------------------------------------
+api-get() { api-call GET "$1" "$2"; }
+api-post() { api-call POST "$1" "$2"; }
+api-put() { api-call PUT "$1" "$2"; }
 api-patch() { api-call PATCH "$1" "$2"; }
-api-delete() { api-call DELETE $*; }
+api-delete() { api-call DELETE "$1" "$2"; }
 
 api-call() {
 	[ -n "$repeat_command" ] && api-repeat && return
@@ -202,12 +240,14 @@ api-call() {
 	local url=$2
 	local data=$3
 	local regex="^https?:"
-	[[ "$url" =~ $regex ]] || url="$GIT_HUB_API_URI/$url"
-	local data_args
-	[ -n "$data" ] && data_args=("-d $data")
+	[[ "$url" =~ $regex ]] || url="$GIT_HUB_API_URI$url"
+	# Need to use an array here to preserve whitespace in the JSON.
+	[ -n "$data" ] && local data_args=(-d "$data")
+	# TODO Figure out how to only specify this complicated command once.
+	# The command is very delicate so need tests in place first.
 	if [ $GIT_VERBOSE ]; then
 		local token=$([ -n "$show_token" ] && echo "$api_token" || echo '********')
-		say "curl -s -S -X$action -H \"Authorization: token $token\" $url "${data_args[@]}" -D \"$GIT_HUB_HEADER\" > $GIT_HUB_OUTPUT 2> $GIT_HUB_ERROR"
+		say "  curl -s -S -X$action -H \"Authorization: token $token\" $url $(echo "${data_args[@]}") -D \"$GIT_HUB_HEADER\" > $GIT_HUB_OUTPUT 2> $GIT_HUB_ERROR"
 	fi
 	[ -n "$dry_run" ] && exit 0
 	curl -s -S -X$action -H "Authorization: token $api_token" $url "${data_args[@]}" -D "$GIT_HUB_HEADER" > $GIT_HUB_OUTPUT 2> $GIT_HUB_ERROR
@@ -243,9 +283,19 @@ api-repeat() {
 }
 
 #------------------------------------------------------------------------------
+# Argument parsing functions:
+#------------------------------------------------------------------------------
 get-args() {
 	local slurp_index=0
     local slurp_re='^\*'
+	local user_repo_re='/'
+	if [[ "$1" = "user-repo" ]]; then
+		if [[ ${command_arguments[0]} =~ $user_repo_re ]]; then
+			check-user-repo ${command_arguments[0]}
+			unset command_arguments[0]
+		fi
+		shift
+	fi
 	for arg in "${command_arguments[@]}"; do
 		if [ $slurp_index -gt 0 ]; then
 			eval ${1/\*/}[$slurp_index]=\"$arg\"
@@ -262,6 +312,16 @@ get-args() {
 			die "Unknown argument: $arg"
 		fi
 	done
+}
+
+check-user-repo() {
+	[[ $1 =~ "/" ]] && user-repo ${1/\// }
+	true
+}
+
+user-repo() {
+	user=$1
+	repo=$2
 }
 
 get-next-page() {
@@ -298,15 +358,36 @@ fetch-value() {
 	local key=$1
 	local var=${key//-/_}
 	local env=GIT_HUB_$(echo $var | tr 'a-z' 'A-Z')
+
+	[ -n "$(eval echo \$$var)" ] && return
 	eval $var="$2"
 	[ -n "$(eval echo \$$var)" ] && return
 	eval $var=\"\$$env\"
 	[ -n "$(eval echo \$$var)" ] && return
+	if [ "$var" = "repo_name" -o "$var" = "user_name" ]; then
+		if [ -f ".git/config" ]; then
+			url=$(git config --file=.git/config remote.origin.url)
+			if [ -n "$url" ]; then
+				local re1='github\.com'
+				if [[ "$url" =~ $re1 ]]; then
+					local re2='^.*[:/](.*)/(.*)\.git$'
+					if [[ "$url" =~ $re2 ]]; then
+						: ${user_name:="${BASH_REMATCH[1]}"}
+						: ${repo_name:="${BASH_REMATCH[2]}"}
+						return
+					fi
+				fi
+			fi
+		fi
+	fi
 	eval $var=$(git config --file=$config_file github.$key || echo '')
 	[ -n "$(eval echo \$$var)" ] && return
 	true
 }
 
+#------------------------------------------------------------------------------
+# Detailed error messages:
+#------------------------------------------------------------------------------
 die_need_api_token() {
 	cat <<eos
 
@@ -323,10 +404,13 @@ Next, run these commands:
 
 Now you should be set up to run most commands. Some commands require that you
 add certain 'scopes' to your token.
+
 eos
 	die
 }
 
+#------------------------------------------------------------------------------
+# JSON support functions:
 #------------------------------------------------------------------------------
 # Format a JSON object from an input list of key/value pairs.
 json-dump-object() {
@@ -373,6 +457,8 @@ json-get() {
 }
 
 #------------------------------------------------------------------------------
+# Report formatting functions:
+#------------------------------------------------------------------------------
 report-value() {
 	local value=$(json-get "/$1")
 	local label=$(eval echo \$label_$1)
@@ -392,13 +478,15 @@ label_email='Email Address'
 label_blog='Web Site'
 
 #------------------------------------------------------------------------------
+# Initial setup functions:
+#------------------------------------------------------------------------------
 assert-env() {
 	GIT_CORE_PATH=$(git --exec-path) || exit $?
 	PATH=$GIT_CORE_PATH:$PATH
 
 	: ${GIT_HUB_API_URI:=https://api.github.com}
-	GIT_HUB_TMP=/tmp
-	GIT_HUB_TMP_PREFIX=$GIT_HUB_TMP/git-hub
+	: ${GIT_HUB_TMP_DIR:=/tmp}
+	GIT_HUB_TMP_PREFIX=$GIT_HUB_TMP_DIR/git-hub
 	GIT_HUB_INPUT=$GIT_HUB_TMP_PREFIX-in-$$
 	GIT_HUB_OUTPUT=$GIT_HUB_TMP_PREFIX-out-$$
 	GIT_HUB_ERROR=$GIT_HUB_TMP_PREFIX-err-$$
@@ -453,16 +541,15 @@ get-options() {
 	done
 
     command="$1"; shift
+	# Some common command aliases:
 	[ "$command" = "user" ] && command="user-info"
 	[ "$command" = "repo" ] && command="repo-info"
 	[ "$command" = "repos" ] && command="repo-list"
 
-	# TODO find better idiom than 'eval'
+	# TODO find better idiom than 'eval' to global array
 	for ((i = 0; i < $#; i++)); do
 		eval command_arguments[$i]=\$$((i+1))
 	done
-
-	true
 }
 
 setup-env() {
@@ -486,11 +573,8 @@ setup-env() {
     # require_work_tree
 }
 
-user-repo() {
-	user=$1
-	repo=$2
-}
-
+#------------------------------------------------------------------------------
+# Begin at the end!
 #------------------------------------------------------------------------------
 main "$@"
 
