@@ -253,7 +253,7 @@ api-call() {
 		curl --silent --show-error --request $action
 		--user-agent git-hub-$GIT_HUB_VERSION
 	)
-	command+=(--header "Authentication: token $api_token")
+	command+=(--header "Authorization: token $api_token")
 	command+=(
 		"${auth[@]}"
 		$url
