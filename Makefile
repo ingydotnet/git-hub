@@ -45,7 +45,7 @@ install-all: uninstall install-exe install-doc
 
 install-exe: build $(GIT_INSTALL_LIB)/$(CMD)./
 	cp lib/$(CMD) $(GIT_INSTALL_LIB)/
-	cp lib/$(CMD)./json.bash $(GIT_INSTALL_LIB)/$(CMD)./json.bash
+	cp lib/$(CMD)./* $(GIT_INSTALL_LIB)/$(CMD)./
 
 install-doc: build-doc
 	install -c -d -m 0755 $(MAN1DIR)
