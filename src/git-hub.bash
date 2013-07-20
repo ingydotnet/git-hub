@@ -6,6 +6,8 @@
 
 set -e
 
+GIT_HUB_VERSION=0.0.1
+
 OPTIONS_SPEC="\
 git hub <command> <options> <arguments>
 
@@ -233,24 +235,51 @@ api-put() { api-call PUT "$1" "$2"; }
 api-patch() { api-call PATCH "$1" "$2"; }
 api-delete() { api-call DELETE "$1" "$2"; }
 
+# Build a command to make the HTTP call to the API server, make the call, and
+# check the result.
 api-call() {
 	[ -n "$repeat_command" ] && api-repeat && return
+
 	require-value api-token "$token"
 	local action=$1
 	local url=$2
 	local data=$3
 	local regex="^https?:"
 	[[ "$url" =~ $regex ]] || url="$GIT_HUB_API_URI$url"
-	# Need to use an array here to preserve whitespace in the JSON.
-	[ -n "$data" ] && local data_args=(-d "$data")
-	# TODO Figure out how to only specify this complicated command once.
-	# The command is very delicate so need tests in place first.
+
+	# Build curl command in an array. This is the only way to preserve quoted
+	# whitespace.
+	local command=(
+		curl --silent --show-error --request $action
+		--user-agent git-hub-$GIT_HUB_VERSION
+	)
+	command+=(--header "Authentication: token $api_token")
+	command+=(
+		"${auth[@]}"
+		$url
+	)
+	[ -n "$data" ] && command+=(-d "$data")
+	command+=(
+		--dump-header $GIT_HUB_HEADER
+		--output $GIT_HUB_OUTPUT
+		--stderr $GIT_HUB_ERROR
+	)
+
 	if [ $GIT_VERBOSE ]; then
-		local token=$([ -n "$show_token" ] && echo "$api_token" || echo '********')
-		say "  curl -s -S -X$action -H \"Authorization: token $token\" $url $(echo "${data_args[@]}") -D \"$GIT_HUB_HEADER\" > $GIT_HUB_OUTPUT 2> $GIT_HUB_ERROR"
+		if [ -n "$show_token" ]; then
+			say "${command[@]}"
+		else
+			say "${command[@]/$api_token/********}"
+		fi
 	fi
+
 	[ -n "$dry_run" ] && exit 0
-	curl -s -S -X$action -H "Authorization: token $api_token" $url "${data_args[@]}" -D "$GIT_HUB_HEADER" > $GIT_HUB_OUTPUT 2> $GIT_HUB_ERROR
+
+	# Run the curl command!
+	"${command[@]}"
+	## Use this line for debugging the real command
+	# set -x; "${command[@]}"; set +x
+
 	check-api-call-status $?
 }
 
@@ -552,7 +581,6 @@ get-options() {
 }
 
 setup-env() {
-    source "$GIT_CORE_PATH/lib/core.bash"
     source "$GIT_CORE_PATH/lib/json.bash"
     if [ -n "$repeat_command" ]; then
 		[ -f $GIT_HUB_TMP_PREFIX-out-* ] ||
@@ -570,6 +598,16 @@ setup-env() {
 		say '*** NOTE: This is a dry run only. ***'
 	true
     # require_work_tree
+}
+
+
+#------------------------------------------------------------------------------
+# General purpose functions:
+#------------------------------------------------------------------------------
+
+# Check if a function exists:
+callable() {
+	[ -n "$(type $1 2> /dev/null)" ]
 }
 
 #------------------------------------------------------------------------------

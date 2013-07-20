@@ -31,7 +31,7 @@ help:
 	@echo 'uninstall  Uninstall $(CMD)'
 	@echo 'clean      Remove build/test files'
 
-build: $(CMD) lib/core.bash lib/json.bash
+build: $(CMD) lib/json.bash
 build-doc doc: $(CMD).1
 
 test: build
@@ -45,7 +45,6 @@ install-all: uninstall install-exe install-doc
 
 install-exe: build $(GIT_INSTALL_LIB)/lib/
 	cp $(CMD) $(GIT_INSTALL_LIB)/
-	cp lib/core.bash $(GIT_INSTALL_LIB)/lib/core.bash
 	cp lib/json.bash $(GIT_INSTALL_LIB)/lib/json.bash
 
 install-doc: build-doc
@@ -54,7 +53,6 @@ install-doc: build-doc
 
 uninstall:
 	rm -f $(GIT_INSTALL_LIB)/$(CMD)
-	rm -f $(GIT_INSTALL_LIB)/lib/core.bash
 	rm -f $(GIT_INSTALL_LIB)/lib/json.bash
 
 $(GIT_INSTALL_LIB)/lib/:
@@ -68,9 +66,6 @@ clean purge:
 $(CMD): src/$(CMD).bash
 	cp $< $@
 	chmod +x $@
-
-lib/core.bash: src/core.bash lib
-	cp $< $@
 
 lib/json.bash: ext/JSON.sh/JSON.sh lib
 	cp $< $@
@@ -100,5 +95,4 @@ ext/JSON.sh/JSON.sh:
 # Undocumented dev rules
 install-link: build uninstall $(GIT_INSTALL_LIB)/lib/
 	ln -s $$PWD/$(CMD) $(GIT_INSTALL_LIB)/$(CMD)
-	ln -s $$PWD/lib/core.bash $(GIT_INSTALL_LIB)/lib/core.bash
 	ln -s $$PWD/lib/json.bash $(GIT_INSTALL_LIB)/lib/json.bash
