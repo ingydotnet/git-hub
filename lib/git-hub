@@ -239,19 +239,23 @@ api-call() {
 	local action=$1
 	local url=$2
 	local data=$3
+
+	user_agent=git-hub-$GIT_HUB_VERSION
+	# Cheap trick to make github pretty-print the JSON output.
+	[ -n "$show_output" ] && user_agent="curl-$user_agent"
+
 	local regex="^https?:"
 	[[ "$url" =~ $regex ]] || url="$GIT_HUB_API_URI$url"
 
 	# Build curl command in an array. This is the only way to preserve quoted
 	# whitespace.
 	local command=(
-		curl --silent --show-error --request $action
-	)
-	[ -z "$show_output" ] &&
-		command+=(--user-agent git-hub-$GIT_HUB_VERSION)
-	command+=(--header "Authorization: token $api_token")
-	command+=(
-		"${auth[@]}"
+		curl
+			--silent
+			--show-error
+			--request $action
+			--user-agent $user_agent
+			--header "Authorization: token $api_token"
 		$url
 	)
 	[ -n "$data" ] && command+=(-d "$data")
@@ -532,7 +536,8 @@ get-options() {
 
 	user=; repo=; token=; list_count=10
 	GIT_QUIET=; GIT_VERBOSE=; show_token=
-	user=; repo=; dry_run=;
+	dry_run=; repeat_command=
+	show_output=; show_headers=; show_json=
 	while [ $# -gt 0 ]; do
 		local option="$1"; shift
 		case "$option" in
