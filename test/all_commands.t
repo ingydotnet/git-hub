@@ -21,7 +21,7 @@ git hub repo-create git-hub-api-test
 git hub repo-list
 git hub repo-edit --repo=git-hub-api-test \
     description "This is just a test repo" \
-    url http://example.com
+    homepage http://example.com
 git hub repo-info git-hub-api-test
 git hub repo-delete git-hub-api-test
 git hub collab-list

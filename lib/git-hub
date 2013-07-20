@@ -187,7 +187,7 @@ github-collab-list() {
 	get-args user-repo
 	require-value repo-name "$repo"
 	require-value user-name "$user"
-	page_size=100
+	page_size=30
 	per_page=$list_count
 	[ $per_page -gt $page_size ] && per_page=$page_size
 	api-get "/repos/$user_name/$repo_name/collaborators?per_page=$per_page"
@@ -246,8 +246,9 @@ api-call() {
 	# whitespace.
 	local command=(
 		curl --silent --show-error --request $action
-		--user-agent git-hub-$GIT_HUB_VERSION
 	)
+	[ -z "$show_output" ] &&
+		command+=(--user-agent git-hub-$GIT_HUB_VERSION)
 	command+=(--header "Authorization: token $api_token")
 	command+=(
 		"${auth[@]}"
@@ -569,10 +570,7 @@ get-options() {
 	[ "$command" = "repo" ] && command="repo-info"
 	[ "$command" = "repos" ] && command="repo-list"
 
-	# TODO find better idiom than 'eval' to global array
-	for ((i = 0; i < $#; i++)); do
-		eval command_arguments[$i]=\$$((i+1))
-	done
+	command_arguments=("$@")
 }
 
 setup-env() {
