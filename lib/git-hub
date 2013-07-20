@@ -59,6 +59,7 @@ main() {
 	[ -n "$show_json" ] && echo "$json_load_data_cache"
 
 	if OK; then
+		list_counter=1
 		if callable "success-github-$command"; then
 			"success-github-$command"
 		else
@@ -119,26 +120,23 @@ github-user-update() {
 github-repo-list() {
     get-args user
 	require-value user-name "$user"
-	page_size=100
+	page_size=30
 	per_page=$list_count
 	[ $per_page -gt $page_size ] && per_page=$page_size
 	api-get "/users/$user_name/repos?sort=pushed;per_page=$per_page"
-	counter=1
 }
 
 success-github-repo-list() {
 	for ((ii=0; ii < $page_size; ii++)); do
-		[ $counter -le $list_count ] || return 0
+		[ $list_counter -gt $list_count ] && return 0
 		name=$(json-get "/$ii/full_name")
+		[ -z "$name" ] && return 0
 		pushed=$(json-get "/$ii/pushed_at")
 		pushed=${pushed/T*/}
 		desc=$(json-get "/$ii/description")
-		[ -z "$name" ] && break
-		printf "%3d) (%s)  %-30s %s\n" $((counter++)) $pushed $name "$desc"
+		printf "%3d) (%s)  %-30s %s\n" $((list_counter++)) $pushed $name "$desc"
 	done
-	if [ $ii -ge $page_size ]; then
-		get-next-page success-github-repo-list
-	fi
+	get-next-page success-github-repo-list
 }
 
 github-repo-info() {
@@ -193,19 +191,16 @@ github-collab-list() {
 	per_page=$list_count
 	[ $per_page -gt $page_size ] && per_page=$page_size
 	api-get "/repos/$user_name/$repo_name/collaborators?per_page=$per_page"
-	counter=1
 }
 
 success-github-collab-list() {
 	for ((ii=0; ii < $page_size; ii++)); do
-		[ $counter -le $list_count ] || return 0
+		[ $list_counter -gt $list_count ] && return 0
 		name=$(json-get "/$ii/login")
-		[ -z "$name" ] && break
-		printf "%3d) %s\n" $((counter++)) $name
+		[ -z "$name" ] && return 0
+		printf "%3d) %s\n" $((list_counter++)) $name
 	done
-	if [ $ii -ge $page_size ]; then
-		get-next-page success-github-collab-list
-	fi
+	get-next-page success-github-collab-list
 }
 
 github-collab-add() {

@@ -24,6 +24,7 @@ git hub repo-edit --repo=git-hub-api-test \
     url http://example.com
 git hub repo-info git-hub-api-test
 git hub repo-delete git-hub-api-test
+git hub collab-list
 git hub repo-info
 
 set +x
