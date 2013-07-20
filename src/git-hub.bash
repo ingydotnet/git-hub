@@ -151,7 +151,7 @@ success-github-repo-info() {
 	for field in \
 		full_name description homepage language \
 		pushed_at \
-		url ssh_url \
+		html_url ssh_url \
 		forks watchers
 	do
 		report-value $field
@@ -466,6 +466,7 @@ report-value() {
 		label=$(echo "$1" | tr '_' ' ')
 		label=${label//ssh/SSH}
 		label=${label//url/URL}
+		label=${label//html/HTML}
 		label=$(for word in $label; do title=`echo "${word:0:1}" | tr a-z A-Z`${word:1}; echo -n "$title "; done)
 	fi
 	if [ -n "$label" -a -n "$value" ]; then
@@ -473,8 +474,6 @@ report-value() {
 	fi
 }
 
-label_login='ID'
-label_email='Email Address'
 label_blog='Web Site'
 
 #------------------------------------------------------------------------------
