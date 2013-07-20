@@ -581,7 +581,7 @@ get-options() {
 }
 
 setup-env() {
-    source "$GIT_CORE_PATH/lib/json.bash"
+    source "$GIT_CORE_PATH/git-hub./json.bash"
     if [ -n "$repeat_command" ]; then
 		[ -f $GIT_HUB_TMP_PREFIX-out-* ] ||
 			die "No previous 'git hub' command to repeat"

@@ -1,13 +1,12 @@
-- Add --user-agent=git-hub-v0.0.1
 - Actions to support
   - followers
   - following
-- switch github-foo-success to success-github-foo
-
-- Add bash-tap support
 - Detect config
+- Add bash-tap support
 
 
++ Add --user-agent=git-hub-v0.0.1
++ switch github-foo-success to success-github-foo
 + Get more pages for lists
 + Install man page like git-subtree
 + Add json.sh support

@@ -31,7 +31,7 @@ help:
 	@echo 'uninstall  Uninstall $(CMD)'
 	@echo 'clean      Remove build/test files'
 
-build: $(CMD) lib/json.bash
+build: lib/$(CMD) lib/$(CMD)./json.bash
 build-doc doc: $(CMD).1
 
 test: build
@@ -43,9 +43,9 @@ install: uninstall install-exe
 
 install-all: uninstall install-exe install-doc
 
-install-exe: build $(GIT_INSTALL_LIB)/lib/
-	cp $(CMD) $(GIT_INSTALL_LIB)/
-	cp lib/json.bash $(GIT_INSTALL_LIB)/lib/json.bash
+install-exe: build $(GIT_INSTALL_LIB)/$(CMD)./
+	cp lib/$(CMD) $(GIT_INSTALL_LIB)/
+	cp lib/$(CMD)./json.bash $(GIT_INSTALL_LIB)/$(CMD)./json.bash
 
 install-doc: build-doc
 	install -c -d -m 0755 $(MAN1DIR)
@@ -53,21 +53,17 @@ install-doc: build-doc
 
 uninstall:
 	rm -f $(GIT_INSTALL_LIB)/$(CMD)
-	rm -f $(GIT_INSTALL_LIB)/lib/json.bash
+	rm -fr $(GIT_INSTALL_LIB)/$(CMD).
 
-$(GIT_INSTALL_LIB)/lib/:
+$(GIT_INSTALL_LIB)/$(CMD)./:
 	mkdir -p $@
 
 clean purge:
-	rm -fr $(CMD) $(CMD).* lib $(TMP) /tmp/$(CMD)-*
+	rm -fr lib/$(CMD)./json.bash $(CMD).* $(TMP) /tmp/$(CMD)-*
 
 ##
 # Build rules:
-$(CMD): src/$(CMD).bash
-	cp $< $@
-	chmod +x $@
-
-lib/json.bash: ext/JSON.sh/JSON.sh lib
+lib/$(CMD)./json.bash: ext/JSON.sh/JSON.sh lib/$(CMD).
 	cp $< $@
 	chmod -x $@
 
@@ -81,7 +77,7 @@ $(CMD).txt: README.asc
 	asciidoc -b docbook -d manpage -f doc/asciidoc.conf \
 		-agit_version=$(GITVER) $^
 
-lib:
+lib/$(CMD).:
 	mkdir $@
 
 ext/JSON.sh/JSON.sh:
@@ -93,6 +89,6 @@ ext/JSON.sh/JSON.sh:
 
 ##
 # Undocumented dev rules
-install-link: build uninstall $(GIT_INSTALL_LIB)/lib/
-	ln -s $$PWD/$(CMD) $(GIT_INSTALL_LIB)/$(CMD)
-	ln -s $$PWD/lib/json.bash $(GIT_INSTALL_LIB)/lib/json.bash
+install-link: build uninstall
+	ln -s $$PWD/lib/$(CMD) $(GIT_INSTALL_LIB)/$(CMD)
+	ln -s $$PWD/lib/$(CMD). $(GIT_INSTALL_LIB)/$(CMD).
