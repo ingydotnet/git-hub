@@ -510,10 +510,10 @@ json-prune-cache() {
 }
 
 json-get() {
-	local key="^$1\s"
+	local key="^$1[[:space:]]"
 	local data="$2"
 	[ -z "$data" ] && data="$json_load_data_cache"
-	value=$(echo "$data" | grep -E --max-count=1 $key | cut -f2)
+	value=$(echo "$data" | grep -E --max-count=1 "$key" | cut -f2)
 	if [ "$value" = 'null' ]; then
 		echo ''
 	else
