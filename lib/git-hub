@@ -105,7 +105,7 @@ github-user-info() {
 
 success-github-user-info() {
 	for field in \
-		login type name email blog location company \
+		login type name email blog location company bio \
 		followers following public_repos public_gists
 	do
 		report-value $field
@@ -152,7 +152,7 @@ success-github-repo-info() {
 		full_name description homepage language \
 		pushed_at \
 		html_url ssh_url \
-		forks watchers
+		forks watchers open_issues
 	do
 		report-value $field
 	done
@@ -221,6 +221,36 @@ github-collab-remove() {
 		api-delete "/repos/$user_name/$repo_name/collaborators/$collab_name"
 	done
 }
+
+# github-repo-stars() {
+# 	require-value repo-name "$repo"
+# 	require-value user-name "$user"
+# 	list_count=500
+# 	page_size=30
+# 	per_page=$list_count
+# 	[ $per_page -gt $page_size ] && per_page=$page_size
+# 	api-get "/repos/$user_name/$repo_name/stargazers"
+# }
+# 
+# success-github-repo-stars() {
+# 	for ((ii=0; ii < $page_size; ii++)); do
+# 		[ $list_counter -gt $list_count ] && break
+# 		name=$(json-get "/$ii/login")
+# 		[ -z "$name" ] && break
+# 		printf "$name+"
+# 		list+=("$name")
+# 		: $((list_counter++))
+# 	done
+# 	die $list_counter $list_count
+# 	if [ $list_counter -le $list_count ]; then
+# 		get-next-page success-github-repo-stars
+# 	else
+# 		die 42
+# 		echo "${list[@]}"
+# 	fi
+# }
+
+# repo-gazers repo-watchers repo-star repo-watch
 #------------------------------------------------------------------------------
 # API calling functions:
 #------------------------------------------------------------------------------
@@ -493,17 +523,24 @@ report-value() {
 	local label=$(eval echo \$label_$1)
 	if [ -z "$label" ]; then
 		label=$(echo "$1" | tr '_' ' ')
-		label=${label//ssh/SSH}
-		label=${label//url/URL}
-		label=${label//html/HTML}
 		label=$(for word in $label; do title=`echo "${word:0:1}" | tr a-z A-Z`${word:1}; echo -n "$title "; done)
 	fi
 	if [ -n "$label" -a -n "$value" ]; then
-		printf "%-15s %s\n" "$label" "$value"
+		if [ ${#value} -lt 80 ]; then
+			printf "%-15s %s\n" "$label" "$value"
+		else
+			value=${value//\\r\\n\\r\\n/\\n\\n  }
+			printf "$label\n"
+			printf "  $value" | fmt
+		fi
 	fi
 }
 
 label_blog='Web Site'
+label_watchers='Star Gazers'
+label_homepage='Web Site'
+label_html_url='GitHub Page'
+label_ssh_url='Remote URL'
 
 #------------------------------------------------------------------------------
 # Initial setup functions:
