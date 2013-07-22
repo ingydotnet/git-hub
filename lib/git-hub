@@ -56,6 +56,7 @@ main() {
 	[ -n "$show_headers" ] && cat $GIT_HUB_HEADER
 	[ -n "$show_output" ] && cat $GIT_HUB_OUTPUT
 	[ -s $GIT_HUB_OUTPUT ] && json-load-cache "$(< $GIT_HUB_OUTPUT)"
+	[ -n "$json_prune_regex" ] && json-prune-cache "$json_prune_regex"
 	[ -n "$show_json" ] && echo "$json_load_data_cache"
 
 	if OK; then
@@ -123,6 +124,7 @@ github-repo-list() {
 	page_size=30
 	per_page=$list_count
 	[ $per_page -gt $page_size ] && per_page=$page_size
+	json_prune_regex='^/[0-9]+/(full_name|pushed_at|description)'
 	api-get "/users/$user_name/repos?sort=pushed;per_page=$per_page"
 }
 
@@ -503,11 +505,15 @@ json-load-cache() {
 	json_load_data_cache=$(echo "$1" | tokenize | parse)
 }
 
+json-prune-cache() {
+	json_load_data_cache=$(echo "$json_load_data_cache" | grep -E "$1")
+}
+
 json-get() {
 	local key="^$1\s"
 	local data="$2"
 	[ -z "$data" ] && data="$json_load_data_cache"
-	value=$(echo "$data" | egrep $key | cut -f2)
+	value=$(echo "$data" | grep -E --max-count=1 $key | cut -f2)
 	if [ "$value" = 'null' ]; then
 		echo ''
 	else
@@ -557,7 +563,7 @@ assert-env() {
 	GIT_HUB_ERROR=$GIT_HUB_TMP_PREFIX-err-$$
 	GIT_HUB_HEADER=$GIT_HUB_TMP_PREFIX-head-$$
 	local cmd
-	for cmd in git curl tr egrep head cut; do
+	for cmd in curl cut git grep head tr; do
 		[ -z "$(which $cmd)" ] &&
 			echo "Required command not found: '$cmd'" && exit 1
 	done

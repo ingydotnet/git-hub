@@ -1,8 +1,20 @@
+- Refactor listing functions
+  - get-list-all url callback
+  - get-list-count url callback
+- Make grepping results faster
 - Actions to support
-  - followers
-  - following
-- Detect config
-- Add bash-tap support
+  - repo-stars
+  - repo-star
+  - repo-watch
+  - user-follow
+  - user-following
+- Don't always require token
+- Make a plan for all actions to support
+
+
+- Detect config user-name or die with helpful text
+- Add bash-tap support to test suite
+- Refactor variable scoping to use minimal globals
 
 
 + Add --user-agent=git-hub-v0.0.1
