@@ -1,6 +1,3 @@
-- Refactor listing functions
-  - get-list-all url callback
-  - get-list-count url callback
 - Actions to support
   - repo-stars
   - repo-star
@@ -18,6 +15,7 @@
 - Refactor variable scoping to use minimal globals
 
 
++ Refactor listing functions
 + Support 'login' for your personal 'user-name'
 + Don't always require token
 + Detect old `user-name` and die.
