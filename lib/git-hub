@@ -60,7 +60,6 @@ main() {
 	[ -n "$show_json" ] && echo "$json_load_data_cache"
 
 	if OK; then
-		list_counter=1
 		if callable "success-github-$command"; then
 			"success-github-$command"
 		else
@@ -132,24 +131,24 @@ github-user-update() {
 github-repo-list() {
     get-args user
 	require-value user-name "${user:-$login}"
-	page_size=30
-	per_page=$list_count
-	[ $per_page -gt $page_size ] && per_page=$page_size
+
 	json_prune_regex='^/[0-9]+/(full_name|pushed_at|description)'
+	list-setup 10
 	api-get "/users/$user_name/repos?sort=pushed;per_page=$per_page"
 }
 
 success-github-repo-list() {
-	for ((ii=0; ii < $page_size; ii++)); do
-		[ $list_counter -gt $list_count ] && return 0
-		name=$(json-get "/$ii/full_name")
-		[ -z "$name" ] && return 0
-		pushed=$(json-get "/$ii/pushed_at")
-		pushed=${pushed/T*/}
-		desc=$(json-get "/$ii/description")
-		printf "%3d) (%s)  %-30s %s\n" $((list_counter++)) $pushed $name "$desc"
-	done
-	get-next-page success-github-repo-list
+    process-list report-github-repo-list
+}
+
+report-github-repo-list() {
+	name=$(json-get "/$1/full_name")
+	[ -z "$name" ] && return 1
+	pushed=$(json-get "/$1/pushed_at")
+	pushed=${pushed/T*/}
+	desc=$(json-get "/$1/description")
+	printf "%3d) (%s)  %-30s %s\n" $list_counter $pushed $name "$desc"
+	return 0
 }
 
 github-repo-info() {
@@ -204,20 +203,19 @@ github-collab-list() {
 	get-args user-repo
 	require-value repo-name "$repo"
 	require-value user-name "$user"
-	page_size=30
-	per_page=$list_count
-	[ $per_page -gt $page_size ] && per_page=$page_size
+	list-setup 10
 	api-get "/repos/$user_name/$repo_name/collaborators?per_page=$per_page"
 }
 
 success-github-collab-list() {
-	for ((ii=0; ii < $page_size; ii++)); do
-		[ $list_counter -gt $list_count ] && return 0
-		name=$(json-get "/$ii/login")
-		[ -z "$name" ] && return 0
-		printf "%3d) %s\n" $((list_counter++)) $name
-	done
-	get-next-page success-github-collab-list
+    process-list report-github-collab-list
+}
+
+report-github-collab-list() {
+	name=$(json-get "/$ii/login")
+	[ -z "$name" ] && return 1
+	printf "%3d) %s\n" $list_counter $name
+	return 0
 }
 
 github-collab-add() {
@@ -242,24 +240,24 @@ github-collab-remove() {
 # github-repo-stars() {
 # 	require-value repo-name "$repo"
 # 	require-value user-name "$user"
-# 	list_count=500
+# 	list_size=500
 # 	page_size=30
-# 	per_page=$list_count
+# 	per_page=$list_size
 # 	[ $per_page -gt $page_size ] && per_page=$page_size
 # 	api-get "/repos/$user_name/$repo_name/stargazers"
 # }
 # 
 # success-github-repo-stars() {
 # 	for ((ii=0; ii < $page_size; ii++)); do
-# 		[ $list_counter -gt $list_count ] && break
+# 		[ $list_counter -gt $list_size ] && break
 # 		name=$(json-get "/$ii/login")
 # 		[ -z "$name" ] && break
 # 		printf "$name+"
 # 		list+=("$name")
 # 		: $((list_counter++))
 # 	done
-# 	die $list_counter $list_count
-# 	if [ $list_counter -le $list_count ]; then
+# 	die $list_counter $list_size
+# 	if [ $list_counter -le $list_size ]; then
 # 		get-next-page success-github-repo-stars
 # 	else
 # 		die 42
@@ -401,18 +399,6 @@ user-repo() {
 	repo=$2
 }
 
-get-next-page() {
-    local callback=$1
-	regexp='Link: <(https:.+?)>; rel="next"'
-	[[ "$(< $GIT_HUB_HEADER)" =~ $regexp ]] || return
-	local link=${BASH_REMATCH[1]}
-	api-get "$link"
-	if OK; then
-		json-load-cache "$(< $GIT_HUB_OUTPUT)"
-		$callback
-	fi
-}
-
 # Usage: require-value variable-name "possible-user-value"
 #   Fetch $variable_name or die
 require-value() {
@@ -460,6 +446,39 @@ fetch-value() {
 	eval $var=$(git config --file=$config_file github.$key || echo '')
 	[ -n "$(eval echo \$$var)" ] && return
 	true
+}
+
+#------------------------------------------------------------------------------
+# List processing functions:
+#------------------------------------------------------------------------------
+list-setup() {
+	: ${list_size:=$1}
+	page_size=${2:-30}
+	list_counter=1
+	per_page=$list_size
+	[ $per_page -gt $page_size ] && per_page=$page_size
+	true
+}
+
+process-list() {
+	callback="$1"
+	for ((ii=0; ii < $page_size; ii++)); do
+		[ $list_counter -gt $list_size ] && return 0
+		$callback $ii || return 0
+		: $((list_counter++))
+	done
+	get-next-page process-list $callback
+}
+
+get-next-page() {
+	regexp='Link: <(https:.+?)>; rel="next"'
+	[[ "$(< $GIT_HUB_HEADER)" =~ $regexp ]] || return
+	local link=${BASH_REMATCH[1]}
+	api-get "$link"
+	if OK; then
+		json-load-cache "$(< $GIT_HUB_OUTPUT)"
+		$1 $2
+	fi
 }
 
 #------------------------------------------------------------------------------
@@ -618,7 +637,7 @@ get-options() {
 	[ $# -eq 0 ] && set -- --help
 	NONGIT_OK=1 source git-sh-setup
 
-	user=; repo=; token=; list_count=10
+	user=; repo=; token=; list_size=
 	GIT_QUIET=; GIT_VERBOSE=; show_token=
 	dry_run=; repeat_command=
 	show_output=; show_headers=; show_json=
@@ -628,7 +647,7 @@ get-options() {
 			--user) user="$1"; shift ;;
 			--repo) repo="$1"; shift ;;
 			--token) token="$1"; shift ;;
-			-c)	list_count=$1; shift ;;
+			-c)	list_size=$1; shift ;;
 
 			-h) usage ;;
 			-q) GIT_QUIET="1"
