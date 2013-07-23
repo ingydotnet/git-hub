@@ -44,8 +44,9 @@ install: uninstall install-exe
 install-all: uninstall install-exe install-doc
 
 install-exe: build $(GIT_INSTALL_LIB)/$(CMD)./
-	cp lib/$(CMD) $(GIT_INSTALL_LIB)/
-	cp lib/$(CMD)./* $(GIT_INSTALL_LIB)/$(CMD)./
+	install -m 0755 lib/$(CMD) $(GIT_INSTALL_LIB)/
+	install -d -m 0755 $(GIT_INSTALL_LIB)/$(CMD)./
+	install -m 0755 lib/$(CMD)./* $(GIT_INSTALL_LIB)/$(CMD)./
 
 install-doc: build-doc
 	install -c -d -m 0755 $(MAN1DIR)
