@@ -116,6 +116,7 @@ github-token-list() {
 	api-get '/authorizations'
 }
 
+# XXX - Can have more than 10 tokens
 success-token-list() {
 	local i=0
 	while true; do
@@ -215,7 +216,8 @@ github-scope-remove() {
 
 github-user-info() {
     get-args user
-	require-value user-name "${user:-$login}"
+	fetch-value user-name "$user"
+	: ${user_name:=$login}
 	api-get "/users/$user_name"
 }
 
@@ -236,7 +238,8 @@ github-user-update() {
 
 github-repo-list() {
     get-args user
-	require-value user-name "${user:-$login}"
+	fetch-value user-name "$user"
+	: ${user_name:=$login}
 
 	json_prune_regex='^/[0-9]+/(full_name|pushed_at|description)'
 	list-setup 10
@@ -317,6 +320,7 @@ success-collab-list() {
     process-list report-collab-list
 }
 
+# XXX Can have more than 10 collabs
 report-collab-list() {
 	name=$(json-get "/$ii/login")
 	[ -z "$name" ] && return 1

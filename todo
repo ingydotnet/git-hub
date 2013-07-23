@@ -5,9 +5,6 @@
   - user-follow
   - user-following
 
-  - git hub scope-list
-  - git hub scope-add <scopes>
-  - git hub scope-remove <scopes>
 - Make a plan for all actions to support
 
 
@@ -15,6 +12,9 @@
 - Refactor variable scoping to use minimal globals
 
 
++ git hub scope-list
++ git hub scope-add <scopes>
++ git hub scope-remove <scopes>
 + Refactor listing functions
 + Support 'login' for your personal 'user-name'
 + Don't always require token
