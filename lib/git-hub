@@ -13,6 +13,9 @@ git hub <command> <options> <arguments>
 
 Commands:
   config, config-unset
+  token-list, token-create, token-delete
+  scope-list, scope-add, scope-remove
+
   user-info, user-update
   repo-list, repo-info, repo-create, repo-edit, repo-delete
   collab-list, collab-add, collab-remove
@@ -60,20 +63,20 @@ main() {
 	[ -n "$show_json" ] && echo "$json_load_data_cache"
 
 	if OK; then
-		if callable "success-github-$command"; then
-			"success-github-$command"
+		if callable "success-$command"; then
+			"success-$command"
 		else
 			say ${message_success:-"'git hub $command' successful"}
 		fi
 		exit 0
-	elif [ -n "$status_code" ] && callable "status-$status_code-github-$command"; then
-		"status-$status_code-github-$command"
+	elif [ -n "$status_code" ] && callable "status-$status_code-$command"; then
+		"status-$status_code-$command"
 		exit 1
 	elif [ -n "$(eval "echo \$message_$status_code")" ]; then
 		say $(eval "echo \$message_$status_code")
 		exit 1
-	elif callable "failure-github-$command"; then
-		"failure-github-$command"
+	elif callable "failure-$command"; then
+		"failure-$command"
 		exit 1
 	else
 		say ${message_failure:="'git hub $command' failed: $status_code $ERROR"}
@@ -107,13 +110,115 @@ github-config-unset() {
 	message_success="Config key '$config_key' has been unset."
 }
 
+github-token-list() {
+	basic_auth="1"
+	api-get '/authorizations'
+}
+
+success-token-list() {
+	local i=0
+	while true; do
+		local token=$(json-get "/$i/token")
+		[ -z "$token" ] && break
+		local id=$(json-get "/$i/id")
+		local note=$(json-get "/$i/note")
+		local name=$(json-get "/$i/app/name")
+		: $((i++))
+		printf "%d) %s %-14s  %s\n" $i $token "(id: $id)" "${note:-$name}"
+	done
+}
+
+github-token-create() {
+	get-args note
+	if [ -n "$note" ]; then
+		json=$(json-dump-object "note" "$note")
+	else
+		json='{}'
+	fi
+	basic_auth="1"
+	api-post '/authorizations' "$json"
+}
+
+success-token-create() {
+	local token=$(json-get "/token")
+	[ -n "$token" ] || die "Can't figure out token value"
+	local id=$(json-get "/id")
+	local note=$(json-get "/note")
+	local name=$(json-get "/app/name")
+	printf "Token created: %s %-14s  %s\n" $token "(id: $id)" "${note:-$name}"
+}
+
+github-token-delete() {
+    get-args id
+	[ -z "$id" ] && die "Command requires token id"
+	basic_auth="1"
+	api-delete "/authorizations/$id"
+	message_success="Token '$id' deleted"
+}
+
+github-scope-list() {
+	get-args id
+	require-value token-id "$id"
+	basic_auth="1"
+	api-get "/authorizations/$id"
+}
+
+success-scope-list() {
+	local i=0
+	local scopes
+	while true; do
+		scope=$(json-get "/scopes/$i")
+		[ -z "$scope" ] && break
+		scopes+=($scope)
+		: $((i++))
+	done
+	echo
+	echo "The current scopes for token-id:$token_id are:"
+	echo "  ${scopes[*]}"
+	cat <<eos
+
+Available scopes are:
+  user          Read/write access to profile info only.
+  user:email    Read access to a user’s email addresses.
+  user:follow   Access to follow or unfollow other users.
+  public_repo   Read/write access to public repos and organizations.
+  repo          Read/write access to public and private repos and orgs.
+  repo:status   Read/write access to public and private repo commit statuses.
+  delete_repo   Delete access to adminable repositories.
+  notifications Read access to a user’s notifications.
+  gist          Write access to gists.
+
+For more info, see: http://developer.github.com/v3/oauth/#scopes
+eos
+}
+
+github-scope-add() {
+	get-args id *scopes
+	require-value token-id "$id"
+	basic_auth="1"
+	local array=$(json-dump-array ${scopes[*]})
+	local json=$(json-dump-object add_scopes "$array")
+	api-patch "/authorizations/$id" "$json"
+	message_success="Scopes added."
+}
+
+github-scope-remove() {
+	get-args id *scopes
+	require-value token-id "$id"
+	basic_auth="1"
+	local array=$(json-dump-array ${scopes[*]})
+	local json=$(json-dump-object remove_scopes "$array")
+	api-patch "/authorizations/$id" "$json"
+	message_success="Scopes removed"
+}
+
 github-user-info() {
     get-args user
 	require-value user-name "${user:-$login}"
 	api-get "/users/$user_name"
 }
 
-success-github-user-info() {
+success-user-info() {
 	for field in \
 		login type name email blog location company bio \
 		followers following public_repos public_gists
@@ -137,11 +242,11 @@ github-repo-list() {
 	api-get "/users/$user_name/repos?sort=pushed;per_page=$per_page"
 }
 
-success-github-repo-list() {
-    process-list report-github-repo-list
+success-repo-list() {
+    process-list report-repo-list
 }
 
-report-github-repo-list() {
+report-repo-list() {
 	name=$(json-get "/$1/full_name")
 	[ -z "$name" ] && return 1
 	pushed=$(json-get "/$1/pushed_at")
@@ -159,7 +264,7 @@ github-repo-info() {
 	api-get "/repos/$user_name/$repo_name"
 }
 
-success-github-repo-info() {
+success-repo-info() {
 	for field in \
 		full_name description homepage language \
 		pushed_at \
@@ -207,11 +312,11 @@ github-collab-list() {
 	api-get "/repos/$user_name/$repo_name/collaborators?per_page=$per_page"
 }
 
-success-github-collab-list() {
-    process-list report-github-collab-list
+success-collab-list() {
+    process-list report-collab-list
 }
 
-report-github-collab-list() {
+report-collab-list() {
 	name=$(json-get "/$ii/login")
 	[ -z "$name" ] && return 1
 	printf "%3d) %s\n" $list_counter $name
@@ -247,7 +352,7 @@ github-collab-remove() {
 # 	api-get "/repos/$user_name/$repo_name/stargazers"
 # }
 # 
-# success-github-repo-stars() {
+# success-repo-stars() {
 # 	for ((ii=0; ii < $page_size; ii++)); do
 # 		[ $list_counter -gt $list_size ] && break
 # 		name=$(json-get "/$ii/login")
@@ -258,7 +363,7 @@ github-collab-remove() {
 # 	done
 # 	die $list_counter $list_size
 # 	if [ $list_counter -le $list_size ]; then
-# 		get-next-page success-github-repo-stars
+# 		get-next-page success-repo-stars
 # 	else
 # 		die 42
 # 		echo "${list[@]}"
@@ -300,10 +405,13 @@ api-call() {
 			--request $action
 		$url
 	)
-	[ -n "$data" ] &&
-		command+=(-d "$data")
-	[ -n "$api_token" ] &&
-		command+=(--header "Authorization: token $api_token")
+	[ -n "$data" ] && command+=(-d "$data")
+	if [ -n "$basic_auth" ]; then
+		command+=(-u "$login")
+	else
+		[ -n "$api_token" ] &&
+			command+=(--header "Authorization: token $api_token")
+	fi
 	command+=(
 		--user-agent $user_agent
 		--dump-header $GIT_HUB_HEADER
@@ -380,7 +488,7 @@ get-args() {
 				eval ${1/\*/}[$slurp_index]=\"$arg\"
 				: $((slurp_index++))
 			else
-				eval $1="$arg"
+				eval $1=\""$arg"\"
 				shift
 			fi
 		else
@@ -536,8 +644,13 @@ eos
 # Format a JSON object from an input list of key/value pairs.
 json-dump-object() {
 	local json='{'
+	local regex='^\['
 	while [ $# -gt 0 ]; do
-		json="$json\"$1\":\"$2\""
+		if [[ "$2" =~ $regex ]]; then
+			json="$json\"$1\":$2"
+		else
+			json="$json\"$1\":\"$2\""
+		fi
 		shift; shift
 		if [ $# -gt 0 ]; then
 			json="$json,"
@@ -545,6 +658,19 @@ json-dump-object() {
 	done
 	json="$json}"
 	echo $json
+}
+
+json-dump-array() {
+	local json='['
+	while [ $# -gt 0 ]; do
+		json="$json\"$1\""
+		shift
+		if [ $# -gt 0 ]; then
+			json="$json,"
+		fi
+	done
+	json="$json]"
+	echo "$json"
 }
 
 # Format a JSON object from an array.
