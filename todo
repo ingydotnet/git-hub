@@ -1,22 +1,28 @@
 - Refactor listing functions
   - get-list-all url callback
   - get-list-count url callback
-- Make grepping results faster
 - Actions to support
   - repo-stars
   - repo-star
   - repo-watch
   - user-follow
   - user-following
-- Don't always require token
+
+  - git hub scope-list
+  - git hub scope-add <scopes>
+  - git hub scope-remove <scopes>
 - Make a plan for all actions to support
 
 
-- Detect config user-name or die with helpful text
 - Add bash-tap support to test suite
 - Refactor variable scoping to use minimal globals
 
 
++ Support 'login' for your personal 'user-name'
++ Don't always require token
++ Detect old `user-name` and die.
++ Detect config user-name or die with helpful text
++ Make grepping results faster
 + Add --user-agent=git-hub-v0.0.1
 + switch github-foo-success to success-github-foo
 + Get more pages for lists

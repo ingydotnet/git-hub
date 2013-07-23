@@ -12,7 +12,7 @@ OPTIONS_SPEC="\
 git hub <command> <options> <arguments>
 
 Commands:
-  config
+  config, config-unset
   user-info, user-update
   repo-list, repo-info, repo-create, repo-edit, repo-delete
   collab-list, collab-add, collab-remove
@@ -87,20 +87,30 @@ main() {
 #------------------------------------------------------------------------------
 github-config() {
     get-args config_key config_value
+	message_success=' '
 	if [ -z "$config_key" ]; then
 		cat $config_file
 	elif [ -z "$config_value" ]; then
-		message_success=$(git config -f $config_file github.$config_key)
+		git config -f $config_file github.$config_key
 	else
-		git config -f $config_file github.$config_key "$config_value"
 		message_success="$config_key=$config_value"
+		git config -f $config_file github.$config_key "$config_value"
 	fi
 	OK=$?
 }
 
+github-config-unset() {
+    get-args config_key
+	[ -n "$config_key" ] ||
+		die "This command requires a config key"
+	git config -f $config_file --unset github.$config_key
+	OK=$?
+	message_success="Config key '$config_key' has been unset."
+}
+
 github-user-info() {
     get-args user
-	require-value user-name "$user"
+	require-value user-name "${user:-$login}"
 	api-get "/users/$user_name"
 }
 
@@ -114,13 +124,14 @@ success-github-user-info() {
 }
 
 github-user-update() {
+	require-value api-token "$token"
 	get-args *key_value_pairs
 	api-patch "/user" "$(json-dump-object-pairs)"
 }
 
 github-repo-list() {
     get-args user
-	require-value user-name "$user"
+	require-value user-name "${user:-$login}"
 	page_size=30
 	per_page=$list_count
 	[ $per_page -gt $page_size ] && per_page=$page_size
@@ -145,7 +156,7 @@ github-repo-info() {
 	get-args repo
 	check-user-repo "$repo"
 	require-value repo-name "$repo"
-	require-value user-name "$user"
+	require-value user-name "${user:-$login}"
 	api-get "/repos/$user_name/$repo_name"
 }
 
@@ -160,9 +171,11 @@ success-github-repo-info() {
 	done
 }
 
+# TODO Support creating repo under an org
 github-repo-create() {
 	get-args repo
 	require-value repo-name "$repo"
+	require-value api-token "$token"
 	api-post "/user/repos" $(json-dump-object 'name' $repo_name)
 	message_success="Repository '$repo_name' created."
 	message_422="Repository name '$repo_name' already exists."
@@ -171,7 +184,8 @@ github-repo-create() {
 github-repo-edit() {
 	get-args *key_value_pairs
 	require-value repo-name "$repo"
-	require-value user-name "$user"
+	require-value user-name "$login"    # TODO should be login or org
+	require-value api-token "$token"
 	key_value_pairs+=(name "$repo_name")
 	api-patch "/repos/$user_name/$repo_name" "$(json-dump-object-pairs)"
 }
@@ -180,7 +194,8 @@ github-repo-delete() {
 	get-args repo
 	check-user-repo "$repo"
 	require-value repo-name "$repo"
-	require-value user-name "$user"
+	require-value user-name "$login"    # TODO should be login or org
+	require-value api-token "$token"
 	api-delete "/repos/$user_name/$repo_name"
 	message_success="Repository '$repo_name' deleted"
 }
@@ -267,7 +282,6 @@ api-delete() { api-call DELETE "$1" "$2"; }
 api-call() {
 	[ -n "$repeat_command" ] && api-repeat && return
 
-	require-value api-token "$token"
 	local action=$1
 	local url=$2
 	local data=$3
@@ -286,12 +300,14 @@ api-call() {
 			--silent
 			--show-error
 			--request $action
-			--user-agent $user_agent
-			--header "Authorization: token $api_token"
 		$url
 	)
-	[ -n "$data" ] && command+=(-d "$data")
+	[ -n "$data" ] &&
+		command+=(-d "$data")
+	[ -n "$api_token" ] &&
+		command+=(--header "Authorization: token $api_token")
 	command+=(
+		--user-agent $user_agent
 		--dump-header $GIT_HUB_HEADER
 		--output $GIT_HUB_OUTPUT
 		--stderr $GIT_HUB_ERROR
@@ -452,19 +468,44 @@ fetch-value() {
 die_need_api_token() {
 	cat <<eos
 
-Can't determine your API Access Token. Usually this means you haven't set up
-your ~/.githubconfig file yet.
-
-First go to https://github.com/settings/applications and retrieve or create a
-Personal API Access Token. This is a 40 digit hexadecimal character string.
-
-Next, run these commands:
+Can't determine your Personal API Access Token, which is required by this
+command. Usually you put your token into the ~/.githubconfig file, like this:
 
 	git hub config api-token <your-personal-api-access-token>
-	git hub config user-name <your-github-login-id>
 
-Now you should be set up to run most commands. Some commands require that you
-add certain 'scopes' to your token.
+To create a new token or get get your value, got to
+https://github.com/settings/applications. This is a 40 digit hexadecimal
+character string.
+
+You can also specify the token using the --token= commandline option, or via
+the GIT_HUB_API_TOKEN environment variable.
+
+eos
+	die
+}
+
+die_config_not_setup() {
+	cat <<eos
+
+To use the 'git hub' command, you need a '~/.githubconfig' file, and it needs
+to contain at least your login id. You can set this by running the following
+command:
+
+	git hub config login <your-github-login-id>
+
+eos
+	die
+}
+
+die_user_name_in_config() {
+	cat <<eos
+
+It looks like your ~/.githubconfig has a 'user-name' key in it. This key has
+been renamed 'login'. You need to fix the config file. Please run these
+commands:
+
+	git hub config-unset user-name
+	git hub config login <your-github-login-id>
 
 eos
 	die
@@ -597,7 +638,9 @@ get-options() {
 				GIT_QUIET=
 				;;
 			-d) dry_run="1" ;;
-			-T) show_token="1" ;;
+			-T) show_token="1"
+				GIT_VERBOSE="1"
+				;;
 
 			--) break ;;
 
@@ -622,6 +665,8 @@ get-options() {
 }
 
 setup-env() {
+    [ "$command" = "config" -o "$command" = "config-unset" ] || check_config
+
     source "$GIT_CORE_PATH/git-hub./json.bash"
     if [ -n "$repeat_command" ]; then
 		[ -f $GIT_HUB_TMP_PREFIX-out-* ] ||
@@ -638,9 +683,15 @@ setup-env() {
 	[ -n "$dry_run" ] &&
 		say '*** NOTE: This is a dry run only. ***'
 	true
-    # require_work_tree
 }
 
+check_config() {
+	[ -f "$config_file" ] || die_config_not_setup
+	[ -n "$(git config -f $config_file github.user-name)" ] &&
+		die_user_name_in_config
+	login="$(git config -f $config_file github.login)"
+	[ -n "$login" ] || die_config_not_setup
+}
 
 #------------------------------------------------------------------------------
 # General purpose functions:
@@ -651,6 +702,8 @@ callable() {
 	[ -n "$(type $1 2> /dev/null)" ]
 }
 
+# This command is provided by `git-sh-setup` but is missing in older versions.
+# Repeating it here for now:
 say () {
 	if test -z "$GIT_QUIET"
 	then
