@@ -33,6 +33,7 @@ user=       GitHub user name
 repo=       GitHub repository name
 token=      GitHub v3 API Authentication Token
 c,count=    Number of items to process
+a,use-auth  Force the use of authentication. (Get around rate limits)
 
 h,help      Show this help
 q,quiet     Show minimal output
@@ -388,6 +389,9 @@ api-call() {
 	local action=$1
 	local url=$2
 	local data=$3
+
+	fetch-value use-auth
+	[ -n "$use_auth" ] && require-value api-token "$token"
 
 	user_agent=git-hub-$GIT_HUB_VERSION
 	# Cheap trick to make github pretty-print the JSON output.
@@ -774,6 +778,7 @@ get-options() {
 			--repo) repo="$1"; shift ;;
 			--token) token="$1"; shift ;;
 			-c)	list_size=$1; shift ;;
+			-a) use_auth="1" ;;
 
 			-h) usage ;;
 			-q) GIT_QUIET="1"
