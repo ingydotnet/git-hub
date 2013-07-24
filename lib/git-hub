@@ -347,16 +347,29 @@ github-collab-remove() {
 	done
 }
 
-# github-repo-stars() {
-# 	require-value repo-name "$repo"
-# 	require-value user-name "$user"
-# 	list_size=500
-# 	page_size=30
-# 	per_page=$list_size
-# 	[ $per_page -gt $page_size ] && per_page=$page_size
-# 	api-get "/repos/$user_name/$repo_name/stargazers"
-# }
-# 
+github-repo-stars() {
+	get-args repo
+	check-user-repo "$repo"
+	require-value repo-name "$repo"
+	require-value user-name "${user:-$login}"
+ 	json_prune_regex='^/[0-9]+/(login)'
+	list-setup 9999
+	api-get "/repos/$user_name/$repo_name/stargazers"
+}
+
+success-repo-stars() {
+    process-list report-repo-stars
+	list="${stars[@]}"
+	echo "$list" | fmt
+}
+
+report-repo-stars() {
+	name=$(json-get "/$1/login")
+	[ -z "$name" ] && return 1
+	stars+=($name)
+	return 0
+}
+
 # success-repo-stars() {
 # 	for ((ii=0; ii < $page_size; ii++)); do
 # 		[ $list_counter -gt $list_size ] && break
