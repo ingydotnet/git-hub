@@ -18,6 +18,7 @@ Commands:
 
   user-info, user-update
   repo-list, repo-info, repo-create, repo-edit, repo-delete
+  repo-stars, repo-star, repo-unstar, user-starred
   collab-list, collab-add, collab-remove
 
 Aliases:
@@ -308,45 +309,6 @@ github-repo-delete() {
 	message_success="Repository '$repo_name' deleted"
 }
 
-github-collab-list() {
-	get-args user-repo
-	require-value repo-name "$repo"
-	require-value user-name "$user"
-	list-setup 10
-	api-get "/repos/$user_name/$repo_name/collaborators?per_page=$per_page"
-}
-
-success-collab-list() {
-    process-list report-collab-list
-}
-
-# XXX Can have more than 10 collabs
-report-collab-list() {
-	name=$(json-get "/$ii/login")
-	[ -z "$name" ] && return 1
-	printf "%3d) %s\n" $list_counter $name
-	return 0
-}
-
-github-collab-add() {
-	say "*** NOTE *** Can't get collab-add working yet. Patches welcome."
-	get-args user-repo *collaborators
-	require-value repo-name "$repo"
-	require-value user-name "$user"
-	for collab_name in ${collaborators[@]}; do
-		api-put "/repos/$user_name/$repo_name/collaborators/$collab_name"
-	done
-}
-
-github-collab-remove() {
-	get-args user-repo *collaborators
-	require-value repo-name "$repo"
-	require-value user-name "$user"
-	for collab_name in ${collaborators[@]}; do
-		api-delete "/repos/$user_name/$repo_name/collaborators/$collab_name"
-	done
-}
-
 github-repo-stars() {
 	get-args repo
 	check-user-repo "$repo"
@@ -370,25 +332,63 @@ report-repo-stars() {
 	return 0
 }
 
-# success-repo-stars() {
-# 	for ((ii=0; ii < $page_size; ii++)); do
-# 		[ $list_counter -gt $list_size ] && break
-# 		name=$(json-get "/$ii/login")
-# 		[ -z "$name" ] && break
-# 		printf "$name+"
-# 		list+=("$name")
-# 		: $((list_counter++))
-# 	done
-# 	die $list_counter $list_size
-# 	if [ $list_counter -le $list_size ]; then
-# 		get-next-page success-repo-stars
-# 	else
-# 		die 42
-# 		echo "${list[@]}"
-# 	fi
-# }
+github-repo-star() {
+	get-args repo
+	check-user-repo "$repo"
+	require-value repo-name "$repo"
+	require-value user-name "${user:-$login}"
+	require-value api-token "$token"
+	api-put "/user/starred/$user_name/$repo_name"
+	message_success="'$user_name/$repo_name' starred"
+}
 
-# repo-gazers repo-watchers repo-star repo-watch
+github-repo-unstar() {
+	get-args repo
+	check-user-repo "$repo"
+	require-value repo-name "$repo"
+	require-value user-name "${user:-$login}"
+	require-value api-token "$token"
+	api-delete "/user/starred/$user_name/$repo_name"
+	message_success="'$user_name/$repo_name' unstarred"
+}
+
+github-user-stars() {
+	get-args user
+	require-value user-name "${user:-$login}"
+	require-value api-token "$token"
+	list-setup 10
+	api-get "/users/$user_name/starred?sort=updated"
+}
+
+success-user-stars() {
+    process-list report-user-stars
+}
+
+report-user-stars() {
+	name=$(json-get "/$ii/full_name")
+	[ -z "$name" ] && return 1
+	printf "%3d) %s\n" $list_counter $name
+	return 0
+}
+
+github-collab-add() {
+	get-args user-repo *collaborators
+	require-value repo-name "$repo"
+	require-value user-name "$user"
+	for collab_name in ${collaborators[@]}; do
+		api-put "/repos/$user_name/$repo_name/collaborators/$collab_name"
+	done
+}
+
+github-collab-remove() {
+	get-args user-repo *collaborators
+	require-value repo-name "$repo"
+	require-value user-name "$user"
+	for collab_name in ${collaborators[@]}; do
+		api-delete "/repos/$user_name/$repo_name/collaborators/$collab_name"
+	done
+}
+
 #------------------------------------------------------------------------------
 # API calling functions:
 #------------------------------------------------------------------------------
@@ -427,6 +427,7 @@ api-call() {
 		$url
 	)
 	[ -n "$data" ] && command+=(-d "$data")
+	[ -z "$data" ] && [ "$action" = "PUT" ] && command+=(-d "$data")
 	if [ -n "$basic_auth" ]; then
 		command+=(-u "$login")
 	else
@@ -750,7 +751,7 @@ report-value() {
 }
 
 label_blog='Web Site'
-label_watchers='Star Gazers'
+label_watchers='Stars'
 label_homepage='Web Site'
 label_html_url='GitHub Page'
 label_ssh_url='Remote URL'
