@@ -371,10 +371,32 @@ report-user-stars() {
 	return 0
 }
 
+github-collab-list() {
+	get-args repo
+	check-user-repo "$repo"
+	require-value repo-name "$repo"
+	require-value user-name "${user:-$login}"
+ 	#json_prune_regex='^/[0-9]+/(login)'
+	list-setup 10
+	api-get "/repos/$user_name/$repo_name/collaborators"
+}
+
+success-collab-list() {
+    process-list report-collab-list
+}
+
+report-collab-list() {
+	name=$(json-get "/$ii/login")
+	[ -z "$name" ] && return 1
+	printf "%3d) %s\n" $list_counter $name
+	return 0
+}
+
 github-collab-add() {
 	get-args user-repo *collaborators
 	require-value repo-name "$repo"
 	require-value user-name "$user"
+	require-value api-token "$token"
 	for collab_name in ${collaborators[@]}; do
 		api-put "/repos/$user_name/$repo_name/collaborators/$collab_name"
 	done
@@ -384,6 +406,7 @@ github-collab-remove() {
 	get-args user-repo *collaborators
 	require-value repo-name "$repo"
 	require-value user-name "$user"
+	require-value api-token "$token"
 	for collab_name in ${collaborators[@]}; do
 		api-delete "/repos/$user_name/$repo_name/collaborators/$collab_name"
 	done

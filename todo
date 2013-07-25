@@ -1,9 +1,14 @@
+- Detect rate-limit failure
+- Show when there are more elements in a list
+
 - Actions to support
-  - repo-stars
-  - repo-star
-  - repo-watch
-  - user-follow
+  - user-followers
   - user-following
+  - user-follow
+  - user-unfollow
+
+  - rate-limit
+  - repo-watch
 
 - Add owner-name concept
 - Add org-name concept
@@ -15,6 +20,8 @@
 - Refactor variable scoping to use minimal globals
 
 
++ repo-stars
++ repo-star
 + git hub scope-list
 + git hub scope-add <scopes>
 + git hub scope-remove <scopes>
