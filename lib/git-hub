@@ -22,11 +22,6 @@ Commands:
   collab-list, collab-add, collab-remove
   user-followers, user-following, user-follow, user-unfollow
 
-Aliases:
-  user=user-info repos=repo-list repo=repo-info
-  followers=user-followers following=user-following
-  follow=user-follow unfollow=user-unfollow
-
 See 'git help hub' for complete documentation and usage of each command.
 
 Options:
@@ -903,8 +898,12 @@ get-options() {
     command="$1"; shift
 	# Some common command aliases:
 	[ "$command" = "user" ] && command="user-info"
+	[ "$command" = "stars" ] && command="repo-stars"
+	[ "$command" = "star" ] && command="repo-star"
+	[ "$command" = "unstar" ] && command="repo-unstar"
 	[ "$command" = "repo" ] && command="repo-info"
 	[ "$command" = "repos" ] && command="repo-list"
+	[ "$command" = "collabs" ] && command="collab-list"
 	[ "$command" = "followers" ] && command="user-followers"
 	[ "$command" = "following" ] && command="user-following"
 	[ "$command" = "follow" ] && command="user-follow"

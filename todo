@@ -1,3 +1,5 @@
+- Pregenerate nroff file for doc and install with `make install`
+- Only show token id, on token-create
 - Detect rate-limit failure
 - Show when there are more elements in a list
 
