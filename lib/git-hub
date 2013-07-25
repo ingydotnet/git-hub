@@ -20,11 +20,12 @@ Commands:
   repo-list, repo-info, repo-create, repo-edit, repo-delete
   repo-stars, repo-star, repo-unstar, user-starred
   collab-list, collab-add, collab-remove
+  user-followers, user-following, user-follow, user-unfollow
 
 Aliases:
-  user == user-info
-  repos == repo-list
-  repo == repo-info
+  user=user-info repos=repo-list repo=repo-info
+  followers=user-followers following=user-following
+  follow=user-follow unfollow=user-unfollow
 
 See 'git help hub' for complete documentation and usage of each command.
 
@@ -376,7 +377,7 @@ github-collab-list() {
 	check-user-repo "$repo"
 	require-value repo-name "$repo"
 	require-value user-name "${user:-$login}"
- 	#json_prune_regex='^/[0-9]+/(login)'
+ 	json_prune_regex='^/[0-9]+/(login)'
 	list-setup 10
 	api-get "/repos/$user_name/$repo_name/collaborators"
 }
@@ -411,6 +412,59 @@ github-collab-remove() {
 		api-delete "/repos/$user_name/$repo_name/collaborators/$collab_name"
 	done
 }
+
+github-user-followers() {
+	get-args user
+	require-value user-name "${user:-$login}"
+ 	json_prune_regex='^/[0-9]+/(login)'
+	list-setup 50
+	api-get "/users/$user_name/followers"
+}
+
+success-user-followers() {
+    process-list report-user-followers
+}
+
+report-user-followers() {
+	name=$(json-get "/$ii/login")
+	[ -z "$name" ] && return 1
+	printf "%3d) %s\n" $list_counter $name
+	return 0
+}
+
+github-user-following() {
+	get-args user
+	require-value user-name "${user:-$login}"
+ 	json_prune_regex='^/[0-9]+/(login)'
+	list-setup 50
+	api-get "/users/$user_name/following"
+}
+
+success-user-following() {
+    process-list report-user-following
+}
+
+report-user-following() {
+	name=$(json-get "/$ii/login")
+	[ -z "$name" ] && return 1
+	printf "%3d) %s\n" $list_counter $name
+	return 0
+}
+
+github-user-follow() {
+	get-args user
+	require-value user-name "$user"
+	require-value api-token "$token"
+	api-put "/user/following/$user_name"
+}
+
+github-user-unfollow() {
+	get-args user
+	require-value user-name "$user"
+	require-value api-token "$token"
+	api-delete "/user/following/$user_name"
+}
+
 
 #------------------------------------------------------------------------------
 # API calling functions:
@@ -851,6 +905,10 @@ get-options() {
 	[ "$command" = "user" ] && command="user-info"
 	[ "$command" = "repo" ] && command="repo-info"
 	[ "$command" = "repos" ] && command="repo-list"
+	[ "$command" = "followers" ] && command="user-followers"
+	[ "$command" = "following" ] && command="user-following"
+	[ "$command" = "follow" ] && command="user-follow"
+	[ "$command" = "unfollow" ] && command="user-unfollow"
 
 	command_arguments=("$@")
 }

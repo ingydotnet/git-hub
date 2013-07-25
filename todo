@@ -8,6 +8,7 @@
   - user-unfollow
 
   - rate-limit
+  - repo-fork
   - repo-watch
 
 - Add owner-name concept
