@@ -1,17 +1,11 @@
-- Pregenerate nroff file for doc and install with `make install`
-- Only show token id, on token-create
-- Detect rate-limit failure
 - Show when there are more elements in a list
+- Detect rate-limit failure
+- change -a to -A and add --all/-a
+- Add quiet versions to output
 
-- Actions to support
-  - user-followers
-  - user-following
-  - user-follow
-  - user-unfollow
-
-  - rate-limit
-  - repo-fork
-  - repo-watch
+- rate-limit
+- repo-fork
+- repo-watch
 
 - Add owner-name concept
 - Add org-name concept
@@ -23,6 +17,11 @@
 - Refactor variable scoping to use minimal globals
 
 
++ user-followers
++ user-following
++ user-follow
++ user-unfollow
++ Pregenerate nroff file for doc and install with `make install`
 + repo-stars
 + repo-star
 + git hub scope-list

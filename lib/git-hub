@@ -17,7 +17,7 @@ Commands:
   scope-list, scope-add, scope-remove
 
   user-info, user-update
-  repo-list, repo-info, repo-create, repo-edit, repo-delete
+  repo-list, repo-info, repo-fork, repo-create, repo-edit, repo-delete
   repo-stars, repo-star, repo-unstar, user-starred
   collab-list, collab-add, collab-remove
   user-followers, user-following, user-follow, user-unfollow
@@ -29,8 +29,9 @@ Options:
 user=       GitHub user name
 repo=       GitHub repository name
 token=      GitHub v3 API Authentication Token
-c,count=    Number of items to process
-a,use-auth  Force the use of authentication. (Get around rate limits)
+c,count=    Number of list items to show
+a,all       Show all list items
+U,use-auth  Force the use of authentication. (Get around rate limits)
 
 h,help      Show this help
 q,quiet     Show minimal output
@@ -274,6 +275,14 @@ success-repo-info() {
 	do
 		report-value $field
 	done
+}
+
+github-repo-fork() {
+	get-args user_repo
+	check-user-repo "$user_repo"
+	require-value repo-name "$repo"
+	require-value user-name "$user"
+	api-post "/repos/$user_name/$repo_name/forks" '{}'
 }
 
 # TODO Support creating repo under an org
@@ -542,7 +551,7 @@ check-api-call-status() {
 	local regex='^[0-9]{3}$'
 	[[ $status_code =~ $regex ]] || return
 	case "$status_code" in
-		200|201|204) OK=0 ;;
+		200|201|202|204) OK=0 ;;
 		*)
 			OK=1
 			ERROR=$(head -1 $GIT_HUB_HEADER | cut -d ' ' -f3-)
@@ -868,7 +877,8 @@ get-options() {
 			--repo) repo="$1"; shift ;;
 			--token) token="$1"; shift ;;
 			-c)	list_size=$1; shift ;;
-			-a) use_auth="1" ;;
+			-a) list_size=999999 ;;
+			-U) use_auth="1" ;;
 
 			-h) usage ;;
 			-q) GIT_QUIET="1"
@@ -898,11 +908,12 @@ get-options() {
     command="$1"; shift
 	# Some common command aliases:
 	[ "$command" = "user" ] && command="user-info"
+	[ "$command" = "repos" ] && command="repo-list"
+	[ "$command" = "repo" ] && command="repo-info"
+	[ "$command" = "fork" ] && command="repo-fork"
 	[ "$command" = "stars" ] && command="repo-stars"
 	[ "$command" = "star" ] && command="repo-star"
 	[ "$command" = "unstar" ] && command="repo-unstar"
-	[ "$command" = "repo" ] && command="repo-info"
-	[ "$command" = "repos" ] && command="repo-list"
 	[ "$command" = "collabs" ] && command="collab-list"
 	[ "$command" = "followers" ] && command="user-followers"
 	[ "$command" = "following" ] && command="user-following"
