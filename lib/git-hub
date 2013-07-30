@@ -17,13 +17,13 @@ Commands:
   scope-list, scope-add, scope-remove
 
   user, user-edit, orgs, org, org-edit
-  repos, repo, repo-edit, repo-fork, repo-create, repo-delete
+  repos, repo, repo-edit, repo-create, repo-delete
+  forks, fork
   stars, star, unstar, starred
   collabs, trust, untrust
   followers, following, follow, unfollow
 
 Aliases:
-  fork == repo-fork
   create == repo-create
 
 See 'git help hub' for complete documentation and usage of each command.
@@ -285,7 +285,8 @@ success-repo() {
 		full_name description homepage language \
 		pushed_at \
 		html_url ssh_url \
-		forks watchers open_issues
+		forks parent__full_name source__full_name \
+		watchers open_issues
 	do
 		report-value $field
 	done
@@ -299,14 +300,6 @@ github-repo-edit() {
 	require-value api-token "$token"
 	key_value_pairs+=(name "$repo_name")
 	api-patch "/repos/$user_name/$repo_name" "$(json-dump-object-pairs)"
-}
-
-github-repo-fork() {
-	get-args user_repo
-	check-user-repo "$user_repo"
-	require-value repo-name "$repo"
-	require-value user-name "$user"
-	api-post "/repos/$user_name/$repo_name/forks" '{}'
 }
 
 # TODO Support creating repo under an org
@@ -327,6 +320,38 @@ github-repo-delete() {
 	require-value api-token "$token"
 	api-delete "/repos/$user_name/$repo_name"
 	message_success="Repository '$repo_name' deleted"
+}
+
+github-forks() {
+	get-args repo
+	check-user-repo "$repo"
+	require-value repo-name "$repo"
+	require-value user-name "${user:-$login}"
+
+# 	json_prune_regex='^/[0-9]+/(full_name)'
+	list-setup 10
+	api-get "/repos/$user_name/$repo_name/forks?sort=newest;per_page=$per_page"
+}
+
+success-forks() {
+    process-list report-forks
+}
+
+report-forks() {
+	name=$(json-get "/$1/full_name")
+	[ -z "$name" ] && return 1
+	pushed=$(json-get "/$1/pushed_at")
+	pushed=${pushed/T*/}
+	printf "%3d) (%s)  %-30s\n" $list_counter $pushed $name
+	return 0
+}
+
+github-fork() {
+	get-args user_repo
+	check-user-repo "$user_repo"
+	require-value repo-name "$repo"
+	require-value user-name "$user"
+	api-post "/repos/$user_name/$repo_name/forks" '{}'
 }
 
 github-repo-stars() {
@@ -694,11 +719,19 @@ list-setup() {
 process-list() {
 	callback="$1"
 	for ((ii=0; ii < $page_size; ii++)); do
-		[ $list_counter -gt $list_size ] && return 0
+		[ $list_counter -gt $list_size ] && break
 		$callback $ii || return 0
 		: $((list_counter++))
 	done
-	get-next-page process-list $callback
+
+	[ $list_counter -gt $list_size ] ||
+		get-next-page process-list $callback
+
+	if [ -z "$more_message_printed" ]; then
+		say ''
+		say "There are more entries. Use --count=# or --all."
+		more_message_printed=1
+	fi
 }
 
 get-next-page() {
@@ -840,7 +873,8 @@ json-get() {
 # Report formatting functions:
 #------------------------------------------------------------------------------
 report-value() {
-	local value=$(json-get "/$1")
+    local key=${1//__/\/}
+	local value=$(json-get "/$key")
 	local label=$(eval echo \$label_$1)
 	if [ -z "$label" ]; then
 		label=$(echo "$1" | tr '_' ' ')
@@ -867,6 +901,8 @@ label_watchers='Stars'
 label_homepage='Web Site'
 label_html_url='GitHub Page'
 label_ssh_url='Remote URL'
+label_parent__full_name='Forked From'
+label_source__full_name='Fork Parent'
 
 #------------------------------------------------------------------------------
 # Initial setup functions:
@@ -940,7 +976,6 @@ get-options() {
 	command_arguments=("$@")
 
 	# Command aliases:
-	[ "$command" = "fork" ] && command="repo-fork"
 	[ "$command" = "create" ] && command="repo-create"
 
     [ "$command" = "config" -o "$command" = "config-unset" ] || check_config
@@ -966,6 +1001,7 @@ unset-global-variables() {
 	show_output=
 	show_headers=
 	show_json=
+	more_message_printed=
 }
 
 setup-env() {
