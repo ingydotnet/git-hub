@@ -6,7 +6,7 @@
 
 set -e
 
-GIT_HUB_VERSION=0.0.1
+GIT_HUB_VERSION=0.0.2
 
 OPTIONS_SPEC="\
 git hub <command> <options> <arguments>
@@ -16,28 +16,30 @@ Commands:
   token-list, token-create, token-delete
   scope-list, scope-add, scope-remove
 
-  user-info, user-update
-  repo-list, repo-info, repo-fork, repo-create, repo-edit, repo-delete
-  repo-stars, repo-star, repo-unstar, user-starred
-  collab-list, collab-add, collab-remove
-  user-followers, user-following, user-follow, user-unfollow
+  user, user-edit, orgs, org, org-edit
+  repos, repo, repo-edit, repo-fork, repo-create, repo-delete
+  stars, star, unstar, starred
+  collabs, trust, untrust
+  followers, following, follow, unfollow
+
+Aliases:
+  fork == repo-fork
+  create == repo-create
 
 See 'git help hub' for complete documentation and usage of each command.
 
 Options:
 --
-user=       GitHub user name
-repo=       GitHub repository name
-token=      GitHub v3 API Authentication Token
 c,count=    Number of list items to show
 a,all       Show all list items
-U,use-auth  Force the use of authentication. (Get around rate limits)
+token=      GitHub v3 API Authentication Token
 
 h,help      Show this help
 q,quiet     Show minimal output
 v,verbose   Show verbose output
 d,dryrun    Don't run the API command
 T           Show API token in the verbose output
+U,use-auth  Force the use of authentication. (Get around rate limits)
  
 O           dev - Show response output
 H           dev - Show reponse headers
@@ -70,16 +72,16 @@ main() {
 		exit 0
 	elif [ -n "$status_code" ] && callable "status-$status_code-$command"; then
 		"status-$status_code-$command"
-		exit 1
+		exit $OK
 	elif [ -n "$(eval "echo \$message_$status_code")" ]; then
 		say $(eval "echo \$message_$status_code")
-		exit 1
+		exit $OK
 	elif callable "failure-$command"; then
 		"failure-$command"
-		exit 1
+		exit $OK
 	else
 		say ${message_failure:="'git hub $command' failed: $status_code $ERROR"}
-		exit 1
+		exit $OK
 	fi
 }
 
@@ -212,14 +214,14 @@ github-scope-remove() {
 	message_success="Scopes removed"
 }
 
-github-user-info() {
+github-user() {
     get-args user
 	fetch-value user-name "$user"
 	: ${user_name:=$login}
 	api-get "/users/$user_name"
 }
 
-success-user-info() {
+success-user() {
 	for field in \
 		login type name email blog location company bio \
 		followers following public_repos public_gists
@@ -228,13 +230,25 @@ success-user-info() {
 	done
 }
 
-github-user-update() {
+github-user-edit() {
 	require-value api-token "$token"
 	get-args *key_value_pairs
 	api-patch "/user" "$(json-dump-object-pairs)"
 }
 
-github-repo-list() {
+github-orgs() {
+	die "'git hub $command' not yet implemented"
+}
+
+github-org() {
+	die "'git hub $command' not yet implemented"
+}
+
+github-org-edit() {
+	die "'git hub $command' not yet implemented"
+}
+
+github-repos() {
     get-args user
 	fetch-value user-name "$user"
 	: ${user_name:=$login}
@@ -244,11 +258,11 @@ github-repo-list() {
 	api-get "/users/$user_name/repos?sort=pushed;per_page=$per_page"
 }
 
-success-repo-list() {
-    process-list report-repo-list
+success-repos() {
+    process-list report-repos
 }
 
-report-repo-list() {
+report-repos() {
 	name=$(json-get "/$1/full_name")
 	[ -z "$name" ] && return 1
 	pushed=$(json-get "/$1/pushed_at")
@@ -258,7 +272,7 @@ report-repo-list() {
 	return 0
 }
 
-github-repo-info() {
+github-repo() {
 	get-args repo
 	check-user-repo "$repo"
 	require-value repo-name "$repo"
@@ -266,7 +280,7 @@ github-repo-info() {
 	api-get "/repos/$user_name/$repo_name"
 }
 
-success-repo-info() {
+success-repo() {
 	for field in \
 		full_name description homepage language \
 		pushed_at \
@@ -275,6 +289,16 @@ success-repo-info() {
 	do
 		report-value $field
 	done
+}
+
+github-repo-edit() {
+	get-args repo *key_value_pairs
+	check-user-repo "$repo"
+	require-value repo-name "$repo"
+	require-value user-name "$login"    # TODO should be login or org
+	require-value api-token "$token"
+	key_value_pairs+=(name "$repo_name")
+	api-patch "/repos/$user_name/$repo_name" "$(json-dump-object-pairs)"
 }
 
 github-repo-fork() {
@@ -293,15 +317,6 @@ github-repo-create() {
 	api-post "/user/repos" $(json-dump-object 'name' $repo_name)
 	message_success="Repository '$repo_name' created."
 	message_422="Repository name '$repo_name' already exists."
-}
-
-github-repo-edit() {
-	get-args *key_value_pairs
-	require-value repo-name "$repo"
-	require-value user-name "$login"    # TODO should be login or org
-	require-value api-token "$token"
-	key_value_pairs+=(name "$repo_name")
-	api-patch "/repos/$user_name/$repo_name" "$(json-dump-object-pairs)"
 }
 
 github-repo-delete() {
@@ -357,7 +372,7 @@ github-repo-unstar() {
 	message_success="'$user_name/$repo_name' unstarred"
 }
 
-github-user-stars() {
+github-starred() {
 	get-args user
 	require-value user-name "${user:-$login}"
 	require-value api-token "$token"
@@ -365,18 +380,18 @@ github-user-stars() {
 	api-get "/users/$user_name/starred?sort=updated"
 }
 
-success-user-stars() {
-    process-list report-user-stars
+success-starred() {
+    process-list report-starred
 }
 
-report-user-stars() {
+report-starred() {
 	name=$(json-get "/$ii/full_name")
 	[ -z "$name" ] && return 1
 	printf "%3d) %s\n" $list_counter $name
 	return 0
 }
 
-github-collab-list() {
+github-collabs() {
 	get-args repo
 	check-user-repo "$repo"
 	require-value repo-name "$repo"
@@ -386,18 +401,18 @@ github-collab-list() {
 	api-get "/repos/$user_name/$repo_name/collaborators"
 }
 
-success-collab-list() {
-    process-list report-collab-list
+success-collabs() {
+    process-list report-collabs
 }
 
-report-collab-list() {
+report-collabs() {
 	name=$(json-get "/$ii/login")
 	[ -z "$name" ] && return 1
 	printf "%3d) %s\n" $list_counter $name
 	return 0
 }
 
-github-collab-add() {
+github-trust() {
 	get-args user-repo *collaborators
 	require-value repo-name "$repo"
 	require-value user-name "$user"
@@ -407,7 +422,7 @@ github-collab-add() {
 	done
 }
 
-github-collab-remove() {
+github-untrust() {
 	get-args user-repo *collaborators
 	require-value repo-name "$repo"
 	require-value user-name "$user"
@@ -417,7 +432,7 @@ github-collab-remove() {
 	done
 }
 
-github-user-followers() {
+github-followers() {
 	get-args user
 	require-value user-name "${user:-$login}"
  	json_prune_regex='^/[0-9]+/(login)'
@@ -425,18 +440,18 @@ github-user-followers() {
 	api-get "/users/$user_name/followers"
 }
 
-success-user-followers() {
-    process-list report-user-followers
+success-followers() {
+    process-list report-followers
 }
 
-report-user-followers() {
+report-followers() {
 	name=$(json-get "/$ii/login")
 	[ -z "$name" ] && return 1
 	printf "%3d) %s\n" $list_counter $name
 	return 0
 }
 
-github-user-following() {
+github-following() {
 	get-args user
 	require-value user-name "${user:-$login}"
  	json_prune_regex='^/[0-9]+/(login)'
@@ -444,25 +459,25 @@ github-user-following() {
 	api-get "/users/$user_name/following"
 }
 
-success-user-following() {
-    process-list report-user-following
+success-following() {
+    process-list report-following
 }
 
-report-user-following() {
+report-following() {
 	name=$(json-get "/$ii/login")
 	[ -z "$name" ] && return 1
 	printf "%3d) %s\n" $list_counter $name
 	return 0
 }
 
-github-user-follow() {
+github-follow() {
 	get-args user
 	require-value user-name "$user"
 	require-value api-token "$token"
 	api-put "/user/following/$user_name"
 }
 
-github-user-unfollow() {
+github-unfollow() {
 	get-args user
 	require-value user-name "$user"
 	require-value api-token "$token"
@@ -482,8 +497,33 @@ api-delete() { api-call DELETE "$1" "$2"; }
 # Build a command to make the HTTP call to the API server, make the call, and
 # check the result.
 api-call() {
+	format-curl-command "$@"
+	[ -n "$GIT_HUB_TEST_COMMAND" ] && return
+
 	[ -n "$repeat_command" ] && api-repeat && return
 
+	if [ $GIT_VERBOSE ]; then
+		if [ -n "$show_token" ]; then
+			say "${curl_command[@]}"
+		else
+			say "${curl_command[@]/$api_token/********}"
+		fi
+	fi
+
+	[ -n "$dry_run" ] && exit 0
+
+	# Run the curl command!
+	set +e #; set -x  # for debugging the real command
+	"${curl_command[@]}"
+	local rc=$?
+	set -e #; set +x  # for debugging the real command
+
+	check-api-call-status $rc
+}
+
+# Build curl command in an global array. This is the only way to preserve
+# quoted whitespace.
+format-curl-command() {
 	local action=$1
 	local url=$2
 	local data=$3
@@ -498,52 +538,31 @@ api-call() {
 	local regex="^https?:"
 	[[ "$url" =~ $regex ]] || url="$GIT_HUB_API_URI$url"
 
-	# Build curl command in an array. This is the only way to preserve quoted
-	# whitespace.
-	local command=(
+	curl_command=(
 		curl
-			--silent
-			--show-error
 			--request $action
 		$url
 	)
-	[ -n "$data" ] && command+=(-d "$data")
-	[ -z "$data" ] && [ "$action" = "PUT" ] && command+=(-d "$data")
+	[ -n "$data" ] || [ "$action" = "PUT" ] && curl_command+=(-d "$data")
 	if [ -n "$basic_auth" ]; then
-		command+=(-u "$login")
-	else
-		[ -n "$api_token" ] &&
-			command+=(--header "Authorization: token $api_token")
+		curl_command+=(-u "$login")
+	elif [ -n "$api_token" ]; then
+		curl_command+=(--header "Authorization: token $api_token")
 	fi
-	command+=(
+	[ -n "$GIT_HUB_TEST_COMMAND" ] && return
+	curl_command+=(
 		--user-agent $user_agent
 		--dump-header $GIT_HUB_HEADER
 		--output $GIT_HUB_OUTPUT
 		--stderr $GIT_HUB_ERROR
+		--silent
+		--show-error
 	)
-
-	if [ $GIT_VERBOSE ]; then
-		if [ -n "$show_token" ]; then
-			say "${command[@]}"
-		else
-			say "${command[@]/$api_token/********}"
-		fi
-	fi
-
-	[ -n "$dry_run" ] && exit 0
-
-	# Run the curl command!
-	"${command[@]}"
-	## Use this line for debugging the real command
-	# set -x; "${command[@]}"; set +x
-
-	check-api-call-status $?
 }
 
 check-api-call-status() {
 	OK=$1
 	if [ ! -f $GIT_HUB_HEADER ]; then
-		OK=1
 		ERROR=$(head -1 $GIT_HUB_ERROR)
 		return
 	fi
@@ -638,9 +657,10 @@ fetch-value() {
 	[ -n "$(eval echo \$$var)" ] && return
 	eval $var=\"\$$env\"
 	[ -n "$(eval echo \$$var)" ] && return
+	local git_dir=${GIT_DIR:-.git}
 	if [ "$var" = "repo_name" -o "$var" = "user_name" ]; then
-		if [ -f ".git/config" ]; then
-			url=$(git config --file=.git/config remote.origin.url)
+		if [ -f "$git_dir/config" ]; then
+			url=$(git config --file=$git_dir/config remote.origin.url)
 			if [ -n "$url" ]; then
 				local re1='github\.com'
 				if [[ "$url" =~ $re1 ]]; then
@@ -703,12 +723,18 @@ command. Usually you put your token into the ~/.githubconfig file, like this:
 
 	git hub config api-token <your-personal-api-access-token>
 
-To create a new token or get get your value, got to
-https://github.com/settings/applications. This is a 40 digit hexadecimal
-character string.
-
 You can also specify the token using the --token= commandline option, or via
 the GIT_HUB_API_TOKEN environment variable.
+
+To list your API tokens:
+
+	git hub token-list
+
+To create a new api token:
+
+	git hub token-create "my git-hub token"
+	# You should probably add at least the 'repo' and 'user' scopes:
+	git hub scope-add <token-id> repo user
 
 eos
 	die
@@ -818,7 +844,12 @@ report-value() {
 	local label=$(eval echo \$label_$1)
 	if [ -z "$label" ]; then
 		label=$(echo "$1" | tr '_' ' ')
-		label=$(for word in $label; do title=`echo "${word:0:1}" | tr a-z A-Z`${word:1}; echo -n "$title "; done)
+		label=$(
+			for word in $label; do
+				title=`echo "${word:0:1}" | tr a-z A-Z`${word:1}
+				echo -n "$title "
+			done
+		)
 	fi
 	if [ -n "$label" -a -n "$value" ]; then
 		if [ ${#value} -lt 80 ]; then
@@ -841,8 +872,12 @@ label_ssh_url='Remote URL'
 # Initial setup functions:
 #------------------------------------------------------------------------------
 assert-env() {
-	GIT_CORE_PATH=$(git --exec-path) || exit $?
-	PATH=$GIT_CORE_PATH:$PATH
+	GIT_EXEC_PATH=$(git --exec-path) || exit $?
+	GIT_HUB_EXEC_PATH=$GIT_EXEC_PATH
+	[ -n "$GIT_HUB_TEST_MODE" ] &&
+		GIT_HUB_EXEC_PATH=$PWD/lib
+	# We source this twice. Now get say and die. Later to parse options.
+	NONGIT_OK=1 source "$GIT_EXEC_PATH/git-sh-setup"
 
 	: ${GIT_HUB_API_URI:=https://api.github.com}
 	: ${GIT_HUB_TMP_DIR:=/tmp}
@@ -851,30 +886,26 @@ assert-env() {
 	GIT_HUB_OUTPUT=$GIT_HUB_TMP_PREFIX-out-$$
 	GIT_HUB_ERROR=$GIT_HUB_TMP_PREFIX-err-$$
 	GIT_HUB_HEADER=$GIT_HUB_TMP_PREFIX-head-$$
+
 	local cmd
 	for cmd in curl cut git grep head tr; do
 		[ -z "$(which $cmd)" ] &&
-			echo "Required command not found: '$cmd'" && exit 1
+			echo "Required shell command not found: '$cmd'" && exit 1
 	done
+
 	[ -z "$HOME" ] &&
 		echo "Cannot determine HOME directory" && exit 1
-	config_file=$GIT_HUB_CONFIG
-	[ -n "$config_file" ] || config_file=$HOME/.githubconfig
+	config_file=${GIT_HUB_CONFIG:-$HOME/.githubconfig}
 }
 
 get-options() {
 	[ $# -eq 0 ] && set -- --help
-	NONGIT_OK=1 source git-sh-setup
+	NONGIT_OK=1 source "$GIT_EXEC_PATH/git-sh-setup"
 
-	user=; repo=; token=; list_size=
-	GIT_QUIET=; GIT_VERBOSE=; show_token=
-	dry_run=; repeat_command=
-	show_output=; show_headers=; show_json=
+	unset-global-variables
 	while [ $# -gt 0 ]; do
 		local option="$1"; shift
 		case "$option" in
-			--user) user="$1"; shift ;;
-			--repo) repo="$1"; shift ;;
 			--token) token="$1"; shift ;;
 			-c)	list_size=$1; shift ;;
 			-a) list_size=999999 ;;
@@ -906,27 +937,39 @@ get-options() {
 	done
 
     command="$1"; shift
-	# Some common command aliases:
-	[ "$command" = "user" ] && command="user-info"
-	[ "$command" = "repos" ] && command="repo-list"
-	[ "$command" = "repo" ] && command="repo-info"
-	[ "$command" = "fork" ] && command="repo-fork"
-	[ "$command" = "stars" ] && command="repo-stars"
-	[ "$command" = "star" ] && command="repo-star"
-	[ "$command" = "unstar" ] && command="repo-unstar"
-	[ "$command" = "collabs" ] && command="collab-list"
-	[ "$command" = "followers" ] && command="user-followers"
-	[ "$command" = "following" ] && command="user-following"
-	[ "$command" = "follow" ] && command="user-follow"
-	[ "$command" = "unfollow" ] && command="user-unfollow"
-
 	command_arguments=("$@")
+
+	# Command aliases:
+	[ "$command" = "fork" ] && command="repo-fork"
+	[ "$command" = "create" ] && command="repo-create"
+
+    [ "$command" = "config" -o "$command" = "config-unset" ] || check_config
+
+	true
+}
+
+unset-global-variables() {
+	command=
+	command_arguments=
+	user=
+	user_name=
+	repo=
+	repo_name=
+	token=
+	api_token=
+	list_size=
+	GIT_QUIET=
+	GIT_VERBOSE=
+	show_token=
+	dry_run=
+	repeat_command=
+	show_output=
+	show_headers=
+	show_json=
 }
 
 setup-env() {
-    [ "$command" = "config" -o "$command" = "config-unset" ] || check_config
-
-    source "$GIT_CORE_PATH/git-hub./json.bash"
+    source "$GIT_HUB_EXEC_PATH/git-hub./json.bash"
     if [ -n "$repeat_command" ]; then
 		[ -f $GIT_HUB_TMP_PREFIX-out-* ] ||
 			die "No previous 'git hub' command to repeat"
@@ -961,8 +1004,8 @@ callable() {
 	[ -n "$(type $1 2> /dev/null)" ]
 }
 
-# This command is provided by `git-sh-setup` but is missing in older versions.
-# Repeating it here for now:
+# This command is provided by `git-sh-setup` but is missing in older versions
+# of git.  Repeating it here for now:
 say () {
 	if test -z "$GIT_QUIET"
 	then
@@ -973,6 +1016,6 @@ say () {
 #------------------------------------------------------------------------------
 # Begin at the end!
 #------------------------------------------------------------------------------
-main "$@"
+[ -n "$GIT_HUB_TEST_MODE" ] || main "$@"
 
 # vim: set tabstop=4 shiftwidth=4 noexpandtab:

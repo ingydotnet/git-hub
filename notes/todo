@@ -1,22 +1,19 @@
+- Add a DEVELOPMENT section to the docs
 - Show when there are more elements in a list
 - Detect rate-limit failure
-- change -a to -A and add --all/-a
 - Add quiet versions to output
-
+- Find out why github fails under zsh (rafl)
 - rate-limit
-- repo-fork
 - repo-watch
-
-- Add owner-name concept
-- Add org-name concept
-
 - Make a plan for all actions to support
-
-
-- Add bash-tap support to test suite
 - Refactor variable scoping to use minimal globals
 
-
++ Add bash-tap support to test suite
++ repo-fork
++ Add owner-name concept
++ Add org-name concept
++ change -a to -U and add --all/-a
++ Detect no network
 + user-followers
 + user-following
 + user-follow

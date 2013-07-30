@@ -1,3 +1,6 @@
 [submodule "ext/JSON.sh"]
 	path = ext/JSON.sh
 	url = git@github.com:ingydotnet/JSON.sh.git
+[submodule "ext/bash-tap"]
+	path = ext/bash-tap
+	url = git@github.com:ingydotnet/bash-tap.git

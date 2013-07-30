@@ -1,0 +1,3 @@
+[remote "origin"]
+	url = git@github.com:ricardo/foo.git
+	fetch = +refs/heads/*:refs/remotes/origin/*

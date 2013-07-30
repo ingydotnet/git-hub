@@ -1,4 +1,4 @@
-.PHONY: default help build doc test install install-all install-exe install-doc
+.PHONY: default help build doc test install install-all install-exe install-doc dev-install dev-test dev-test-reset check-dev-install
 
 ##
 # Make sure we have 'git' and it works OK.
@@ -34,10 +34,8 @@ help:
 build: lib/$(CMD) lib/$(CMD)./json.bash
 doc: doc/$(CMD).1
 
-test: build
-	@# prove -e bash test
-	@#bash test/repos-create.t
-	bash test/all_commands.t
+test: build ext/bash-tap/bash-tap
+	prove test/
 
 install: uninstall install-exe install-doc
 
@@ -83,15 +81,32 @@ doc/%.1: %.1
 lib/$(CMD).:
 	mkdir $@
 
-ext/JSON.sh/JSON.sh:
+ext/JSON.sh/JSON.sh ext/bash-tap/bash-tap:
 	git submodule update --init
-	if [ ! -f "$@" ]; then \
+	@if [ ! -f "$@" ]; then \
 	    echo "Failed to create '$@'"; \
 	    exit 1; \
 	fi
 
 ##
 # Undocumented dev rules
-install-link: build uninstall
+
+# Install using symlinks so repo changes can be tested live
+dev-install: build uninstall
 	ln -s $$PWD/lib/$(CMD) $(GIT_INSTALL_LIB)/$(CMD)
 	ln -s $$PWD/lib/$(CMD). $(GIT_INSTALL_LIB)/$(CMD).
+
+# Run a bunch of live tests. Make sure this thing really works. :)
+dev-test: check-dev-install
+	bash test/dev-test/all_commands.t
+
+# Run this to reset if `make dev-test` fails.
+dev-test-reset: check-dev-install
+	GIT_HUB_TEST_RESET=1 bash test/dev-test/all_commands.t
+
+check-dev-install:
+	@if [ ! -L $$(git --exec-path)/git-hub ]; then \
+	    echo "Run 'make dev-install' first"; \
+	    exit 1; \
+	fi
+

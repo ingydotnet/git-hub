@@ -11,21 +11,21 @@ if [ -n "$GIT_HUB_TEST_RESET" ]; then
     exit 0
 fi
 
-git hub user-info
+git hub user
 git hub user cdent
-git hub repo-info pegex-pm
-git hub repo-list
+git hub repo pegex-pm
+git hub repos
 git hub repos cdent
 git hub repo cdent/simper
-git hub repo-create git-hub-api-test
-git hub repo-list
-git hub repo-edit --repo=git-hub-api-test \
+git hub create git-hub-api-test
+git hub repos
+git hub repo-edit ingydotnet/git-hub-api-test \
     description "This is just a test repo" \
     homepage http://example.com
-git hub repo-info git-hub-api-test
+git hub repo git-hub-api-test
 git hub repo-delete git-hub-api-test
-git hub collab-list
-git hub repo-info
+git hub collabs
+git hub repo
 
 set +x
 
