@@ -54,14 +54,9 @@ main() {
 	get-options "$@"
 	setup-env
 
-	! callable github-"$command" &&
+	callable github-"$command" ||
 		die "Unknown 'git hub' command: '$command'"
 	github-"$command" "$@"
-	[ -n "$show_headers" ] && cat $GIT_HUB_HEADER
-	[ -n "$show_output" ] && cat $GIT_HUB_OUTPUT
-	[ -s $GIT_HUB_OUTPUT ] && json-load-cache "$(< $GIT_HUB_OUTPUT)"
-	[ -n "$json_prune_regex" ] && json-prune-cache "$json_prune_regex"
-	[ -n "$show_json" ] && echo "$json_load_data_cache"
 
 	if OK; then
 		if callable "success-$command"; then
@@ -80,7 +75,8 @@ main() {
 		"failure-$command"
 		exit $OK
 	else
-		say ${message_failure:="'git hub $command' failed: $status_code $ERROR"}
+		say ${message_failure:-"'git hub $command' failed: $status_code"}
+		say "$ERROR"
 		exit $OK
 	fi
 }
@@ -113,21 +109,11 @@ github-config-unset() {
 
 github-token-list() {
 	basic_auth="1"
-	api-get '/authorizations'
+	report-list '/authorizations' 'token id note app/name'
 }
 
-# XXX - Can have more than 10 tokens
-success-token-list() {
-	local i=0
-	while true; do
-		local token=$(json-get "/$i/token")
-		[ -z "$token" ] && break
-		local id=$(json-get "/$i/id")
-		local note=$(json-get "/$i/note")
-		local name=$(json-get "/$i/app/name")
-		: $((i++))
-		printf "%d) %s %-14s  %s\n" $i $token "(id: $id)" "${note:-$name}"
-	done
+format-token-list-entry() {
+	printf "%d) %s %-14s  %s\n" $1 $2 "(id: $3)" "${4:-$5}"
 }
 
 github-token-create() {
@@ -172,7 +158,7 @@ success-scope-list() {
 		scope=$(json-get "/scopes/$i")
 		[ -z "$scope" ] && break
 		scopes+=($scope)
-		: $((i++))
+		let i=i+1
 	done
 	echo
 	echo "The current scopes for token-id:$token_id are:"
@@ -253,23 +239,12 @@ github-repos() {
 	fetch-value user-name "$user"
 	: ${user_name:=$login}
 
-	json_prune_regex='^/[0-9]+/(full_name|pushed_at|description)'
-	list-setup 10
-	api-get "/users/$user_name/repos?sort=pushed;per_page=$per_page"
+	report-list "/users/$user_name/repos?sort=pushed;per_page=PER_PAGE" \
+		'pushed_at full_name description'
 }
 
-success-repos() {
-    process-list report-repos
-}
-
-report-repos() {
-	name=$(json-get "/$1/full_name")
-	[ -z "$name" ] && return 1
-	pushed=$(json-get "/$1/pushed_at")
-	pushed=${pushed/T*/}
-	desc=$(json-get "/$1/description")
-	printf "%3d) (%s)  %-30s %s\n" $list_counter $pushed $name "$desc"
-	return 0
+format-repos-entry() {
+	printf "%d) (%s)  %-30s %s\n" $1 ${2/T*} $3 "$4"
 }
 
 github-repo() {
@@ -328,22 +303,13 @@ github-forks() {
 	require-value repo-name "$repo"
 	require-value user-name "${user:-$login}"
 
-# 	json_prune_regex='^/[0-9]+/(full_name)'
-	list-setup 10
-	api-get "/repos/$user_name/$repo_name/forks?sort=newest;per_page=$per_page"
+	report-list \
+		"/repos/$user_name/$repo_name/forks?sort=newest;per_page=PER_PAGE" \
+		'pushed_at full_name'
 }
 
-success-forks() {
-    process-list report-forks
-}
-
-report-forks() {
-	name=$(json-get "/$1/full_name")
-	[ -z "$name" ] && return 1
-	pushed=$(json-get "/$1/pushed_at")
-	pushed=${pushed/T*/}
-	printf "%3d) (%s)  %-30s\n" $list_counter $pushed $name
-	return 0
+format-forks-entry() {
+	printf "%d) (%s)  %-30s\n" $1 ${2/T*/} $3
 }
 
 github-fork() {
@@ -354,27 +320,17 @@ github-fork() {
 	api-post "/repos/$user_name/$repo_name/forks" '{}'
 }
 
-github-repo-stars() {
+github-stars() {
 	get-args repo
 	check-user-repo "$repo"
 	require-value repo-name "$repo"
 	require-value user-name "${user:-$login}"
- 	json_prune_regex='^/[0-9]+/(login)'
-	list-setup 9999
-	api-get "/repos/$user_name/$repo_name/stargazers"
+	report-list "/repos/$user_name/$repo_name/stargazers" \
+		'login'
 }
 
-success-repo-stars() {
-    process-list report-repo-stars
-	list="${stars[@]}"
-	echo "$list" | fmt
-}
-
-report-repo-stars() {
-	name=$(json-get "/$1/login")
-	[ -z "$name" ] && return 1
-	stars+=($name)
-	return 0
+format-stars-entry() {
+	printf "%d) %s\n" $1 $2
 }
 
 github-repo-star() {
@@ -400,20 +356,12 @@ github-repo-unstar() {
 github-starred() {
 	get-args user
 	require-value user-name "${user:-$login}"
-	require-value api-token "$token"
-	list-setup 10
-	api-get "/users/$user_name/starred?sort=updated"
+	report-list "/users/$user_name/starred?sort=updated" \
+		'full_name'
 }
 
-success-starred() {
-    process-list report-starred
-}
-
-report-starred() {
-	name=$(json-get "/$ii/full_name")
-	[ -z "$name" ] && return 1
-	printf "%3d) %s\n" $list_counter $name
-	return 0
+format-starred-entry() {
+	printf "%d) %s\n" $1 $2
 }
 
 github-collabs() {
@@ -421,20 +369,12 @@ github-collabs() {
 	check-user-repo "$repo"
 	require-value repo-name "$repo"
 	require-value user-name "${user:-$login}"
- 	json_prune_regex='^/[0-9]+/(login)'
-	list-setup 10
-	api-get "/repos/$user_name/$repo_name/collaborators"
+	report-list "/repos/$user_name/$repo_name/collaborators" \
+		'login'
 }
 
-success-collabs() {
-    process-list report-collabs
-}
-
-report-collabs() {
-	name=$(json-get "/$ii/login")
-	[ -z "$name" ] && return 1
-	printf "%3d) %s\n" $list_counter $name
-	return 0
+format-collabs-entry() {
+	printf "%d) %s\n" $1 $2
 }
 
 github-trust() {
@@ -460,39 +400,23 @@ github-untrust() {
 github-followers() {
 	get-args user
 	require-value user-name "${user:-$login}"
- 	json_prune_regex='^/[0-9]+/(login)'
-	list-setup 50
-	api-get "/users/$user_name/followers"
+	report-list "/users/$user_name/followers" \
+		'login'
 }
 
-success-followers() {
-    process-list report-followers
-}
-
-report-followers() {
-	name=$(json-get "/$ii/login")
-	[ -z "$name" ] && return 1
-	printf "%3d) %s\n" $list_counter $name
-	return 0
+format-followers-entry() {
+	printf "%d) %s\n" $1 $2
 }
 
 github-following() {
 	get-args user
 	require-value user-name "${user:-$login}"
- 	json_prune_regex='^/[0-9]+/(login)'
-	list-setup 50
-	api-get "/users/$user_name/following"
+	report-list "/users/$user_name/following" \
+		'login'
 }
 
-success-following() {
-    process-list report-following
-}
-
-report-following() {
-	name=$(json-get "/$ii/login")
-	[ -z "$name" ] && return 1
-	printf "%3d) %s\n" $list_counter $name
-	return 0
+format-following-entry() {
+	printf "%d) %s\n" $1 $2
 }
 
 github-follow() {
@@ -525,8 +449,6 @@ api-call() {
 	format-curl-command "$@"
 	[ -n "$GIT_HUB_TEST_COMMAND" ] && return
 
-	[ -n "$repeat_command" ] && api-repeat && return
-
 	if [ $GIT_VERBOSE ]; then
 		if [ -n "$show_token" ]; then
 			say "${curl_command[@]}"
@@ -537,13 +459,26 @@ api-call() {
 
 	[ -n "$dry_run" ] && exit 0
 
-	# Run the curl command!
-	set +e #; set -x  # for debugging the real command
-	"${curl_command[@]}"
-	local rc=$?
-	set -e #; set +x  # for debugging the real command
+	if [ -z "$repeat_command" ]; then
+		# Run the curl command!
+		set +e #; set -x  # for debugging the real command
+		"${curl_command[@]}"
+		rc=$?
+		set -e #; set +x  # for debugging the real command
+	else
+		# Use last command run results.
+		rc=0
+	fi
+
+	[ -n "$show_headers" ] && cat $GIT_HUB_HEADER
+	[ -n "$show_output" ] && cat $GIT_HUB_OUTPUT
+	[ -s $GIT_HUB_OUTPUT ] && json-load-cache "$(< $GIT_HUB_OUTPUT)"
+	[ -n "$json_prune_regex" ] && json-prune-cache "$json_prune_regex"
+	[ -n "$show_json" ] && echo "$json_load_data_cache"
 
 	check-api-call-status $rc
+
+	true
 }
 
 # Build curl command in an global array. This is the only way to preserve
@@ -554,7 +489,9 @@ format-curl-command() {
 	local data=$3
 
 	fetch-value use-auth
-	[ -n "$use_auth" ] && require-value api-token "$token"
+	[ -z "$GIT_HUB_TEST_COMMAND" ] &&
+		[ -n "$use_auth" ] &&
+		require-value api-token "$token"
 
 	user_agent=git-hub-$GIT_HUB_VERSION
 	# Cheap trick to make github pretty-print the JSON output.
@@ -595,7 +532,18 @@ check-api-call-status() {
 	local regex='^[0-9]{3}$'
 	[[ $status_code =~ $regex ]] || return
 	case "$status_code" in
-		200|201|202|204) OK=0 ;;
+		200|201|202|204)
+			OK=0
+			;;
+		403)
+			OK=1
+			ERROR=$(json-get '/message')
+			local regex='rate limit exceeded'
+			if [[ "$ERROR" =~ "$regex" ]]; then
+				ERROR="$ERROR Try the --use-auth option."
+			fi
+			ERROR=$(echo "$ERROR" | fmt)
+			;;
 		*)
 			OK=1
 			ERROR=$(head -1 $GIT_HUB_HEADER | cut -d ' ' -f3-)
@@ -605,11 +553,6 @@ check-api-call-status() {
 
 OK() {
 	return $OK
-}
-
-api-repeat() {
-	check-api-call-status 0
-	true
 }
 
 #------------------------------------------------------------------------------
@@ -629,11 +572,11 @@ get-args() {
 	for arg in "${command_arguments[@]}"; do
 		if [ $slurp_index -gt 0 ]; then
 			eval ${1/\*/}[$slurp_index]=\"$arg\"
-			: $((slurp_index++))
+			let slurp_index=slurp_index+1
 		elif [ $# -gt 0 ]; then
 			if [[ $1 =~ $slurp_re ]]; then
 				eval ${1/\*/}[$slurp_index]=\"$arg\"
-				: $((slurp_index++))
+				let slurp_index=slurp_index+1
 			else
 				eval $1=\""$arg"\"
 				shift
@@ -707,42 +650,43 @@ fetch-value() {
 #------------------------------------------------------------------------------
 # List processing functions:
 #------------------------------------------------------------------------------
-list-setup() {
-	: ${list_size:=$1}
-	page_size=${2:-30}
-	list_counter=1
-	per_page=$list_size
-	[ $per_page -gt $page_size ] && per_page=$page_size
-	true
-}
-
-process-list() {
-	callback="$1"
-	for ((ii=0; ii < $page_size; ii++)); do
-		[ $list_counter -gt $list_size ] && break
-		$callback $ii || return 0
-		: $((list_counter++))
+report-list() {
+	message_success=' '
+	local url="$1" fields=($2) ii
+ 	local list_max=${list_size:-${3:-$(($(tput lines) - 4))}}
+	local per_page=${4:-100}
+	[ $per_page -gt $list_max ] && per_page=$list_max
+	url=${url/PER_PAGE/$per_page}
+	local list_counter=1
+	while true; do
+		api-get $url
+		json-prune-list "${fields[@]}"
+		local page_size=$(echo "$json_load_data_cache" | cut -d '/' -f2 | tail -1)
+		for ((ii = 0; ii <= page_size && list_counter <= list_max; ii++)); do
+			local -a values=()
+			for field in "${fields[@]}"; do
+				value="$(json-get "/$ii/$field")"
+				values+=("$value")
+			done
+			"format-$command-entry" $list_counter "${values[@]}"
+			let list_counter=list_counter+1
+		done
+		url=$(get-next-page-url)
+		if [ $list_counter -gt $list_max ]; then
+			if [ -n "$url" -o $ii -lt $page_size ]; then
+				echo --More--
+			fi
+			break
+		fi
+		[ -z "$url" ] && break
 	done
-
-	[ $list_counter -gt $list_size ] ||
-		get-next-page process-list $callback
-
-	if [ -z "$more_message_printed" ]; then
-		say ''
-		say "There are more entries. Use --count=# or --all."
-		more_message_printed=1
-	fi
 }
 
-get-next-page() {
-	regexp='Link: <(https:.+?)>; rel="next"'
-	[[ "$(< $GIT_HUB_HEADER)" =~ $regexp ]] || return
-	local link=${BASH_REMATCH[1]}
-	api-get "$link"
-	if OK; then
-		json-load-cache "$(< $GIT_HUB_OUTPUT)"
-		$1 $2
-	fi
+get-next-page-url() {
+	local regexp='Link: <(https:.+?)>; rel="next"'
+	[[ "$(< $GIT_HUB_HEADER)" =~ $regexp ]] &&
+		echo "${BASH_REMATCH[1]}"
+	true
 }
 
 #------------------------------------------------------------------------------
@@ -857,6 +801,11 @@ json-prune-cache() {
 	json_load_data_cache=$(echo "$json_load_data_cache" | grep -E "$1")
 }
 
+json-prune-list() {
+	local fields="$@"
+	json-prune-cache "^/[0-9]+/(${fields// /|})\b"
+}
+
 json-get() {
 	local key="^$1[[:space:]]"
 	local data="$2"
@@ -925,7 +874,7 @@ assert-env() {
 
 	local cmd
 	for cmd in curl cut git grep head tr; do
-		[ -z "$(which $cmd)" ] &&
+		[ -z "$(type $cmd) > /dev/null" ] &&
 			echo "Required shell command not found: '$cmd'" && exit 1
 	done
 
@@ -1001,6 +950,7 @@ unset-global-variables() {
 	show_output=
 	show_headers=
 	show_json=
+	list_complete=
 	more_message_printed=
 }
 

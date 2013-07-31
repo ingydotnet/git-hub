@@ -1,5 +1,5 @@
+- Review global variables
 - Add a DEVELOPMENT section to the docs
-- Detect rate-limit failure
 - Add quiet versions to output
 - Find out why github fails under zsh (rafl)
 - rate-limit
@@ -7,6 +7,7 @@
 - Make a plan for all actions to support
 - Refactor variable scoping to use minimal globals
 
++ Detect rate-limit failure
 + Show when there are more elements in a list
 + Add bash-tap support to test suite
 + repo-fork
