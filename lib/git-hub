@@ -62,7 +62,9 @@ main() {
 		if callable "success-$command"; then
 			"success-$command"
 		else
-			say ${message_success:-"'git hub $command' successful"}
+			if [ "$message_success" != '0' ]; then
+				say ${message_success:-"'git hub $command' successful"}
+			fi
 		fi
 		exit 0
 	elif [ -n "$status_code" ] && callable "status-$status_code-$command"; then
@@ -86,7 +88,7 @@ main() {
 #------------------------------------------------------------------------------
 github-config() {
     get-args config_key config_value
-	message_success=' '
+	message_success=0
 	if [ -z "$config_key" ]; then
 		cat $config_file
 	elif [ -z "$config_value" ]; then
@@ -117,6 +119,7 @@ format-token-list-entry() {
 }
 
 github-token-create() {
+	local json
 	get-args note
 	if [ -n "$note" ]; then
 		json=$(json-dump-object "note" "$note")
@@ -651,9 +654,9 @@ fetch-value() {
 # List processing functions:
 #------------------------------------------------------------------------------
 report-list() {
-	message_success=' '
+	message_success=0
 	local url="$1" fields=($2) ii
- 	local list_max=${list_size:-${3:-$(($(tput lines) - 4))}}
+ 	local list_max=${list_size:-${3:-$(($(tput lines) - 3))}}
 	local per_page=${4:-100}
 	[ $per_page -gt $list_max ] && per_page=$list_max
 	url=${url/PER_PAGE/$per_page}

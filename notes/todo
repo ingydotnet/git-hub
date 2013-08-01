@@ -2,10 +2,13 @@
 - Add a DEVELOPMENT section to the docs
 - Add quiet versions to output
 - Find out why github fails under zsh (rafl)
-- rate-limit
-- repo-watch
+- search command
+- rate-limit command
+- repo-watch command
 - Make a plan for all actions to support
 - Refactor variable scoping to use minimal globals
+- git hub scope-add --all
+- git hub scope-remove --all
 
 + Detect rate-limit failure
 + Show when there are more elements in a list
