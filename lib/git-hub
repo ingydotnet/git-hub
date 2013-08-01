@@ -111,11 +111,17 @@ github-config-unset() {
 
 github-token-list() {
 	basic_auth="1"
-	report-list '/authorizations' 'token id note app/name'
+	report-list \
+		'/authorizations' \
+		'token id note app/name'
 }
 
 format-token-list-entry() {
-	printf "%d) %s %-14s  %s\n" $1 $2 "(id: $3)" "${4:-$5}"
+	if QUIET; then
+		printf "%-7s  %s\n" $3 "${4:-$5}"
+	else
+		printf "%d) %s %-14s  %s\n" $1 $2 "(id: $3)" "${4:-$5}"
+	fi
 }
 
 github-token-create() {
@@ -136,7 +142,11 @@ success-token-create() {
 	local id=$(json-get "/id")
 	local note=$(json-get "/note")
 	local name=$(json-get "/app/name")
-	printf "Token created: %s %-14s  %s\n" $token "(id: $id)" "${note:-$name}"
+	if QUIET; then
+		printf "$id"
+	else
+		printf "Token created: %s %-14s  %s\n" $token "(id: $id)" "${note:-$name}"
+	fi
 }
 
 github-token-delete() {
@@ -156,13 +166,21 @@ github-scope-list() {
 
 success-scope-list() {
 	local i=0
-	local scopes
+	local scopes scope
 	while true; do
 		scope=$(json-get "/scopes/$i")
 		[ -z "$scope" ] && break
 		scopes+=($scope)
 		let i=i+1
 	done
+
+	if QUIET; then
+		for scope in "${scopes[@]}"; do
+			echo "$scope"
+		done
+		return
+	fi
+
 	echo
 	echo "The current scopes for token-id:$token_id are:"
 	echo "  ${scopes[*]}"
@@ -184,8 +202,18 @@ eos
 }
 
 github-scope-add() {
-	get-args id *scopes
+    if ALL; then
+		get-args id
+		scopes=(
+			user user:email user:follow
+			public_repo repo repo:status delete_repo
+			notifications gist
+		)
+	else
+		get-args id *scopes
+	fi
 	require-value token-id "$id"
+	check-token-id "$id"
 	basic_auth="1"
 	local array=$(json-dump-array ${scopes[*]})
 	local json=$(json-dump-object add_scopes "$array")
@@ -194,7 +222,16 @@ github-scope-add() {
 }
 
 github-scope-remove() {
-	get-args id *scopes
+    if ALL; then
+		get-args id
+		scopes=(
+			user user:email user:follow
+			public_repo repo repo:status delete_repo
+			notifications gist
+		)
+	else
+		get-args id *scopes
+	fi
 	require-value token-id "$id"
 	basic_auth="1"
 	local array=$(json-dump-array ${scopes[*]})
@@ -242,12 +279,17 @@ github-repos() {
 	fetch-value user-name "$user"
 	: ${user_name:=$login}
 
-	report-list "/users/$user_name/repos?sort=pushed;per_page=PER_PAGE" \
+	report-list \
+		"/users/$user_name/repos?sort=pushed;per_page=PER_PAGE" \
 		'pushed_at full_name description'
 }
 
 format-repos-entry() {
-	printf "%d) (%s)  %-30s %s\n" $1 ${2/T*} $3 "$4"
+	if QUIET; then
+		printf "$3\n"
+	else
+		printf "%d) (%s)  %-30s %s\n" $1 ${2/T*} $3 "$4"
+	fi
 }
 
 github-repo() {
@@ -312,7 +354,11 @@ github-forks() {
 }
 
 format-forks-entry() {
-	printf "%d) (%s)  %-30s\n" $1 ${2/T*/} $3
+	if QUIET; then
+		printf "$3\n"
+	else
+		printf "%d) (%s)  %-30s\n" $1 ${2/T*/} $3
+	fi
 }
 
 github-fork() {
@@ -328,12 +374,17 @@ github-stars() {
 	check-user-repo "$repo"
 	require-value repo-name "$repo"
 	require-value user-name "${user:-$login}"
-	report-list "/repos/$user_name/$repo_name/stargazers" \
+	report-list \
+		"/repos/$user_name/$repo_name/stargazers" \
 		'login'
 }
 
 format-stars-entry() {
-	printf "%d) %s\n" $1 $2
+	if QUIET; then
+		printf "$2\n"
+	else
+		printf "%d) %s\n" $1 $2
+	fi
 }
 
 github-repo-star() {
@@ -359,12 +410,17 @@ github-repo-unstar() {
 github-starred() {
 	get-args user
 	require-value user-name "${user:-$login}"
-	report-list "/users/$user_name/starred?sort=updated" \
+	report-list \
+		"/users/$user_name/starred?sort=updated" \
 		'full_name'
 }
 
 format-starred-entry() {
-	printf "%d) %s\n" $1 $2
+	if QUIET; then
+		printf "$2\n"
+	else
+		printf "%d) %s\n" $1 $2
+	fi
 }
 
 github-collabs() {
@@ -372,12 +428,17 @@ github-collabs() {
 	check-user-repo "$repo"
 	require-value repo-name "$repo"
 	require-value user-name "${user:-$login}"
-	report-list "/repos/$user_name/$repo_name/collaborators" \
+	report-list \
+		"/repos/$user_name/$repo_name/collaborators" \
 		'login'
 }
 
 format-collabs-entry() {
-	printf "%d) %s\n" $1 $2
+	if QUIET; then
+		printf "$2\n"
+	else
+		printf "%d) %s\n" $1 $2
+	fi
 }
 
 github-trust() {
@@ -403,23 +464,33 @@ github-untrust() {
 github-followers() {
 	get-args user
 	require-value user-name "${user:-$login}"
-	report-list "/users/$user_name/followers" \
+	report-list \
+		"/users/$user_name/followers" \
 		'login'
 }
 
 format-followers-entry() {
-	printf "%d) %s\n" $1 $2
+	if QUIET; then
+		printf "$2\n"
+	else
+		printf "%d) %s\n" $1 $2
+	fi
 }
 
 github-following() {
 	get-args user
 	require-value user-name "${user:-$login}"
-	report-list "/users/$user_name/following" \
+	report-list \
+		"/users/$user_name/following" \
 		'login'
 }
 
 format-following-entry() {
-	printf "%d) %s\n" $1 $2
+	if QUIET; then
+		printf "$2\n"
+	else
+		printf "%d) %s\n" $1 $2
+	fi
 }
 
 github-follow() {
@@ -554,9 +625,10 @@ check-api-call-status() {
 	esac
 }
 
-OK() {
-	return $OK
-}
+OK() { return $OK; }
+QUIET() { [ -n "$GIT_QUIET" ] && return 0 || return 1; }
+VERBOSE() { [ -n "$GIT_VERBOSE" ] && return 0 || return 1; }
+ALL() { [ -n "$GIT_HUB_ALL" ] && return 0 || return 1; }
 
 #------------------------------------------------------------------------------
 # Argument parsing functions:
@@ -650,6 +722,16 @@ fetch-value() {
 	true
 }
 
+check-token-id() {
+	local id="$1"
+	[ ${#id} -eq 40 ] &&
+		die "'$command' requires a *token-id*, not a *token-value*."
+	local regex='^[0-9]+$'
+	[[ "$id" =~ $regex ]] ||
+		die "'$id' is invalid token-id. Must be an integer value."
+	true
+}
+
 #------------------------------------------------------------------------------
 # List processing functions:
 #------------------------------------------------------------------------------
@@ -677,7 +759,9 @@ report-list() {
 		url=$(get-next-page-url)
 		if [ $list_counter -gt $list_max ]; then
 			if [ -n "$url" -o $ii -lt $page_size ]; then
-				echo --More--
+				if ! QUIET; then
+					echo --More--
+				fi
 			fi
 			break
 		fi
@@ -827,15 +911,18 @@ json-get() {
 report-value() {
     local key=${1//__/\/}
 	local value=$(json-get "/$key")
-	local label=$(eval echo \$label_$1)
-	if [ -z "$label" ]; then
-		label=$(echo "$1" | tr '_' ' ')
-		label=$(
-			for word in $label; do
-				title=`echo "${word:0:1}" | tr a-z A-Z`${word:1}
-				echo -n "$title "
-			done
-		)
+	local label="$key"
+	if ! QUIET; then
+		label=$(eval echo \$label_$1)
+		if [ -z "$label" ]; then
+			label=$(echo "$1" | tr '_' ' ')
+			label=$(
+				for word in $label; do
+					title=`echo "${word:0:1}" | tr a-z A-Z`${word:1}
+					echo -n "$title "
+				done
+			)
+		fi
 	fi
 	if [ -n "$label" -a -n "$value" ]; then
 		if [ ${#value} -lt 80 ]; then
@@ -896,7 +983,9 @@ get-options() {
 		case "$option" in
 			--token) token="$1"; shift ;;
 			-c)	list_size=$1; shift ;;
-			-a) list_size=999999 ;;
+			-a) GIT_HUB_ALL="1"
+				list_size=999999
+				;;
 			-U) use_auth="1" ;;
 
 			-h) usage ;;

@@ -1,15 +1,25 @@
-- Review global variables
-- Add a DEVELOPMENT section to the docs
-- Add quiet versions to output
-- Find out why github fails under zsh (rafl)
-- search command
-- rate-limit command
-- repo-watch command
-- Make a plan for all actions to support
+- Make doc for `make dev-test` command.
+- Add GIT_HUB_PASSWORD support
+- Fix repo-edit
+  - Shell escaping of [$`] on json object strings
+  - Check user-edit
 - Refactor variable scoping to use minimal globals
-- git hub scope-add --all
-- git hub scope-remove --all
+  - Review global variables
+- Add a DEVELOPMENT docuent to the repo
+- Find out why github fails under zsh (rafl)
+- New commands to add:
+  - search
+  - rate-limit
+  - repo-watch
+  - pull-request
+  - Make a plan for all actions to support
+- use .git/config from anywhere inside a repo (not just ./.git/config)
+- add plugin support
+  - write an irc plugin
 
++ git hub scope-add --all
++ git hub scope-remove --all
++ Add quiet versions to output
 + Detect rate-limit failure
 + Show when there are more elements in a list
 + Add bash-tap support to test suite
