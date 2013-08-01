@@ -97,7 +97,7 @@ dev-install: build uninstall
 	ln -s $$PWD/lib/$(CMD). $(GIT_INSTALL_LIB)/$(CMD).
 
 # Run a bunch of live tests. Make sure this thing really works. :)
-dev-test: check-dev-install
+dev-test: check-dev-install doc
 	bash test/dev-test/all_commands.t
 
 # Run this to reset if `make dev-test` fails.

@@ -2,12 +2,12 @@
 .\"     Title: git-hub
 .\"    Author: [see the "AUTHOR" section]
 .\" Generator: DocBook XSL Stylesheets v1.76.1 <http://docbook.sf.net/>
-.\"      Date: 07/31/2013
+.\"      Date: 08/01/2013
 .\"    Manual: Git Manual
 .\"    Source: Git 1.7.9.5
 .\"  Language: English
 .\"
-.TH "GIT\-HUB" "1" "07/31/2013" "Git 1\&.7\&.9\&.5" "Git Manual"
+.TH "GIT\-HUB" "1" "08/01/2013" "Git 1\&.7\&.9\&.5" "Git Manual"
 .\" -----------------------------------------------------------------
 .\" * Define some portability stuff
 .\" -----------------------------------------------------------------
@@ -28,13 +28,13 @@
 .\" * MAIN CONTENT STARTS HERE *
 .\" -----------------------------------------------------------------
 .SH "NAME"
-git-hub \- Do GitHub operations from git
+git-hub \- Do GitHub operations from the `git` command
 .SH "SYNOPSIS"
 .sp
 Here is just a few of the things you can do on GitHub with a simple command:
 .sp
 .nf
-\fIgit hub\fR                             # Show the cheat sheet
+\fIgit hub\fR                             # Show the git hub cheat sheet
 \fIgit help\fR hub                        # Show this awesome documentation
 \fIgit hub\fR config login <your\-login>   # Do this first!
 \fIgit hub\fR user <user>                 # Get info about a user
@@ -42,11 +42,11 @@ Here is just a few of the things you can do on GitHub with a simple command:
 \fIgit hub\fR create <repo>               # Create a new repository
 \fIgit hub\fR fork <owner>/<repo>         # Fork a repository
 \fIgit hub\fR repo\-edit <repo> description \fIJust another GitHub repo\fR
-\fIgit hub\fR delete <repo>               # Delete a repository
+\fIgit hub\fR delete <owner>/<repo>       # Delete a repository
 \fIgit hub\fR followers <user>            # List a user\(cqs followers
 \fIgit hub\fR star ingydotnet/git\-hub     # Star a repository
-\fIgit hub\fR trust ingydotnet            # Add collaborators to repo
 \fIgit hub\fR follow ingydotnet           # Follow a user
+\fIgit hub\fR trust ingydotnet            # Add collaborators to repo
 .fi
 .SH "DESCRIPTION"
 .sp
@@ -128,7 +128,7 @@ These values will be stored in ~/\&.githubconfig, like this:
 You can edit this file by hand or use the git hub config command\&.
 .SH "AUTHENTICATION"
 .sp
-Many end points of the GitHub v3 API require a Personal API Access Token\&. You can list your current tokens with this command:
+Many endpoints of the GitHub v3 API require a Personal API Access Token\&. You can list your current tokens with this command:
 .sp
 .if n \{\
 .RS 4
@@ -146,7 +146,7 @@ If you don\(cqt have any tokens or want a new one for the git\-hub command, run 
 .RS 4
 .\}
 .nf
-git hub token\-create
+git hub token\-create "git\-hub command token"
 git hub scope\-add <token\-id> user repo
 git hub scope\-list <token\-id>
 .fi
@@ -158,7 +158,7 @@ You can also see all your tokens on the web at \m[blue]\fBthis page\fR\m[]\&\s-2
 .sp
 You can specify your API token to git hub on the commandline with \-\-token=\&.\&.\&. or in the GIT_HUB_API_TOKEN environment variable, but the easiest thing to do is just set it in the git\-hub config\&.
 .sp
-Certain token scopes are required for various GitHub API operations\&. Make sure your token has the scopes turned on for the things you want to do\&. See the scope\-list, scope\-add and scope\-remove git hub subcommands\&.
+Certain token \fBscopes\fR are required for various GitHub API operations\&. Make sure your token has the scopes turned on for the things you want to do\&. See the scope\-list, scope\-add and scope\-remove git hub subcommands\&.
 .if n \{\
 .sp
 .\}
@@ -177,7 +177,7 @@ All the git hub commands dealing with tokens and scopes require you to enter you
 .RE
 .SH "RATE LIMITS"
 .sp
-GitHUb limits unauthenticated API calls to 60 per hour, and authenticated API calls to 5000 per hour\&. For this reason you may wish to use authentication even for calls that don\(cqt need it\&. You can use the \-a/\-\-use\-auth option to make sure a command uses authentication\&. You can also set the config file to always use authentication, with this command:
+GitHUb limits unauthenticated API calls to 60 per hour, and authenticated API calls to 5000 per hour\&. For this reason you may wish to use authentication even for calls that don\(cqt need it\&. You can use the \-U/\-\-use\-auth option to make sure a command uses authentication\&. You can also set the config file to always use authentication, with this command:
 .sp
 .if n \{\
 .RS 4
@@ -201,6 +201,83 @@ export GIT_HUB_USE_AUTH=1
 .RE
 .\}
 .SH "OPTIONS"
+.sp
+Commandline options start with a dash and can appear in any order in the command\&.
+.PP
+\-\-token=<api\-token>
+.RS 4
+Set or override the api\-token required by the command\&. This value can also come from the
+GIT_HUB_API_TOKEN
+environment variable\&. Usually this value comes from your
+~/\&.githubconfig
+file\&.
+.RE
+.PP
+\-c <number>, \-\-count=<number>
+.RS 4
+This option is for commands that return a list of things\&. Specify the number of items you want the command to return\&. Each list command has a reasonable default value\&.
+.RE
+.PP
+\-a, \-\-all
+.RS 4
+Show all elements for list commands\&. Also applies to a few other commands as documented\&.
+.RE
+.PP
+\-q, \-\-quiet
+.RS 4
+Show minimal output\&. For commands the produce lists, just list the data\&. For commands that produce reports, show the raw storage keys, rather than the human friendly ones\&. You will need the raw keys to edit/change values\&.
+.RE
+.PP
+\-v, \-\-verbose
+.RS 4
+Show detailed output\&. Notably, show the raw command that is used for the GitHub API calls\&.
+.RE
+.PP
+\-d, \-\-dryrun
+.RS 4
+Don\(cqt actually make the API call\&. This option turns on verbose mode\&.
+.RE
+.PP
+\-T
+.RS 4
+Show the API token in the verbose output\&. Hidden by default\&. This option turns on verbose mode\&.
+.RE
+.PP
+\-U, \-\-use\-auth
+.RS 4
+Use authentication whether it is needed or not for a certain command\&. This is useful if you have exceeded your hourly GitHub API rate limit, which is 60 calls unauthenticated, and 5000 calls authenticated\&.
+.RE
+.SH "DEV OPTIONS"
+.sp
+There are a number of dev options that will give you lots of extra information (albeit in a less readable form)\&.
+.PP
+\-O
+.RS 4
+Show the API reponse output\&. Always in JSON format\&. JSON is pretty\-printed\&.
+.RE
+.PP
+\-H
+.RS 4
+Show the API response headers\&.
+.RE
+.PP
+\-J
+.RS 4
+Show the API response JSON, in decoded form\&.
+.RE
+.PP
+\-x
+.RS 4
+Turn on Bash
+\-x
+debugging\&. This will show every bash command executed in the program\&.
+.RE
+.PP
+\-R
+.RS 4
+Repeat the last command, using the previous API server response\&. Useful for development and debugging\&. (Beware, only caches the most recent API call, so not really good for commands that make multiple calls)\&.
+.RE
+.SH "ARGUMENTS"
 .sp
 The git hub command gets its input values from these sources (in this order):
 .sp
@@ -255,84 +332,7 @@ The
 file\&.
 .RE
 .sp
-Commandline options start with a dash and can appear in any order in the command\&.
-.PP
-\-\-token=<api\-token>
-.RS 4
-Set or override the api\-token required by the command\&. This value can also come from the
-GIT_HUB_API_TOKEN
-environment variable\&. Usually this value comes from your
-~/\&.githubconfig
-file\&.
-.RE
-.PP
-\-c <number>, \-\-count=<number>
-.RS 4
-This option is for commands that return a list of things\&. Specify the number of items you want the command to return\&. Each list command has a reasonable default value\&.
-.RE
-.PP
-\-a, \-\-all
-.RS 4
-Show all elements in a list\&.
-.RE
-.PP
-\-q, \-\-quiet
-.RS 4
-Show minimal output\&.
-.RE
-.PP
-\-v, \-\-verbose
-.RS 4
-Show detailed output\&.
-.RE
-.PP
-\-d, \-\-dryrun
-.RS 4
-Don\(cqt actually make the API call\&. This option turns on verbose mode\&.
-.RE
-.PP
-\-T
-.RS 4
-Show the API token in the verbose output\&. Hidden by default\&. This option turns on verbose mode\&.
-.RE
-.PP
-\-U, \-\-use\-auth
-.RS 4
-Use authentication whether it is needed or not for a certain command\&. This is useful if you have exceeded your hourly GitHub API rate limit, which is 60 calls unauthenticated, and 5000 calls authenticated\&.
-.RE
-.SH "DEV OPTIONS"
-.sp
-There are a number of dev options that will give you lots of extra information (albeit in a less readable form)\&.
-.PP
-\-O
-.RS 4
-Show the API reponse output\&. Always in JSON format\&. JSON is pretty\-printed\&.
-.RE
-.PP
-\-H
-.RS 4
-Show the API response headers\&.
-.RE
-.PP
-\-J
-.RS 4
-Show the API response JSON, in decoded form\&.
-.RE
-.PP
-\-x
-.RS 4
-Turn on Bash
-\-x
-debugging\&. This will show every bash command executed in the program\&.
-.RE
-.PP
-\-R
-.RS 4
-Repeat the last command, using the previous API server response\&. Useful for development and debugging\&. (Beware, only caches the most recent API call, so not really good for commands that make multiple calls)\&.
-.RE
-.SH "ARGUMENTS"
-.sp
-Most of the commands described below have arguments\&. This section defines each of the argument types\&. Note that argument values that are strings containing whitespace need to be specified in single or double quotes\&.
+Most of the commands described below have arguments\&. This section defines each of the argument types\&. Note that argument values that are strings containing whitespace need to be quoted\&.
 .sp
 Arguments listsed in square brackets are optional and arguments followed by \&.\&.\&. indicate that more than one is allowed\&.
 .PP
@@ -364,7 +364,7 @@ environment variable\&.
 .PP
 <repo>
 .RS 4
-A GitHub reposotiry name\&. If this argument is optional, it defaults to the GitHub repo name of the repo you are currently in\&.
+A GitHub repository name\&. If this argument is optional, it defaults to the GitHub repo name of the repo you are currently in\&.
 \fBOverride\fR:
 GIT_HUB_REPO_NAME
 environment variable\&.
@@ -379,7 +379,7 @@ me/myrepo\&. If this argument is optional, it defaults the the owner and repo of
 .PP
 <key\-value\-pair>
 .RS 4
-Two strings separated by whitespace\&. Values with embedded whitespace should be quoted\&. The definition of each command that needs these pairs, will list the valid keys\&.
+Two strings separated by whitespace\&. Values with embedded whitespace should be quoted\&. The documentation of each command that needs these pairs, will list the valid keys\&.
 .RE
 .PP
 <api\-token\-id>
@@ -400,17 +400,20 @@ command will tell you all of these, and what they mean\&.
 config [<config\-key> [<config\-value>]]
 .RS 4
 With no args, this command will print the contents of
-~/\&.githubconfig\&. With one argument (a key), print the current value of the config key\&. With two arguments (key value), set the value of the config key\&. Only 2 keys are currently supported:
-login
+~/\&.githubconfig\&. With one argument (a key), print the current value of the config key\&. With two arguments (key value), set the value of the config key\&. Only 3 keys are currently supported:
+login,
+api\-token
 and
-api\-token\&.
+use\-auth\&.
 .RE
 .sp
 config\-unset <config\-key> Unset a config key\&. Removes the key from the ~/\&.githubconfig file\&.
 .PP
 token\-list
 .RS 4
-List all the API tokens for your GitHub account\&.
+List all the API tokens for your GitHub account\&. Use the
+\-\-quiet
+option to print the token IDs and descriptions, but not the actual token values\&.
 .RE
 .PP
 token\-create [<description\-string>]
@@ -438,12 +441,16 @@ List the scopes assigned to your API token, and also list all the possible scope
 .PP
 scope\-add <api\-token\-id> <scope\-name>\&...
 .RS 4
-Add one or more scopes to your API token\&.
+Add one or more scopes to your API token\&. You can use the
+\-\-all
+option to add all possible scopes at once\&.
 .RE
 .PP
 scope\-remove <api\-token\-id> <scope\-name>\&...
 .RS 4
-Remove one or more scopes from your API token\&.
+Remove one or more scopes from your API token\&. You can use the
+\-\-all
+option to remove all possible scopes at once\&.
 .RE
 .PP
 user [<user>]
@@ -454,6 +461,17 @@ Show basic information about a specific user\&. User defaults to the owner of th
 user\-edit <user> <key\-value\-pair>\&...
 .RS 4
 Set specific meta\-data fields of a user to new values\&. You list the parameters as key/value pairs\&.
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+You can edit the following user keys: `name`, `email`, `blog`,
+`location`, `company`, `bio`\&.
+.fi
+.if n \{\
+.RE
+.\}
 .RE
 .PP
 orgs <user>
@@ -484,13 +502,23 @@ Show basic information about a specific repository\&.
 repo\-edit [<owner>/<repo>] <key\-value\-pair>\&...
 .RS 4
 Set specific meta\-data fields of a repository to new values\&. You list the parameters as key/value pairs\&.
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+You can edit the following repo keys: `description`, `homepage`\&.
+.fi
+.if n \{\
+.RE
+.\}
 .RE
 .PP
 repo\-create [<org>/]<repo>
 .RS 4
 Create a new GitHub repository\&.
 \fBAlias\fR:
-create
+create\&.
 .RE
 .PP
 repo\-delete <owner>/<repo>
@@ -529,7 +557,7 @@ to a repository\&.
 .PP
 starred [<user>]
 .RS 4
-Show repositories that a user has starred\&.
+List repositories that a user has starred\&.
 .RE
 .PP
 collabs [<owner>/<repo>]
@@ -549,7 +577,7 @@ Remove one or more collaborators from a repository\&.
 .PP
 followers [<user>]
 .RS 4
-List the people who are following a user\&.
+List the people who are followers of a user\&.
 .RE
 .PP
 following [<user>]
