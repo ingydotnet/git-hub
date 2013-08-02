@@ -1,7 +1,10 @@
-- Make doc for `make dev-test` command.
+- Change -U to -A
 - Add GIT_HUB_PASSWORD support
+- Implement org-* commands
+- Implement `git hub user --all`
+- Implement `git hub repo --all`
 - Fix repo-edit
-  - Shell escaping of [$`] on json object strings
+  - Shell escaping of [$`\n\t] on json object strings
   - Check user-edit
 - Refactor variable scoping to use minimal globals
   - Review global variables
@@ -14,9 +17,15 @@
   - pull-request
   - Make a plan for all actions to support
 - use .git/config from anywhere inside a repo (not just ./.git/config)
+  - test "$(git rev-parse --is-inside-work-tree 2>/dev/null)" = true ||
 - add plugin support
   - write an irc plugin
+- Finish the commands.t test
+- Add commands to all-commands.t
 
++ Use --raw instead of --quiet for sparse views
++ Change GIT_{QUIET,VERBOSE} GIT_HUB_*
++ Make doc for `make dev-test` command.
 + git hub scope-add --all
 + git hub scope-remove --all
 + Add quiet versions to output

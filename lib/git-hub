@@ -32,6 +32,7 @@ Options:
 --
 c,count=    Number of list items to show
 a,all       Show all list items
+r,raw       Show output in a raw data form
 token=      GitHub v3 API Authentication Token
 
 h,help      Show this help
@@ -44,8 +45,8 @@ U,use-auth  Force the use of authentication. (Get around rate limits)
 O           dev - Show response output
 H           dev - Show reponse headers
 J           dev - Show parsed JSON response
-x           dev - Turn on Bash trace (set -x) output
 R           dev - Repeat last command without contacting server
+x           dev - Turn on Bash trace (set -x) output
 "
 
 #------------------------------------------------------------------------------
@@ -117,7 +118,7 @@ github-token-list() {
 }
 
 format-token-list-entry() {
-	if QUIET; then
+	if RAW || QUIET; then
 		printf "%-7s  %s\n" $3 "${4:-$5}"
 	else
 		printf "%d) %s %-14s  %s\n" $1 $2 "(id: $3)" "${4:-$5}"
@@ -142,7 +143,7 @@ success-token-create() {
 	local id=$(json-get "/id")
 	local note=$(json-get "/note")
 	local name=$(json-get "/app/name")
-	if QUIET; then
+	if RAW || QUIET; then
 		printf "$id"
 	else
 		printf "Token created: %s %-14s  %s\n" $token "(id: $id)" "${note:-$name}"
@@ -174,7 +175,7 @@ success-scope-list() {
 		let i=i+1
 	done
 
-	if QUIET; then
+	if RAW; then
 		for scope in "${scopes[@]}"; do
 			echo "$scope"
 		done
@@ -285,7 +286,7 @@ github-repos() {
 }
 
 format-repos-entry() {
-	if QUIET; then
+	if RAW; then
 		printf "$3\n"
 	else
 		printf "%d) (%s)  %-30s %s\n" $1 ${2/T*} $3 "$4"
@@ -354,7 +355,7 @@ github-forks() {
 }
 
 format-forks-entry() {
-	if QUIET; then
+	if RAW; then
 		printf "$3\n"
 	else
 		printf "%d) (%s)  %-30s\n" $1 ${2/T*/} $3
@@ -380,7 +381,7 @@ github-stars() {
 }
 
 format-stars-entry() {
-	if QUIET; then
+	if RAW; then
 		printf "$2\n"
 	else
 		printf "%d) %s\n" $1 $2
@@ -416,7 +417,7 @@ github-starred() {
 }
 
 format-starred-entry() {
-	if QUIET; then
+	if RAW; then
 		printf "$2\n"
 	else
 		printf "%d) %s\n" $1 $2
@@ -434,7 +435,7 @@ github-collabs() {
 }
 
 format-collabs-entry() {
-	if QUIET; then
+	if RAW; then
 		printf "$2\n"
 	else
 		printf "%d) %s\n" $1 $2
@@ -470,7 +471,7 @@ github-followers() {
 }
 
 format-followers-entry() {
-	if QUIET; then
+	if RAW; then
 		printf "$2\n"
 	else
 		printf "%d) %s\n" $1 $2
@@ -486,7 +487,7 @@ github-following() {
 }
 
 format-following-entry() {
-	if QUIET; then
+	if RAW; then
 		printf "$2\n"
 	else
 		printf "%d) %s\n" $1 $2
@@ -523,7 +524,7 @@ api-call() {
 	format-curl-command "$@"
 	[ -n "$GIT_HUB_TEST_COMMAND" ] && return
 
-	if [ $GIT_VERBOSE ]; then
+	if VERBOSE; then
 		if [ -n "$show_token" ]; then
 			say "${curl_command[@]}"
 		else
@@ -571,8 +572,7 @@ format-curl-command() {
 	# Cheap trick to make github pretty-print the JSON output.
 	[ -n "$show_output" ] && user_agent="curl-$user_agent"
 
-	local regex="^https?:"
-	[[ "$url" =~ $regex ]] || url="$GIT_HUB_API_URI$url"
+	[[ "$url" =~ ^https?: ]] || url="$GIT_HUB_API_URI$url"
 
 	curl_command=(
 		curl
@@ -603,8 +603,7 @@ check-api-call-status() {
 		return
 	fi
 	status_code=$(head -1 $GIT_HUB_HEADER | cut -d ' ' -f2)
-	local regex='^[0-9]{3}$'
-	[[ $status_code =~ $regex ]] || return
+	[[ $status_code =~ ^[0-9]{3}$ ]] || return
 	case "$status_code" in
 		200|201|202|204)
 			OK=0
@@ -626,8 +625,9 @@ check-api-call-status() {
 }
 
 OK() { return $OK; }
+RAW() { [ -n "$GIT_HUB_RAW" ] && return 0 || return 1; }
 QUIET() { [ -n "$GIT_QUIET" ] && return 0 || return 1; }
-VERBOSE() { [ -n "$GIT_VERBOSE" ] && return 0 || return 1; }
+VERBOSE() { [ -n "$GIT_HUB_VERBOSE" ] && return 0 || return 1; }
 ALL() { [ -n "$GIT_HUB_ALL" ] && return 0 || return 1; }
 
 #------------------------------------------------------------------------------
@@ -912,7 +912,7 @@ report-value() {
     local key=${1//__/\/}
 	local value=$(json-get "/$key")
 	local label="$key"
-	if ! QUIET; then
+	if ! RAW; then
 		label=$(eval echo \$label_$1)
 		if [ -z "$label" ]; then
 			label=$(echo "$1" | tr '_' ' ')
@@ -952,7 +952,7 @@ assert-env() {
 	[ -n "$GIT_HUB_TEST_MODE" ] &&
 		GIT_HUB_EXEC_PATH=$PWD/lib
 	# We source this twice. Now get say and die. Later to parse options.
-	NONGIT_OK=1 source "$GIT_EXEC_PATH/git-sh-setup"
+	OPTIONS_SPEC= NONGIT_OK=1 source "$GIT_EXEC_PATH/git-sh-setup"
 
 	: ${GIT_HUB_API_URI:=https://api.github.com}
 	: ${GIT_HUB_TMP_DIR:=/tmp}
@@ -989,15 +989,13 @@ get-options() {
 			-U) use_auth="1" ;;
 
 			-h) usage ;;
-			-q) GIT_QUIET="1"
-				GIT_VERBOSE=
-				;;
-			-v) GIT_VERBOSE="1"
-				GIT_QUIET=
-				;;
+			-r) GIT_HUB_RAW="1" ;;
+			-q) GIT_QUIET="1" ;;
+			-v) GIT_HUB_VERBOSE="1" ;;
 			-d) dry_run="1" ;;
 			-T) show_token="1"
-				GIT_VERBOSE="1"
+				GIT_HUB_VERBOSE="1"
+				GIT_QUIET=
 				;;
 
 			--) break ;;
@@ -1035,7 +1033,7 @@ unset-global-variables() {
 	api_token=
 	list_size=
 	GIT_QUIET=
-	GIT_VERBOSE=
+	GIT_HUB_VERBOSE=
 	show_token=
 	dry_run=
 	repeat_command=

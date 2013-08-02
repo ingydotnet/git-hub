@@ -204,15 +204,6 @@ export GIT_HUB_USE_AUTH=1
 .sp
 Commandline options start with a dash and can appear in any order in the command\&.
 .PP
-\-\-token=<api\-token>
-.RS 4
-Set or override the api\-token required by the command\&. This value can also come from the
-GIT_HUB_API_TOKEN
-environment variable\&. Usually this value comes from your
-~/\&.githubconfig
-file\&.
-.RE
-.PP
 \-c <number>, \-\-count=<number>
 .RS 4
 This option is for commands that return a list of things\&. Specify the number of items you want the command to return\&. Each list command has a reasonable default value\&.
@@ -223,9 +214,28 @@ This option is for commands that return a list of things\&. Specify the number o
 Show all elements for list commands\&. Also applies to a few other commands as documented\&.
 .RE
 .PP
+\-r, \-\-raw
+.RS 4
+For commands the produce lists, just list the raw data\&. For commands that produce reports, show the raw storage keys, rather than the human friendly ones\&. You will need the raw keys to edit/change values\&.
+.RE
+.PP
+\-\-token=<api\-token>
+.RS 4
+Set or override the api\-token required by the command\&. This value can also come from the
+GIT_HUB_API_TOKEN
+environment variable\&. Usually this value comes from your
+~/\&.githubconfig
+file\&.
+.RE
+.PP
+\-h, \-\-help
+.RS 4
+Show the brief command usage\&.
+.RE
+.PP
 \-q, \-\-quiet
 .RS 4
-Show minimal output\&. For commands the produce lists, just list the data\&. For commands that produce reports, show the raw storage keys, rather than the human friendly ones\&. You will need the raw keys to edit/change values\&.
+Show minimal output\&.
 .RE
 .PP
 \-v, \-\-verbose
@@ -266,16 +276,16 @@ Show the API response headers\&.
 Show the API response JSON, in decoded form\&.
 .RE
 .PP
+\-R
+.RS 4
+Repeat the last command, using the previous API server response\&. Useful for development and debugging\&. (Beware, only caches the most recent API call, so not really good for commands that make multiple calls)\&.
+.RE
+.PP
 \-x
 .RS 4
 Turn on Bash
 \-x
 debugging\&. This will show every bash command executed in the program\&.
-.RE
-.PP
-\-R
-.RS 4
-Repeat the last command, using the previous API server response\&. Useful for development and debugging\&. (Beware, only caches the most recent API call, so not really good for commands that make multiple calls)\&.
 .RE
 .SH "ARGUMENTS"
 .sp
@@ -334,7 +344,7 @@ file\&.
 .sp
 Most of the commands described below have arguments\&. This section defines each of the argument types\&. Note that argument values that are strings containing whitespace need to be quoted\&.
 .sp
-Arguments listsed in square brackets are optional and arguments followed by \&.\&.\&. indicate that more than one is allowed\&.
+Argument variable names are always indicated by angle brackets, like: <variable>\&. Arguments listed in square brackets are optional and arguments followed by \&.\&.\&. indicate that more than one is allowed\&.
 .PP
 <user>
 .RS 4
@@ -412,7 +422,7 @@ config\-unset <config\-key> Unset a config key\&. Removes the key from the ~/\&.
 token\-list
 .RS 4
 List all the API tokens for your GitHub account\&. Use the
-\-\-quiet
+\-\-raw
 option to print the token IDs and descriptions, but not the actual token values\&.
 .RE
 .PP
@@ -422,7 +432,9 @@ Create a new API token for your GitHub login id\&. Note: Creating a new token wi
 ~/\&.githubconfig
 file; you need to do that yourself with the
 git hub config api\-token <token\-value>
-command\&.
+command\&. Use the
+\-\-raw
+option to just print the new token id\&.
 .RE
 .PP
 token\-delete <api\-token\-id>
@@ -436,7 +448,9 @@ command), not by token value\&.
 .PP
 scope\-list <api\-token\-id>
 .RS 4
-List the scopes assigned to your API token, and also list all the possible scope values that you can assign\&.
+List the scopes assigned to your API token, and also list all the possible scope values that you can assign\&. Use the
+\-\-raw
+option to just list the scopes\&.
 .RE
 .PP
 scope\-add <api\-token\-id> <scope\-name>\&...
@@ -455,7 +469,9 @@ option to remove all possible scopes at once\&.
 .PP
 user [<user>]
 .RS 4
-Show basic information about a specific user\&. User defaults to the owner of the current repo, or your login if you are not inside a repo directory\&.
+Show basic information about a specific user\&. User defaults to the owner of the current repo, or your login if you are not inside a repo directory\&. Use the
+\-\-raw
+option to show the actual API keys\&.
 .RE
 .PP
 user\-edit <user> <key\-value\-pair>\&...
@@ -474,14 +490,16 @@ You can edit the following user keys: `name`, `email`, `blog`,
 .\}
 .RE
 .PP
-orgs <user>
+orgs [<user>]
 .RS 4
 List the organizations that a user is a member of\&.
 .RE
 .PP
 org <org>
 .RS 4
-Show basic information about a GitHub organization\&.
+Show basic information about a GitHub organization\&. Use the
+\-\-raw
+option to show the actual API keys\&.
 .RE
 .PP
 org\-edit <org> <key\-value\-pairs>\&...
@@ -496,7 +514,9 @@ List the repos for a user or organization\&. List is returned in order of recent
 .PP
 repo [<repo>]
 .RS 4
-Show basic information about a specific repository\&.
+Show basic information about a specific repository\&. Use the
+\-\-raw
+option to show the actual API keys\&.
 .RE
 .PP
 repo\-edit [<owner>/<repo>] <key\-value\-pair>\&...
@@ -609,10 +629,10 @@ $ git init
 $ git add README
 $ git commit \-m \*(AqFirst commit\*(Aq
 $ git hub create foo
-$ git hub repo foo
+$ git hub repo foo \-\-raw
 $ git remote add origin <new\-remote\-address>
 $ git push origin master
-$ git hub edit \e
+$ git hub repo\-edit \e
     description \*(AqThe new foo\*(Aq \e
     homepage http://example\&.com
 $ git hub repo
