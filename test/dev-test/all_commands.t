@@ -22,6 +22,9 @@ git hub repos
 git hub repo-edit ingydotnet/git-hub-api-test \
     description "This is just a test repo" \
     homepage http://example.com
+git hub star git-hub-api-test
+git hub stars git-hub-api-test
+git hub unstar git-hub-api-test
 git hub repo git-hub-api-test
 git hub repo-delete git-hub-api-test
 git hub collabs
