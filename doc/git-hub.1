@@ -505,6 +505,27 @@ option to show the actual API keys\&.
 org\-edit <org> <key\-value\-pairs>\&...
 .RS 4
 Set specific meta\-data fields of an organization to new values\&. You list the parameters as key/value pairs\&.
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+You can edit the following organization keys: `name`, `email`,
+`billing_email`, `blog`, `location`, `company`\&.
+.fi
+.if n \{\
+.RE
+.\}
+.RE
+.PP
+members <org>
+.RS 4
+List the members of an organization\&.
+.RE
+.PP
+teams <org>
+.RS 4
+List the teams in an organization\&.
 .RE
 .PP
 repos [<user>]

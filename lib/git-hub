@@ -16,7 +16,7 @@ Commands:
   token-list, token-create, token-delete
   scope-list, scope-add, scope-remove
 
-  user, user-edit, orgs, org, org-edit
+  user, user-edit, orgs, org, org-edit, members, teams
   repos, repo, repo-edit, repo-create, repo-delete
   forks, fork
   stars, star, unstar, starred
@@ -264,15 +264,54 @@ github-user-edit() {
 }
 
 github-orgs() {
-	die "'git hub $command' not yet implemented"
+    get-args user
+	fetch-value user-name "$user"
+	: ${user_name:=$login}
+
+	report-list \
+		"/users/$user_name/orgs" \
+		'login'
 }
 
 github-org() {
-	die "'git hub $command' not yet implemented"
+	get-args org
+	require-value org-name "$org"
+	api-get "/orgs/$org_name"
+}
+
+success-org() {
+	for field in \
+		login type name billing_email email blog location company \
+		html_url public_repos public
+	do
+		report-value $field
+	done
 }
 
 github-org-edit() {
-	die "'git hub $command' not yet implemented"
+	require-value api-token "$token"
+	get-args org *key_value_pairs
+	require-value org-name "$org"
+	api-patch "/orgs/$org_name" "$(json-dump-object-pairs)"
+}
+
+github-members() {
+    get-args org
+	require-value org-name "$org"
+
+	report-list \
+		"/orgs/$org_name/members" \
+		'login'
+}
+
+github-teams() {
+	require-value api-token "$token"
+    get-args org
+	require-value org-name "$org"
+
+	report-list \
+		"/orgs/$org_name/teams" \
+		'name'
 }
 
 github-repos() {
@@ -376,16 +415,8 @@ github-stars() {
 	require-value repo-name "$repo"
 	require-value user-name "${user:-$login}"
 	report-list \
-		"/repos/$user_name/$repo_name/stargazers" \
+		"/repos/$user_name/$repo_name/stargazers?per_page=PER_PAGE" \
 		'login'
-}
-
-format-stars-entry() {
-	if RAW; then
-		printf "$2\n"
-	else
-		printf "%d) %s\n" $1 $2
-	fi
 }
 
 github-repo-star() {
@@ -412,16 +443,8 @@ github-starred() {
 	get-args user
 	require-value user-name "${user:-$login}"
 	report-list \
-		"/users/$user_name/starred?sort=updated" \
+		"/users/$user_name/starred?sort=updated;per_page=PER_PAGE" \
 		'full_name'
-}
-
-format-starred-entry() {
-	if RAW; then
-		printf "$2\n"
-	else
-		printf "%d) %s\n" $1 $2
-	fi
 }
 
 github-collabs() {
@@ -432,14 +455,6 @@ github-collabs() {
 	report-list \
 		"/repos/$user_name/$repo_name/collaborators" \
 		'login'
-}
-
-format-collabs-entry() {
-	if RAW; then
-		printf "$2\n"
-	else
-		printf "%d) %s\n" $1 $2
-	fi
 }
 
 github-trust() {
@@ -466,32 +481,16 @@ github-followers() {
 	get-args user
 	require-value user-name "${user:-$login}"
 	report-list \
-		"/users/$user_name/followers" \
+		"/users/$user_name/followers?per_page=PER_PAGE" \
 		'login'
-}
-
-format-followers-entry() {
-	if RAW; then
-		printf "$2\n"
-	else
-		printf "%d) %s\n" $1 $2
-	fi
 }
 
 github-following() {
 	get-args user
 	require-value user-name "${user:-$login}"
 	report-list \
-		"/users/$user_name/following" \
+		"/users/$user_name/following?per_page=PER_PAGE" \
 		'login'
-}
-
-format-following-entry() {
-	if RAW; then
-		printf "$2\n"
-	else
-		printf "%d) %s\n" $1 $2
-	fi
 }
 
 github-follow() {
@@ -757,7 +756,11 @@ report-list() {
 				value="$(json-get "/$ii/$field")"
 				values+=("$value")
 			done
-			"format-$command-entry" $list_counter "${values[@]}"
+			if callable "format-$command-entry"; then
+				"format-$command-entry" $list_counter "${values[@]}"
+			else
+				default-format-entry $list_counter "${values[@]}"
+			fi
 			let list_counter=list_counter+1
 		done
 		url=$(get-next-page-url)
@@ -778,6 +781,14 @@ get-next-page-url() {
 	[[ "$(< $GIT_HUB_HEADER)" =~ $regexp ]] &&
 		echo "${BASH_REMATCH[1]}"
 	true
+}
+
+default-format-entry() {
+	if RAW; then
+		printf "$2\n"
+	else
+		printf "%d) %s\n" $1 $2
+	fi
 }
 
 #------------------------------------------------------------------------------
@@ -841,7 +852,7 @@ eos
 # Format a JSON object from an input list of key/value pairs.
 json-dump-object() {
 	local json='{'
-	local regex='^\['
+	local regex='(^\[|^null$|^[0-9]+$)'
 	while [ $# -gt 0 ]; do
 		if [[ "$2" =~ $regex ]]; then
 			json="$json\"$1\":$2"
@@ -872,10 +883,15 @@ json-dump-array() {
 
 # Format a JSON object from an array.
 json-dump-object-pairs() {
+	local regex='(^\[|^null$|^[0-9]+$)'
 	local json='{'
 	for ((i = 0; i < ${#key_value_pairs[@]}; i = i+2)); do
 		local value=${key_value_pairs[$((i+1))]}
-		json="$json\"${key_value_pairs[$i]}\":\"$value\""
+		if [[ "$value" =~ $regex ]]; then
+			json="$json\"${key_value_pairs[$i]}\":$value"
+		else
+			json="$json\"${key_value_pairs[$i]}\":\"$value\""
+		fi
 		if [ $((${#key_value_pairs[@]} - $i)) -gt 2 ]; then
 			json="$json,"
 		fi

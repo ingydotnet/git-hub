@@ -1,4 +1,4 @@
-- Implement org-* commands
+- Fix star and unstar
 - Implement `git hub user --all`
 - Implement `git hub repo --all`
 - Fix repo-edit
@@ -21,6 +21,7 @@
 - Finish the commands.t test
 - Add more commands to all-commands.t
 
++ Implement org-* commands
 + Add GIT_HUB_PASSWORD support
 + Change -U to -A
 + Use --raw instead of --quiet for sparse views
