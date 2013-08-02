@@ -1,4 +1,3 @@
-- Add GIT_HUB_PASSWORD support
 - Implement org-* commands
 - Implement `git hub user --all`
 - Implement `git hub repo --all`
@@ -20,8 +19,9 @@
 - add plugin support
   - write an irc plugin
 - Finish the commands.t test
-- Add commands to all-commands.t
+- Add more commands to all-commands.t
 
++ Add GIT_HUB_PASSWORD support
 + Change -U to -A
 + Use --raw instead of --quiet for sparse views
 + Change GIT_{QUIET,VERBOSE} GIT_HUB_*

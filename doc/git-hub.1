@@ -172,12 +172,12 @@ Certain token \fBscopes\fR are required for various GitHub API operations\&. Mak
 .ps -1
 .br
 .sp
-All the git hub commands dealing with tokens and scopes require you to enter your GitHub password\&.
+All the git hub commands dealing with tokens and scopes require you to enter your GitHub password\&. If you need to issue a bunch of these commands and you don\(cqt want to retype your password each time, you can put your password in the GIT_HUB_PASSWORD environment variable\&.
 .sp .5v
 .RE
 .SH "RATE LIMITS"
 .sp
-GitHUb limits unauthenticated API calls to 60 per hour, and authenticated API calls to 5000 per hour\&. For this reason you may wish to use authentication even for calls that don\(cqt need it\&. You can use the \-U/\-\-use\-auth option to make sure a command uses authentication\&. You can also set the config file to always use authentication, with this command:
+GitHUb limits unauthenticated API calls to 60 per hour, and authenticated API calls to 5000 per hour\&. For this reason you may wish to use authentication even for calls that don\(cqt need it\&. You can use the \-A/\-\-use\-auth option to make sure a command uses authentication\&. You can also set the config file to always use authentication, with this command:
 .sp
 .if n \{\
 .RS 4
@@ -253,9 +253,9 @@ Don\(cqt actually make the API call\&. This option turns on verbose mode\&.
 Show the API token in the verbose output\&. Hidden by default\&. This option turns on verbose mode\&.
 .RE
 .PP
-\-U, \-\-use\-auth
+\-A, \-\-use\-auth
 .RS 4
-Use authentication whether it is needed or not for a certain command\&. This is useful if you have exceeded your hourly GitHub API rate limit, which is 60 calls unauthenticated, and 5000 calls authenticated\&.
+Use authentication whether or not it is needed for a certain command\&. This is useful if you have exceeded your hourly GitHub API rate limit, which is 60 calls unauthenticated, and 5000 calls authenticated\&.
 .RE
 .SH "DEV OPTIONS"
 .sp

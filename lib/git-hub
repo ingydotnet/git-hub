@@ -581,7 +581,11 @@ format-curl-command() {
 	)
 	[ -n "$data" ] || [ "$action" = "PUT" ] && curl_command+=(-d "$data")
 	if [ -n "$basic_auth" ]; then
-		curl_command+=(-u "$login")
+		if [ -n "$GIT_HUB_PASSWORD" ]; then
+			curl_command+=(-u "$login:$GIT_HUB_PASSWORD")
+		else
+			curl_command+=(-u "$login")
+		fi
 	elif [ -n "$api_token" ]; then
 		curl_command+=(--header "Authorization: token $api_token")
 	fi
