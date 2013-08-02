@@ -40,7 +40,7 @@ q,quiet     Show minimal output
 v,verbose   Show verbose output
 d,dryrun    Don't run the API command
 T           Show API token in the verbose output
-U,use-auth  Force the use of authentication. (Get around rate limits)
+A,use-auth  Force the use of authentication. (Get around rate limits)
  
 O           dev - Show response output
 H           dev - Show reponse headers
@@ -986,7 +986,7 @@ get-options() {
 			-a) GIT_HUB_ALL="1"
 				list_size=999999
 				;;
-			-U) use_auth="1" ;;
+			-A) use_auth="1" ;;
 
 			-h) usage ;;
 			-r) GIT_HUB_RAW="1" ;;

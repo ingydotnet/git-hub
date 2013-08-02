@@ -1,4 +1,3 @@
-- Change -U to -A
 - Add GIT_HUB_PASSWORD support
 - Implement org-* commands
 - Implement `git hub user --all`
@@ -23,6 +22,7 @@
 - Finish the commands.t test
 - Add commands to all-commands.t
 
++ Change -U to -A
 + Use --raw instead of --quiet for sparse views
 + Change GIT_{QUIET,VERBOSE} GIT_HUB_*
 + Make doc for `make dev-test` command.
