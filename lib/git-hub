@@ -34,6 +34,7 @@ c,count=    Number of list items to show
 a,all       Show all list items
 r,raw       Show output in a raw data form
 token=      GitHub v3 API Authentication Token
+tor         Use Tor (default: '127.0.0.1:9050')
 
 h,help      Show this help
 q,quiet     Show minimal output
@@ -578,6 +579,9 @@ format-curl-command() {
 			--request $action
 		$url
 	)
+	if [ -n "$GIT_HUB_CURL_OPTIONS" ]; then
+		curl_command+=( $GIT_HUB_CURL_OPTIONS )
+	fi
 	[ -n "$data" ] || [ "$action" = "PUT" ] && curl_command+=(-d "$data")
 	if [ -n "$basic_auth" ]; then
 		if [ -n "$GIT_HUB_PASSWORD" ]; then
@@ -1015,7 +1019,9 @@ get-options() {
 			-d) dry_run="1" ;;
 			-T) show_token="1"
 				GIT_HUB_VERBOSE="1"
-				GIT_QUIET=
+				GIT_QUIET=;;
+			--tor) GIT_HUB_TOR="1"
+				GIT_HUB_CURL_OPTIONS+="--socks5-hostname $GIT_HUB_TOR_HOST:$GIT_HUB_TOR_PORT"
 				;;
 
 			--) break ;;
@@ -1054,6 +1060,10 @@ unset-global-variables() {
 	list_size=
 	GIT_QUIET=
 	GIT_HUB_VERBOSE=
+	GIT_HUB_TOR=
+	GIT_HUB_TOR_HOST="127.0.0.1"
+	GIT_HUB_TOR_PORT="9050"
+	GIT_HUB_CURL_OPTIONS=
 	show_token=
 	dry_run=
 	repeat_command=
