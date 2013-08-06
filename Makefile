@@ -13,6 +13,8 @@ endif
 MAN1DIR ?= /usr/local/share/man/man1
 GITVER ?= $(word 3,$(shell git --version))
 
+
+
 ##
 # Define common variables
 CMD := git-hub
@@ -81,7 +83,7 @@ doc/%.1: %.1
 lib/$(CMD).:
 	mkdir $@
 
-ext/JSON.sh/JSON.sh ext/bash-tap/bash-tap:
+ext/JSON.sh/JSON.sh ext/test-simple-bash/test-simple.bash:
 	git submodule update --init
 	@if [ ! -f "$@" ]; then \
 	    echo "Failed to create '$@'"; \

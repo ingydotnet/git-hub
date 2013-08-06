@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# git-hub: Use the GitHub v3 API commands from git
+# git-hub: Do GitHub operations from the `git` command
 #
 # Copyright (c) 2013 Ingy döt Net
 
@@ -205,6 +205,7 @@ eos
 github-scope-add() {
     if ALL; then
 		get-args id
+		# XXX Dedup this array in github-scope-remove
 		scopes=(
 			user user:email user:follow
 			public_repo repo repo:status delete_repo
@@ -315,12 +316,12 @@ github-teams() {
 }
 
 github-repos() {
-    get-args user
-	fetch-value user-name "$user"
-	: ${user_name:=$login}
+    get-args owner
+	fetch-value owner-name "$owner"
+	: ${owner_name:=$login}
 
 	report-list \
-		"/users/$user_name/repos?sort=pushed;per_page=PER_PAGE" \
+		"/users/$owner_name/repos?sort=pushed;per_page=PER_PAGE" \
 		'pushed_at full_name description'
 }
 
@@ -334,10 +335,10 @@ format-repos-entry() {
 
 github-repo() {
 	get-args repo
-	check-user-repo "$repo"
+	check-owner-repo "$repo"
 	require-value repo-name "$repo"
-	require-value user-name "${user:-$login}"
-	api-get "/repos/$user_name/$repo_name"
+	require-value owner-name "${owner:-$login}"
+	api-get "/repos/$owner_name/$repo_name"
 }
 
 success-repo() {
@@ -353,13 +354,12 @@ success-repo() {
 }
 
 github-repo-edit() {
-	get-args repo *key_value_pairs
-	check-user-repo "$repo"
+	get-args owner-repo *key_value_pairs
 	require-value repo-name "$repo"
-	require-value user-name "$login"    # TODO should be login or org
+	require-value owner-name "$owner"
 	require-value api-token "$token"
 	key_value_pairs+=(name "$repo_name")
-	api-patch "/repos/$user_name/$repo_name" "$(json-dump-object-pairs)"
+	api-patch "/repos/$owner_name/$repo_name" "$(json-dump-object-pairs)"
 }
 
 # TODO Support creating repo under an org
@@ -373,23 +373,22 @@ github-repo-create() {
 }
 
 github-repo-delete() {
-	get-args repo
-	check-user-repo "$repo"
-	require-value repo-name "$repo"
-	require-value user-name "$login"    # TODO should be login or org
+	get-args owner-repo
+	require-value delete-repo-name "$repo"
+	require-value delete-owner-name "$owner"
 	require-value api-token "$token"
-	api-delete "/repos/$user_name/$repo_name"
-	message_success="Repository '$repo_name' deleted"
+	api-delete "/repos/$delete_owner_name/$delete_repo_name"
+	message_success="Repository '$delete_owner_name/$delete_repo_name' deleted"
 }
 
 github-forks() {
 	get-args repo
-	check-user-repo "$repo"
+	check-owner-repo "$repo"
 	require-value repo-name "$repo"
-	require-value user-name "${user:-$login}"
+	require-value owner-name "${owner:-$login}"
 
 	report-list \
-		"/repos/$user_name/$repo_name/forks?sort=newest;per_page=PER_PAGE" \
+		"/repos/$owner_name/$repo_name/forks?sort=newest;per_page=PER_PAGE" \
 		'pushed_at full_name'
 }
 
@@ -402,41 +401,40 @@ format-forks-entry() {
 }
 
 github-fork() {
-	get-args user_repo
-	check-user-repo "$user_repo"
+	get-args owner-repo org
 	require-value repo-name "$repo"
-	require-value user-name "$user"
-	api-post "/repos/$user_name/$repo_name/forks" '{}'
+	require-value owner-name "$owner"
+	api-post "/repos/$owner_name/$repo_name/forks" '{}'
 }
 
 github-stars() {
 	get-args repo
-	check-user-repo "$repo"
+	check-owner-repo "$repo"
 	require-value repo-name "$repo"
-	require-value user-name "${user:-$login}"
+	require-value owner-name "${owner:-$login}"
 	report-list \
-		"/repos/$user_name/$repo_name/stargazers?per_page=PER_PAGE" \
+		"/repos/$owner_name/$repo_name/stargazers?per_page=PER_PAGE" \
 		'login'
 }
 
 github-star() {
 	get-args repo
-	check-user-repo "$repo"
+	check-owner-repo "$repo"
 	require-value repo-name "$repo"
-	require-value user-name "${user:-$login}"
+	require-value owner-name "${owner:-$login}"
 	require-value api-token "$token"
-	api-put "/user/starred/$user_name/$repo_name"
-	message_success="'$user_name/$repo_name' starred"
+	api-put "/user/starred/$owner_name/$repo_name"
+	message_success="'$owner_name/$repo_name' starred"
 }
 
 github-unstar() {
 	get-args repo
-	check-user-repo "$repo"
+	check-owner-repo "$repo"
 	require-value repo-name "$repo"
-	require-value user-name "${user:-$login}"
+	require-value owner-name "${owner:-$login}"
 	require-value api-token "$token"
-	api-delete "/user/starred/$user_name/$repo_name"
-	message_success="'$user_name/$repo_name' unstarred"
+	api-delete "/user/starred/$owner_name/$repo_name"
+	message_success="'$owner_name/$repo_name' unstarred"
 }
 
 github-starred() {
@@ -449,31 +447,31 @@ github-starred() {
 
 github-collabs() {
 	get-args repo
-	check-user-repo "$repo"
+	check-owner-repo "$repo"
 	require-value repo-name "$repo"
-	require-value user-name "${user:-$login}"
+	require-value owner-name "${owner:-$login}"
 	report-list \
-		"/repos/$user_name/$repo_name/collaborators" \
+		"/repos/$owner_name/$repo_name/collaborators" \
 		'login'
 }
 
 github-trust() {
-	get-args user-repo *collaborators
+	get-args owner-repo *collaborators
 	require-value repo-name "$repo"
-	require-value user-name "$user"
+	require-value owner-name "$owner"
 	require-value api-token "$token"
 	for collab_name in ${collaborators[@]}; do
-		api-put "/repos/$user_name/$repo_name/collaborators/$collab_name"
+		api-put "/repos/$owner_name/$repo_name/collaborators/$collab_name"
 	done
 }
 
 github-untrust() {
-	get-args user-repo *collaborators
+	get-args owner-repo *collaborators
 	require-value repo-name "$repo"
-	require-value user-name "$user"
+	require-value owner-name "$owner"
 	require-value api-token "$token"
 	for collab_name in ${collaborators[@]}; do
-		api-delete "/repos/$user_name/$repo_name/collaborators/$collab_name"
+		api-delete "/repos/$owner_name/$repo_name/collaborators/$collab_name"
 	done
 }
 
@@ -531,7 +529,10 @@ api-call() {
 		fi
 	fi
 
-	[ -n "$dry_run" ] && exit 0
+	[ -n "$dry_run" ] && {
+		say '*** NOTE: This is a dry run only. ***'
+		exit 0
+	}
 
 	if [ -z "$repeat_command" ]; then
 		# Run the curl command!
@@ -638,22 +639,22 @@ ALL() { [ -n "$GIT_HUB_ALL" ] && return 0 || return 1; }
 #------------------------------------------------------------------------------
 get-args() {
 	local slurp_index=0
-    local slurp_re='^\*'
-	local user_repo_re='/'
-	if [[ "$1" = "user-repo" ]]; then
-		if [[ ${command_arguments[0]} =~ $user_repo_re ]]; then
-			check-user-repo ${command_arguments[0]}
+	if [[ "$1" = "owner-repo" ]]; then
+		if [[ "${command_arguments[0]}" =~ / ]]; then
+			check-owner-repo ${command_arguments[0]}
 			unset command_arguments[0]
 		fi
 		shift
 	fi
+	local -a slurp
 	for arg in "${command_arguments[@]}"; do
 		if [ $slurp_index -gt 0 ]; then
-			eval ${1/\*/}[$slurp_index]=\"$arg\"
+			slurp[$slurp_index]="$arg"
 			let slurp_index=slurp_index+1
 		elif [ $# -gt 0 ]; then
-			if [[ $1 =~ $slurp_re ]]; then
-				eval ${1/\*/}[$slurp_index]=\"$arg\"
+			if [[ "$1" =~ ^\* ]]; then
+				slurp_name=${1/\*/}
+				slurp[$slurp_index]="$arg"
 				let slurp_index=slurp_index+1
 			else
 				eval $1=\""$arg"\"
@@ -663,15 +664,18 @@ get-args() {
 			die "Unknown argument: $arg"
 		fi
 	done
+	if [ $slurp_index -gt 0 ]; then
+		eval $slurp_name=\(\"\${slurp[@]}\"\)
+	fi
 }
 
-check-user-repo() {
-	[[ $1 =~ "/" ]] && user-repo ${1/\// }
+check-owner-repo() {
+	[[ $1 =~ / ]] && owner-repo ${1/\// }
 	true
 }
 
-user-repo() {
-	user=$1
+owner-repo() {
+	owner=$1
 	repo=$2
 }
 
@@ -703,15 +707,20 @@ fetch-value() {
 	[ -n "$(eval echo \$$var)" ] && return
 	eval $var=\"\$$env\"
 	[ -n "$(eval echo \$$var)" ] && return
+	# XXX get .git dir from git's api (anywhere in the repo)
 	local git_dir=${GIT_DIR:-.git}
-	if [ "$var" = "repo_name" -o "$var" = "user_name" ]; then
+	if [ "$var" = "repo_name" -o \
+		 "$var" = "owner_name" -o \
+		 "$var" = "user_name" ]; then
 		if [ -f "$git_dir/config" ]; then
+			# XXX don't require 'origin' remote name
 			url=$(git config --file=$git_dir/config remote.origin.url)
 			if [ -n "$url" ]; then
 				local re1='github\.com'
 				if [[ "$url" =~ $re1 ]]; then
 					local re2='^.*[:/](.*)/(.*)\.git$'
 					if [[ "$url" =~ $re2 ]]; then
+						: ${owner_name:="${BASH_REMATCH[1]}"}
 						: ${user_name:="${BASH_REMATCH[1]}"}
 						: ${repo_name:="${BASH_REMATCH[2]}"}
 						return
@@ -886,7 +895,8 @@ json-dump-object-pairs() {
 	local regex='(^\[|^null$|^[0-9]+$)'
 	local json='{'
 	for ((i = 0; i < ${#key_value_pairs[@]}; i = i+2)); do
-		local value=${key_value_pairs[$((i+1))]}
+		local value="${key_value_pairs[$((i+1))]}"
+		value=${value//\"/\\\"}
 		if [[ "$value" =~ $regex ]]; then
 			json="$json\"${key_value_pairs[$i]}\":$value"
 		else
@@ -920,8 +930,13 @@ json-get() {
 	value=$(echo "$data" | grep -E --max-count=1 "$key" | cut -f2)
 	if [ "$value" = 'null' ]; then
 		echo ''
+	elif [[ "$value" =~ ^\" ]]; then
+		value=${value#\"}
+		value=${value%\"}
+		value=${value//\\\"/\"}
+		echo "$value"
 	else
-		echo ${value//\"/}
+		echo "$value"
 	fi
 }
 
@@ -1047,6 +1062,8 @@ unset-global-variables() {
 	command_arguments=
 	user=
 	user_name=
+	owner=
+	owner_name=
 	repo=
 	repo_name=
 	token=
@@ -1078,9 +1095,6 @@ setup-env() {
 	else
 		rm -f $GIT_HUB_TMP_PREFIX-*
 	fi
-	[ -n "$dry_run" ] &&
-		say '*** NOTE: This is a dry run only. ***'
-	true
 }
 
 check_config() {

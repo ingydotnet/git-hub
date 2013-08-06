@@ -1,18 +1,16 @@
-- Fix star and unstar
+- Eliminate todos
 - Implement `git hub user --all`
 - Implement `git hub repo --all`
-- Fix repo-edit
-  - Shell escaping of [$`\n\t] on json object strings
-  - Check user-edit
 - Refactor variable scoping to use minimal globals
   - Review global variables
 - Add a DEVELOPMENT docuent to the repo
 - Find out why github fails under zsh (rafl)
 - New commands to add:
+  - pulls       - list pull requests
+  - pull        - issue a pull request
   - search
   - rate-limit
   - repo-watch
-  - pull-request
   - Make a plan for all actions to support
 - use .git/config from anywhere inside a repo (not just ./.git/config)
   - test "$(git rev-parse --is-inside-work-tree 2>/dev/null)" = true ||
@@ -20,7 +18,12 @@
   - write an irc plugin
 - Finish the commands.t test
 - Add more commands to all-commands.t
+- Don't allow `make build` to be run under `sudo make install`
 
++ Fix repo-edit
+  + Shell escaping of ["$`\n\t] on json object strings
+  + Check user-edit
++ Fix star and unstar
 + Implement org-* commands
 + Add GIT_HUB_PASSWORD support
 + Change -U to -A

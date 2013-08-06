@@ -11,6 +11,8 @@ if [ -n "$GIT_HUB_TEST_RESET" ]; then
     exit 0
 fi
 
+# export GIT_HUB_COUNT=5
+
 git hub user
 git hub user cdent
 git hub repo pegex-pm
@@ -25,6 +27,7 @@ git hub repo-edit ingydotnet/git-hub-api-test \
 git hub star git-hub-api-test
 git hub stars git-hub-api-test
 git hub unstar git-hub-api-test
+git hub starred -c5
 git hub repo git-hub-api-test
 git hub repo-delete git-hub-api-test
 git hub collabs
