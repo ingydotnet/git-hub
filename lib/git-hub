@@ -911,7 +911,7 @@ json-dump-object-pairs() {
 }
 
 json-load-cache() {
-	json_load_data_cache=$(echo "$1" | tokenize | parse)
+	JSON.load "$1" json_load_data_cache
 }
 
 json-prune-cache() {

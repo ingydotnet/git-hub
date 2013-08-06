@@ -1,13 +1,14 @@
 #!/bin/bash
 
-set -e
-
-source $PWD/ext/bash-tap/bash-tap
-# plan tests 2
+PATH=lib:ext/test-simple-bash/lib:ext/json-bash/lib:$PATH
+source test-simple.bash tests 1
 
 GIT_HUB_TEST_MODE="1"
-GIT_HUB_CONFIG=$PWD/test/test-config
+GIT_HUB_TEST_COMMAND="1"
+GIT_HUB_CONFIG=$PWD/test/githubconfig
 
-ok $a "lala"
+source $PWD/lib/git-hub
+assert-env
 
-done_testing
+command_arguments=(login)
+ok [ $(github-config) == tommy ] "Reading login form config works"

@@ -1,9 +1,7 @@
 #!/bin/bash
 
-set -e
-
-source $PWD/ext/bash-tap/bash-tap
-# plan tests 2
+PATH=lib:ext/test-simple-bash/lib:ext/json-bash/lib:$PATH
+source test-simple.bash tests 8
 
 GIT_HUB_TEST_MODE="1"
 GIT_HUB_TEST_COMMAND="1"
@@ -21,7 +19,7 @@ test_command() {
     local curl="${curl_command[@]}"
     local label="$@"
     [ -n "$GIT_DIR" ] && label=$(printf "%-40s %s" "$label" "($GIT_DIR)")
-    is "$curl" "$expected" "$label"
+    ok [ "$curl" = "$expected" ] "$label"
 }
 
 expect() {
@@ -30,10 +28,10 @@ expect() {
     expected="curl --request $action https://api.github.com$suffix"
 }
 
-diag "Test all the permutations of command and arguments and environments"
+echo "# Test all the permutations of command and arguments and environments"
 
 #----------------------------------------------------------------------------
-diag "Test 'user' commands:"
+echo "# Test 'user' commands:"
 
 expect GET /users/tommy
 GIT_DIR=not-in-git-dir \
@@ -52,14 +50,14 @@ GIT_DIR=$foo_git \
 test_command "user geraldo"
 
 #----------------------------------------------------------------------------
-diag "Test 'user-edit' commands:"
+echo "# Test 'user-edit' commands:"
 
 expect PATCH /user -d '{"name":"Tomster"}' AUTH
 GIT_DIR=not-in-git-dir \
 test_command 'user-edit name Tomster'
 
 #----------------------------------------------------------------------------
-diag "Test 'repo' commands:"
+echo "# Test 'repo' commands:"
 
 expect 'GET' "/repos/tommy/xyz"
 GIT_DIR=not-in-git-dir \
@@ -71,5 +69,3 @@ test_command "repo"
 
 expect 'GET' "/repos/geraldo/rivets"
 test_command "repo geraldo/rivets"
-
-done_testing
