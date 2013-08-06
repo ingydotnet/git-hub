@@ -638,6 +638,7 @@ ALL() { [ -n "$GIT_HUB_ALL" ] && return 0 || return 1; }
 # Argument parsing functions:
 #------------------------------------------------------------------------------
 get-args() {
+	local last=${!#}
 	local slurp_index=0
 	if [[ "$1" = "owner-repo" ]]; then
 		if [[ "${command_arguments[0]}" =~ / ]]; then
@@ -646,15 +647,14 @@ get-args() {
 		fi
 		shift
 	fi
-	local -a slurp
 	for arg in "${command_arguments[@]}"; do
 		if [ $slurp_index -gt 0 ]; then
-			slurp[$slurp_index]="$arg"
+			eval $slurp_name[\$slurp_index]=\"\$arg\"
 			let slurp_index=slurp_index+1
 		elif [ $# -gt 0 ]; then
 			if [[ "$1" =~ ^\* ]]; then
-				slurp_name=${1/\*/}
-				slurp[$slurp_index]="$arg"
+				local slurp_name=${1/\*/}
+				eval $slurp_name[\$slurp_index]=\"\$arg\"
 				let slurp_index=slurp_index+1
 			else
 				eval $1=\""$arg"\"
@@ -664,8 +664,12 @@ get-args() {
 			die "Unknown argument: $arg"
 		fi
 	done
-	if [ $slurp_index -gt 0 ]; then
-		eval $slurp_name=\(\"\${slurp[@]}\"\)
+	if [ "$last" = "*key_value_pairs" ]; then
+		if [ "${#key_value_pairs[@]}" -eq 0 ]; then
+			die "Command needs key/value pairs, but none given"
+		elif [ $(( ${#key_value_pairs[@]} % 2)) -eq 1 ]; then
+			die "Odd number of items for key/value pairs"
+		fi
 	fi
 }
 
@@ -757,6 +761,7 @@ report-list() {
 	local list_counter=1
 	while true; do
 		api-get $url
+		[ -n "$GIT_HUB_TEST_COMMAND" ] && return
 		json-prune-list "${fields[@]}"
 		local page_size=$(echo "$json_load_data_cache" | cut -d '/' -f2 | tail -1)
 		for ((ii = 0; ii <= page_size && list_counter <= list_max; ii++)); do
@@ -1062,12 +1067,15 @@ unset-global-variables() {
 	command_arguments=
 	user=
 	user_name=
+	org=
+	org_name=
 	owner=
 	owner_name=
 	repo=
 	repo_name=
 	token=
 	api_token=
+	key_value_pairs=()
 	list_size=
 	GIT_QUIET=
 	GIT_HUB_VERBOSE=
