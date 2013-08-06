@@ -1,3 +1,10 @@
+- Namespace global vars with GitHub.func GitHub_varname
+- Eliminate evals
+- use fgrep in JSON.get
+- dev-test/all_commands.t is broken
+  - convert all_commands.t to test-simple / prove
+- make install needs to uninstall first if dev-install in place
+- Write dev-test for installation from git `clone git-hub`
 - Eliminate todos
 - Implement `git hub user --all`
 - Implement `git hub repo --all`

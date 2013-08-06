@@ -54,8 +54,8 @@ install-lib: build $(INSTALL_LIB)/$(CMD)./
 	install -m 0755 lib/$(CMD)./* $(INSTALL_LIB)/$(CMD)./
 
 install-doc: doc
-	install -c -d -m 0755 $(MAN1DIR)
-	install -c -m 0644 doc/$(CMD).1 $(MAN1DIR)
+	install -c -d -m 0755 $(INSTALL_MAN)
+	install -c -m 0644 doc/$(CMD).1 $(INSTALL_MAN)
 
 uninstall: uninstall-lib uninstall-doc
 
@@ -64,7 +64,7 @@ uninstall-lib:
 	rm -fr $(INSTALL_LIB)/$(CMD).
 
 uninstall-doc:
-	rm -f $(MAN1DIR)/$(CMD).1
+	rm -f $(INSTALL_MAN)/$(CMD).1
 
 $(INSTALL_LIB)/$(CMD)./:
 	mkdir -p $@
@@ -83,7 +83,7 @@ $(SUBMODULE):
 lib/$(CMD)./json.bash: $(JSON) lib/$(CMD).
 	cp $< $@
 
-$(CMD).txt: README.asc
+$(CMD).txt: readme.asc
 	cp $< $@
 
 %.xml: %.txt
@@ -109,7 +109,7 @@ dev-install: build uninstall
 	ln -s $$PWD/lib/$(CMD). $(INSTALL_LIB)/$(CMD).
 
 # Run a bunch of live tests. Make sure this thing really works. :)
-dev-test: check-dev-install doc
+dev-test: check-dev-install
 	bash test/dev-test/all_commands.t
 
 # Run this to reset if `make dev-test` fails.
