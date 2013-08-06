@@ -1,0 +1,6 @@
+[submodule "ext/test-simple-bash"]
+	path = ext/test-simple-bash
+	url = git@github.com:ingydotnet/test-simple-bash.git
+[submodule "ext/json-bash"]
+	path = ext/json-bash
+	url = git@github.com:ingydotnet/json-bash.git
