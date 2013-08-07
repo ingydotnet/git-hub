@@ -8,7 +8,7 @@ GIT_HUB_TEST_COMMAND="1"
 GIT_HUB_CONFIG=$PWD/test/githubconfig
 
 source $PWD/lib/git-hub
-assert-env
+GitHub.assert-env
 
 foo_git=./test/foo.git
 fake_token=0123456789ABCDEF
@@ -24,14 +24,14 @@ test_command() {
         GIT_DIR=not-in-git-dir
     fi
     eval set -- "$1"
-    get-options "$@"
+    GitHub.get-options "$@"
     # subvert git-core/git-sh-setup's die
     die_with_status () {
         shift
         die_msg="$@"
         died=true
     }
-    "github-$command"
+    "GitHub.$command"
     local curl="${curl_command[@]}"
     local label="$1"
     label=$(printf "%-40s %s" "$label" "($GIT_DIR)")

@@ -8,7 +8,7 @@ GIT_HUB_TEST_COMMAND="1"
 GIT_HUB_CONFIG=$PWD/test/githubconfig
 
 source $PWD/lib/git-hub
-assert-env
+GitHub.assert-env
 
 command_arguments=(login)
-ok [ $(github-config) == tommy ] "Reading login form config works"
+ok [ $(GitHub.config) == tommy ] "Reading login form config works"

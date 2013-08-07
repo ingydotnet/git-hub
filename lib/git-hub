@@ -50,31 +50,31 @@ x           dev - Turn on Bash trace (set -x) output
 "
 
 #------------------------------------------------------------------------------
-main() {
-	assert-env
-	get-options "$@"
-	setup-env
+GitHub.main() {
+	GitHub.assert-env
+	GitHub.get-options "$@"
+	GitHub.setup-env
 
-	callable github-"$command" ||
+	GitHub.callable GitHub."$command" ||
 		die "Unknown 'git hub' command: '$command'"
-	github-"$command" "$@"
+	GitHub."$command" "$@"
 
 	if OK; then
-		if callable "success-$command"; then
-			"success-$command"
+		if GitHub.callable "GitHub.success-$command"; then
+			"GitHub.success-$command"
 		else
 			if [ "$message_success" != '0' ]; then
 				say ${message_success:-"'git hub $command' successful"}
 			fi
 		fi
 		exit 0
-	elif [ -n "$status_code" ] && callable "status-$status_code-$command"; then
+	elif [ -n "$status_code" ] && GitHub.callable "status-$status_code-$command"; then
 		"status-$status_code-$command"
 		exit $OK
 	elif [ -n "$(eval "echo \$message_$status_code")" ]; then
 		say $(eval "echo \$message_$status_code")
 		exit $OK
-	elif callable "failure-$command"; then
+	elif GitHub.callable "failure-$command"; then
 		"failure-$command"
 		exit $OK
 	else
@@ -87,8 +87,8 @@ main() {
 #------------------------------------------------------------------------------
 # `git hub` command functions:
 #------------------------------------------------------------------------------
-github-config() {
-    get-args config_key config_value
+GitHub.config() {
+    GitHub.get-args config_key config_value
 	message_success=0
 	if [ -z "$config_key" ]; then
 		cat $config_file
@@ -101,8 +101,8 @@ github-config() {
 	OK=$?
 }
 
-github-config-unset() {
-    get-args config_key
+GitHub.config-unset() {
+    GitHub.get-args config_key
 	[ -n "$config_key" ] ||
 		die "This command requires a config key"
 	git config -f $config_file --unset github.$config_key
@@ -110,14 +110,14 @@ github-config-unset() {
 	message_success="Config key '$config_key' has been unset."
 }
 
-github-token-list() {
+GitHub.token-list() {
 	basic_auth="1"
-	report-list \
+	GitHub.report-list \
 		'/authorizations' \
 		'token id note app/name'
 }
 
-format-token-list-entry() {
+GitHub.format-token-list-entry() {
 	if RAW || QUIET; then
 		printf "%-7s  %s\n" $3 "${4:-$5}"
 	else
@@ -125,24 +125,24 @@ format-token-list-entry() {
 	fi
 }
 
-github-token-create() {
+GitHub.token-create() {
 	local json
-	get-args note
+	GitHub.get-args note
 	if [ -n "$note" ]; then
-		json=$(json-dump-object "note" "$note")
+		json=$(GitHub.json-dump-object "note" "$note")
 	else
 		json='{}'
 	fi
 	basic_auth="1"
-	api-post '/authorizations' "$json"
+	GitHub.api-post '/authorizations' "$json"
 }
 
-success-token-create() {
-	local token=$(json-get "/token")
+GitHub.success-token-create() {
+	local token=$(GitHub.json-get "/token")
 	[ -n "$token" ] || die "Can't figure out token value"
-	local id=$(json-get "/id")
-	local note=$(json-get "/note")
-	local name=$(json-get "/app/name")
+	local id=$(GitHub.json-get "/id")
+	local note=$(GitHub.json-get "/note")
+	local name=$(GitHub.json-get "/app/name")
 	if RAW || QUIET; then
 		printf "$id"
 	else
@@ -150,26 +150,26 @@ success-token-create() {
 	fi
 }
 
-github-token-delete() {
-    get-args id
+GitHub.token-delete() {
+    GitHub.get-args id
 	[ -z "$id" ] && die "Command requires token id"
 	basic_auth="1"
-	api-delete "/authorizations/$id"
+	GitHub.api-delete "/authorizations/$id"
 	message_success="Token '$id' deleted"
 }
 
-github-scope-list() {
-	get-args id
-	require-value token-id "$id"
+GitHub.scope-list() {
+	GitHub.get-args id
+	GitHub.require-value token-id "$id"
 	basic_auth="1"
-	api-get "/authorizations/$id"
+	GitHub.api-get "/authorizations/$id"
 }
 
-success-scope-list() {
+GitHub.success-scope-list() {
 	local i=0
 	local scopes scope
 	while true; do
-		scope=$(json-get "/scopes/$i")
+		scope=$(GitHub.json-get "/scopes/$i")
 		[ -z "$scope" ] && break
 		scopes+=($scope)
 		let i=i+1
@@ -202,130 +202,130 @@ For more info, see: http://developer.github.com/v3/oauth/#scopes
 eos
 }
 
-github-scope-add() {
+GitHub.scope-add() {
     if ALL; then
-		get-args id
-		# XXX Dedup this array in github-scope-remove
+		GitHub.get-args id
+		# XXX Dedup this array in GitHub.scope-remove
 		scopes=(
 			user user:email user:follow
 			public_repo repo repo:status delete_repo
 			notifications gist
 		)
 	else
-		get-args id *scopes
+		GitHub.get-args id *scopes
 	fi
-	require-value token-id "$id"
-	check-token-id "$id"
+	GitHub.require-value token-id "$id"
+	GitHub.check-token-id "$id"
 	basic_auth="1"
-	local array=$(json-dump-array ${scopes[*]})
-	local json=$(json-dump-object add_scopes "$array")
-	api-patch "/authorizations/$id" "$json"
+	local array=$(GitHub.json-dump-array ${scopes[*]})
+	local json=$(GitHub.json-dump-object add_scopes "$array")
+	GitHub.api-patch "/authorizations/$id" "$json"
 	message_success="Scopes added."
 }
 
-github-scope-remove() {
+GitHub.scope-remove() {
     if ALL; then
-		get-args id
+		GitHub.get-args id
 		scopes=(
 			user user:email user:follow
 			public_repo repo repo:status delete_repo
 			notifications gist
 		)
 	else
-		get-args id *scopes
+		GitHub.get-args id *scopes
 	fi
-	require-value token-id "$id"
+	GitHub.require-value token-id "$id"
 	basic_auth="1"
-	local array=$(json-dump-array ${scopes[*]})
-	local json=$(json-dump-object remove_scopes "$array")
-	api-patch "/authorizations/$id" "$json"
+	local array=$(GitHub.json-dump-array ${scopes[*]})
+	local json=$(GitHub.json-dump-object remove_scopes "$array")
+	GitHub.api-patch "/authorizations/$id" "$json"
 	message_success="Scopes removed"
 }
 
-github-user() {
-    get-args user
-	fetch-value user-name "$user"
+GitHub.user() {
+    GitHub.get-args user
+	GitHub.fetch-value user-name "$user"
 	: ${user_name:=$login}
-	api-get "/users/$user_name"
+	GitHub.api-get "/users/$user_name"
 }
 
-success-user() {
+GitHub.success-user() {
 	for field in \
 		login type name email blog location company bio \
 		followers following public_repos public_gists
 	do
-		report-value $field
+		GitHub.report-value $field
 	done
 }
 
-github-user-edit() {
-	require-value api-token "$token"
-	get-args *key_value_pairs
-	api-patch "/user" "$(json-dump-object-pairs)"
+GitHub.user-edit() {
+	GitHub.require-value api-token "$token"
+	GitHub.get-args *key_value_pairs
+	GitHub.api-patch "/user" "$(GitHub.json-dump-object-pairs)"
 }
 
-github-orgs() {
-    get-args user
-	fetch-value user-name "$user"
+GitHub.orgs() {
+    GitHub.get-args user
+	GitHub.fetch-value user-name "$user"
 	: ${user_name:=$login}
 
-	report-list \
+	GitHub.report-list \
 		"/users/$user_name/orgs" \
 		'login'
 }
 
-github-org() {
-	get-args org
-	require-value org-name "$org"
-	api-get "/orgs/$org_name"
+GitHub.org() {
+	GitHub.get-args org
+	GitHub.require-value org-name "$org"
+	GitHub.api-get "/orgs/$org_name"
 }
 
-success-org() {
+GitHub.success-org() {
 	for field in \
 		login type name billing_email email blog location company \
 		html_url public_repos public
 	do
-		report-value $field
+		GitHub.report-value $field
 	done
 }
 
-github-org-edit() {
-	require-value api-token "$token"
-	get-args org *key_value_pairs
-	require-value org-name "$org"
-	api-patch "/orgs/$org_name" "$(json-dump-object-pairs)"
+GitHub.org-edit() {
+	GitHub.require-value api-token "$token"
+	GitHub.get-args org *key_value_pairs
+	GitHub.require-value org-name "$org"
+	GitHub.api-patch "/orgs/$org_name" "$(GitHub.json-dump-object-pairs)"
 }
 
-github-members() {
-    get-args org
-	require-value org-name "$org"
+GitHub.members() {
+    GitHub.get-args org
+	GitHub.require-value org-name "$org"
 
-	report-list \
+	GitHub.report-list \
 		"/orgs/$org_name/members" \
 		'login'
 }
 
-github-teams() {
-	require-value api-token "$token"
-    get-args org
-	require-value org-name "$org"
+GitHub.teams() {
+	GitHub.require-value api-token "$token"
+    GitHub.get-args org
+	GitHub.require-value org-name "$org"
 
-	report-list \
+	GitHub.report-list \
 		"/orgs/$org_name/teams" \
 		'name'
 }
 
-github-repos() {
-    get-args owner
-	fetch-value owner-name "$owner"
+GitHub.repos() {
+    GitHub.get-args owner
+	GitHub.fetch-value owner-name "$owner"
 	: ${owner_name:=$login}
 
-	report-list \
+	GitHub.report-list \
 		"/users/$owner_name/repos?sort=pushed;per_page=PER_PAGE" \
 		'pushed_at full_name description'
 }
 
-format-repos-entry() {
+GitHub.format-repos-entry() {
 	if RAW; then
 		printf "$3\n"
 	else
@@ -333,15 +333,15 @@ format-repos-entry() {
 	fi
 }
 
-github-repo() {
-	get-args repo
-	check-owner-repo "$repo"
-	require-value repo-name "$repo"
-	require-value owner-name "${owner:-$login}"
-	api-get "/repos/$owner_name/$repo_name"
+GitHub.repo() {
+	GitHub.get-args repo
+	GitHub.check-owner-repo "$repo"
+	GitHub.require-value repo-name "$repo"
+	GitHub.require-value owner-name "${owner:-$login}"
+	GitHub.api-get "/repos/$owner_name/$repo_name"
 }
 
-success-repo() {
+GitHub.success-repo() {
 	for field in \
 		full_name description homepage language \
 		pushed_at \
@@ -349,50 +349,50 @@ success-repo() {
 		forks parent__full_name source__full_name \
 		watchers open_issues
 	do
-		report-value $field
+		GitHub.report-value $field
 	done
 }
 
-github-repo-edit() {
-	get-args owner-repo *key_value_pairs
-	require-value repo-name "$repo"
-	require-value owner-name "$owner"
-	require-value api-token "$token"
+GitHub.repo-edit() {
+	GitHub.get-args owner-repo *key_value_pairs
+	GitHub.require-value repo-name "$repo"
+	GitHub.require-value owner-name "$owner"
+	GitHub.require-value api-token "$token"
 	key_value_pairs+=(name "$repo_name")
-	api-patch "/repos/$owner_name/$repo_name" "$(json-dump-object-pairs)"
+	GitHub.api-patch "/repos/$owner_name/$repo_name" "$(GitHub.json-dump-object-pairs)"
 }
 
 # TODO Support creating repo under an org
-github-repo-create() {
-	get-args repo
-	require-value repo-name "$repo"
-	require-value api-token "$token"
-	api-post "/user/repos" $(json-dump-object 'name' $repo_name)
+GitHub.repo-create() {
+	GitHub.get-args repo
+	GitHub.require-value repo-name "$repo"
+	GitHub.require-value api-token "$token"
+	GitHub.api-post "/user/repos" $(GitHub.json-dump-object 'name' $repo_name)
 	message_success="Repository '$repo_name' created."
 	message_422="Repository name '$repo_name' already exists."
 }
 
-github-repo-delete() {
-	get-args owner-repo
-	require-value delete-repo-name "$repo"
-	require-value delete-owner-name "$owner"
-	require-value api-token "$token"
-	api-delete "/repos/$delete_owner_name/$delete_repo_name"
+GitHub.repo-delete() {
+	GitHub.get-args owner-repo
+	GitHub.require-value delete-repo-name "$repo"
+	GitHub.require-value delete-owner-name "$owner"
+	GitHub.require-value api-token "$token"
+	GitHub.api-delete "/repos/$delete_owner_name/$delete_repo_name"
 	message_success="Repository '$delete_owner_name/$delete_repo_name' deleted"
 }
 
-github-forks() {
-	get-args repo
-	check-owner-repo "$repo"
-	require-value repo-name "$repo"
-	require-value owner-name "${owner:-$login}"
+GitHub.forks() {
+	GitHub.get-args repo
+	GitHub.check-owner-repo "$repo"
+	GitHub.require-value repo-name "$repo"
+	GitHub.require-value owner-name "${owner:-$login}"
 
-	report-list \
+	GitHub.report-list \
 		"/repos/$owner_name/$repo_name/forks?sort=newest;per_page=PER_PAGE" \
 		'pushed_at full_name'
 }
 
-format-forks-entry() {
+GitHub.format-forks-entry() {
 	if RAW; then
 		printf "$3\n"
 	else
@@ -400,125 +400,124 @@ format-forks-entry() {
 	fi
 }
 
-github-fork() {
-	get-args owner-repo org
-	require-value repo-name "$repo"
-	require-value owner-name "$owner"
-	api-post "/repos/$owner_name/$repo_name/forks" '{}'
+GitHub.fork() {
+	GitHub.get-args owner-repo org
+	GitHub.require-value repo-name "$repo"
+	GitHub.require-value owner-name "$owner"
+	GitHub.api-post "/repos/$owner_name/$repo_name/forks" '{}'
 }
 
-github-stars() {
-	get-args repo
-	check-owner-repo "$repo"
-	require-value repo-name "$repo"
-	require-value owner-name "${owner:-$login}"
-	report-list \
+GitHub.stars() {
+	GitHub.get-args repo
+	GitHub.check-owner-repo "$repo"
+	GitHub.require-value repo-name "$repo"
+	GitHub.require-value owner-name "${owner:-$login}"
+	GitHub.report-list \
 		"/repos/$owner_name/$repo_name/stargazers?per_page=PER_PAGE" \
 		'login'
 }
 
-github-star() {
-	get-args repo
-	check-owner-repo "$repo"
-	require-value repo-name "$repo"
-	require-value owner-name "${owner:-$login}"
-	require-value api-token "$token"
-	api-put "/user/starred/$owner_name/$repo_name"
+GitHub.star() {
+	GitHub.get-args repo
+	GitHub.check-owner-repo "$repo"
+	GitHub.require-value repo-name "$repo"
+	GitHub.require-value owner-name "${owner:-$login}"
+	GitHub.require-value api-token "$token"
+	GitHub.api-put "/user/starred/$owner_name/$repo_name"
 	message_success="'$owner_name/$repo_name' starred"
 }
 
-github-unstar() {
-	get-args repo
-	check-owner-repo "$repo"
-	require-value repo-name "$repo"
-	require-value owner-name "${owner:-$login}"
-	require-value api-token "$token"
-	api-delete "/user/starred/$owner_name/$repo_name"
+GitHub.unstar() {
+	GitHub.get-args repo
+	GitHub.check-owner-repo "$repo"
+	GitHub.require-value repo-name "$repo"
+	GitHub.require-value owner-name "${owner:-$login}"
+	GitHub.require-value api-token "$token"
+	GitHub.api-delete "/user/starred/$owner_name/$repo_name"
 	message_success="'$owner_name/$repo_name' unstarred"
 }
 
-github-starred() {
-	get-args user
-	require-value user-name "${user:-$login}"
-	report-list \
+GitHub.starred() {
+	GitHub.get-args user
+	GitHub.require-value user-name "${user:-$login}"
+	GitHub.report-list \
 		"/users/$user_name/starred?sort=updated;per_page=PER_PAGE" \
 		'full_name'
 }
 
-github-collabs() {
-	get-args repo
-	check-owner-repo "$repo"
-	require-value repo-name "$repo"
-	require-value owner-name "${owner:-$login}"
-	report-list \
+GitHub.collabs() {
+	GitHub.get-args repo
+	GitHub.check-owner-repo "$repo"
+	GitHub.require-value repo-name "$repo"
+	GitHub.require-value owner-name "${owner:-$login}"
+	GitHub.report-list \
 		"/repos/$owner_name/$repo_name/collaborators" \
 		'login'
 }
 
-github-trust() {
-	get-args owner-repo *collaborators
-	require-value repo-name "$repo"
-	require-value owner-name "$owner"
-	require-value api-token "$token"
+GitHub.trust() {
+	GitHub.get-args owner-repo *collaborators
+	GitHub.require-value repo-name "$repo"
+	GitHub.require-value owner-name "$owner"
+	GitHub.require-value api-token "$token"
 	for collab_name in ${collaborators[@]}; do
-		api-put "/repos/$owner_name/$repo_name/collaborators/$collab_name"
+		GitHub.api-put "/repos/$owner_name/$repo_name/collaborators/$collab_name"
 	done
 }
 
-github-untrust() {
-	get-args owner-repo *collaborators
-	require-value repo-name "$repo"
-	require-value owner-name "$owner"
-	require-value api-token "$token"
+GitHub.untrust() {
+	GitHub.get-args owner-repo *collaborators
+	GitHub.require-value repo-name "$repo"
+	GitHub.require-value owner-name "$owner"
+	GitHub.require-value api-token "$token"
 	for collab_name in ${collaborators[@]}; do
-		api-delete "/repos/$owner_name/$repo_name/collaborators/$collab_name"
+		GitHub.api-delete "/repos/$owner_name/$repo_name/collaborators/$collab_name"
 	done
 }
 
-github-followers() {
-	get-args user
-	require-value user-name "${user:-$login}"
-	report-list \
+GitHub.followers() {
+	GitHub.get-args user
+	GitHub.require-value user-name "${user:-$login}"
+	GitHub.report-list \
 		"/users/$user_name/followers?per_page=PER_PAGE" \
 		'login'
 }
 
-github-following() {
-	get-args user
-	require-value user-name "${user:-$login}"
-	report-list \
+GitHub.following() {
+	GitHub.get-args user
+	GitHub.require-value user-name "${user:-$login}"
+	GitHub.report-list \
 		"/users/$user_name/following?per_page=PER_PAGE" \
 		'login'
 }
 
-github-follow() {
-	get-args user
-	require-value user-name "$user"
-	require-value api-token "$token"
-	api-put "/user/following/$user_name"
+GitHub.follow() {
+	GitHub.get-args user
+	GitHub.require-value user-name "$user"
+	GitHub.require-value api-token "$token"
+	GitHub.api-put "/user/following/$user_name"
 }
 
-github-unfollow() {
-	get-args user
-	require-value user-name "$user"
-	require-value api-token "$token"
-	api-delete "/user/following/$user_name"
+GitHub.unfollow() {
+	GitHub.get-args user
+	GitHub.require-value user-name "$user"
+	GitHub.require-value api-token "$token"
+	GitHub.api-delete "/user/following/$user_name"
 }
-
 
 #------------------------------------------------------------------------------
 # API calling functions:
 #------------------------------------------------------------------------------
-api-get() { api-call GET "$1" "$2"; }
-api-post() { api-call POST "$1" "$2"; }
-api-put() { api-call PUT "$1" "$2"; }
-api-patch() { api-call PATCH "$1" "$2"; }
-api-delete() { api-call DELETE "$1" "$2"; }
+GitHub.api-get() { GitHub.api-call GET "$1" "$2"; }
+GitHub.api-post() { GitHub.api-call POST "$1" "$2"; }
+GitHub.api-put() { GitHub.api-call PUT "$1" "$2"; }
+GitHub.api-patch() { GitHub.api-call PATCH "$1" "$2"; }
+GitHub.api-delete() { GitHub.api-call DELETE "$1" "$2"; }
 
 # Build a command to make the HTTP call to the API server, make the call, and
 # check the result.
-api-call() {
-	format-curl-command "$@"
+GitHub.api-call() {
+	GitHub.format-curl-command "$@"
 	[ -n "$GIT_HUB_TEST_COMMAND" ] && return
 
 	if VERBOSE; then
@@ -547,26 +546,26 @@ api-call() {
 
 	[ -n "$show_headers" ] && cat $GIT_HUB_HEADER
 	[ -n "$show_output" ] && cat $GIT_HUB_OUTPUT
-	[ -s $GIT_HUB_OUTPUT ] && json-load-cache "$(< $GIT_HUB_OUTPUT)"
-	[ -n "$json_prune_regex" ] && json-prune-cache "$json_prune_regex"
+	[ -s $GIT_HUB_OUTPUT ] && GitHub.json-load-cache "$(< $GIT_HUB_OUTPUT)"
+	[ -n "$json_prune_regex" ] && GitHub.json-prune-cache "$json_prune_regex"
 	[ -n "$show_json" ] && echo "$json_load_data_cache"
 
-	check-api-call-status $rc
+	GitHub.check-api-call-status $rc
 
 	true
 }
 
 # Build curl command in an global array. This is the only way to preserve
 # quoted whitespace.
-format-curl-command() {
+GitHub.format-curl-command() {
 	local action=$1
 	local url=$2
 	local data=$3
 
-	fetch-value use-auth
+	GitHub.fetch-value use-auth
 	[ -z "$GIT_HUB_TEST_COMMAND" ] &&
 		[ -n "$use_auth" ] &&
-		require-value api-token "$token"
+		GitHub.require-value api-token "$token"
 
 	user_agent=git-hub-$GIT_HUB_VERSION
 	# Cheap trick to make github pretty-print the JSON output.
@@ -600,7 +599,7 @@ format-curl-command() {
 	)
 }
 
-check-api-call-status() {
+GitHub.check-api-call-status() {
 	OK=$1
 	if [ ! -f $GIT_HUB_HEADER ]; then
 		ERROR=$(head -1 $GIT_HUB_ERROR)
@@ -614,7 +613,7 @@ check-api-call-status() {
 			;;
 		403)
 			OK=1
-			ERROR=$(json-get '/message')
+			ERROR=$(GitHub.json-get '/message')
 			local regex='rate limit exceeded'
 			if [[ "$ERROR" =~ "$regex" ]]; then
 				ERROR="$ERROR Try the --use-auth option."
@@ -637,12 +636,12 @@ ALL() { [ -n "$GIT_HUB_ALL" ] && return 0 || return 1; }
 #------------------------------------------------------------------------------
 # Argument parsing functions:
 #------------------------------------------------------------------------------
-get-args() {
+GitHub.get-args() {
 	local last=${!#}
 	local slurp_index=0
 	if [[ "$1" = "owner-repo" ]]; then
 		if [[ "${command_arguments[0]}" =~ / ]]; then
-			check-owner-repo ${command_arguments[0]}
+			GitHub.check-owner-repo ${command_arguments[0]}
 			unset command_arguments[0]
 		fi
 		shift
@@ -673,35 +672,35 @@ get-args() {
 	fi
 }
 
-check-owner-repo() {
-	[[ $1 =~ / ]] && owner-repo ${1/\// }
+GitHub.check-owner-repo() {
+	[[ $1 =~ / ]] && GitHub.owner-repo ${1/\// }
 	true
 }
 
-owner-repo() {
+GitHub.owner-repo() {
 	owner=$1
 	repo=$2
 }
 
-# Usage: require-value variable-name "possible-user-value"
+# Usage: GitHub.require-value variable-name "possible-user-value"
 #   Fetch $variable_name or die
-require-value() {
+GitHub.require-value() {
 	local key=$1
 	local var=${key//-/_}
-	fetch-value "$@"
+	GitHub.fetch-value "$@"
 	if [ -z "$(eval echo \$$var)" ]; then
-		[ "$var" = "api_token" ] && die_need_api_token
+		[ "$var" = "api_token" ] && GitHub.die_need_api_token
 		die "Can't find value for '$var'"
 	fi
 	true
 }
 
-# Usage: fetch-value variable-name "possible-user-value"
+# Usage: GitHub.fetch-value variable-name "possible-user-value"
 #   Sets $variable_name to the first of:
 #   - possible-user-value
 #   - $GIT_HUB_VARIABLE_NAME
 #   - git config github.variable-name
-fetch-value() {
+GitHub.fetch-value() {
 	local key=$1
 	local var=${key//-/_}
 	local env=GIT_HUB_$(echo $var | tr 'a-z' 'A-Z')
@@ -738,7 +737,7 @@ fetch-value() {
 	true
 }
 
-check-token-id() {
+GitHub.check-token-id() {
 	local id="$1"
 	[ ${#id} -eq 40 ] &&
 		die "'$command' requires a *token-id*, not a *token-value*."
@@ -751,7 +750,7 @@ check-token-id() {
 #------------------------------------------------------------------------------
 # List processing functions:
 #------------------------------------------------------------------------------
-report-list() {
+GitHub.report-list() {
 	message_success=0
 	local url="$1" fields=($2) ii
  	local list_max=${list_size:-${3:-$(($(tput lines) - 3))}}
@@ -760,24 +759,24 @@ report-list() {
 	url=${url/PER_PAGE/$per_page}
 	local list_counter=1
 	while true; do
-		api-get $url
+		GitHub.api-get $url
 		[ -n "$GIT_HUB_TEST_COMMAND" ] && return
-		json-prune-list "${fields[@]}"
+		GitHub.json-prune-list "${fields[@]}"
 		local page_size=$(echo "$json_load_data_cache" | cut -d '/' -f2 | tail -1)
 		for ((ii = 0; ii <= page_size && list_counter <= list_max; ii++)); do
 			local -a values=()
 			for field in "${fields[@]}"; do
-				value="$(json-get "/$ii/$field")"
+				value="$(GitHub.json-get "/$ii/$field")"
 				values+=("$value")
 			done
-			if callable "format-$command-entry"; then
-				"format-$command-entry" $list_counter "${values[@]}"
+			if GitHub.callable "GitHub.format-$command-entry"; then
+				"GitHub.format-$command-entry" $list_counter "${values[@]}"
 			else
-				default-format-entry $list_counter "${values[@]}"
+				GitHub.default-format-entry $list_counter "${values[@]}"
 			fi
 			let list_counter=list_counter+1
 		done
-		url=$(get-next-page-url)
+		url=$(GitHub.get-next-page-url)
 		if [ $list_counter -gt $list_max ]; then
 			if [ -n "$url" -o $ii -lt $page_size ]; then
 				if ! QUIET; then
@@ -790,14 +789,14 @@ report-list() {
 	done
 }
 
-get-next-page-url() {
+GitHub.get-next-page-url() {
 	local regexp='Link: <(https:.+?)>; rel="next"'
 	[[ "$(< $GIT_HUB_HEADER)" =~ $regexp ]] &&
 		echo "${BASH_REMATCH[1]}"
 	true
 }
 
-default-format-entry() {
+GitHub.default-format-entry() {
 	if RAW; then
 		printf "$2\n"
 	else
@@ -808,7 +807,7 @@ default-format-entry() {
 #------------------------------------------------------------------------------
 # Detailed error messages:
 #------------------------------------------------------------------------------
-die_need_api_token() {
+GitHub.die_need_api_token() {
 	cat <<eos
 
 Can't determine your Personal API Access Token, which is required by this
@@ -833,7 +832,7 @@ eos
 	die
 }
 
-die_config_not_setup() {
+GitHub.die_config_not_setup() {
 	cat <<eos
 
 To use the 'git hub' command, you need a '~/.githubconfig' file, and it needs
@@ -846,7 +845,7 @@ eos
 	die
 }
 
-die_user_name_in_config() {
+GitHub.die_user_name_in_config() {
 	cat <<eos
 
 It looks like your ~/.githubconfig has a 'user-name' key in it. This key has
@@ -864,7 +863,7 @@ eos
 # JSON support functions:
 #------------------------------------------------------------------------------
 # Format a JSON object from an input list of key/value pairs.
-json-dump-object() {
+GitHub.json-dump-object() {
 	local json='{'
 	local regex='(^\[|^null$|^[0-9]+$)'
 	while [ $# -gt 0 ]; do
@@ -882,7 +881,7 @@ json-dump-object() {
 	echo $json
 }
 
-json-dump-array() {
+GitHub.json-dump-array() {
 	local json='['
 	while [ $# -gt 0 ]; do
 		json="$json\"$1\""
@@ -896,7 +895,7 @@ json-dump-array() {
 }
 
 # Format a JSON object from an array.
-json-dump-object-pairs() {
+GitHub.json-dump-object-pairs() {
 	local regex='(^\[|^null$|^[0-9]+$)'
 	local json='{'
 	for ((i = 0; i < ${#key_value_pairs[@]}; i = i+2)); do
@@ -915,20 +914,20 @@ json-dump-object-pairs() {
 	echo $json
 }
 
-json-load-cache() {
+GitHub.json-load-cache() {
 	JSON.load "$1" json_load_data_cache
 }
 
-json-prune-cache() {
+GitHub.json-prune-cache() {
 	json_load_data_cache=$(echo "$json_load_data_cache" | grep -E "$1")
 }
 
-json-prune-list() {
+GitHub.json-prune-list() {
 	local fields="$@"
-	json-prune-cache "^/[0-9]+/(${fields// /|})\b"
+	GitHub.json-prune-cache "^/[0-9]+/(${fields// /|})\b"
 }
 
-json-get() {
+GitHub.json-get() {
 	local key="^$1[[:space:]]"
 	local data="$2"
 	[ -z "$data" ] && data="$json_load_data_cache"
@@ -948,9 +947,9 @@ json-get() {
 #------------------------------------------------------------------------------
 # Report formatting functions:
 #------------------------------------------------------------------------------
-report-value() {
+GitHub.report-value() {
     local key=${1//__/\/}
-	local value=$(json-get "/$key")
+	local value=$(GitHub.json-get "/$key")
 	local label="$key"
 	if ! RAW; then
 		label=$(eval echo \$label_$1)
@@ -986,7 +985,7 @@ label_source__full_name='Fork Parent'
 #------------------------------------------------------------------------------
 # Initial setup functions:
 #------------------------------------------------------------------------------
-assert-env() {
+GitHub.assert-env() {
 	GIT_EXEC_PATH=$(git --exec-path) || exit $?
 	GIT_HUB_EXEC_PATH=$GIT_EXEC_PATH
 	[ -n "$GIT_HUB_TEST_MODE" ] &&
@@ -1013,11 +1012,11 @@ assert-env() {
 	config_file=${GIT_HUB_CONFIG:-$HOME/.githubconfig}
 }
 
-get-options() {
+GitHub.get-options() {
 	[ $# -eq 0 ] && set -- --help
 	NONGIT_OK=1 source "$GIT_EXEC_PATH/git-sh-setup"
 
-	unset-global-variables
+	GitHub.unset-global-variables
 	while [ $# -gt 0 ]; do
 		local option="$1"; shift
 		case "$option" in
@@ -1057,12 +1056,12 @@ get-options() {
 	# Command aliases:
 	[ "$command" = "create" ] && command="repo-create"
 
-    [ "$command" = "config" -o "$command" = "config-unset" ] || check_config
+    [ "$command" = "config" -o "$command" = "config-unset" ] || GitHub.check_config
 
 	true
 }
 
-unset-global-variables() {
+GitHub.unset-global-variables() {
 	command=
 	command_arguments=
 	user=
@@ -1089,7 +1088,7 @@ unset-global-variables() {
 	more_message_printed=
 }
 
-setup-env() {
+GitHub.setup-env() {
     source "$GIT_HUB_EXEC_PATH/git-hub./json.bash"
     if [ -n "$repeat_command" ]; then
 		[ -f $GIT_HUB_TMP_PREFIX-out-* ] ||
@@ -1105,12 +1104,12 @@ setup-env() {
 	fi
 }
 
-check_config() {
-	[ -f "$config_file" ] || die_config_not_setup
+GitHub.check_config() {
+	[ -f "$config_file" ] || GitHub.die_config_not_setup
 	[ -n "$(git config -f $config_file github.user-name)" ] &&
-		die_user_name_in_config
+		GitHub.die_user_name_in_config
 	login="$(git config -f $config_file github.login)"
-	[ -n "$login" ] || die_config_not_setup
+	[ -n "$login" ] || GitHub.die_config_not_setup
 }
 
 #------------------------------------------------------------------------------
@@ -1118,13 +1117,13 @@ check_config() {
 #------------------------------------------------------------------------------
 
 # Check if a function exists:
-callable() {
+GitHub.callable() {
 	[ -n "$(type $1 2> /dev/null)" ]
 }
 
 # This command is provided by `git-sh-setup` but is missing in older versions
 # of git.  Repeating it here for now:
-say () {
+say() {
 	if test -z "$GIT_QUIET"
 	then
 		printf '%s\n' "$*"
@@ -1134,6 +1133,6 @@ say () {
 #------------------------------------------------------------------------------
 # Begin at the end!
 #------------------------------------------------------------------------------
-[ -n "$GIT_HUB_TEST_MODE" ] || main "$@"
+[ -n "$GIT_HUB_TEST_MODE" ] || GitHub.main "$@"
 
 # vim: set tabstop=4 shiftwidth=4 noexpandtab:
