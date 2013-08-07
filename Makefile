@@ -41,19 +41,17 @@ help:
 
 build: lib/$(CMD) lib/$(CMD)./json.bash
 
-doc: doc/$(CMD).1
-
 test: build $(TEST_SIMPLE)
 	prove $(PROVE_OPTIONS) test/
 
 install: install-lib install-doc
 
-install-lib: build $(INSTALL_LIB)/$(CMD)./
+install-lib: build uninstall-lib $(INSTALL_LIB)/$(CMD)./
 	install -m 0755 lib/$(CMD) $(INSTALL_LIB)/
 	install -d -m 0755 $(INSTALL_LIB)/$(CMD)./
 	install -m 0755 lib/$(CMD)./* $(INSTALL_LIB)/$(CMD)./
 
-install-doc: doc
+install-doc:
 	install -c -d -m 0755 $(INSTALL_MAN)
 	install -c -m 0644 doc/$(CMD).1 $(INSTALL_MAN)
 
@@ -80,6 +78,8 @@ $(SUBMODULE):
 
 ##
 # Build rules:
+doc: doc/$(CMD).1
+
 lib/$(CMD)./json.bash: $(JSON) lib/$(CMD).
 	cp $< $@
 
@@ -104,7 +104,7 @@ lib/$(CMD).:
 # Undocumented dev rules
 
 # Install using symlinks so repo changes can be tested live
-dev-install: build uninstall
+dev-install: build uninstall-lib
 	ln -s $$PWD/lib/$(CMD) $(INSTALL_LIB)/$(CMD)
 	ln -s $$PWD/lib/$(CMD). $(INSTALL_LIB)/$(CMD).
 
