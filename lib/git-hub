@@ -41,7 +41,7 @@ v,verbose   Show verbose output
 d,dryrun    Don't run the API command
 T           Show API token in the verbose output
 A,use-auth  Force the use of authentication. (Get around rate limits)
- 
+
 O           dev - Show response output
 H           dev - Show reponse headers
 J           dev - Show parsed JSON response
@@ -404,6 +404,7 @@ GitHub.fork() {
 	GitHub.get-args owner-repo org
 	GitHub.require-value repo-name "$repo"
 	GitHub.require-value owner-name "$owner"
+	GitHub.require-value api-token "$token"
 	GitHub.api-post "/repos/$owner_name/$repo_name/forks" '{}'
 }
 
