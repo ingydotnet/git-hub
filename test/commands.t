@@ -10,7 +10,7 @@ GIT_HUB_CONFIG=$PWD/test/githubconfig
 source $PWD/lib/git-hub
 GitHub.assert-env
 
-foo_git=./test/foo.git
+foo_git=./test/ricardo-foo.git
 fake_token=0123456789ABCDEF
 
 test_command() {
