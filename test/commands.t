@@ -1,7 +1,7 @@
 #!/bin/bash
 
 PATH=lib:ext/test-simple-bash/lib:ext/json-bash/lib:$PATH
-source test-simple.bash tests 22
+source test-simple.bash tests 23
 
 GIT_HUB_TEST_MODE="1"
 GIT_HUB_TEST_COMMAND="1"
@@ -11,6 +11,7 @@ source $PWD/lib/git-hub
 GitHub.assert-env
 
 foo_git=./test/ricardo-foo.git
+foo_noext=./test/ricardo-foo
 fake_token=0123456789ABCDEF
 
 test_command() {
@@ -175,6 +176,9 @@ test_command "repo" $foo_git
 
 expect 'GET' "/repos/geraldo/rivets"
 test_command "repo geraldo/rivets"
+
+expect 'GET' "/repos/ricardo/foo"
+test_command "repo" $foo_noext
 
 #----------------------------------------------------------------------------
 note "Test 'forks' commands:"

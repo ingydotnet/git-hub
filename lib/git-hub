@@ -722,8 +722,9 @@ GitHub.fetch-value() {
 			if [ -n "$url" ]; then
 				local re1='github\.com'
 				if [[ "$url" =~ $re1 ]]; then
-					local re2='^.*[:/](.*)/(.*)\.git$'
-					if [[ "$url" =~ $re2 ]]; then
+					local re2='^.*[:/](.*)/(.*?)\.git$'
+					local re3='^.*[:/](.*)/(.*?)$'
+					if [[ "$url" =~ $re2 ]] || [[ "$url" =~ $re3 ]]; then
 						: ${owner_name:="${BASH_REMATCH[1]}"}
 						: ${user_name:="${BASH_REMATCH[1]}"}
 						: ${repo_name:="${BASH_REMATCH[2]}"}
