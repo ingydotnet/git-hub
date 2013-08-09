@@ -711,25 +711,25 @@ GitHub.fetch-value() {
 	[ -n "$(eval echo \$$var)" ] && return
 	eval $var=\"\$$env\"
 	[ -n "$(eval echo \$$var)" ] && return
-	# XXX get .git dir from git's api (anywhere in the repo)
-	local git_dir=${GIT_DIR:-.git}
 	if [ "$var" = "repo_name" -o \
 		 "$var" = "owner_name" -o \
 		 "$var" = "user_name" ]; then
-		if [ -f "$git_dir/config" ]; then
-			# XXX don't require 'origin' remote name
-			url=$(git config --file=$git_dir/config remote.origin.url)
-			if [ -n "$url" ]; then
-				local re1='github\.com'
-				if [[ "$url" =~ $re1 ]]; then
-					local re2='^.*[:/](.*)/(.*?)\.git$'
-					local re3='^.*[:/](.*)/(.*?)$'
-					if [[ "$url" =~ $re2 ]] || [[ "$url" =~ $re3 ]]; then
-						: ${owner_name:="${BASH_REMATCH[1]}"}
-						: ${user_name:="${BASH_REMATCH[1]}"}
-						: ${repo_name:="${BASH_REMATCH[2]}"}
-						return
-					fi
+		url=$(
+			git remote -v 2> /dev/null |
+				grep -E '\s+\(fetch\)$' |
+				sed -r 's/\s+\(fetch\)$//' |
+				grep 'github\.com' |
+				head -n1
+		)
+		if [ -n "$url" ]; then
+			if [[ "$url" =~ github\.com ]]; then
+				local re1='^.*[:/](.*)/(.*?)\.git$'
+				local re2='^.*[:/](.*)/(.*?)$'
+				if [[ "$url" =~ $re1 ]] || [[ "$url" =~ $re2 ]]; then
+					: ${owner_name:="${BASH_REMATCH[1]}"}
+					: ${user_name:="${BASH_REMATCH[1]}"}
+					: ${repo_name:="${BASH_REMATCH[2]}"}
+					return
 				fi
 			fi
 		fi

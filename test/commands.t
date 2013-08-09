@@ -1,7 +1,7 @@
 #!/bin/bash
 
 PATH=lib:ext/test-simple-bash/lib:ext/json-bash/lib:$PATH
-source test-simple.bash tests 23
+source test-simple.bash tests 24
 
 GIT_HUB_TEST_MODE="1"
 GIT_HUB_TEST_COMMAND="1"
@@ -12,6 +12,7 @@ GitHub.assert-env
 
 foo_git=./test/ricardo-foo.git
 foo_noext=./test/ricardo-foo
+foo_noorigin=./test/ricardo-foo-no-origin
 fake_token=0123456789ABCDEF
 
 test_command() {
@@ -20,9 +21,9 @@ test_command() {
     die_msg=
     [ -n "$D" ] && diag "$expected"
     if [ -n "$2" ]; then
-        GIT_DIR="$2"
+        export GIT_DIR="$2"
     else
-        GIT_DIR=not-in-git-dir
+        export GIT_DIR=not-in-git-dir
     fi
     eval set -- "$1"
     GitHub.get-options "$@"
@@ -179,6 +180,9 @@ test_command "repo geraldo/rivets"
 
 expect 'GET' "/repos/ricardo/foo"
 test_command "repo" $foo_noext
+
+expect 'GET' "/repos/ricardo/foo"
+test_command "repo" $foo_noorigin
 
 #----------------------------------------------------------------------------
 note "Test 'forks' commands:"

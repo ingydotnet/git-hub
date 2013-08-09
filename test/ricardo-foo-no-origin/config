@@ -1,0 +1,6 @@
+[remote "bummer"]
+	url = git@blahblah.com:dumbo/foo
+	fetch = +refs/heads/*:refs/remotes/origin/*
+[remote "partytime"]
+	url = git@github.com:ricardo/foo
+	fetch = +refs/heads/*:refs/remotes/origin/*
