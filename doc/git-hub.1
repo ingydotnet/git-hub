@@ -2,12 +2,12 @@
 .\"     Title: git-hub
 .\"    Author: [see the "AUTHOR" section]
 .\" Generator: DocBook XSL Stylesheets v1.76.1 <http://docbook.sf.net/>
-.\"      Date: 08/06/2013
+.\"      Date: 08/09/2013
 .\"    Manual: Git Manual
 .\"    Source: Git 1.7.9.5
 .\"  Language: English
 .\"
-.TH "GIT\-HUB" "1" "08/06/2013" "Git 1\&.7\&.9\&.5" "Git Manual"
+.TH "GIT\-HUB" "1" "08/09/2013" "Git 1\&.7\&.9\&.5" "Git Manual"
 .\" -----------------------------------------------------------------
 .\" * Define some portability stuff
 .\" -----------------------------------------------------------------
@@ -469,9 +469,11 @@ option to remove all possible scopes at once\&.
 .PP
 user [<user>]
 .RS 4
-Show basic information about a specific user\&. User defaults to the owner of the current repo, or your login if you are not inside a repo directory\&. Use the
+Show basic information about a specific user\&. User defaults to the owner of the current repo, or your login if you are not inside a repo directory\&. The
 \-\-raw
-option to show the actual API keys\&.
+and
+\-\-json
+options show the data in different formats than normal output\&.
 .RE
 .PP
 user\-edit <user> <key\-value\-pair>\&...
@@ -497,9 +499,11 @@ List the organizations that a user is a member of\&.
 .PP
 org <org>
 .RS 4
-Show basic information about a GitHub organization\&. Use the
+Show basic information about a GitHub organization\&. The
 \-\-raw
-option to show the actual API keys\&.
+and
+\-\-json
+options show the data in different formats than normal output\&.
 .RE
 .PP
 org\-edit <org> <key\-value\-pairs>\&...
@@ -535,9 +539,11 @@ List the repos for a user or organization\&. List is returned in order of recent
 .PP
 repo [<repo>]
 .RS 4
-Show basic information about a specific repository\&. Use the
+Show basic information about a specific repository\&. The
 \-\-raw
-option to show the actual API keys\&.
+and
+\-\-json
+options show the data in different formats than normal output\&.
 .RE
 .PP
 repo\-edit [<owner>/<repo>] <key\-value\-pair>\&...
@@ -650,7 +656,7 @@ $ git init
 $ git add README
 $ git commit \-m \*(AqFirst commit\*(Aq
 $ git hub create foo
-$ git hub repo foo \-\-raw
+$ git hub repo foo      # Get repo info including the remote address
 $ git remote add origin <new\-remote\-address>
 $ git push origin master
 $ git hub repo\-edit \e
@@ -665,28 +671,78 @@ $ git hub repo
 Note that on the last two commands you don\(cqt need to set the <repo> because it can be gleaned from the remote\&. Also on the edit command notice how you can specify multiple key/value pairs\&.
 .SH "EXAMPLE 2. COMMANDS FROM WITHIN A REPO"
 .sp
-Assume your current working directory is not a repo:
+Assume your current working directory is not a GitHub repo:
 .sp
 .if n \{\
 .RS 4
 .\}
 .nf
-$ # This command will list *your* repos:
-$ git repos
+$ # List *your* repos:
+$ git hub repos
 $ # Clone someone else\*(Aqs repo:
-$ git clone git@github\&.com:tomas/skull\&.git
+$ git clone git@github\&.com:ingydotnet/git\-hub
 $ # cd into it:
-$ cd skull
-$ # This command will show tomas\*(Aq recent repos:
-$ git repos
-$ # This command will show info about tomas/skull:
-$ git repo
+$ cd git\-hub
+$ # Get info about ingydotnet:
+$ git hub user
+$ # Show ingydotnet\*(Aqs recent repos:
+$ git hub repos
+$ # Show info about ingydotnet/git\-hub:
+$ git hub repo
+$ # Fork the git\-hub repo:
+$ git hub fork
+$ # Follow ingydotnet:
+$ git hub follow
+$ # See who ingydotnet is following:
+$ git hub following
+$ # Star the ingydotnet/git\-hub repo:
+$ git hub stars
 .fi
 .if n \{\
 .RE
 .\}
 .sp
-The git hub command tries to be environmentally aware\&. If you are in a GitHub cloned repo directory, and you don\(cqt specify an <owner> or a <repo>, then they will be pulled from the remote url\&. Otherwise, if you don\(cqt specify an <user> it will use the one (presumably yours) that you set with the git hub config login \&.\&.\&. command\&.
+The git hub command tries to be environmentally aware\&. If you are in a GitHub cloned repo directory, and you don\(cqt specify <user> or <owner> or <repo> for a command that needs them, then they will be pulled from the remote url\&. Otherwise, if you don\(cqt specify a <user> it will use the one (presumably yours) that you set with the git hub config login \&.\&.\&. command\&.
+.SH "EXAMPLE 3. BUILDING COMPLEX COMMANDS"
+.sp
+The git hub command can be used to output raw data, which can be fed into other commands; even other git hub commands\&. This lets you do some powerful automation with very little code\&. The \-\-raw (\-r) and \-\-quiet (\-q) flags will make the output of many commands be usable as data\&. These examples, written in Bash, are shown in multiline form for clarity, but can easily be made into one\-liners, if you want\&.
+.PP
+Get information about all your followers
+.RS 4
+for user in $(git hub followers <your\-login> \-ar); do git hub user $user echo # Separate them with a blank line done
+.RE
+.PP
+Follow all your followers
+.RS 4
+for user in $(git hub followers <your\-login> \-ar); do git hub follow $user done
+.RE
+.PP
+Clone all repos in an organization
+.RS 4
+for repo in $(git hub repos <org>); do git clone $(git hub repo \-r | egrap
+\fI^github_url\fR
+| \-f2) done
+.RE
+.sp
+Star the latest 5 repos from all the people you are following that have more than 50 repos::
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+for user in $(git hub following <your\-login> \-ar); do
+    num=$(git hub user $user \-r | egrep \*(Aq^public_repos\*(Aq | cut \-f2)
+    if [ $num \-gt 50 ]; then
+        echo "$user has $num repos!"
+        for repo in $(git hub repos $user \-qc5); do
+            git hub star $repo
+        done
+    fi
+done
+.fi
+.if n \{\
+.RE
+.\}
 .SH "AUTHOR"
 .sp
 Written by Ingy d\(:ot Net <\m[blue]\fBingy@ingy\&.net\fR\m[]\&\s-2\u[2]\d\s+2>
