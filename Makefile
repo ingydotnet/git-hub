@@ -33,23 +33,19 @@ default: help
 help:
 	@echo 'Makefile rules:'
 	@echo ''
-	@echo 'build      Build $(CMD)'
 	@echo 'test       Run all tests'
 	@echo 'install    Install $(CMD)'
 	@echo 'uninstall  Uninstall $(CMD)'
-	@echo 'clean      Remove build/test files'
 
-build: lib/$(CMD) lib/$(CMD)./json.bash
-
-test: build $(TEST_SIMPLE)
+test: $(SUBMODULE)
 	prove $(PROVE_OPTIONS) test/
 
 install: install-lib install-doc
 
-install-lib: build uninstall-lib $(INSTALL_LIB)/$(CMD)./
+install-lib: $(SUBMODULE) uninstall-lib $(INSTALL_LIB)/$(CMD)./
 	install -m 0755 lib/$(CMD) $(INSTALL_LIB)/
 	install -d -m 0755 $(INSTALL_LIB)/$(CMD)./
-	install -m 0755 lib/$(CMD)./* $(INSTALL_LIB)/$(CMD)./
+	install -m 0755 $(JSON) $(INSTALL_LIB)/$(CMD)./json.bash
 
 install-doc:
 	install -c -d -m 0755 $(INSTALL_MAN)
@@ -67,9 +63,6 @@ uninstall-doc:
 $(INSTALL_LIB)/$(CMD)./:
 	mkdir -p $@
 
-clean purge:
-	rm -fr lib/$(CMD)./json.bash $(CMD).* $(TMP) /tmp/$(CMD)-*
-
 ##
 # Sanity checks:
 $(SUBMODULE):
@@ -79,9 +72,6 @@ $(SUBMODULE):
 ##
 # Build rules:
 doc: doc/$(CMD).1
-
-lib/$(CMD)./json.bash: $(JSON) lib/$(CMD).
-	cp $< $@
 
 $(CMD).txt: readme.asc
 	cp $< $@
@@ -104,9 +94,9 @@ lib/$(CMD).:
 # Undocumented dev rules
 
 # Install using symlinks so repo changes can be tested live
-dev-install: build uninstall-lib
+dev-install: $(SUBMODULE) uninstall-lib $(INSTALL_LIB)/$(CMD)./
 	ln -s $$PWD/lib/$(CMD) $(INSTALL_LIB)/$(CMD)
-	ln -s $$PWD/lib/$(CMD). $(INSTALL_LIB)/$(CMD).
+	ln -s $$PWD/$(JSON) $(INSTALL_LIB)/$(CMD)./json.bash
 
 # Run a bunch of live tests. Make sure this thing really works. :)
 dev-test: check-dev-install
