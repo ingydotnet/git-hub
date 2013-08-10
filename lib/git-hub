@@ -17,11 +17,10 @@ Commands:
   scope-list, scope-add, scope-remove
 
   user, user-edit, orgs, org, org-edit, members, teams
-  repos, repo, repo-edit, repo-create, repo-delete
-  forks, fork
-  stars, star, unstar, starred
-  collabs, trust, untrust
+  repos, repo, repo-edit, repo-create, repo-delete, forks, fork
+  stars, star, unstar, starred, collabs, trust, untrust
   followers, following, follow, unfollow
+  issues, issue, issue-create, issue-edit
 
 Aliases:
   create == repo-create
@@ -32,7 +31,8 @@ Options:
 --
 c,count=    Number of list items to show
 a,all       Show all list items
-r,raw       Show output in a raw data form
+r,raw       Show output data in a raw form
+j,json      Show output data in JSON
 token=      GitHub v3 API Authentication Token
 
 h,help      Show this help
@@ -250,12 +250,11 @@ GitHub.user() {
 }
 
 GitHub.success-user() {
-	for field in \
-		login type name email blog location company bio \
+	fields=(
+		login type name email blog location company bio
 		followers following public_repos public_gists
-	do
-		GitHub.report-value $field
-	done
+	)
+	GitHub.report-data
 }
 
 GitHub.user-edit() {
@@ -281,12 +280,11 @@ GitHub.org() {
 }
 
 GitHub.success-org() {
-	for field in \
-		login type name billing_email email blog location company \
+	fields=(
+		login type name billing_email email blog location company
 		html_url public_repos public
-	do
-		GitHub.report-value $field
-	done
+	)
+	GitHub.report-data
 }
 
 GitHub.org-edit() {
@@ -342,15 +340,14 @@ GitHub.repo() {
 }
 
 GitHub.success-repo() {
-	for field in \
+	local fields=(
 		full_name description homepage language \
 		pushed_at \
 		html_url ssh_url \
 		forks parent__full_name source__full_name \
 		watchers open_issues
-	do
-		GitHub.report-value $field
-	done
+	)
+	GitHub.report-data
 }
 
 GitHub.repo-edit() {
@@ -406,6 +403,10 @@ GitHub.fork() {
 	GitHub.require-value owner-name "$owner"
 	GitHub.require-value api-token "$token"
 	GitHub.api-post "/repos/$owner_name/$repo_name/forks" '{}'
+}
+
+GitHub.format-issues-entry() {
+printf "%d) #%d (%s) %-6s @%-16s %s\n" $1 $2 ${3/T*/} $4 $5 "$6"
 }
 
 GitHub.stars() {
@@ -504,6 +505,17 @@ GitHub.unfollow() {
 	GitHub.require-value user-name "$user"
 	GitHub.require-value api-token "$token"
 	GitHub.api-delete "/user/following/$user_name"
+}
+
+GitHub.issues() {
+	GitHub.get-args repo
+	GitHub.check-owner-repo "$repo"
+	GitHub.require-value repo-name "$repo"
+	GitHub.require-value owner-name "${owner:-$login}"
+
+	GitHub.report-list \
+		"/repos/$owner_name/$repo_name/issues?sort=updated;per_page=PER_PAGE" \
+		'number updated_at state user/login title'
 }
 
 #------------------------------------------------------------------------------
@@ -630,7 +642,8 @@ GitHub.check-api-call-status() {
 
 OK() { return $OK; }
 RAW() { [ -n "$GIT_HUB_RAW" ] && return 0 || return 1; }
-QUIET() { [ -n "$GIT_QUIET" ] && return 0 || return 1; }
+JSON() { [ -n "$GIT_HUB_JSON" ] && return 0 || return 1; }
+QUIET() { [ -n "$GIT_HUB_QUIET" ] && return 0 || return 1; }
 VERBOSE() { [ -n "$GIT_HUB_VERBOSE" ] && return 0 || return 1; }
 ALL() { [ -n "$GIT_HUB_ALL" ] && return 0 || return 1; }
 
@@ -916,6 +929,23 @@ GitHub.json-dump-object-pairs() {
 	echo $json
 }
 
+GitHub.pretty-json-object() {
+	declare -a keys=("$@")
+	JSON.load "$(< $GIT_HUB_OUTPUT)"
+	echo '{'
+	for (( i = 0; i < ${#keys[@]}; i++)); do
+		local key="${keys[$i]}"
+		local key=${key//__/\/}
+		local value=$(JSON.get "/$key" - || true)
+		if [ -n "$value" ]; then
+			printf "    \"$key\": $value"
+			[[ $(($i+1)) -lt ${#keys[@]} ]] && printf ','
+			printf "\n"
+		fi
+	done
+	echo '}'
+}
+
 GitHub.json-load-cache() {
 	JSON.load "$1" json_load_data_cache
 }
@@ -949,6 +979,17 @@ GitHub.json-get() {
 #------------------------------------------------------------------------------
 # Report formatting functions:
 #------------------------------------------------------------------------------
+GitHub.report-data() {
+	if JSON; then
+		GitHub.pretty-json-object "${fields[@]}"
+	else
+		for field in "${fields[@]}"; do
+			GitHub.report-value $field
+		done
+	fi
+	unset fields
+}
+
 GitHub.report-value() {
     local key=${1//__/\/}
 	local value=$(GitHub.json-get "/$key")
@@ -966,12 +1007,16 @@ GitHub.report-value() {
 		fi
 	fi
 	if [ -n "$label" -a -n "$value" ]; then
-		if [ ${#value} -lt 80 ]; then
-			printf "%-15s %s\n" "$label" "$value"
+		if RAW; then
+			printf "$label\t$value\n"
 		else
-			value=${value//\\r\\n\\r\\n/\\n\\n  }
-			printf "$label\n"
-			printf "  $value" | fmt
+			if [ ${#value} -lt 80 ]; then
+				printf "%-15s %s\n" "$label" "$value"
+			else
+				value=${value//\\r\\n\\r\\n/\\n\\n  }
+				printf "$label\n"
+				printf "  $value" | fmt
+			fi
 		fi
 	fi
 }
@@ -1031,6 +1076,7 @@ GitHub.get-options() {
 
 			-h) usage ;;
 			-r) GIT_HUB_RAW="1" ;;
+			-j) GIT_HUB_JSON="1" ;;
 			-q) GIT_QUIET="1" ;;
 			-v) GIT_HUB_VERBOSE="1" ;;
 			-d) dry_run="1" ;;
