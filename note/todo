@@ -1,16 +1,20 @@
+== Documentation
+- Add a prerequisites section to doc
+- Add a DEVELOPMENT document to the repo
+
+== Refactoring
+- Don't source git-sh-setup. Can't trust functionality.
 - Namespace global vars with GitHub.func GitHub_varname
 - Eliminate evals
 - use fgrep in JSON.get
+- Eliminate todos
+
+== Testing
 - dev-test/all_commands.t is broken
   - convert all_commands.t to test-simple / prove
 - Write dev-test for installation from git `clone git-hub`
-- Eliminate todos
-- Implement `git hub user --all`
-- Implement `git hub repo --all`
-- Refactor variable scoping to use minimal globals
-  - Review global variables
-- Add a DEVELOPMENT docuent to the repo
-- Find out why github fails under zsh (rafl)
+
+== Commands
 - New commands to add:
   - pulls       - list pull requests
   - pull        - issue a pull request
@@ -18,13 +22,38 @@
   - rate-limit
   - repo-watch
   - Make a plan for all actions to support
-- use .git/config from anywhere inside a repo (not just ./.git/config)
-  - test "$(git rev-parse --is-inside-work-tree 2>/dev/null)" = true ||
+
+== Output
+- Add --json/-j flag for json view of user/org/repo
+- Separate key/value with <tab> in --raw output
+- Implement `git hub user --all`
+- Implement `git hub repo --all`
+- Print config file name
+- Be explicit for no scopes on scope-list
+
+== Error Handling
+- Helpful msg when rate limit exceeded
+- Don't allow email@address for `git hub config login …`
+- Better error msging for mistakes.
+  - Think about what common errors might happen.
+
+== Bugs
+- Find out why github fails under zsh (rafl)
+- no error msg printed on wrong password
+
+== Mac Bugs
+- Mac only printing first page (first 100)
+- `git hub stars` not printing -More-
+- `git hub followers` not honoring current repo
+
+== Plugin
 - add plugin support
   - write an irc plugin
 - Finish the commands.t test
 - Add more commands to all-commands.t
 
++ use .git/config from anywhere inside a repo (not just ./.git/config)
+  + test "$(git rev-parse --is-inside-work-tree 2>/dev/null)" = true ||
 + Don't allow `make build` to be run under `sudo make install`
 + make install needs to uninstall first if dev-install in place
 + Fix repo-edit
