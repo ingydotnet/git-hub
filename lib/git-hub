@@ -55,12 +55,12 @@ GitHub.main() {
 	GitHub.get-options "$@"
 	GitHub.setup-env
 
-	GitHub.callable GitHub."$command" ||
+	callable GitHub."$command" ||
 		die "Unknown 'git hub' command: '$command'"
 	GitHub."$command" "$@"
 
 	if OK; then
-		if GitHub.callable "GitHub.success-$command"; then
+		if callable "GitHub.success-$command"; then
 			"GitHub.success-$command"
 		else
 			if [ "$message_success" != '0' ]; then
@@ -68,13 +68,13 @@ GitHub.main() {
 			fi
 		fi
 		exit 0
-	elif [ -n "$status_code" ] && GitHub.callable "status-$status_code-$command"; then
+	elif [ -n "$status_code" ] && callable "status-$status_code-$command"; then
 		"status-$status_code-$command"
 		exit $OK
 	elif [ -n "$(eval "echo \$message_$status_code")" ]; then
 		say $(eval "echo \$message_$status_code")
 		exit $OK
-	elif GitHub.callable "failure-$command"; then
+	elif callable "failure-$command"; then
 		"failure-$command"
 		exit $OK
 	else
@@ -784,7 +784,7 @@ GitHub.report-list() {
 				value="$(GitHub.json-get "/$ii/$field")"
 				values+=("$value")
 			done
-			if GitHub.callable "GitHub.format-$command-entry"; then
+			if callable "GitHub.format-$command-entry"; then
 				"GitHub.format-$command-entry" $list_counter "${values[@]}"
 			else
 				GitHub.default-format-entry $list_counter "${values[@]}"
@@ -1037,8 +1037,6 @@ GitHub.assert-env() {
 	GIT_HUB_EXEC_PATH=$GIT_EXEC_PATH
 	[ -n "$GIT_HUB_TEST_MODE" ] &&
 		GIT_HUB_EXEC_PATH=$PWD/lib
-	# We source this twice. Now get say and die. Later to parse options.
-	OPTIONS_SPEC= NONGIT_OK=1 source "$GIT_EXEC_PATH/git-sh-setup"
 
 	: ${GIT_HUB_API_URI:=https://api.github.com}
 	: ${GIT_HUB_TMP_DIR:=/tmp}
@@ -1061,7 +1059,12 @@ GitHub.assert-env() {
 
 GitHub.get-options() {
 	[ $# -eq 0 ] && set -- --help
-	NONGIT_OK=1 source "$GIT_EXEC_PATH/git-sh-setup"
+
+	eval "$(
+		echo "$OPTIONS_SPEC" |
+			git rev-parse --parseopt -- "$@" ||
+		echo exit $?
+	)"
 
 	GitHub.unset-global-variables
 	while [ $# -gt 0 ]; do
@@ -1077,12 +1080,12 @@ GitHub.get-options() {
 			-h) usage ;;
 			-r) GIT_HUB_RAW="1" ;;
 			-j) GIT_HUB_JSON="1" ;;
-			-q) GIT_QUIET="1" ;;
+			-q) GIT_HUB_QUIET="1" ;;
 			-v) GIT_HUB_VERBOSE="1" ;;
 			-d) dry_run="1" ;;
 			-T) show_token="1"
 				GIT_HUB_VERBOSE="1"
-				GIT_QUIET=
+				GIT_HUB_QUIET=
 				;;
 
 			--) break ;;
@@ -1104,7 +1107,8 @@ GitHub.get-options() {
 	# Command aliases:
 	[ "$command" = "create" ] && command="repo-create"
 
-    [ "$command" = "config" -o "$command" = "config-unset" ] || GitHub.check_config
+    [ "$command" = "config" -o "$command" = "config-unset" ] ||
+		GitHub.check_config
 
 	true
 }
@@ -1124,7 +1128,7 @@ GitHub.unset-global-variables() {
 	api_token=
 	key_value_pairs=()
 	list_size=
-	GIT_QUIET=
+	GIT_HUB_QUIET=
 	GIT_HUB_VERBOSE=
 	show_token=
 	dry_run=
@@ -1164,18 +1168,35 @@ GitHub.check_config() {
 # General purpose functions:
 #------------------------------------------------------------------------------
 
+die () {
+	local c=($(caller ${DIE_STACK_LEVEL:-0}))
+	msg="$(echo -en "$*")"
+	if [ -z "$msg" ]; then
+		printf 'Died' >&2
+	else
+		printf '%s' "$(echo -en "$msg")" >&2
+	fi
+	[[ "$@" =~ \n$ ]] && exit 1
+	if [ ${#c[@]} -eq 2 ]; then
+		printf " at line %d of %s\n" ${c[@]} >&2
+	else
+		printf " at line %d in %s of %s\n" ${c[@]} >&2
+	fi
+	exit 1
+}
+
+say () {
+	[ -z "$GIT_HUB_QUIET" ] &&
+		echo "$@" >&1
+}
+
 # Check if a function exists:
-GitHub.callable() {
+callable() {
 	[ -n "$(type $1 2> /dev/null)" ]
 }
 
-# This command is provided by `git-sh-setup` but is missing in older versions
-# of git.  Repeating it here for now:
-say() {
-	if test -z "$GIT_QUIET"
-	then
-		printf '%s\n' "$*"
-	fi
+usage() {
+	die "Usage: $(basename "$0" | sed -e 's/-/ /') $USAGE"
 }
 
 #------------------------------------------------------------------------------

@@ -17,6 +17,7 @@ fake_token=0123456789ABCDEF
 
 test_command() {
     local TestSimple_CALL_STACK_LEVEL=2
+    DIE_STACK_LEVEL=3
     died=false
     die_msg=
     [ -n "$D" ] && diag "$expected"
@@ -27,9 +28,8 @@ test_command() {
     fi
     eval set -- "$1"
     GitHub.get-options "$@"
-    # subvert git-core/git-sh-setup's die
-    die_with_status () {
-        shift
+    # subvert git-hub's die
+    die () {
         die_msg="$@"
         died=true
     }

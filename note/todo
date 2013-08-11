@@ -1,10 +1,11 @@
+== Pomodoro!
+
 == Documentation
 - Add a prerequisites section to doc
 - Add a DEVELOPMENT document to the repo
 
 == Refactoring
 - Move follow commands next to user/org in code and doc
-- Don't source git-sh-setup. Can't trust functionality.
 - Namespace global vars with GitHub.func GitHub_varname
 - Eliminate evals
 - use fgrep in JSON.get
@@ -54,6 +55,8 @@
 - Finish the commands.t test
 - Add more commands to all-commands.t
 
+== Done
++ Don't source git-sh-setup. Can't trust functionality.
 + use .git/config from anywhere inside a repo (not just ./.git/config)
   + test "$(git rev-parse --is-inside-work-tree 2>/dev/null)" = true ||
 + Don't allow `make build` to be run under `sudo make install`

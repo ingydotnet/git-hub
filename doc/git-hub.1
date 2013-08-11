@@ -2,12 +2,12 @@
 .\"     Title: git-hub
 .\"    Author: [see the "AUTHOR" section]
 .\" Generator: DocBook XSL Stylesheets v1.76.1 <http://docbook.sf.net/>
-.\"      Date: 08/09/2013
+.\"      Date: 08/10/2013
 .\"    Manual: Git Manual
 .\"    Source: Git 1.7.9.5
 .\"  Language: English
 .\"
-.TH "GIT\-HUB" "1" "08/09/2013" "Git 1\&.7\&.9\&.5" "Git Manual"
+.TH "GIT\-HUB" "1" "08/10/2013" "Git 1\&.7\&.9\&.5" "Git Manual"
 .\" -----------------------------------------------------------------
 .\" * Define some portability stuff
 .\" -----------------------------------------------------------------
@@ -697,6 +697,7 @@ $ # See who ingydotnet is following:
 $ git hub following
 $ # Star the ingydotnet/git\-hub repo:
 $ git hub stars
+$ # etc\&.\&.\&.
 .fi
 .if n \{\
 .RE
@@ -717,7 +718,7 @@ Follow all your followers
 for user in $(git hub followers <your\-login> \-ar); do git hub follow $user done
 .RE
 .PP
-Clone all repos in an organization
+Clone all the repos in an organization
 .RS 4
 for repo in $(git hub repos <org>); do git clone $(git hub repo \-r | egrap
 \fI^github_url\fR
@@ -731,9 +732,9 @@ Star the latest 5 repos from all the people you are following that have more tha
 .\}
 .nf
 for user in $(git hub following <your\-login> \-ar); do
-    num=$(git hub user $user \-r | egrep \*(Aq^public_repos\*(Aq | cut \-f2)
+    num=$(git hub user $user \-r | grep ^public_repos | cut \-f2)
     if [ $num \-gt 50 ]; then
-        echo "$user has $num repos!"
+        echo $user has $num repos!
         for repo in $(git hub repos $user \-qc5); do
             git hub star $repo
         done
