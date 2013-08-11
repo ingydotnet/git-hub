@@ -5,6 +5,7 @@
 - Add a DEVELOPMENT document to the repo
 
 == Refactoring
+- Makefile should check for `prove` on test
 - Namespace global vars with GitHub.func GitHub_varname
 - Eliminate evals
 - use fgrep in JSON.get
@@ -27,7 +28,6 @@
   - Make a plan for all actions to support
 
 == Output
-- Add --json/-j flag for json view of user/org/repo
 - Separate key/value with <tab> in --raw output
 - Implement `git hub user --all`
 - Implement `git hub repo --all`
@@ -39,6 +39,13 @@
 - Don't allow email@address for `git hub config login …`
 - Better error msging for mistakes.
   - Think about what common errors might happen.
+
+== UX
+- Add a setup command that walks a user through configuration
+  - Should be a plugin
+
+== Performance
+- Support etag caching
 
 == Bugs
 - Find out why github fails under zsh (rafl)
@@ -56,6 +63,9 @@
 - Add more commands to all-commands.t
 
 == Done
++ Add --json/-j flag for json view of user/org/repo
++ User -r drops paragraphs after first one
++ JSON.load is expanding \n in linear tree
 + Move follow commands next to user/org in code and doc
 + Don't source git-sh-setup. Can't trust functionality.
 + use .git/config from anywhere inside a repo (not just ./.git/config)

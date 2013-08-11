@@ -931,14 +931,14 @@ GitHub.json-dump-object-pairs() {
 
 GitHub.pretty-json-object() {
 	declare -a keys=("$@")
-	JSON.load "$(< $GIT_HUB_OUTPUT)"
+
 	echo '{'
 	for (( i = 0; i < ${#keys[@]}; i++)); do
 		local key="${keys[$i]}"
 		local key=${key//__/\/}
-		local value=$(JSON.get "/$key" - || true)
+		local value="$(JSON.get "/$key" "json_load_data_cache" || true)"
 		if [ -n "$value" ]; then
-			printf "    \"$key\": $value"
+			printf "    \"%s\": %s" "$key" "$value"
 			[[ $(($i+1)) -lt ${#keys[@]} ]] && printf ','
 			printf "\n"
 		fi
@@ -951,7 +951,8 @@ GitHub.json-load-cache() {
 }
 
 GitHub.json-prune-cache() {
-	json_load_data_cache=$(echo "$json_load_data_cache" | grep -E "$1")
+	json_load_data_cache="$(echo "$json_load_data_cache" | grep -E "$1")"
+	echo -n "$json_load_data_cache" | hexdump -C; exit 126
 }
 
 GitHub.json-prune-list() {
@@ -1008,7 +1009,7 @@ GitHub.report-value() {
 	fi
 	if [ -n "$label" -a -n "$value" ]; then
 		if RAW; then
-			printf "$label\t$value\n"
+			printf "%s\t%s\n" "$label" "$value"
 		else
 			if [ ${#value} -lt 80 ]; then
 				printf "%-15s %s\n" "$label" "$value"
@@ -1168,15 +1169,17 @@ GitHub.check_config() {
 # General purpose functions:
 #------------------------------------------------------------------------------
 
-die () {
+die() {
 	local c=($(caller ${DIE_STACK_LEVEL:-0}))
-	msg="$(echo -en "$*")"
+	msg="$@"
 	if [ -z "$msg" ]; then
 		printf 'Died' >&2
 	else
-		printf '%s' "$(echo -en "$msg")" >&2
+		printf '%s' "$msg" >&2
 	fi
-	[[ "$@" =~ \n$ ]] && exit 1
+	local trailing_newline_re=$'\n''$'
+	[[ "$msg" =~ $trailing_newline_re ]] && exit 1
+
 	if [ ${#c[@]} -eq 2 ]; then
 		printf " at line %d of %s\n" ${c[@]} >&2
 	else
@@ -1185,7 +1188,7 @@ die () {
 	exit 1
 }
 
-say () {
+say() {
 	[ -z "$GIT_HUB_QUIET" ] &&
 		echo "$@" >&1
 }
