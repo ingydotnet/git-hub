@@ -17,9 +17,9 @@ Commands:
   scope-list, scope-add, scope-remove
 
   user, user-edit, orgs, org, org-edit, members, teams
+  followers, following, follow, unfollow
   repos, repo, repo-edit, repo-create, repo-delete, forks, fork
   stars, star, unstar, starred, collabs, trust, untrust
-  followers, following, follow, unfollow
   issues, issue, issue-create, issue-edit
 
 Aliases:
@@ -313,6 +313,36 @@ GitHub.teams() {
 		'name'
 }
 
+GitHub.followers() {
+	GitHub.get-args user
+	GitHub.require-value user-name "${user:-$login}"
+	GitHub.report-list \
+		"/users/$user_name/followers?per_page=PER_PAGE" \
+		'login'
+}
+
+GitHub.following() {
+	GitHub.get-args user
+	GitHub.require-value user-name "${user:-$login}"
+	GitHub.report-list \
+		"/users/$user_name/following?per_page=PER_PAGE" \
+		'login'
+}
+
+GitHub.follow() {
+	GitHub.get-args user
+	GitHub.require-value user-name "$user"
+	GitHub.require-value api-token "$token"
+	GitHub.api-put "/user/following/$user_name"
+}
+
+GitHub.unfollow() {
+	GitHub.get-args user
+	GitHub.require-value user-name "$user"
+	GitHub.require-value api-token "$token"
+	GitHub.api-delete "/user/following/$user_name"
+}
+
 GitHub.repos() {
     GitHub.get-args owner
 	GitHub.fetch-value owner-name "$owner"
@@ -475,36 +505,6 @@ GitHub.untrust() {
 	for collab_name in ${collaborators[@]}; do
 		GitHub.api-delete "/repos/$owner_name/$repo_name/collaborators/$collab_name"
 	done
-}
-
-GitHub.followers() {
-	GitHub.get-args user
-	GitHub.require-value user-name "${user:-$login}"
-	GitHub.report-list \
-		"/users/$user_name/followers?per_page=PER_PAGE" \
-		'login'
-}
-
-GitHub.following() {
-	GitHub.get-args user
-	GitHub.require-value user-name "${user:-$login}"
-	GitHub.report-list \
-		"/users/$user_name/following?per_page=PER_PAGE" \
-		'login'
-}
-
-GitHub.follow() {
-	GitHub.get-args user
-	GitHub.require-value user-name "$user"
-	GitHub.require-value api-token "$token"
-	GitHub.api-put "/user/following/$user_name"
-}
-
-GitHub.unfollow() {
-	GitHub.get-args user
-	GitHub.require-value user-name "$user"
-	GitHub.require-value api-token "$token"
-	GitHub.api-delete "/user/following/$user_name"
 }
 
 GitHub.issues() {

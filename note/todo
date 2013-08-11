@@ -5,7 +5,6 @@
 - Add a DEVELOPMENT document to the repo
 
 == Refactoring
-- Move follow commands next to user/org in code and doc
 - Namespace global vars with GitHub.func GitHub_varname
 - Eliminate evals
 - use fgrep in JSON.get
@@ -19,6 +18,7 @@
 
 == Commands
 - New commands to add:
+  - clone       - clone a repo using github info
   - pulls       - list pull requests
   - pull        - issue a pull request
   - search
@@ -56,6 +56,7 @@
 - Add more commands to all-commands.t
 
 == Done
++ Move follow commands next to user/org in code and doc
 + Don't source git-sh-setup. Can't trust functionality.
 + use .git/config from anywhere inside a repo (not just ./.git/config)
   + test "$(git rev-parse --is-inside-work-tree 2>/dev/null)" = true ||
