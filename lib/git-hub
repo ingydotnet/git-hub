@@ -88,7 +88,7 @@ GitHub.main() {
 # `git hub` command functions:
 #------------------------------------------------------------------------------
 GitHub.config() {
-    GitHub.get-args config_key config_value
+	GitHub.get-args config_key config_value
 	message_success=0
 	if [ -z "$config_key" ]; then
 		cat $config_file
@@ -102,7 +102,7 @@ GitHub.config() {
 }
 
 GitHub.config-unset() {
-    GitHub.get-args config_key
+	GitHub.get-args config_key
 	[ -n "$config_key" ] ||
 		die "This command requires a config key"
 	git config -f $config_file --unset github.$config_key
@@ -151,7 +151,7 @@ GitHub.success-token-create() {
 }
 
 GitHub.token-delete() {
-    GitHub.get-args id
+	GitHub.get-args id
 	[ -z "$id" ] && die "Command requires token id"
 	basic_auth="1"
 	GitHub.api-delete "/authorizations/$id"
@@ -203,7 +203,7 @@ eos
 }
 
 GitHub.scope-add() {
-    if ALL; then
+	if ALL; then
 		GitHub.get-args id
 		# XXX Dedup this array in GitHub.scope-remove
 		scopes=(
@@ -224,7 +224,7 @@ GitHub.scope-add() {
 }
 
 GitHub.scope-remove() {
-    if ALL; then
+	if ALL; then
 		GitHub.get-args id
 		scopes=(
 			user user:email user:follow
@@ -243,7 +243,7 @@ GitHub.scope-remove() {
 }
 
 GitHub.user() {
-    GitHub.get-args user
+	GitHub.get-args user
 	GitHub.fetch-value user-name "$user"
 	: ${user_name:=$login}
 	GitHub.api-get "/users/$user_name"
@@ -264,7 +264,7 @@ GitHub.user-edit() {
 }
 
 GitHub.orgs() {
-    GitHub.get-args user
+	GitHub.get-args user
 	GitHub.fetch-value user-name "$user"
 	: ${user_name:=$login}
 
@@ -295,7 +295,7 @@ GitHub.org-edit() {
 }
 
 GitHub.members() {
-    GitHub.get-args org
+	GitHub.get-args org
 	GitHub.require-value org-name "$org"
 
 	GitHub.report-list \
@@ -305,7 +305,7 @@ GitHub.members() {
 
 GitHub.teams() {
 	GitHub.require-value api-token "$token"
-    GitHub.get-args org
+	GitHub.get-args org
 	GitHub.require-value org-name "$org"
 
 	GitHub.report-list \
@@ -344,7 +344,7 @@ GitHub.unfollow() {
 }
 
 GitHub.repos() {
-    GitHub.get-args owner
+	GitHub.get-args owner
 	GitHub.fetch-value owner-name "$owner"
 	: ${owner_name:=$login}
 
@@ -729,15 +729,14 @@ GitHub.fetch-value() {
 		 "$var" = "user_name" ]; then
 		url=$(
 			git remote -v 2> /dev/null |
-				grep -E '\s+\(fetch\)$' |
-				sed -r 's/\s+\(fetch\)$//' |
+				$SED_R 's/\s+\(fetch\)$//' |
 				grep 'github\.com' |
 				head -n1
 		)
 		if [ -n "$url" ]; then
 			if [[ "$url" =~ github\.com ]]; then
-				local re1='^.*[:/](.*)/(.*?)\.git$'
-				local re2='^.*[:/](.*)/(.*?)$'
+				local re1='^[^:/]*[:/](.*)/(.*)\.git$'
+				local re2='^[^:/]*[:/](.*)/(.*)$'
 				if [[ "$url" =~ $re1 ]] || [[ "$url" =~ $re2 ]]; then
 					: ${owner_name:="${BASH_REMATCH[1]}"}
 					: ${user_name:="${BASH_REMATCH[1]}"}
@@ -992,7 +991,7 @@ GitHub.report-data() {
 }
 
 GitHub.report-value() {
-    local key=${1//__/\/}
+	local key=${1//__/\/}
 	local value=$(GitHub.json-get "/$key")
 	local label="$key"
 	if ! RAW; then
@@ -1102,13 +1101,13 @@ GitHub.get-options() {
 		esac
 	done
 
-    command="$1"; shift
+	command="$1"; shift
 	command_arguments=("$@")
 
 	# Command aliases:
 	[ "$command" = "create" ] && command="repo-create"
 
-    [ "$command" = "config" -o "$command" = "config-unset" ] ||
+	[ "$command" = "config" -o "$command" = "config-unset" ] ||
 		GitHub.check_config
 
 	true
@@ -1142,8 +1141,8 @@ GitHub.unset-global-variables() {
 }
 
 GitHub.setup-env() {
-    source "$GIT_HUB_EXEC_PATH/git-hub./json.bash"
-    if [ -n "$repeat_command" ]; then
+	source "$GIT_HUB_EXEC_PATH/git-hub./json.bash"
+	if [ -n "$repeat_command" ]; then
 		[ -f $GIT_HUB_TMP_PREFIX-out-* ] ||
 			die "No previous 'git hub' command to repeat"
 		local old_output=$(echo $GIT_HUB_TMP_PREFIX-out-*)
@@ -1164,6 +1163,13 @@ GitHub.check_config() {
 	login="$(git config -f $config_file github.login)"
 	[ -n "$login" ] || GitHub.die_config_not_setup
 }
+
+#------------------------------------------------------------------------------
+# System dependent stuff:
+#------------------------------------------------------------------------------
+SED_R='sed -r'
+[ ${OSTYPE//[0-9.]/} == 'darwin' ] &&
+	SED_R='sed -E'
 
 #------------------------------------------------------------------------------
 # General purpose functions:
