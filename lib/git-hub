@@ -951,7 +951,6 @@ GitHub.json-load-cache() {
 
 GitHub.json-prune-cache() {
 	json_load_data_cache="$(echo "$json_load_data_cache" | grep -E "$1")"
-	echo -n "$json_load_data_cache" | hexdump -C; exit 126
 }
 
 GitHub.json-prune-list() {
