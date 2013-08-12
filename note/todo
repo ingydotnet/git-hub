@@ -5,7 +5,6 @@
 - Add a DEVELOPMENT document to the repo
 
 == Refactoring
-- Makefile should check for `prove` on test
 - Namespace global vars with GitHub.func GitHub_varname
 - Eliminate evals
 - use fgrep in JSON.get
@@ -63,6 +62,7 @@
 - Add more commands to all-commands.t
 
 == Done
++ Makefile should check for `prove` on test
 + Add --json/-j flag for json view of user/org/repo
 + User -r drops paragraphs after first one
 + JSON.load is expanding \n in linear tree

@@ -13,6 +13,11 @@ ifeq ($(INSTALL_LIB),)
 endif
 INSTALL_MAN ?= $(PREFIX)/share/man/man1
 
+PROVE ?= $(shell which prove)
+ifeq ($(PROVE),)
+    PROVE := test-needs-prove
+endif
+
 # Submodules
 JSON=ext/json-bash/lib/json.bash
 TEST_SIMPLE=ext/test-simple-bash/lib/test-simple.bash
@@ -37,7 +42,7 @@ help:
 	@echo 'install    Install $(CMD)'
 	@echo 'uninstall  Uninstall $(CMD)'
 
-test: $(SUBMODULE)
+test: $(SUBMODULE) $(PROVE)
 	prove $(PROVE_OPTIONS) test/
 
 install: install-lib install-doc
@@ -67,6 +72,10 @@ $(INSTALL_LIB)/$(CMD)./:
 # Sanity checks:
 $(SUBMODULE):
 	@echo 'You need to run `git submodule update --init` first.' >&2
+	@exit 1
+
+$(PROVE):
+	@echo '`make test` requires the `prove` utility'
 	@exit 1
 
 ##
