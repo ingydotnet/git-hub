@@ -51,9 +51,6 @@
 - no error msg printed on wrong password
 
 == Mac Bugs
-- Mac only printing first page (first 100)
-- `git hub stars` not printing -More-
-- `git hub followers` not honoring current repo
 
 == Plugin
 - add plugin support
@@ -62,6 +59,9 @@
 - Add more commands to all-commands.t
 
 == Done
++ `git hub followers` not honoring current repo
++ `git hub stars` not printing -More-
++ Mac only printing first page (first 100)
 + Makefile should check for `prove` on test
 + Add --json/-j flag for json view of user/org/repo
 + User -r drops paragraphs after first one
