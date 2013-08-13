@@ -735,6 +735,7 @@ GitHub.fetch-value() {
 				grep 'github\.com' |
 				head -n1
 		)
+                url=$(shopt -s extglob; echo ${url% (@(fetch|push))})
 		if [ -n "$url" ]; then
 			if [[ "$url" =~ github\.com ]]; then
 				local re1='^[^:/]*[:/](.*)/(.*)\.git$'
