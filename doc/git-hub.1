@@ -2,12 +2,12 @@
 .\"     Title: git-hub
 .\"    Author: [see the "AUTHOR" section]
 .\" Generator: DocBook XSL Stylesheets v1.76.1 <http://docbook.sf.net/>
-.\"      Date: 08/10/2013
+.\"      Date: 08/14/2013
 .\"    Manual: Git Manual
 .\"    Source: Git 1.7.9.5
 .\"  Language: English
 .\"
-.TH "GIT\-HUB" "1" "08/10/2013" "Git 1\&.7\&.9\&.5" "Git Manual"
+.TH "GIT\-HUB" "1" "08/14/2013" "Git 1\&.7\&.9\&.5" "Git Manual"
 .\" -----------------------------------------------------------------
 .\" * Define some portability stuff
 .\" -----------------------------------------------------------------
@@ -44,15 +44,19 @@ Here is just a few of the things you can do on GitHub with a simple command:
 \fIgit hub\fR repo\-edit <repo> description \fIJust another GitHub repo\fR
 \fIgit hub\fR delete <owner>/<repo>       # Delete a repository
 \fIgit hub\fR followers <user>            # List a user\(cqs followers
-\fIgit hub\fR star ingydotnet/git\-hub     # Star a repository
-\fIgit hub\fR follow ingydotnet           # Follow a user
+\fIgit hub\fR star ingydotnet/git\-hub     # Star this repository
+\fIgit hub\fR follow ingydotnet           # Follow this author
 \fIgit hub\fR trust ingydotnet            # Add collaborators to repo
+                                      # Read about all your rollowers
+git hub followers \-ra|git hub user \-  # Show user info for all followers
 .fi
 .SH "DESCRIPTION"
 .sp
-The \fBhub\fR subcommand for git, allows you do perform many of the operations made available by GitHub\(cqs v3 REST API, from the git commandline command\&.
+The \fBhub\fR subcommand for git, allows you to perform many of the operations made available by GitHub\(cqs v3 REST API, from the git commandline command\&.
 .sp
-You can fork, create, delete and modify repositories\&. You can get information about repositories and users\&. You can \fBstar\fR, \fBwatch\fR and \fBfollow\fR things, and find out who else is doing the same\&. The API is quite extensive\&. With this command you can do many of your day to day GitHub actions without needing a web browser\&.
+You can fork, create, delete and modify repositories\&. You can get information about users, repositories and issues\&. You can \fBstar\fR, \fBwatch\fR and \fBfollow\fR things, and find out who else is doing the same\&. The API is quite extensive\&. With this command you can do many of your day to day GitHub actions without needing a web browser\&.
+.sp
+You can also chain commands together using the output of one as the input of another\&. See PIPING AND EACH below\&.
 .SH "INSTALLATION"
 .sp
 Just run (possibly with sudo):
@@ -146,9 +150,10 @@ If you don\(cqt have any tokens or want a new one for the git\-hub command, run 
 .RS 4
 .\}
 .nf
-git hub token\-create "git\-hub command token"
+git hub token\-create "my git\-hub command token"
 git hub scope\-add <token\-id> user repo
 git hub scope\-list <token\-id>
+git hub config api\-token <token\-value>
 .fi
 .if n \{\
 .RE
@@ -226,6 +231,11 @@ GIT_HUB_API_TOKEN
 environment variable\&. Usually this value comes from your
 ~/\&.githubconfig
 file\&.
+.RE
+.PP
+\-
+.RS 4
+An option (known as the EACH option) consisting of a single dash, is small but very powerful\&. It means to read the next line from stdin, and put the content into the command at that point\&. See PIPING and EACH below\&.
 .RE
 .PP
 \-h, \-\-help
@@ -532,6 +542,26 @@ teams <org>
 List the teams in an organization\&.
 .RE
 .PP
+followers [<user>]
+.RS 4
+List the people who are followers of a user\&.
+.RE
+.PP
+following [<user>]
+.RS 4
+List the people that a user is following\&.
+.RE
+.PP
+follow <user>\&...
+.RS 4
+Follow one or more users\&.
+.RE
+.PP
+unfollow <user>\&...
+.RS 4
+Stop following one or more users\&.
+.RE
+.PP
 repos [<user>]
 .RS 4
 List the repos for a user or organization\&. List is returned in order of recent activity\&.
@@ -622,25 +652,45 @@ untrust [<owner>/<repo>] <user>\&...
 Remove one or more collaborators from a repository\&.
 .RE
 .PP
-followers [<user>]
+issues [<owner>/<repo>]
 .RS 4
-List the people who are followers of a user\&.
+List the issues for a repo\&.
 .RE
 .PP
-following [<user>]
+issue [<owner>/<repo>] <issue\-id\-number>
 .RS 4
-List the people that a user is following\&.
+Show info (including any comments) for a specific issue\&.
 .RE
-.PP
-follow <user>\&...
+.SH "PIPING AND EACH"
+.sp
+You can pipe the output of one git hub into another and multiply your power\&. The command being piped into should use the EACH option which consists of a single dash\&. It will cause the command to be run once for each line of input, inserting the line into the command, in place of the dash\&.
+.sp
+.if n \{\
 .RS 4
-Follow one or more users\&.
+.\}
+.nf
+git hub followers \-\-raw
+.fi
+.if n \{\
 .RE
-.PP
-unfollow <user>\&...
+.\}
+.sp
+Will list lines containing only user ids\&. You can pipe it into commands needing a user id, like:
+.sp
+.if n \{\
 .RS 4
-Stop following one or more users\&.
+.\}
+.nf
+git hub followers \-\-raw | git hub user \- \-\-json
+.fi
+.if n \{\
 .RE
+.\}
+.sp
+Thus printing the JSON user info for each follower\&.
+.SH "EXAMPLES"
+.sp
+The following sections show lots of interesting ways to use git hub\&. Let your imagination be your guide\&.
 .SH "EXAMPLE 1. CREATE A NEW REPO AND GITHUB ORIGIN"
 .sp
 Do everything from the command line:
@@ -680,7 +730,7 @@ Assume your current working directory is not a GitHub repo:
 $ # List *your* repos:
 $ git hub repos
 $ # Clone someone else\*(Aqs repo:
-$ git clone git@github\&.com:ingydotnet/git\-hub
+$ git hub clone ingydotnet/git\-hub
 $ # cd into it:
 $ cd git\-hub
 $ # Get info about ingydotnet:
@@ -696,7 +746,7 @@ $ git hub follow
 $ # See who ingydotnet is following:
 $ git hub following
 $ # Star the ingydotnet/git\-hub repo:
-$ git hub stars
+$ git hub star
 $ # etc\&.\&.\&.
 .fi
 .if n \{\
@@ -720,9 +770,7 @@ for user in $(git hub followers <your\-login> \-ar); do git hub follow $user don
 .PP
 Clone all the repos in an organization
 .RS 4
-for repo in $(git hub repos <org>); do git clone $(git hub repo \-r | egrap
-\fI^github_url\fR
-| \-f2) done
+for repo in $(git hub repos <org> \-ar); do git clone $(git hub repo $repo \-r | grep ^ssh_url | cut \-f2) done
 .RE
 .sp
 Star the latest 5 repos from all the people you are following that have more than 50 repos::
@@ -749,7 +797,7 @@ done
 Written by Ingy d\(:ot Net <\m[blue]\fBingy@ingy\&.net\fR\m[]\&\s-2\u[2]\d\s+2>
 .SH "STATUS"
 .sp
-This command is still in early development\&. Only the basic commands have been supported, but the plan is to support as much of the API as possible\&. Patches / Pull Requests welcome\&.
+This command is still in early development\&. Only the basic commands have been supported, but the plan is to support as much of the API as possible\&. Patches / Pull Requests welcome\&. See the file notes/todo in the git\-hub repo for upcoming changes\&.
 .sp
 There are rudimentary tests in place but testing is not yet extensive\&. Expect more testing soon\&. Also please include tests\-in\-kind for any patches you submit\&.
 .sp

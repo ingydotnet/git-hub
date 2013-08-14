@@ -20,7 +20,7 @@ Commands:
   followers, following, follow, unfollow
   repos, repo, repo-edit, repo-create, repo-delete, forks, fork
   stars, star, unstar, starred, collabs, trust, untrust
-  issues, issue, issue-create, issue-edit
+  issues, issue
 
 Aliases:
   create == repo-create
@@ -138,11 +138,11 @@ GitHub.token-create() {
 }
 
 GitHub.success-token-create() {
-	local token=$(GitHub.json-get "/token")
+	local token=$(JSON.get -s "/token" -)
 	[ -n "$token" ] || die "Can't figure out token value"
-	local id=$(GitHub.json-get "/id")
-	local note=$(GitHub.json-get "/note")
-	local name=$(GitHub.json-get "/app/name")
+	local id=$(JSON.get -n "/id" -)
+	local note=$(JSON.get -s "/note" -)
+	local name=$(JSON.get "/app/name" -)
 	if RAW || QUIET; then
 		printf "$id"
 	else
@@ -169,7 +169,7 @@ GitHub.success-scope-list() {
 	local i=0
 	local scopes scope
 	while true; do
-		scope=$(GitHub.json-get "/scopes/$i")
+		scope=$(JSON.get -s "/scopes/$i" -)
 		[ -z "$scope" ] && break
 		scopes+=($scope)
 		let i=i+1
@@ -437,10 +437,6 @@ GitHub.fork() {
 	GitHub.api-post "/repos/$owner_name/$repo_name/forks" '{}'
 }
 
-GitHub.format-issues-entry() {
-printf "%d) #%d (%s) %-6s @%-16s %s\n" $1 $2 ${3/T*/} $4 $5 "$6"
-}
-
 GitHub.stars() {
 	GitHub.get-args repo
 	GitHub.check-owner-repo "$repo"
@@ -520,6 +516,44 @@ GitHub.issues() {
 		'number updated_at state user/login title'
 }
 
+GitHub.format-issues-entry() {
+	printf "%d) #%d (%s) %-6s @%-16s %s\n" $1 $2 ${3/T*/} $4 $5 "$6"
+}
+
+GitHub.issue() {
+	GitHub.get-args owner-repo number
+	GitHub.require-value repo-name "$repo"
+	GitHub.require-value owner-name "${owner:-$login}"
+	GitHub.api-get "/repos/$owner_name/$repo_name/issues/$number"
+}
+
+GitHub.success-issue() {
+	label_title='Issue'
+	label_body='Description:'
+	local fields=(
+		title number user__login state body
+	)
+	GitHub.report-data
+	local comments=$(JSON.get -n /comments -)
+	[ $comments -gt 0 ] &&
+		GitHub.issue-list-comments $(JSON.get -n /number -)
+}
+
+GitHub.issue-list-comments() {
+	echo Comments:
+    command=comments
+	GitHub.report-list \
+		"/repos/$owner_name/$repo_name/issues/$number/comments?sort=updated;per_page=PER_PAGE" \
+		'user/login updated_at body'
+	echo
+}
+
+GitHub.format-comments-entry() {
+	printf "  %d) %-14s (%s)\n" $1 $2 ${3/T*/}
+	body=$(echo "$4" | $SED 's/\\"/"/g;s/\\r//g;s/\\n\\n */\n\n     /g')
+	echo -e "     $body" | fmt
+}
+
 #------------------------------------------------------------------------------
 # API calling functions:
 #------------------------------------------------------------------------------
@@ -561,9 +595,9 @@ GitHub.api-call() {
 
 	[ -n "$show_headers" ] && cat $GIT_HUB_HEADER
 	[ -n "$show_output" ] && cat $GIT_HUB_OUTPUT
-	[ -s $GIT_HUB_OUTPUT ] && GitHub.json-load-cache "$(< $GIT_HUB_OUTPUT)"
+	[ -s $GIT_HUB_OUTPUT ] && JSON.load "$(< $GIT_HUB_OUTPUT)"
+	[ -n "$show_json" ] && JSON.cache
 	[ -n "$json_prune_regex" ] && GitHub.json-prune-cache "$json_prune_regex"
-	[ -n "$show_json" ] && echo "$json_load_data_cache"
 
 	GitHub.check-api-call-status $rc
 
@@ -628,7 +662,7 @@ GitHub.check-api-call-status() {
 			;;
 		403)
 			OK=1
-			ERROR=$(GitHub.json-get '/message')
+			ERROR=$(JSON.get -s '/message' -)
 			local regex='rate limit exceeded'
 			if [[ "$ERROR" =~ "$regex" ]]; then
 				ERROR="$ERROR Try the --use-auth option."
@@ -731,7 +765,7 @@ GitHub.fetch-value() {
 		 "$var" = "user_name" ]; then
 		url=$(
 			git remote -v 2> /dev/null |
-				$SED_R 's/\s+\(fetch\)$//' |
+				$SED 's/\s+\(fetch\)$//' |
 				grep 'github\.com' |
 				head -n1
 		)
@@ -779,11 +813,11 @@ GitHub.report-list() {
 		GitHub.api-get $url
 		[ -n "$GIT_HUB_TEST_COMMAND" ] && return
 		GitHub.json-prune-list "${fields[@]}"
-		local page_size=$(echo "$json_load_data_cache" | cut -d '/' -f2 | tail -1)
+		local page_size=$(JSON.cache | tail -n1 | cut -d '/' -f2)
 		for ((ii = 0; ii <= page_size && list_counter <= list_max; ii++)); do
 			local -a values=()
 			for field in "${fields[@]}"; do
-				value="$(GitHub.json-get "/$ii/$field")"
+				value="$(JSON.get -a "/$ii/$field" -)"
 				values+=("$value")
 			done
 			if callable "GitHub.format-$command-entry"; then
@@ -817,7 +851,7 @@ GitHub.default-format-entry() {
 	if RAW; then
 		printf "$2\n"
 	else
-		printf "%d) %s\n" $1 $2
+		printf "%d) %s\n" "$1" "$2"
 	fi
 }
 
@@ -938,7 +972,7 @@ GitHub.pretty-json-object() {
 	for (( i = 0; i < ${#keys[@]}; i++)); do
 		local key="${keys[$i]}"
 		local key=${key//__/\/}
-		local value="$(JSON.get "/$key" "json_load_data_cache" || true)"
+		local value="$(JSON.get "/$key" - || true)"
 		if [ -n "$value" ]; then
 			printf "    \"%s\": %s" "$key" "$value"
 			[[ $(($i+1)) -lt ${#keys[@]} ]] && printf ','
@@ -948,34 +982,14 @@ GitHub.pretty-json-object() {
 	echo '}'
 }
 
-GitHub.json-load-cache() {
-	JSON.load "$1" json_load_data_cache
-}
 
 GitHub.json-prune-cache() {
-	json_load_data_cache="$(echo "$json_load_data_cache" | grep -E "$1")"
+	JSON__cache="$(echo "$JSON__cache" | grep -E "$1")"
 }
 
 GitHub.json-prune-list() {
 	local fields="$@"
 	GitHub.json-prune-cache "^/[0-9]+/(${fields// /|})\b"
-}
-
-GitHub.json-get() {
-	local key="^$1[[:space:]]"
-	local data="$2"
-	[ -z "$data" ] && data="$json_load_data_cache"
-	value=$(echo "$data" | grep -E --max-count=1 "$key" | cut -f2)
-	if [ "$value" = 'null' ]; then
-		echo ''
-	elif [[ "$value" =~ ^\" ]]; then
-		value=${value#\"}
-		value=${value%\"}
-		value=${value//\\\"/\"}
-		echo "$value"
-	else
-		echo "$value"
-	fi
 }
 
 #------------------------------------------------------------------------------
@@ -988,13 +1002,14 @@ GitHub.report-data() {
 		for field in "${fields[@]}"; do
 			GitHub.report-value $field
 		done
+		! RAW && echo
 	fi
 	unset fields
 }
 
 GitHub.report-value() {
 	local key=${1//__/\/}
-	local value=$(GitHub.json-get "/$key")
+	local value=$(JSON.get -a "/$key" -)
 	local label="$key"
 	if ! RAW; then
 		label=$(eval echo \$label_$1)
@@ -1023,6 +1038,7 @@ GitHub.report-value() {
 	fi
 }
 
+label_user__login='User'
 label_blog='Web Site'
 label_watchers='Stars'
 label_homepage='Web Site'
@@ -1030,6 +1046,7 @@ label_html_url='GitHub Page'
 label_ssh_url='Remote URL'
 label_parent__full_name='Forked From'
 label_source__full_name='Fork Parent'
+label_number='ID #'
 
 #------------------------------------------------------------------------------
 # Initial setup functions:
@@ -1049,9 +1066,11 @@ GitHub.assert-env() {
 	GIT_HUB_HEADER=$GIT_HUB_TMP_PREFIX-head-$$
 
 	local cmd
-	for cmd in curl cut git grep head tr; do
-		[ -z "$(type $cmd) > /dev/null" ] &&
-			echo "Required shell command not found: '$cmd'" && exit 1
+	for cmd in curl cut git grep head sed tr; do
+		if [ -z "$(type $cmd) > /dev/null" ]; then
+			echo "Required shell command not found: '$cmd'"
+			exit 1
+		fi
 	done
 
 	[ -z "$HOME" ] &&
@@ -1169,9 +1188,9 @@ GitHub.check_config() {
 #------------------------------------------------------------------------------
 # System dependent stuff:
 #------------------------------------------------------------------------------
-SED_R='sed -r'
+SED='sed -r'
 [ ${OSTYPE//[0-9.]/} == 'darwin' ] &&
-	SED_R='sed -E'
+	SED='sed -E'
 
 #------------------------------------------------------------------------------
 # General purpose functions:
@@ -1204,10 +1223,6 @@ say() {
 # Check if a function exists:
 callable() {
 	[ -n "$(type $1 2> /dev/null)" ]
-}
-
-usage() {
-	die "Usage: $(basename "$0" | sed -e 's/-/ /') $USAGE"
 }
 
 #------------------------------------------------------------------------------

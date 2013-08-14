@@ -1,10 +1,12 @@
 == Pomodoro!
 
 == Documentation
+- Add an Environment Variables section
 - Add a prerequisites section to doc
 - Add a DEVELOPMENT document to the repo
 
 == Refactoring
+- Switch GitHub.method style naming to GitHub::method
 - Namespace global vars with GitHub.func GitHub_varname
 - Eliminate evals
 - use fgrep in JSON.get
@@ -18,6 +20,8 @@
 
 == Commands
 - New commands to add:
+  - help        - show help screen
+  - setup       - Initial user setup wizard
   - clone       - clone a repo using github info
   - pulls       - list pull requests
   - pull        - issue a pull request
@@ -40,17 +44,22 @@
   - Think about what common errors might happen.
 
 == UX
+- Add pagination
 - Add a setup command that walks a user through configuration
   - Should be a plugin
+- Support piping between commands:
+        git hub followers --get=user | git hub user ---
 
 == Performance
 - Support etag caching
+- Parallel requests
 
 == Bugs
 - Find out why github fails under zsh (rafl)
 - no error msg printed on wrong password
 
 == Mac Bugs
+- Not removing (fetch) from values.
 
 == Plugin
 - add plugin support
