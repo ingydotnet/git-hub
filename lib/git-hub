@@ -169,7 +169,7 @@ GitHub.success-scope-list() {
 	local i=0
 	local scopes scope
 	while true; do
-		scope=$(JSON.get -s "/scopes/$i" -)
+		scope=$(JSON.get -s "/scopes/$i" - 2>/dev/null || echo '')
 		[ -z "$scope" ] && break
 		scopes+=($scope)
 		let i=i+1
