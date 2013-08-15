@@ -787,11 +787,21 @@ The git hub command tries to be environmentally aware\&. If you are in a GitHub 
 .SH "EXAMPLE 3. BUILDING COMPLEX COMMANDS"
 .sp
 The git hub command can be used to output raw data, which can be fed into other commands; even other git hub commands\&. This lets you do some powerful automation with very little code\&. The \-\-raw (\-r) and \-\-quiet (\-q) flags will make the output of many commands be usable as data, and the \- (EACH) option makes commands read data from stdin\&.
-.PP
-Get information about all your followers
+.sp
+Get information about all your followers:
+.sp
+.if n \{\
 .RS 4
-for user in $(git hub followers <your\-login> \-ar); do git hub user $user echo # Separate them with a blank line done
+.\}
+.nf
+for user in $(git hub followers <your\-login> \-ar); do
+    git hub user $user
+    echo                # Separate them with a blank line
+done
+.fi
+.if n \{\
 .RE
+.\}
 .sp
 Or more simply by using PIPING and EACH:
 .sp
@@ -804,18 +814,32 @@ fgit hub followers <your\-login> \-ar | git hub user \-
 .if n \{\
 .RE
 .\}
-.PP
-Follow all your followers
-.RS 4
-git hub followers <your\-login> \-ar | git hub follow \-
-.RE
-.PP
-Clone all the repos in an organization
-.RS 4
-git hub repos <org> \-ar | git hub clone \-
-.RE
 .sp
-Star the latest 5 repos from all the people you are following that have more than 50 repos::
+Follow all your followers:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+git hub followers <your\-login> \-ar | git hub follow \-
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+Clone all the repos in an organization:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+git hub repos <org> \-ar | git hub clone \-
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+Star the latest 5 repos from all the people you are following that have more than 50 repos:
 .sp
 .if n \{\
 .RS 4
