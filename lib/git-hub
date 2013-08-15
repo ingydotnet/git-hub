@@ -1270,7 +1270,7 @@ GitHub.setup-env() {
 		GIT_HUB_ERROR=$GIT_HUB_TMP_PREFIX-err-$pid
 		GIT_HUB_HEADER=$GIT_HUB_TMP_PREFIX-head-$pid
 	else
-		rm -f $GIT_HUB_TMP_PREFIX-* || true
+		rm -f $GIT_HUB_TMP_PREFIX-* 2> /dev/null || true
 	fi
 }
 
