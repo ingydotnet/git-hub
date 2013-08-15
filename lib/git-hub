@@ -12,15 +12,15 @@ OPTIONS_SPEC="\
 git hub <command> <options> <arguments>
 
 Commands:
+  user, user-get, user-edit, orgs, org, org-get, org-edit, members, teams
+  followers, following, follow, unfollow, clone
+  repos, repo, repo-get, repo-edit, repo-create, repo-delete, forks, fork
+  stars, star, unstar, starred, collabs, trust, untrust
+  issues, issue
+
   config, config-unset
   token-list, token-create, token-delete
   scope-list, scope-add, scope-remove
-
-  user, user-edit, orgs, org, org-edit, members, teams
-  followers, following, follow, unfollow
-  repos, repo, repo-edit, repo-create, repo-delete, forks, fork
-  stars, star, unstar, starred, collabs, trust, untrust
-  issues, issue
 
 Aliases:
   create == repo-create
@@ -33,25 +33,39 @@ c,count=    Number of list items to show
 a,all       Show all list items
 r,raw       Show output data in a raw form
 j,json      Show output data in JSON
-token=      GitHub v3 API Authentication Token
+each        Run command for each line of stdin
 
 h,help      Show this help
 q,quiet     Show minimal output
 v,verbose   Show verbose output
+token=      Specify the GitHub v3 API Authentication Token
 d,dryrun    Don't run the API command
 T           Show API token in the verbose output
 A,use-auth  Force the use of authentication. (Get around rate limits)
 
-O           dev - Show response output
-H           dev - Show reponse headers
-J           dev - Show parsed JSON response
-R           dev - Repeat last command without contacting server
-x           dev - Turn on Bash trace (set -x) output
+O           Debug - Show response output
+H           Debug - Show reponse headers
+J           Debug - Show parsed JSON response
+R           Debug - Repeat last command without contacting server
+x           Debug - Turn on Bash trace (set -x) output
 "
 
 #------------------------------------------------------------------------------
 GitHub.main() {
 	GitHub.assert-env
+	local each
+	for ((i = 1; i <= $#; i++)); do
+		[ "${!i}" == '-' ] && each=1 && break
+	done
+	if [ -n "$each" ]; then
+		GIT_HUB_EACH=1
+		GitHub.run-each "$@"
+	else
+		GitHub.run-command "$@"
+	fi
+}
+
+GitHub.run-command() {
 	GitHub.get-options "$@"
 	GitHub.setup-env
 
@@ -67,7 +81,7 @@ GitHub.main() {
 				say ${message_success:-"'git hub $command' successful"}
 			fi
 		fi
-		exit 0
+		EACH || exit 0
 	elif [ -n "$status_code" ] && callable "status-$status_code-$command"; then
 		"status-$status_code-$command"
 		exit $OK
@@ -84,164 +98,30 @@ GitHub.main() {
 	fi
 }
 
+GitHub.run-each() {
+	before=()
+	after=()
+	for ((i = 1; i <= $#; i++)); do
+		if [ ${!i} == '-' ]; then
+			flag=1
+		elif [ -z "$flag" ]; then
+			before+=( "${!i}" )
+		else
+			after+=("${!i}")
+		fi
+	done
+	while read line; do
+		options=()
+		options+=("${before[@]}")
+		options+=($line)
+		options+=("${after[@]}")
+		GitHub.run-command "${options[@]}"
+	done
+}
+
 #------------------------------------------------------------------------------
 # `git hub` command functions:
 #------------------------------------------------------------------------------
-GitHub.config() {
-	GitHub.get-args config_key config_value
-	message_success=0
-	if [ -z "$config_key" ]; then
-		cat $config_file
-	elif [ -z "$config_value" ]; then
-		git config -f $config_file github.$config_key
-	else
-		message_success="$config_key=$config_value"
-		git config -f $config_file github.$config_key "$config_value"
-	fi
-	OK=$?
-}
-
-GitHub.config-unset() {
-	GitHub.get-args config_key
-	[ -n "$config_key" ] ||
-		die "This command requires a config key"
-	git config -f $config_file --unset github.$config_key
-	OK=$?
-	message_success="Config key '$config_key' has been unset."
-}
-
-GitHub.token-list() {
-	basic_auth="1"
-	GitHub.report-list \
-		'/authorizations' \
-		'token id note app/name'
-}
-
-GitHub.format-token-list-entry() {
-	if RAW || QUIET; then
-		printf "%-7s  %s\n" $3 "${4:-$5}"
-	else
-		printf "%d) %s %-14s  %s\n" $1 $2 "(id: $3)" "${4:-$5}"
-	fi
-}
-
-GitHub.token-create() {
-	local json
-	GitHub.get-args note
-	if [ -n "$note" ]; then
-		json=$(GitHub.json-dump-object "note" "$note")
-	else
-		json='{}'
-	fi
-	basic_auth="1"
-	GitHub.api-post '/authorizations' "$json"
-}
-
-GitHub.success-token-create() {
-	local token=$(JSON.get -s "/token" -)
-	[ -n "$token" ] || die "Can't figure out token value"
-	local id=$(JSON.get -n "/id" -)
-	local note=$(JSON.get -s "/note" -)
-	local name=$(JSON.get "/app/name" -)
-	if RAW || QUIET; then
-		printf "$id"
-	else
-		printf "Token created: %s %-14s  %s\n" $token "(id: $id)" "${note:-$name}"
-	fi
-}
-
-GitHub.token-delete() {
-	GitHub.get-args id
-	[ -z "$id" ] && die "Command requires token id"
-	basic_auth="1"
-	GitHub.api-delete "/authorizations/$id"
-	message_success="Token '$id' deleted"
-}
-
-GitHub.scope-list() {
-	GitHub.get-args id
-	GitHub.require-value token-id "$id"
-	basic_auth="1"
-	GitHub.api-get "/authorizations/$id"
-}
-
-GitHub.success-scope-list() {
-	local i=0
-	local scopes scope
-	while true; do
-		scope=$(JSON.get -s "/scopes/$i" - 2>/dev/null || echo '')
-		[ -z "$scope" ] && break
-		scopes+=($scope)
-		let i=i+1
-	done
-
-	if RAW; then
-		for scope in "${scopes[@]}"; do
-			echo "$scope"
-		done
-		return
-	fi
-
-	echo
-	echo "The current scopes for token-id:$token_id are:"
-	echo "  ${scopes[*]}"
-	cat <<eos
-
-Available scopes are:
-  user          Read/write access to profile info only.
-  user:email    Read access to a user’s email addresses.
-  user:follow   Access to follow or unfollow other users.
-  public_repo   Read/write access to public repos and organizations.
-  repo          Read/write access to public and private repos and orgs.
-  repo:status   Read/write access to public and private repo commit statuses.
-  delete_repo   Delete access to adminable repositories.
-  notifications Read access to a user’s notifications.
-  gist          Write access to gists.
-
-For more info, see: http://developer.github.com/v3/oauth/#scopes
-eos
-}
-
-GitHub.scope-add() {
-	if ALL; then
-		GitHub.get-args id
-		# XXX Dedup this array in GitHub.scope-remove
-		scopes=(
-			user user:email user:follow
-			public_repo repo repo:status delete_repo
-			notifications gist
-		)
-	else
-		GitHub.get-args id *scopes
-	fi
-	GitHub.require-value token-id "$id"
-	GitHub.check-token-id "$id"
-	basic_auth="1"
-	local array=$(GitHub.json-dump-array ${scopes[*]})
-	local json=$(GitHub.json-dump-object add_scopes "$array")
-	GitHub.api-patch "/authorizations/$id" "$json"
-	message_success="Scopes added."
-}
-
-GitHub.scope-remove() {
-	if ALL; then
-		GitHub.get-args id
-		scopes=(
-			user user:email user:follow
-			public_repo repo repo:status delete_repo
-			notifications gist
-		)
-	else
-		GitHub.get-args id *scopes
-	fi
-	GitHub.require-value token-id "$id"
-	basic_auth="1"
-	local array=$(GitHub.json-dump-array ${scopes[*]})
-	local json=$(GitHub.json-dump-object remove_scopes "$array")
-	GitHub.api-patch "/authorizations/$id" "$json"
-	message_success="Scopes removed"
-}
-
 GitHub.user() {
 	GitHub.get-args user
 	GitHub.fetch-value user-name "$user"
@@ -255,6 +135,24 @@ GitHub.success-user() {
 		followers following public_repos public_gists
 	)
 	GitHub.report-data
+}
+
+GitHub.user-get() {
+	GitHub.get-args user key
+	GitHub.api-get "/users/$user"
+	OK || return
+	local value=$(JSON.get -a "/$key" -)
+	[ -n "$value" ] || {
+		message_failure="Couldn't get value for '$key'"
+		OK=1
+		return
+	}
+	if OK && [ -n "$value" ]; then
+		message_success="$value"
+	else
+		message_failure="Couldn't get value for '$key'"
+		OK=1
+	fi
 }
 
 GitHub.user-edit() {
@@ -285,6 +183,25 @@ GitHub.success-org() {
 		html_url public_repos public
 	)
 	GitHub.report-data
+}
+
+GitHub.org-get() {
+	GitHub.get-args org key
+	GitHub.require-value org-name "$org"
+	GitHub.api-get "/orgs/$org_name"
+	OK || return
+	local value=$(JSON.get -a "/$key" -)
+	[ -n "$value" ] || {
+		message_failure="Couldn't get value for '$key'"
+		OK=1
+		return
+	}
+	if OK && [ -n "$value" ]; then
+		message_success="$value"
+	else
+		message_failure="Couldn't get value for '$key'"
+		OK=1
+	fi
 }
 
 GitHub.org-edit() {
@@ -345,6 +262,14 @@ GitHub.unfollow() {
 	GitHub.api-delete "/user/following/$user_name"
 }
 
+GitHub.clone() {
+	GitHub.get-args owner-repo dir
+	GitHub.require-value repo-name "$repo"
+	GitHub.require-value owner-name "$owner"
+	git clone "git@github.com:$owner_name/$repo_name" $dir
+	message_success="Repository '$owner_name/$repo_name' cloned"
+}
+
 GitHub.repos() {
 	GitHub.get-args owner
 	GitHub.fetch-value owner-name "$owner"
@@ -380,6 +305,26 @@ GitHub.success-repo() {
 		watchers open_issues
 	)
 	GitHub.report-data
+}
+
+GitHub.repo-get() {
+	GitHub.get-args owner-repo key
+	GitHub.require-value repo-name "$repo"
+	GitHub.require-value owner-name "${owner:-$login}"
+	GitHub.api-get "/repos/$owner_name/$repo_name"
+	OK || return
+	local value=$(JSON.get -a "/$key" -)
+	[ -n "$value" ] || {
+		message_failure="Couldn't get value for '$key'"
+		OK=1
+		return
+	}
+	if OK && [ -n "$value" ]; then
+		message_success="$value"
+	else
+		message_failure="Couldn't get value for '$key'"
+		OK=1
+	fi
 }
 
 GitHub.repo-edit() {
@@ -554,6 +499,161 @@ GitHub.format-comments-entry() {
 	echo -e "     $body" | fmt
 }
 
+GitHub.config() {
+	GitHub.get-args config_key config_value
+	message_success=0
+	if [ -z "$config_key" ]; then
+		cat $config_file
+	elif [ -z "$config_value" ]; then
+		git config -f $config_file github.$config_key
+	else
+		message_success="$config_key=$config_value"
+		git config -f $config_file github.$config_key "$config_value"
+	fi
+	OK=$?
+}
+
+GitHub.config-unset() {
+	GitHub.get-args config_key
+	[ -n "$config_key" ] ||
+		die "This command requires a config key"
+	git config -f $config_file --unset github.$config_key
+	OK=$?
+	message_success="Config key '$config_key' has been unset."
+}
+
+GitHub.token-list() {
+	basic_auth="1"
+	GitHub.report-list \
+		'/authorizations' \
+		'token id note app/name'
+}
+
+GitHub.format-token-list-entry() {
+	if RAW || QUIET; then
+		printf "%-7s  %s\n" $3 "${4:-$5}"
+	else
+		printf "%d) %s %-14s  %s\n" $1 $2 "(id: $3)" "${4:-$5}"
+	fi
+}
+
+GitHub.token-create() {
+	local json
+	GitHub.get-args note
+	if [ -n "$note" ]; then
+		json=$(GitHub.json-dump-object "note" "$note")
+	else
+		json='{}'
+	fi
+	basic_auth="1"
+	GitHub.api-post '/authorizations' "$json"
+}
+
+GitHub.success-token-create() {
+	local token=$(JSON.get -s "/token" -)
+	[ -n "$token" ] || die "Can't figure out token value"
+	local id=$(JSON.get -n "/id" -)
+	local note=$(JSON.get -s "/note" -)
+	local name=$(JSON.get "/app/name" -)
+	if RAW || QUIET; then
+		printf "$id"
+	else
+		printf "Token created: %s %-14s  %s\n" $token "(id: $id)" "${note:-$name}"
+	fi
+}
+
+GitHub.token-delete() {
+	GitHub.get-args id
+	[ -z "$id" ] && die "Command requires token id"
+	basic_auth="1"
+	GitHub.api-delete "/authorizations/$id"
+	message_success="Token '$id' deleted"
+}
+
+GitHub.scope-list() {
+	GitHub.get-args id
+	GitHub.require-value token-id "$id"
+	basic_auth="1"
+	GitHub.api-get "/authorizations/$id"
+}
+
+GitHub.success-scope-list() {
+	local i=0
+	local scopes scope
+	while true; do
+		scope=$(JSON.get -s "/scopes/$i" - 2>/dev/null || echo '')
+		[ -z "$scope" ] && break
+		scopes+=($scope)
+		let i=i+1
+	done
+
+	if RAW; then
+		for scope in "${scopes[@]}"; do
+			echo "$scope"
+		done
+		return
+	fi
+
+	echo
+	echo "The current scopes for token-id:$token_id are:"
+	echo "  ${scopes[*]}"
+	cat <<eos
+
+Available scopes are:
+  user          Read/write access to profile info only.
+  user:email    Read access to a user’s email addresses.
+  user:follow   Access to follow or unfollow other users.
+  public_repo   Read/write access to public repos and organizations.
+  repo          Read/write access to public and private repos and orgs.
+  repo:status   Read/write access to public and private repo commit statuses.
+  delete_repo   Delete access to adminable repositories.
+  notifications Read access to a user’s notifications.
+  gist          Write access to gists.
+
+For more info, see: http://developer.github.com/v3/oauth/#scopes
+eos
+}
+
+GitHub.scope-add() {
+	if ALL; then
+		GitHub.get-args id
+		# XXX Dedup this array in GitHub.scope-remove
+		scopes=(
+			user user:email user:follow
+			public_repo repo repo:status delete_repo
+			notifications gist
+		)
+	else
+		GitHub.get-args id *scopes
+	fi
+	GitHub.require-value token-id "$id"
+	GitHub.check-token-id "$id"
+	basic_auth="1"
+	local array=$(GitHub.json-dump-array ${scopes[*]})
+	local json=$(GitHub.json-dump-object add_scopes "$array")
+	GitHub.api-patch "/authorizations/$id" "$json"
+	message_success="Scopes added."
+}
+
+GitHub.scope-remove() {
+	if ALL; then
+		GitHub.get-args id
+		scopes=(
+			user user:email user:follow
+			public_repo repo repo:status delete_repo
+			notifications gist
+		)
+	else
+		GitHub.get-args id *scopes
+	fi
+	GitHub.require-value token-id "$id"
+	basic_auth="1"
+	local array=$(GitHub.json-dump-array ${scopes[*]})
+	local json=$(GitHub.json-dump-object remove_scopes "$array")
+	GitHub.api-patch "/authorizations/$id" "$json"
+	message_success="Scopes removed"
+}
+
 #------------------------------------------------------------------------------
 # API calling functions:
 #------------------------------------------------------------------------------
@@ -677,6 +777,7 @@ GitHub.check-api-call-status() {
 }
 
 OK() { return $OK; }
+EACH() { [ -n "$GIT_HUB_EACH" ] && return 0 || return 1; }
 RAW() { [ -n "$GIT_HUB_RAW" ] && return 0 || return 1; }
 JSON() { [ -n "$GIT_HUB_JSON" ] && return 0 || return 1; }
 QUIET() { [ -n "$GIT_HUB_QUIET" ] && return 0 || return 1; }
@@ -842,7 +943,7 @@ GitHub.report-list() {
 
 GitHub.get-next-page-url() {
 	local regexp='Link: <(https:[^>]+)>; rel="next"'
-	[[ "$(< $GIT_HUB_HEADER)" =~ $regexp ]] &&
+	[[ -e "$GIT_HUB_HEADER" ]] && [[ "$(< $GIT_HUB_HEADER)" =~ $regexp ]] &&
 		echo "${BASH_REMATCH[1]}"
 	true
 }
@@ -1052,10 +1153,8 @@ label_number='ID #'
 # Initial setup functions:
 #------------------------------------------------------------------------------
 GitHub.assert-env() {
-	GIT_EXEC_PATH=$(git --exec-path) || exit $?
-	GIT_HUB_EXEC_PATH=$GIT_EXEC_PATH
-	[ -n "$GIT_HUB_TEST_MODE" ] &&
-		GIT_HUB_EXEC_PATH=$PWD/lib
+	local git_path=$(git --exec-path) || exit $?
+	PATH=$git_path/git-hub.:$PATH source json.bash
 
 	: ${GIT_HUB_API_URI:=https://api.github.com}
 	: ${GIT_HUB_TMP_DIR:=/tmp}
@@ -1098,7 +1197,6 @@ GitHub.get-options() {
 				;;
 			-A) use_auth="1" ;;
 
-			-h) usage ;;
 			-r) GIT_HUB_RAW="1" ;;
 			-j) GIT_HUB_JSON="1" ;;
 			-q) GIT_HUB_QUIET="1" ;;
@@ -1111,7 +1209,7 @@ GitHub.get-options() {
 
 			--) break ;;
 
-			# Dev options:
+			# Debug options:
 			-O) show_output="1" ;;
 			-H) show_headers="1" ;;
 			-J) show_json="1" ;;
@@ -1162,7 +1260,6 @@ GitHub.unset-global-variables() {
 }
 
 GitHub.setup-env() {
-	source "$GIT_HUB_EXEC_PATH/git-hub./json.bash"
 	if [ -n "$repeat_command" ]; then
 		[ -f $GIT_HUB_TMP_PREFIX-out-* ] ||
 			die "No previous 'git hub' command to repeat"
@@ -1173,7 +1270,7 @@ GitHub.setup-env() {
 		GIT_HUB_ERROR=$GIT_HUB_TMP_PREFIX-err-$pid
 		GIT_HUB_HEADER=$GIT_HUB_TMP_PREFIX-head-$pid
 	else
-		rm -f $GIT_HUB_TMP_PREFIX-*
+		rm -f $GIT_HUB_TMP_PREFIX-* || true
 	fi
 }
 
@@ -1228,6 +1325,7 @@ callable() {
 #------------------------------------------------------------------------------
 # Begin at the end!
 #------------------------------------------------------------------------------
-[ -n "$GIT_HUB_TEST_MODE" ] || GitHub.main "$@"
+[ "${BASH_SOURCE[0]}" == "$0" ] && GitHub.main "$@"
+:
 
 # vim: set tabstop=4 shiftwidth=4 noexpandtab:

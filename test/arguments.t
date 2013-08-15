@@ -3,10 +3,9 @@
 PATH=lib:ext/test-simple-bash/lib:ext/json-bash/lib:$PATH
 source test-simple.bash tests 4
 
-GIT_HUB_TEST_MODE="1"
 GIT_HUB_CONFIG=$PWD/test/githubconfig
-
 source git-hub
+
 GitHub.assert-env
 
 cmd="config"

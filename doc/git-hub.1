@@ -48,7 +48,7 @@ Here is just a few of the things you can do on GitHub with a simple command:
 \fIgit hub\fR follow ingydotnet           # Follow this author
 \fIgit hub\fR trust ingydotnet            # Add collaborators to repo
                                       # Read about all your rollowers
-git hub followers \-ra|git hub user \-  # Show user info for all followers
+git hub followers \-ra|git hub user \-  # Show user info for each follower
 .fi
 .SH "DESCRIPTION"
 .sp
@@ -224,23 +224,25 @@ Show all elements for list commands\&. Also applies to a few other commands as d
 For commands the produce lists, just list the raw data\&. For commands that produce reports, show the raw storage keys, rather than the human friendly ones\&. You will need the raw keys to edit/change values\&.
 .RE
 .PP
-\-\-token=<api\-token>
+\-j, \-\-json
 .RS 4
-Set or override the api\-token required by the command\&. This value can also come from the
-GIT_HUB_API_TOKEN
-environment variable\&. Usually this value comes from your
-~/\&.githubconfig
-file\&.
+For some commands, you can get the raw data in JSON\&.
 .RE
 .PP
 \-
 .RS 4
-An option (known as the EACH option) consisting of a single dash, is small but very powerful\&. It means to read the next line from stdin, and put the content into the command at that point\&. See PIPING and EACH below\&.
+This option, just a single
+\fI\-\fR, is small but very powerful\&. It means to read the next line from stdin, and put the content into the command at that point\&. See PIPING and EACH below\&.
 .RE
 .PP
-\-h, \-\-help
+\-h
 .RS 4
 Show the brief command usage\&.
+.RE
+.PP
+\-\-help
+.RS 4
+Show the full documentation\&.
 .RE
 .PP
 \-q, \-\-quiet
@@ -251,6 +253,15 @@ Show minimal output\&.
 \-v, \-\-verbose
 .RS 4
 Show detailed output\&. Notably, show the raw command that is used for the GitHub API calls\&.
+.RE
+.PP
+\-\-token=<api\-token>
+.RS 4
+Set or override the api\-token required by the command\&. This value can also come from the
+GIT_HUB_API_TOKEN
+environment variable\&. Usually this value comes from your
+~/\&.githubconfig
+file\&.
 .RE
 .PP
 \-d, \-\-dryrun
@@ -267,9 +278,9 @@ Show the API token in the verbose output\&. Hidden by default\&. This option tur
 .RS 4
 Use authentication whether or not it is needed for a certain command\&. This is useful if you have exceeded your hourly GitHub API rate limit, which is 60 calls unauthenticated, and 5000 calls authenticated\&.
 .RE
-.SH "DEV OPTIONS"
+.SH "DEBUG OPTIONS"
 .sp
-There are a number of dev options that will give you lots of extra information (albeit in a less readable form)\&.
+There are a number of debug options that will give you lots of extra information (albeit in a less pretty format)\&.
 .PP
 \-O
 .RS 4
@@ -417,66 +428,6 @@ command will tell you all of these, and what they mean\&.
 .RE
 .SH "COMMANDS"
 .PP
-config [<config\-key> [<config\-value>]]
-.RS 4
-With no args, this command will print the contents of
-~/\&.githubconfig\&. With one argument (a key), print the current value of the config key\&. With two arguments (key value), set the value of the config key\&. Only 3 keys are currently supported:
-login,
-api\-token
-and
-use\-auth\&.
-.RE
-.sp
-config\-unset <config\-key> Unset a config key\&. Removes the key from the ~/\&.githubconfig file\&.
-.PP
-token\-list
-.RS 4
-List all the API tokens for your GitHub account\&. Use the
-\-\-raw
-option to print the token IDs and descriptions, but not the actual token values\&.
-.RE
-.PP
-token\-create [<description\-string>]
-.RS 4
-Create a new API token for your GitHub login id\&. Note: Creating a new token will not automatically add it to your
-~/\&.githubconfig
-file; you need to do that yourself with the
-git hub config api\-token <token\-value>
-command\&. Use the
-\-\-raw
-option to just print the new token id\&.
-.RE
-.PP
-token\-delete <api\-token\-id>
-.RS 4
-Delete one of your API tokens for your GitHub login id\&. Note: You need to delete tokens by
-\fBid\fR
-(listed by the
-token\-list
-command), not by token value\&.
-.RE
-.PP
-scope\-list <api\-token\-id>
-.RS 4
-List the scopes assigned to your API token, and also list all the possible scope values that you can assign\&. Use the
-\-\-raw
-option to just list the scopes\&.
-.RE
-.PP
-scope\-add <api\-token\-id> <scope\-name>\&...
-.RS 4
-Add one or more scopes to your API token\&. You can use the
-\-\-all
-option to add all possible scopes at once\&.
-.RE
-.PP
-scope\-remove <api\-token\-id> <scope\-name>\&...
-.RS 4
-Remove one or more scopes from your API token\&. You can use the
-\-\-all
-option to remove all possible scopes at once\&.
-.RE
-.PP
 user [<user>]
 .RS 4
 Show basic information about a specific user\&. User defaults to the owner of the current repo, or your login if you are not inside a repo directory\&. The
@@ -560,6 +511,11 @@ Follow one or more users\&.
 unfollow <user>\&...
 .RS 4
 Stop following one or more users\&.
+.RE
+.PP
+clone <owner>/<repo> [<directory>]
+.RS 4
+Clone a GitHub repo\&.
 .RE
 .PP
 repos [<user>]
@@ -661,9 +617,71 @@ issue [<owner>/<repo>] <issue\-id\-number>
 .RS 4
 Show info (including any comments) for a specific issue\&.
 .RE
+.PP
+config [<config\-key> [<config\-value>]]
+.RS 4
+With no args, this command will print the contents of
+~/\&.githubconfig\&. With one argument (a key), print the current value of the config key\&. With two arguments (key value), set the value of the config key\&. Only 3 keys are currently supported:
+login,
+api\-token
+and
+use\-auth\&.
+.RE
+.sp
+config\-unset <config\-key> Unset a config key\&. Removes the key from the ~/\&.githubconfig file\&.
+.PP
+token\-list
+.RS 4
+List all the API tokens for your GitHub account\&. Use the
+\-\-raw
+option to print the token IDs and descriptions, but not the actual token values\&.
+.RE
+.PP
+token\-create [<description\-string>]
+.RS 4
+Create a new API token for your GitHub login id\&. Note: Creating a new token will not automatically add it to your
+~/\&.githubconfig
+file; you need to do that yourself with the
+git hub config api\-token <token\-value>
+command\&. Use the
+\-\-raw
+option to just print the new token id\&.
+.RE
+.PP
+token\-delete <api\-token\-id>
+.RS 4
+Delete one of your API tokens for your GitHub login id\&. Note: You need to delete tokens by
+\fBid\fR
+(listed by the
+token\-list
+command), not by token value\&.
+.RE
+.PP
+scope\-list <api\-token\-id>
+.RS 4
+List the scopes assigned to your API token, and also list all the possible scope values that you can assign\&. Use the
+\-\-raw
+option to just list the scopes\&.
+.RE
+.PP
+scope\-add <api\-token\-id> <scope\-name>\&...
+.RS 4
+Add one or more scopes to your API token\&. You can use the
+\-\-all
+option to add all possible scopes at once\&.
+.RE
+.PP
+scope\-remove <api\-token\-id> <scope\-name>\&...
+.RS 4
+Remove one or more scopes from your API token\&. You can use the
+\-\-all
+option to remove all possible scopes at once\&.
+.RE
 .SH "PIPING AND EACH"
 .sp
-You can pipe the output of one git hub into another and multiply your power\&. The command being piped into should use the EACH option which consists of a single dash\&. It will cause the command to be run once for each line of input, inserting the line into the command, in place of the dash\&.
+You can pipe the output of one git hub into another and multiply your power\&. The command being piped into should use the EACH option which is a single dash (\fI\-\fR)\&. It will cause the command to be run once for each line of input, inserting the line into the command, in place of the \fI\-\fR\&.
+.sp
+This command:
 .sp
 .if n \{\
 .RS 4
@@ -675,7 +693,7 @@ git hub followers \-\-raw
 .RE
 .\}
 .sp
-Will list lines containing only user ids\&. You can pipe it into commands needing a user id, like:
+will list lines containing only user ids\&. You can pipe it into commands needing a user id, like:
 .sp
 .if n \{\
 .RS 4
@@ -687,7 +705,19 @@ git hub followers \-\-raw | git hub user \- \-\-json
 .RE
 .\}
 .sp
-Thus printing the JSON user info for each follower\&.
+Thus printing the JSON user info for each follower\&. Same as:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+for _ in `git hub followers \-\-raw`; do
+    git hub user $_ \-\-json
+done
+.fi
+.if n \{\
+.RE
+.\}
 .SH "EXAMPLES"
 .sp
 The following sections show lots of interesting ways to use git hub\&. Let your imagination be your guide\&.
@@ -756,21 +786,33 @@ $ # etc\&.\&.\&.
 The git hub command tries to be environmentally aware\&. If you are in a GitHub cloned repo directory, and you don\(cqt specify <user> or <owner> or <repo> for a command that needs them, then they will be pulled from the remote url\&. Otherwise, if you don\(cqt specify a <user> it will use the one (presumably yours) that you set with the git hub config login \&.\&.\&. command\&.
 .SH "EXAMPLE 3. BUILDING COMPLEX COMMANDS"
 .sp
-The git hub command can be used to output raw data, which can be fed into other commands; even other git hub commands\&. This lets you do some powerful automation with very little code\&. The \-\-raw (\-r) and \-\-quiet (\-q) flags will make the output of many commands be usable as data\&. These examples, written in Bash, are shown in multiline form for clarity, but can easily be made into one\-liners, if you want\&.
+The git hub command can be used to output raw data, which can be fed into other commands; even other git hub commands\&. This lets you do some powerful automation with very little code\&. The \-\-raw (\-r) and \-\-quiet (\-q) flags will make the output of many commands be usable as data, and the \- (EACH) option makes commands read data from stdin\&.
 .PP
 Get information about all your followers
 .RS 4
 for user in $(git hub followers <your\-login> \-ar); do git hub user $user echo # Separate them with a blank line done
 .RE
+.sp
+Or more simply by using PIPING and EACH:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+fgit hub followers <your\-login> \-ar | git hub user \-
+.fi
+.if n \{\
+.RE
+.\}
 .PP
 Follow all your followers
 .RS 4
-for user in $(git hub followers <your\-login> \-ar); do git hub follow $user done
+git hub followers <your\-login> \-ar | git hub follow \-
 .RE
 .PP
 Clone all the repos in an organization
 .RS 4
-for repo in $(git hub repos <org> \-ar); do git clone $(git hub repo $repo \-r | grep ^ssh_url | cut \-f2) done
+git hub repos <org> \-ar | git hub clone \-
 .RE
 .sp
 Star the latest 5 repos from all the people you are following that have more than 50 repos::
@@ -779,15 +821,11 @@ Star the latest 5 repos from all the people you are following that have more tha
 .RS 4
 .\}
 .nf
-for user in $(git hub following <your\-login> \-ar); do
-    num=$(git hub user $user \-r | grep ^public_repos | cut \-f2)
-    if [ $num \-gt 50 ]; then
-        echo $user has $num repos!
-        for repo in $(git hub repos $user \-qc5); do
-            git hub star $repo
-        done
-    fi
-done
+git hub following <your\-login> \-ar |
+    git hub user\-get \- public_repos |
+    perl \-nle \*(Aqprint if $_ > 50\*(Aq |
+    git hub repos \- \-qc5 |
+    git hub star \-
 .fi
 .if n \{\
 .RE

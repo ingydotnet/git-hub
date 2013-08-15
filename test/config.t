@@ -3,7 +3,6 @@
 PATH=lib:ext/test-simple-bash/lib:ext/json-bash/lib:$PATH
 source test-simple.bash tests 1
 
-GIT_HUB_TEST_MODE="1"
 GIT_HUB_TEST_COMMAND="1"
 GIT_HUB_CONFIG=$PWD/test/githubconfig
 
