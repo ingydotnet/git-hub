@@ -6,6 +6,8 @@
 
 set -e
 
+# XXX Test minimum Bash version up front
+
 GIT_HUB_VERSION=0.0.2
 
 OPTIONS_SPEC="\
@@ -14,16 +16,13 @@ git hub <command> <options> <arguments>
 Commands:
   user, user-get, user-edit, orgs, org, org-get, org-edit, members, teams
   followers, following, follow, unfollow, clone
-  repos, repo, repo-get, repo-edit, repo-create, repo-delete, forks, fork
+  repos, repo, repo-get, repo-edit, repo-new, repo-delete, forks, fork
   stars, star, unstar, starred, collabs, trust, untrust
   issues, issue
 
   config, config-unset
-  token-list, token-create, token-delete
+  token-list, token-new, token-delete
   scope-list, scope-add, scope-remove
-
-Aliases:
-  create == repo-create
 
 See 'git help hub' for complete documentation and usage of each command.
 
@@ -52,7 +51,7 @@ x           Debug - Turn on Bash trace (set -x) output
 
 #------------------------------------------------------------------------------
 GitHub.main() {
-	GitHub.assert-env
+	GitHub.init-env
 	local each
 	for ((i = 1; i <= $#; i++)); do
 		[ "${!i}" == '-' ] && each=1 && break
@@ -337,7 +336,7 @@ GitHub.repo-edit() {
 }
 
 # TODO Support creating repo under an org
-GitHub.repo-create() {
+GitHub.repo-new() {
 	GitHub.get-args repo
 	GitHub.require-value repo-name "$repo"
 	GitHub.require-value api-token "$token"
@@ -503,12 +502,12 @@ GitHub.config() {
 	GitHub.get-args config_key config_value
 	message_success=0
 	if [ -z "$config_key" ]; then
-		cat $config_file
+		cat $GIT_HUB_CONFIG
 	elif [ -z "$config_value" ]; then
-		git config -f $config_file github.$config_key
+		git config -f $GIT_HUB_CONFIG github.$config_key
 	else
 		message_success="$config_key=$config_value"
-		git config -f $config_file github.$config_key "$config_value"
+		git config -f $GIT_HUB_CONFIG github.$config_key "$config_value"
 	fi
 	OK=$?
 }
@@ -517,7 +516,7 @@ GitHub.config-unset() {
 	GitHub.get-args config_key
 	[ -n "$config_key" ] ||
 		die "This command requires a config key"
-	git config -f $config_file --unset github.$config_key
+	git config -f $GIT_HUB_CONFIG --unset github.$config_key
 	OK=$?
 	message_success="Config key '$config_key' has been unset."
 }
@@ -537,7 +536,7 @@ GitHub.format-token-list-entry() {
 	fi
 }
 
-GitHub.token-create() {
+GitHub.token-new() {
 	local json
 	GitHub.get-args note
 	if [ -n "$note" ]; then
@@ -549,7 +548,7 @@ GitHub.token-create() {
 	GitHub.api-post '/authorizations' "$json"
 }
 
-GitHub.success-token-create() {
+GitHub.success-token-new() {
 	local token=$(JSON.get -s "/token" -)
 	[ -n "$token" ] || die "Can't figure out token value"
 	local id=$(JSON.get -n "/id" -)
@@ -884,7 +883,7 @@ GitHub.fetch-value() {
 			fi
 		fi
 	fi
-	eval $var=$(git config --file=$config_file github.$key || echo '')
+	eval $var=$(git config --file=$GIT_HUB_CONFIG github.$key || echo '')
 	[ -n "$(eval echo \$$var)" ] && return
 	true
 }
@@ -963,7 +962,7 @@ GitHub.die_need_api_token() {
 	cat <<eos
 
 Can't determine your Personal API Access Token, which is required by this
-command. Usually you put your token into the ~/.githubconfig file, like this:
+command. Usually you put your token into the ~/.git-hub/config file, like this:
 
 	git hub config api-token <your-personal-api-access-token>
 
@@ -976,7 +975,7 @@ To list your API tokens:
 
 To create a new api token:
 
-	git hub token-create "my git-hub token"
+	git hub token-new "my git-hub token"
 	# You should probably add at least the 'repo' and 'user' scopes:
 	git hub scope-add <token-id> repo user
 
@@ -987,7 +986,7 @@ eos
 GitHub.die_config_not_setup() {
 	cat <<eos
 
-To use the 'git hub' command, you need a '~/.githubconfig' file, and it needs
+To use the 'git hub' command, you need a '~/.git-hub/config' file, and it needs
 to contain at least your login id. You can set this by running the following
 command:
 
@@ -1000,7 +999,7 @@ eos
 GitHub.die_user_name_in_config() {
 	cat <<eos
 
-It looks like your ~/.githubconfig has a 'user-name' key in it. This key has
+It looks like your ~/.git-hub/config has a 'user-name' key in it. This key has
 been renamed 'login'. You need to fix the config file. Please run these
 commands:
 
@@ -1152,29 +1151,50 @@ label_number='ID #'
 #------------------------------------------------------------------------------
 # Initial setup functions:
 #------------------------------------------------------------------------------
-GitHub.assert-env() {
-	local git_path=$(git --exec-path) || exit $?
-	PATH=$git_path/git-hub.:$PATH source json.bash
+GitHub.init-env() {
+	[ -z "$HOME" ] && die "Cannot determine HOME directory"
 
+	GitHub.check-system-commands curl cut git grep head sed tr
+
+	: ${GIT_HUB_EXEC_PATH:="$(dirname "${BASH_SOURCE[0]}")"}
+	: ${GIT_HUB_EXT_PATH:=$GIT_HUB_EXEC_PATH/git-hub.d}
 	: ${GIT_HUB_API_URI:=https://api.github.com}
-	: ${GIT_HUB_TMP_DIR:=/tmp}
-	GIT_HUB_TMP_PREFIX=$GIT_HUB_TMP_DIR/git-hub
-	GIT_HUB_INPUT=$GIT_HUB_TMP_PREFIX-in-$$
-	GIT_HUB_OUTPUT=$GIT_HUB_TMP_PREFIX-out-$$
-	GIT_HUB_ERROR=$GIT_HUB_TMP_PREFIX-err-$$
-	GIT_HUB_HEADER=$GIT_HUB_TMP_PREFIX-head-$$
+	: ${GIT_HUB_TMP_DIR:=$HOME/.git-hub/tmp}
+	: ${GIT_HUB_TMP_PREFIX:=$GIT_HUB_TMP_DIR/git-hub}
+	: ${GIT_HUB_INPUT:=$GIT_HUB_TMP_PREFIX-in-$$}
+	: ${GIT_HUB_OUTPUT:=$GIT_HUB_TMP_PREFIX-out-$$}
+	: ${GIT_HUB_ERROR:=$GIT_HUB_TMP_PREFIX-err-$$}
+	: ${GIT_HUB_HEADER:=$GIT_HUB_TMP_PREFIX-head-$$}
 
+	GitHub.assert-env-var EXEC_PATH EXT_PATH API_URI \
+		TMP_DIR TMP_PREFIX INPUT OUTPUT ERROR HEADER
+
+	[ -d "$GIT_HUB_EXT_PATH" ] ||
+		die "Hmm... git-hub does not seem to be properly installed\n"
+
+	: ${GIT_HUB_CONFIG:=$HOME/.git-hub/config}
+}
+
+GitHub.check-system-commands() {
+	local missing=false
 	local cmd
-	for cmd in curl cut git grep head sed tr; do
-		if [ -z "$(type $cmd) > /dev/null" ]; then
+	for cmd in $@; do
+		if ! $(type $cmd &> /dev/null); then
 			echo "Required shell command not found: '$cmd'"
-			exit 1
+			missing=true
 		fi
 	done
+	$missing && exit 1
+	:
+}
 
-	[ -z "$HOME" ] &&
-		echo "Cannot determine HOME directory" && exit 1
-	config_file=${GIT_HUB_CONFIG:-$HOME/.githubconfig}
+GitHub.assert-env-var() {
+	local var
+	for var in $@; do
+		var=GIT_HUB_$var
+		[ -n "${!var}" ] ||
+			die "'$var' is not set"
+	done
 }
 
 GitHub.get-options() {
@@ -1223,9 +1243,6 @@ GitHub.get-options() {
 	command="$1"; shift
 	command_arguments=("$@")
 
-	# Command aliases:
-	[ "$command" = "create" ] && command="repo-create"
-
 	[ "$command" = "config" -o "$command" = "config-unset" ] ||
 		GitHub.check_config
 
@@ -1260,6 +1277,8 @@ GitHub.unset-global-variables() {
 }
 
 GitHub.setup-env() {
+	GitHub.source-ext json.bash
+
 	if [ -n "$repeat_command" ]; then
 		[ -f $GIT_HUB_TMP_PREFIX-out-* ] ||
 			die "No previous 'git hub' command to repeat"
@@ -1274,11 +1293,15 @@ GitHub.setup-env() {
 	fi
 }
 
+GitHub.source-ext() {
+	PATH=$GIT_HUB_EXT_PATH:$PATH source "$1"
+}
+
 GitHub.check_config() {
-	[ -f "$config_file" ] || GitHub.die_config_not_setup
-	[ -n "$(git config -f $config_file github.user-name)" ] &&
+	[ -e "$GIT_HUB_CONFIG" ] || GitHub.die_config_not_setup
+	[ -n "$(git config -f $GIT_HUB_CONFIG github.user-name)" ] &&
 		GitHub.die_user_name_in_config
-	login="$(git config -f $config_file github.login)"
+	login="$(git config -f $GIT_HUB_CONFIG github.login)"
 	[ -n "$login" ] || GitHub.die_config_not_setup
 }
 
@@ -1295,7 +1318,7 @@ SED='sed -r'
 
 die() {
 	local c=($(caller ${DIE_STACK_LEVEL:-0}))
-	msg="$@"
+	msg="${@//\\n/$'\n'}"
 	if [ -z "$msg" ]; then
 		printf 'Died' >&2
 	else

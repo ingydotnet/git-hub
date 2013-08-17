@@ -1,12 +1,14 @@
 #!/bin/bash
 
-PATH=lib:ext/test-simple-bash/lib:ext/json-bash/lib:$PATH
+# set -ex
+
+PATH=ext/test-simple-bash/lib:$PATH
 source test-simple.bash tests 4
 
 GIT_HUB_CONFIG=$PWD/test/githubconfig
+PATH=lib:$PATH
 source git-hub
-
-GitHub.assert-env
+GitHub.init-env
 
 cmd="config"
 GitHub.get-options $cmd

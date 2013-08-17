@@ -1,38 +1,32 @@
-.PHONY: default help build doc test \
-    install install-lib install-doc \
-    uninstall uninstall-lib uninstall-doc \
-    dev-test dev-install dev-test-reset check-dev-install
-
 CMD := git-hub
-TMP := ./tmp
 
+LOCAL_LIB = lib/$(CMD)
+LOCAL_EXT = $(shell find $(LOCAL_LIB).d -type f) \
+	    $(shell find $(LOCAL_LIB).d -type l)
+
+# XXX Make these vars look like git.git/Makefile style
 PREFIX ?= /usr/local
 INSTALL_LIB ?= $(shell git --exec-path)
-ifeq ($(INSTALL_LIB),)
-    $(error Cannot determine location of git commands)
-endif
 INSTALL_MAN ?= $(PREFIX)/share/man/man1
-
-PROVE ?= $(shell which prove)
-ifeq ($(PROVE),)
-    PROVE := test-needs-prove
-endif
+INSTALL_EXT ?= $(INSTALL_LIB)/git-hub.d
 
 # Submodules
 JSON=ext/json-bash/lib/json.bash
 TEST_SIMPLE=ext/test-simple-bash/lib/test-simple.bash
 SUBMODULE := $(JSON) $(TEST_SIMPLE)
 
+## XXX assert good bash
+
 ##
 # Make sure we have 'git' and it works OK.
-GIT ?= $(shell which git)
-ifeq ($(GIT),)
+ifeq ($(shell which git),)
     $(error 'git' is not installed on this system)
 endif
 GITVER ?= $(word 3,$(shell git --version))
 
 ##
 # User targets:
+.PHONY: default help test
 default: help
 
 help:
@@ -42,30 +36,36 @@ help:
 	@echo 'install    Install $(CMD)'
 	@echo 'uninstall  Uninstall $(CMD)'
 
-test: $(SUBMODULE) $(PROVE)
+test: $(SUBMODULE)
+ifeq ($(shell which prove),)
+	@echo '`make test` requires the `prove` utility'
+	@exit 1
+endif
 	prove $(PROVE_OPTIONS) test/
 
+.PHONY: install install-lib install-doc
 install: install-lib install-doc
 
-install-lib: $(SUBMODULE) uninstall-lib $(INSTALL_LIB)/$(CMD)./
-	install -m 0755 lib/$(CMD) $(INSTALL_LIB)/
-	install -d -m 0755 $(INSTALL_LIB)/$(CMD)./
-	install -m 0755 $(JSON) $(INSTALL_LIB)/$(CMD)./json.bash
+install-lib: $(SUBMODULE) $(INSTALL_EXT)
+	install -C -m 0755 $(LOCAL_LIB) $(INSTALL_LIB)/
+	install -C -d -m 0755 $(INSTALL_EXT)/
+	install -C -m 0755 $(LOCAL_EXT) $(INSTALL_EXT)/
 
 install-doc:
-	install -c -d -m 0755 $(INSTALL_MAN)
-	install -c -m 0644 doc/$(CMD).1 $(INSTALL_MAN)
+	install -C -d -m 0755 $(INSTALL_MAN)
+	install -C -m 0644 doc/$(CMD).1 $(INSTALL_MAN)
 
+.PHONY: uninstall uninstall-lib uninstall-doc
 uninstall: uninstall-lib uninstall-doc
 
 uninstall-lib:
 	rm -f $(INSTALL_LIB)/$(CMD)
-	rm -fr $(INSTALL_LIB)/$(CMD).
+	rm -fr $(INSTALL_EXT)/
 
 uninstall-doc:
 	rm -f $(INSTALL_MAN)/$(CMD).1
 
-$(INSTALL_LIB)/$(CMD)./:
+$(INSTALL_EXT):
 	mkdir -p $@
 
 ##
@@ -74,12 +74,9 @@ $(SUBMODULE):
 	@echo 'You need to run `git submodule update --init` first.' >&2
 	@exit 1
 
-$(PROVE):
-	@echo '`make test` requires the `prove` utility'
-	@exit 1
-
 ##
 # Build rules:
+.PHONY: doc
 doc: doc/$(CMD).1
 
 $(CMD).txt: readme.asc
@@ -96,27 +93,30 @@ $(CMD).txt: readme.asc
 doc/%.1: %.1
 	mv $< $@
 
-lib/$(CMD).:
-	mkdir $@
-
 ##
 # Undocumented dev rules
 
 # Install using symlinks so repo changes can be tested live
-dev-install: $(SUBMODULE) uninstall-lib $(INSTALL_LIB)/$(CMD)./
+.PHONY: dev-install dev-test dev-test-reset check-dev-install
+dev-install: $(SUBMODULE) uninstall-lib $(INSTALL_EXT)
 	ln -s $$PWD/lib/$(CMD) $(INSTALL_LIB)/$(CMD)
-	ln -s $$PWD/$(JSON) $(INSTALL_LIB)/$(CMD)./json.bash
+	chmod 0755 $(INSTALL_EXT)/
+	@for ext in $(LOCAL_EXT); do \
+	    echo "ln -s $$PWD/$$ext $(INSTALL_EXT)/$${ext#lib/git-hub.d/}"; \
+	    ln -s $$PWD/$$ext $(INSTALL_EXT)/$${ext#lib/git-hub.d/}; \
+	done
 
 # Run a bunch of live tests. Make sure this thing really works. :)
 dev-test: check-dev-install
 	bash test/dev-test/all_commands.t
+	bash test/dev-test/each.t
 
 # Run this to reset if `make dev-test` fails.
 dev-test-reset: check-dev-install
 	GIT_HUB_TEST_RESET=1 bash test/dev-test/all_commands.t
 
 check-dev-install:
-	@if [ ! -L $$(git --exec-path)/git-hub ]; then \
+	@if [ ! -L $(INSTALL_LIB)/$(CMD) ]; then \
 	    echo "Run 'make dev-install' first"; \
 	    exit 1; \
 	fi

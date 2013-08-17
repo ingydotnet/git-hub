@@ -19,7 +19,7 @@ git hub repo pegex-pm
 git hub repos
 git hub repos cdent
 git hub repo cdent/simper
-git hub create git-hub-api-test
+git hub repo-new git-hub-api-test
 git hub repos
 git hub repo-edit ingydotnet/git-hub-api-test \
     description "This is just a test repo" \

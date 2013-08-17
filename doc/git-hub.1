@@ -2,12 +2,12 @@
 .\"     Title: git-hub
 .\"    Author: [see the "AUTHOR" section]
 .\" Generator: DocBook XSL Stylesheets v1.76.1 <http://docbook.sf.net/>
-.\"      Date: 08/14/2013
+.\"      Date: 08/17/2013
 .\"    Manual: Git Manual
 .\"    Source: Git 1.7.9.5
 .\"  Language: English
 .\"
-.TH "GIT\-HUB" "1" "08/14/2013" "Git 1\&.7\&.9\&.5" "Git Manual"
+.TH "GIT\-HUB" "1" "08/17/2013" "Git 1\&.7\&.9\&.5" "Git Manual"
 .\" -----------------------------------------------------------------
 .\" * Define some portability stuff
 .\" -----------------------------------------------------------------
@@ -34,21 +34,23 @@ git-hub \- Do GitHub operations from the `git` command
 Here is just a few of the things you can do on GitHub with a simple command:
 .sp
 .nf
-\fIgit hub\fR                             # Show the git hub cheat sheet
-\fIgit help\fR hub                        # Show this awesome documentation
-\fIgit hub\fR config login <your\-login>   # Do this first!
-\fIgit hub\fR user <user>                 # Get info about a user
-\fIgit hub\fR repos <owner>               # List recent repositories
-\fIgit hub\fR create <repo>               # Create a new repository
-\fIgit hub\fR fork <owner>/<repo>         # Fork a repository
-\fIgit hub\fR repo\-edit <repo> description \fIJust another GitHub repo\fR
-\fIgit hub\fR delete <owner>/<repo>       # Delete a repository
-\fIgit hub\fR followers <user>            # List a user\(cqs followers
-\fIgit hub\fR star ingydotnet/git\-hub     # Star this repository
-\fIgit hub\fR follow ingydotnet           # Follow this author
-\fIgit hub\fR trust ingydotnet            # Add collaborators to repo
-                                      # Read about all your rollowers
-git hub followers \-ra|git hub user \-  # Show user info for each follower
+git hub                             # Show the `git hub` cheat sheet
+git help hub                        # Show this awesome documentation
+git hub setup                       # Do this first!
+git hub user <user>                 # Get info about a user
+git hub repos <owner>               # List recent repositories
+git hub new <repo>                  # Create a new repository
+git hub fork <owner>/<repo>         # Fork a repository
+git hub clone <owner>/<repo>        # Clone a GitHub repository
+                                    # Set/Change your repo description
+git hub repo\-edit <repo> description \*(AqJust another GitHub repo\*(Aq
+git hub delete <owner>/<repo>       # Delete a repository
+git hub followers <user>            # List a user\*(Aqs followers
+git hub star ingydotnet/git\-hub     # Star this repository
+git hub follow ingydotnet           # Follow this author
+git hub trust ingydotnet            # Add collaborators to repo
+                                    # Stalk all your followers
+git hub followers \-ra | git hub user \-
 .fi
 .SH "DESCRIPTION"
 .sp
@@ -56,7 +58,7 @@ The \fBhub\fR subcommand for git, allows you to perform many of the operations m
 .sp
 You can fork, create, delete and modify repositories\&. You can get information about users, repositories and issues\&. You can \fBstar\fR, \fBwatch\fR and \fBfollow\fR things, and find out who else is doing the same\&. The API is quite extensive\&. With this command you can do many of your day to day GitHub actions without needing a web browser\&.
 .sp
-You can also chain commands together using the output of one as the input of another\&. See PIPING AND EACH below\&.
+You can also chain commands together using the output of one as the input of another\&. See PIPE AND EACH below\&.
 .SH "INSTALLATION"
 .sp
 Just run (possibly with sudo):
@@ -83,124 +85,14 @@ git help hub
 .if n \{\
 .RE
 .\}
-.SH "CONFIGURATION"
 .sp
-Before using the git hub command, you will need to set a couple configuration options\&. Run these commands:
-.sp
-.if n \{\
-.RS 4
-.\}
-.nf
-git hub config login <your\-github\-login\-id>
-git hub config api\-token <your\-github\-api\-token>
-.fi
-.if n \{\
-.RE
-.\}
-.sp
-.if n \{\
-.sp
-.\}
-.RS 4
-.it 1 an-trap
-.nr an-no-space-flag 1
-.nr an-break-flag 1
-.br
-.ps +1
-\fBNote\fR
-.ps -1
-.br
-.sp
-If you don\(cqt know what your API token is, see the next section\&.
-.sp .5v
-.RE
-.sp
-These values will be stored in ~/\&.githubconfig, like this:
+To do a local install, use the DESTDIR environment variable\&.
 .sp
 .if n \{\
 .RS 4
 .\}
 .nf
-[github]
-        login = <your\-github\-id>
-        api\-token = <your\-github\-api\-token>
-.fi
-.if n \{\
-.RE
-.\}
-.sp
-You can edit this file by hand or use the git hub config command\&.
-.SH "AUTHENTICATION"
-.sp
-Many endpoints of the GitHub v3 API require a Personal API Access Token\&. You can list your current tokens with this command:
-.sp
-.if n \{\
-.RS 4
-.\}
-.nf
-git hub token\-list
-.fi
-.if n \{\
-.RE
-.\}
-.sp
-If you don\(cqt have any tokens or want a new one for the git\-hub command, run these commands:
-.sp
-.if n \{\
-.RS 4
-.\}
-.nf
-git hub token\-create "my git\-hub command token"
-git hub scope\-add <token\-id> user repo
-git hub scope\-list <token\-id>
-git hub config api\-token <token\-value>
-.fi
-.if n \{\
-.RE
-.\}
-.sp
-You can also see all your tokens on the web at \m[blue]\fBthis page\fR\m[]\&\s-2\u[1]\d\s+2\&.
-.sp
-You can specify your API token to git hub on the commandline with \-\-token=\&.\&.\&. or in the GIT_HUB_API_TOKEN environment variable, but the easiest thing to do is just set it in the git\-hub config\&.
-.sp
-Certain token \fBscopes\fR are required for various GitHub API operations\&. Make sure your token has the scopes turned on for the things you want to do\&. See the scope\-list, scope\-add and scope\-remove git hub subcommands\&.
-.if n \{\
-.sp
-.\}
-.RS 4
-.it 1 an-trap
-.nr an-no-space-flag 1
-.nr an-break-flag 1
-.br
-.ps +1
-\fBNote\fR
-.ps -1
-.br
-.sp
-All the git hub commands dealing with tokens and scopes require you to enter your GitHub password\&. If you need to issue a bunch of these commands and you don\(cqt want to retype your password each time, you can put your password in the GIT_HUB_PASSWORD environment variable\&.
-.sp .5v
-.RE
-.SH "RATE LIMITS"
-.sp
-GitHUb limits unauthenticated API calls to 60 per hour, and authenticated API calls to 5000 per hour\&. For this reason you may wish to use authentication even for calls that don\(cqt need it\&. You can use the \-A/\-\-use\-auth option to make sure a command uses authentication\&. You can also set the config file to always use authentication, with this command:
-.sp
-.if n \{\
-.RS 4
-.\}
-.nf
-git hub config use\-auth 1
-.fi
-.if n \{\
-.RE
-.\}
-.sp
-Another option is to set the GIT_HUB_USE_AUTH environment variable:
-.sp
-.if n \{\
-.RS 4
-.\}
-.nf
-export GIT_HUB_USE_AUTH=1
+make install DESTDIR=$HOME/local/
 .fi
 .if n \{\
 .RE
@@ -232,7 +124,7 @@ For some commands, you can get the raw data in JSON\&.
 \-
 .RS 4
 This option, just a single
-\fI\-\fR, is small but very powerful\&. It means to read the next line from stdin, and put the content into the command at that point\&. See PIPING and EACH below\&.
+\fI\-\fR, is small but very powerful\&. It means to read the next line from stdin, and put the content into the command at that point\&. See PIPE and EACH below\&.
 .RE
 .PP
 \-h
@@ -427,6 +319,8 @@ git hub scope\-list
 command will tell you all of these, and what they mean\&.
 .RE
 .SH "COMMANDS"
+.sp
+These are the commands you can use to perform most of your daily GitHub interactions from the command line\&.
 .PP
 user [<user>]
 .RS 4
@@ -547,11 +441,9 @@ You can edit the following repo keys: `description`, `homepage`\&.
 .\}
 .RE
 .PP
-repo\-create [<org>/]<repo>
+repo\-new [<org>/]<repo>
 .RS 4
 Create a new GitHub repository\&.
-\fBAlias\fR:
-create\&.
 .RE
 .PP
 repo\-delete <owner>/<repo>
@@ -617,6 +509,15 @@ issue [<owner>/<repo>] <issue\-id\-number>
 .RS 4
 Show info (including any comments) for a specific issue\&.
 .RE
+.sp
+issue\-new [<owner>/<repo>] Create a new issue for a repository\&.
+.sp
+issue\-comment [<owner>/<repo>] <issue\-id\-number> [<comment\-text\-string>] Add a comment to an issue\&. If no comment string is given, the command will open your default editor and let you enter the text\&.
+.sp
+issue\-close [<owner>/<repo>] <issue\-id\-number> [<comment\-text\-string>] Close an issue with an option comment\&. If you use the string \fI\&...\fR as your comment, your ediitor will be opened to allow you to type in your comment text\&.
+.SH "CONFIGURATION COMMANDS"
+.sp
+These commands are for editing your git\-hub config file and managing your GitHub authentication tokens\&.
 .PP
 config [<config\-key> [<config\-value>]]
 .RS 4
@@ -637,7 +538,7 @@ List all the API tokens for your GitHub account\&. Use the
 option to print the token IDs and descriptions, but not the actual token values\&.
 .RE
 .PP
-token\-create [<description\-string>]
+token\-new [<description\-string>]
 .RS 4
 Create a new API token for your GitHub login id\&. Note: Creating a new token will not automatically add it to your
 ~/\&.githubconfig
@@ -677,7 +578,7 @@ Remove one or more scopes from your API token\&. You can use the
 \-\-all
 option to remove all possible scopes at once\&.
 .RE
-.SH "PIPING AND EACH"
+.SH "PIPE AND EACH"
 .sp
 You can pipe the output of one git hub into another and multiply your power\&. The command being piped into should use the EACH option which is a single dash (\fI\-\fR)\&. It will cause the command to be run once for each line of input, inserting the line into the command, in place of the \fI\-\fR\&.
 .sp
@@ -718,6 +619,128 @@ done
 .if n \{\
 .RE
 .\}
+.SH "CONFIGURATION"
+.sp
+Before using the git hub command, you will need to set a couple configuration options\&. Run these commands:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+git hub config login <your\-github\-login\-id>
+git hub config api\-token <your\-github\-api\-token>
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+.if n \{\
+.sp
+.\}
+.RS 4
+.it 1 an-trap
+.nr an-no-space-flag 1
+.nr an-break-flag 1
+.br
+.ps +1
+\fBNote\fR
+.ps -1
+.br
+.sp
+If you don\(cqt know what your API token is, see the next section\&.
+.sp .5v
+.RE
+.sp
+These values will be stored in ~/\&.githubconfig, like this:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+[github]
+        login = <your\-github\-id>
+        api\-token = <your\-github\-api\-token>
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+You can edit this file by hand or use the git hub config command\&.
+.SH "AUTHENTICATION"
+.sp
+Many endpoints of the GitHub v3 API require a Personal API Access Token\&. You can list your current tokens with this command:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+git hub token\-list
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+If you don\(cqt have any tokens or want a new one for the git\-hub command, run these commands:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+git hub token\-new "my git\-hub command token"
+git hub scope\-add <token\-id> user repo
+git hub scope\-list <token\-id>
+git hub config api\-token <token\-value>
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+You can also see all your tokens on the web at \m[blue]\fBthis page\fR\m[]\&\s-2\u[1]\d\s+2\&.
+.sp
+You can specify your API token to git hub on the commandline with \-\-token=\&.\&.\&. or in the GIT_HUB_API_TOKEN environment variable, but the easiest thing to do is just set it in the git\-hub config\&.
+.sp
+Certain token \fBscopes\fR are required for various GitHub API operations\&. Make sure your token has the scopes turned on for the things you want to do\&. See the scope\-list, scope\-add and scope\-remove git hub subcommands\&.
+.if n \{\
+.sp
+.\}
+.RS 4
+.it 1 an-trap
+.nr an-no-space-flag 1
+.nr an-break-flag 1
+.br
+.ps +1
+\fBNote\fR
+.ps -1
+.br
+.sp
+All the git hub commands dealing with tokens and scopes require you to enter your GitHub password\&. If you need to issue a bunch of these commands and you don\(cqt want to retype your password each time, you can put your password in the GIT_HUB_PASSWORD environment variable\&.
+.sp .5v
+.RE
+.SH "RATE LIMITS"
+.sp
+GitHUb limits unauthenticated API calls to 60 per hour, and authenticated API calls to 5000 per hour\&. For this reason you may wish to use authentication even for calls that don\(cqt need it\&. You can use the \-A/\-\-use\-auth option to make sure a command uses authentication\&. You can also set the config file to always use authentication, with this command:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+git hub config use\-auth 1
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+Another option is to set the GIT_HUB_USE_AUTH environment variable:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+export GIT_HUB_USE_AUTH=1
+.fi
+.if n \{\
+.RE
+.\}
 .SH "EXAMPLES"
 .sp
 The following sections show lots of interesting ways to use git hub\&. Let your imagination be your guide\&.
@@ -735,7 +758,7 @@ $ echo \*(AqThe new foo\*(Aq > README
 $ git init
 $ git add README
 $ git commit \-m \*(AqFirst commit\*(Aq
-$ git hub create foo
+$ git hub new foo
 $ git hub repo foo      # Get repo info including the remote address
 $ git remote add origin <new\-remote\-address>
 $ git push origin master
@@ -803,7 +826,7 @@ done
 .RE
 .\}
 .sp
-Or more simply by using PIPING and EACH:
+Or more simply by using PIPE and EACH:
 .sp
 .if n \{\
 .RS 4
@@ -859,9 +882,9 @@ git hub following <your\-login> \-ar |
 Written by Ingy d\(:ot Net <\m[blue]\fBingy@ingy\&.net\fR\m[]\&\s-2\u[2]\d\s+2>
 .SH "STATUS"
 .sp
-This command is still in early development\&. Only the basic commands have been supported, but the plan is to support as much of the API as possible\&. Patches / Pull Requests welcome\&. See the file notes/todo in the git\-hub repo for upcoming changes\&.
+This command is still in early development\&. The plan is to support as much of the API as possible\&. Patches / Pull Requests welcome\&. See the file notes/todo in the git\-hub repo for upcoming changes\&.
 .sp
-There are rudimentary tests in place but testing is not yet extensive\&. Expect more testing soon\&. Also please include tests\-in\-kind for any patches you submit\&.
+Try make test\&. There are tests in place but testing is not yet extensive\&. Expect more testing soon\&. Also please include tests\-in\-kind for any patches you submit\&.
 .sp
 This command is attempting to follow the guidelines for git command development, so that it may one day be a standard command for git\&.
 .sp

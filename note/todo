@@ -1,4 +1,15 @@
 == Pomodoro!
+- Write setup detection
+- Write setup command
+- Write issue-close issue-new issue-comment
+
+- Cache all results
+- Use git-hub-test-user account for dev testing
+
+- Build doc/*.asc into man
+- Review git/Documentation/CodingGuidelines
+- Redo Makefile based on git itself
+- Support DESTDIR
 
 == Documentation
 - Add an Environment Variables section
@@ -9,20 +20,18 @@
 - Switch GitHub.method style naming to GitHub::method
 - Namespace global vars with GitHub.func GitHub_varname
 - Eliminate evals
-- use fgrep in JSON.get
 - Eliminate todos
-- Replace local JSON stuff with json.bash stuff
 
 == Testing
-- dev-test/all_commands.t is broken
-  - convert all_commands.t to test-simple / prove
+- convert all_commands.t to test-simple / prove
 - Write dev-test for installation from git `clone git-hub`
+- Finish the commands.t test
+- Add more commands to all-commands.t
 
 == Commands
 - New commands to add:
   - help        - show help screen
   - setup       - Initial user setup wizard
-  - clone       - clone a repo using github info
   - pulls       - list pull requests
   - pull        - issue a pull request
   - search
@@ -31,7 +40,6 @@
   - Make a plan for all actions to support
 
 == Output
-- Separate key/value with <tab> in --raw output
 - Implement `git hub user --all`
 - Implement `git hub repo --all`
 - Print config file name
@@ -44,11 +52,10 @@
   - Think about what common errors might happen.
 
 == UX
-- Add pagination
+- Support a git-hub-shell
 - Add a setup command that walks a user through configuration
   - Should be a plugin
-- Support piping between commands:
-        git hub followers --get=user | git hub user ---
+- Add pagination
 
 == Performance
 - Support etag caching
@@ -59,15 +66,24 @@
 - no error msg printed on wrong password
 
 == Mac Bugs
-- Not removing (fetch) from values.
 
 == Plugin
 - add plugin support
   - write an irc plugin
-- Finish the commands.t test
-- Add more commands to all-commands.t
 
 == Done
++ Change -create commands to -new
++ Move /tmp stuff to ~/.git-hub/tmp/
++ Move ~/.githubconfig to ~/.git-hub/config
++ Extra exec files should go under lib/git-hub.d/
++ Remove 'create' alias
++ clone       - clone a repo using github info
++ Separate key/value with <tab> in --raw output
++ Support piping between commands:
+        git hub followers --get=user | git hub user ---
++ Not removing (fetch) from values.
++ dev-test/all_commands.t is broken
++ Replace local JSON stuff with json.bash stuff
 + `git hub followers` not honoring current repo
 + `git hub stars` not printing -More-
 + Mac only printing first page (first 100)
