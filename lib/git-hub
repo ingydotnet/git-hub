@@ -1243,7 +1243,11 @@ GitHub.check-system-commands() {
 }
 
 GitHub.source-ext() {
+	set +e
 	PATH=$GIT_HUB_EXT_PATH:$PATH source "$1" 2> /dev/null
+        local rc=$?
+        set -e
+        return $rc
 }
 
 GitHub.assert-env-var() {
