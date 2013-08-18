@@ -1,28 +1,25 @@
 == Pomodoro!
-- Write setup detection
-- Write setup command
-- Write issue-close issue-new issue-comment
 
-- Cache all results
-- Use git-hub-test-user account for dev testing
-
-- Build doc/*.asc into man
-- Review git/Documentation/CodingGuidelines
-- Redo Makefile based on git itself
-- Support DESTDIR
 
 == Documentation
+- Build doc/*.asc into man
 - Add an Environment Variables section
 - Add a prerequisites section to doc
 - Add a DEVELOPMENT document to the repo
 
 == Refactoring
+- Review git/Documentation/CodingGuidelines
 - Switch GitHub.method style naming to GitHub::method
 - Namespace global vars with GitHub.func GitHub_varname
 - Eliminate evals
 - Eliminate todos
 
+== Makefile
+- Redo Makefile based on git itself
+- Support DESTDIR
+
 == Testing
+- Use git-hub-test-user account for dev testing
 - convert all_commands.t to test-simple / prove
 - Write dev-test for installation from git `clone git-hub`
 - Finish the commands.t test
@@ -31,12 +28,14 @@
 == Commands
 - New commands to add:
   - help        - show help screen
-  - setup       - Initial user setup wizard
   - pulls       - list pull requests
   - pull        - issue a pull request
   - search
   - rate-limit
   - repo-watch
+  - issue-close
+  - issue-new
+  - issue-comment
   - Make a plan for all actions to support
 
 == Output
@@ -56,22 +55,28 @@
 - Add a setup command that walks a user through configuration
   - Should be a plugin
 - Add pagination
+- COmmand completion
 
 == Performance
+- Cache all results
 - Support etag caching
 - Parallel requests
 
 == Bugs
 - Find out why github fails under zsh (rafl)
-- no error msg printed on wrong password
+- No error msg printed on wrong password
 
 == Mac Bugs
 
 == Plugin
-- add plugin support
-  - write an irc plugin
+- Document plugins
+- Write an IRC plugin
 
 == Done
++ setup       - Initial user setup wizard
++ add plugin support
++ Write setup detection
++ Write setup command
 + Change -create commands to -new
 + Move /tmp stuff to ~/.git-hub/tmp/
 + Move ~/.githubconfig to ~/.git-hub/config

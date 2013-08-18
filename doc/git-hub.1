@@ -2,12 +2,12 @@
 .\"     Title: git-hub
 .\"    Author: [see the "AUTHOR" section]
 .\" Generator: DocBook XSL Stylesheets v1.76.1 <http://docbook.sf.net/>
-.\"      Date: 08/17/2013
+.\"      Date: 08/18/2013
 .\"    Manual: Git Manual
 .\"    Source: Git 1.7.9.5
 .\"  Language: English
 .\"
-.TH "GIT\-HUB" "1" "08/17/2013" "Git 1\&.7\&.9\&.5" "Git Manual"
+.TH "GIT\-HUB" "1" "08/18/2013" "Git 1\&.7\&.9\&.5" "Git Manual"
 .\" -----------------------------------------------------------------
 .\" * Define some portability stuff
 .\" -----------------------------------------------------------------
@@ -322,6 +322,23 @@ command will tell you all of these, and what they mean\&.
 .sp
 These are the commands you can use to perform most of your daily GitHub interactions from the command line\&.
 .PP
+setup
+.RS 4
+Before you can use the commands described below, you need to perform some setup/configuration steps\&. The
+git hub setup
+command will walk you through this process with ease\&. You can also use this command to change your configuration at any time in the future\&.
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+If you would rather do the steps by hand, see CONFIGURATION COMMANDS below\&.
+.fi
+.if n \{\
+.RE
+.\}
+.RE
+.PP
 user [<user>]
 .RS 4
 Show basic information about a specific user\&. User defaults to the owner of the current repo, or your login if you are not inside a repo directory\&. The
@@ -330,6 +347,8 @@ and
 \-\-json
 options show the data in different formats than normal output\&.
 .RE
+.sp
+user\-get <user> <data\-key> Get a specific data value for a particular user\&.
 .PP
 user\-edit <user> <key\-value\-pair>\&...
 .RS 4
@@ -360,6 +379,8 @@ and
 \-\-json
 options show the data in different formats than normal output\&.
 .RE
+.sp
+org\-get <org> <data\-key> Get a specific data value for a particular organization\&.
 .PP
 org\-edit <org> <key\-value\-pairs>\&...
 .RS 4
@@ -425,6 +446,8 @@ and
 \-\-json
 options show the data in different formats than normal output\&.
 .RE
+.sp
+repo\-get <owner>/<repo> <data\-key> Get a specific data value for a particular repository\&.
 .PP
 repo\-edit [<owner>/<repo>] <key\-value\-pair>\&...
 .RS 4
@@ -548,6 +571,8 @@ command\&. Use the
 \-\-raw
 option to just print the new token id\&.
 .RE
+.sp
+token\-get <api\-token\-id> <data\-key> Get a specific data value for a particular token\&.
 .PP
 token\-delete <api\-token\-id>
 .RS 4
