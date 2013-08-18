@@ -69,7 +69,7 @@ GitHub.run-command() {
 	GitHub.get-options "$@"
 	GitHub.assert-env
 
-	callable GitHub."$command" ||
+	callable-or-source GitHub."$command" ||
 		die "Unknown 'git hub' command: '$command'\n"
 	GitHub."$command" "$@"
 
@@ -1304,7 +1304,7 @@ GitHub.get-options() {
 	[[ "$command" == "setup" ]] ||
 	[[ "$command" = "config" ]] ||
 	[[ "$command" = "config-unset" ]] ||
-	! (callable GitHub."$command") ||
+	! (callable-or-source GitHub."$command") ||
 		GitHub.check-config
 
 	:
@@ -1431,9 +1431,13 @@ prompt() {
 
 # Check if a function exists:
 callable() {
-	[ -n "$(type $1 2> /dev/null)" ] ||
-		GitHub.source-ext git-hub-"$command" &&
-		[ -n "$(type $1 2> /dev/null)" ]
+	[ -n "$(type "$1" 2> /dev/null)" ]
+}
+
+callable-or-source() {
+	callable "$1" ||
+		GitHub.source-ext git-hub-"${1#GitHub.}" &&
+		callable "$1"
 }
 
 #------------------------------------------------------------------------------
