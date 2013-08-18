@@ -73,6 +73,7 @@
 - Write an IRC plugin
 
 == Done
++ Check for minimum Bash version
 + setup       - Initial user setup wizard
 + add plugin support
 + Write setup detection

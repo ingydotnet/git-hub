@@ -6,7 +6,15 @@
 
 set -e
 
-# XXX Test minimum Bash version up front
+{
+	GitHub.version-check() {
+		test $1 -ge 4 && return
+		test $1 -eq 3 -a $2 -ge 2 && return
+		echo "Bash version 3.2 or higher required for 'git hub'" >&2
+		exit 1
+	}
+	GitHub.version-check "${BASH_VERSINFO[@]}"
+}
 
 GIT_HUB_VERSION=0.0.2
 
