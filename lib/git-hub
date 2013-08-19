@@ -6,6 +6,12 @@
 
 set -e
 
+# S=$(date +'%s.%N')
+# bench() {
+# 	local t=$(date +'%s.%N')
+# 	perl -e '($a,$b,$_)=@ARGV;printf "%-20s %s\n",$b-$a,$_' $S $t "$1"
+# }
+
 {
 	GitHub.version-check() {
 		test $1 -ge 4 && return
@@ -66,11 +72,11 @@ GitHub.main() {
 		[ "${!i}" == '-' ] && each=1 && break
 	done
 	if [ -n "$each" ]; then
-		GIT_HUB_EACH=1
 		GitHub.run-each "$@"
 	else
 		GitHub.run-command "$@"
 	fi
+	exit $OK
 }
 
 GitHub.run-command() {
@@ -89,20 +95,19 @@ GitHub.run-command() {
 				say ${message_success:-"'git hub $command' successful"}
 			fi
 		fi
-		EACH || exit 0
-	elif [ -n "$status_code" ] && callable "status-$status_code-$command"; then
-		"status-$status_code-$command"
-		exit $OK
-	elif [ -n "$(eval "echo \$message_$status_code")" ]; then
-		say $(eval "echo \$message_$status_code")
-		exit $OK
-	elif callable "failure-$command"; then
-		"failure-$command"
-		exit $OK
 	else
-		say ${message_failure:-"'git hub $command' failed: $status_code"}
-		say "$ERROR"
-		exit $OK
+		local var=message_$status_code
+		local msg=${!var}
+		if [ -n "$status_code" ] && callable "status-$status_code-$command"; then
+			"status-$status_code-$command"
+		elif [ -n "$msg" ]; then
+			echo "$msg"
+		elif callable "failure-$command"; then
+			"failure-$command"
+		else
+			say ${message_failure:-"'git hub $command' failed: $status_code"}
+			say "$ERROR"
+		fi
 	fi
 }
 
@@ -124,6 +129,7 @@ GitHub.run-each() {
 		options+=($line)
 		options+=("${after[@]}")
 		GitHub.run-command "${options[@]}"
+		OK || return
 	done
 }
 
@@ -135,6 +141,7 @@ GitHub.user() {
 	GitHub.fetch-value user-name "$user"
 	: ${user_name:=$login}
 	GitHub.api-get "/users/$user_name"
+	message_404="User '$user_name' not found."
 }
 
 GitHub.success-user() {
@@ -807,7 +814,6 @@ GitHub.check-api-call-status() {
 }
 
 OK() { return $OK; }
-EACH() { [ -n "$GIT_HUB_EACH" ] && return 0 || return 1; }
 RAW() { [ -n "$GIT_HUB_RAW" ] && return 0 || return 1; }
 JSON() { [ -n "$GIT_HUB_JSON" ] && return 0 || return 1; }
 QUIET() { [ -n "$GIT_HUB_QUIET" ] && return 0 || return 1; }
