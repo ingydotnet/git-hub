@@ -875,7 +875,7 @@ GitHub.require-value() {
 	local key=$1
 	local var=${key//-/_}
 	GitHub.fetch-value "$@"
-	if [ -z "$(eval echo \$$var)" ]; then
+	if [ -z "${!var}" ]; then
 		[ "$var" = "api_token" ] && GitHub.need-api-token
 		die "Can't find value for '$var'"
 	fi
@@ -892,11 +892,11 @@ GitHub.fetch-value() {
 	local var=${key//-/_}
 	local env=GIT_HUB_$(echo $var | tr 'a-z' 'A-Z')
 
-	[ -n "$(eval echo \$$var)" ] && return
-	eval $var="$2"
-	[ -n "$(eval echo \$$var)" ] && return
-	eval $var=\"\$$env\"
-	[ -n "$(eval echo \$$var)" ] && return
+	[ -n "${!var}" ] && return
+	printf -v "$var" "$2"
+	[ -n "${!var}" ] && return
+	printf -v "$var" "${!env}"
+	[ -n "${!var}" ] && return
 	if [ "$var" = "repo_name" -o \
 		 "$var" = "owner_name" -o \
 		 "$var" = "user_name" ]; then
@@ -906,7 +906,7 @@ GitHub.fetch-value() {
 				grep 'github\.com' |
 				head -n1
 		)
-                url=$(shopt -s extglob; echo ${url% (@(fetch|push))})
+		url=$(shopt -s extglob; echo ${url% (@(fetch|push))})
 		if [ -n "$url" ]; then
 			if [[ "$url" =~ github\.com ]]; then
 				local re1='^[^:/]*[:/](.*)/(.*)\.git$'
@@ -920,8 +920,8 @@ GitHub.fetch-value() {
 			fi
 		fi
 	fi
-	eval $var=$(git config --file=$GIT_HUB_CONFIG github.$key || echo '')
-	[ -n "$(eval echo \$$var)" ] && return
+	printf -v "$var" "$(git config --file=$GIT_HUB_CONFIG github.$key || echo '')"
+	[ -n "${!var}" ] && return
 	true
 }
 
@@ -941,6 +941,7 @@ GitHub.check-token-id() {
 GitHub.report-list() {
 	message_success=0
 	local url="$1" fields=($2) ii
+	GitHub.fetch-value list-size
  	local list_max=${list_size:-${3:-$(($(tput lines) - 3))}}
 	local per_page=${4:-100}
 	[ $per_page -gt $list_max ] && per_page=$list_max
@@ -1155,7 +1156,8 @@ GitHub.report-value() {
 	local value=$(JSON.get -a "/$key" -)
 	local label="$key"
 	if ! RAW; then
-		label=$(eval echo \$label_$1)
+	local var="lable_$1"
+		label="${!var}"
 		if [ -z "$label" ]; then
 			label=$(echo "$1" | tr '_' ' ')
 			label=$(
@@ -1259,9 +1261,9 @@ GitHub.check-system-commands() {
 GitHub.source-ext() {
 	set +e
 	PATH=$GIT_HUB_EXT_PATH:$PATH source "$1" 2> /dev/null
-        local rc=$?
-        set -e
-        return $rc
+	local rc=$?
+	set -e
+	return $rc
 }
 
 GitHub.assert-env-var() {
@@ -1287,8 +1289,9 @@ GitHub.get-options() {
 		local option="$1"; shift
 		case "$option" in
 			--token) token="$1"; shift ;;
-			-c)	list_size=$1; shift ;;
-			-a) GIT_HUB_ALL="1"
+			-c) list_size=$1; shift ;;
+			-a)
+				GIT_HUB_ALL="1"
 				list_size=999999
 				;;
 			-A) use_auth="1" ;;
