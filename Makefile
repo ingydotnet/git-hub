@@ -107,17 +107,10 @@ dev-install: $(SUBMODULE) uninstall-lib $(INSTALL_EXT)
 	done
 
 # Run a bunch of live tests. Make sure this thing really works. :)
-dev-test: check-dev-install
+dev-test:
 	bash test/dev-test/all_commands.t
 	bash test/dev-test/each.t
 
 # Run this to reset if `make dev-test` fails.
 dev-test-reset: check-dev-install
 	GIT_HUB_TEST_RESET=1 bash test/dev-test/all_commands.t
-
-check-dev-install:
-	@if [ ! -L $(INSTALL_LIB)/$(CMD) ]; then \
-	    echo "Run 'make dev-install' first"; \
-	    exit 1; \
-	fi
-
