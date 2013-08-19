@@ -3,6 +3,7 @@
 # This test is just a large grained, realtime test of the commands. Good to
 # run before commit or release.
 
+export GIT_EXEC_PATH=$PWD/lib:$(git --exec-path)
 set -ex
 
 ## Reset section
@@ -11,7 +12,7 @@ if [ -n "$GIT_HUB_TEST_RESET" ]; then
     exit 0
 fi
 
-# export GIT_HUB_COUNT=5
+export GIT_HUB_LIST_SIZE=5
 
 git hub user
 git hub user cdent
