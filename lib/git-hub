@@ -154,7 +154,13 @@ GitHub.success-user() {
 
 GitHub.user-get() {
 	GitHub.get-args user key
-	GitHub.api-get "/users/$user"
+	if [ -z "$key" ]; then
+		key="$user"
+		user=
+	fi
+	GitHub.fetch-value user-name "$user"
+	: ${user_name:=$login}
+	GitHub.api-get "/users/$user_name"
 	OK || return
 	local value=$(JSON.get -a "/$key" -)
 	[ -n "$value" ] || {
