@@ -974,9 +974,7 @@ GitHub.report-list() {
 		url=$(GitHub.get-next-page-url)
 		if [ $list_counter -gt $list_max ]; then
 			if [ -n "$url" -o $ii -lt $page_size ]; then
-				if ! QUIET; then
-					echo --More--
-				fi
+				say --More--
 			fi
 			break
 		fi
@@ -1302,7 +1300,10 @@ GitHub.get-options() {
 				;;
 			-A) use_auth="1" ;;
 
-			-r) GIT_HUB_RAW="1" ;;
+			-r)
+				GIT_HUB_RAW="1"
+				GIT_HUB_QUIET="1"
+				;;
 			-j) GIT_HUB_JSON="1" ;;
 			-q) GIT_HUB_QUIET="1" ;;
 			-v) GIT_HUB_VERBOSE="1" ;;
