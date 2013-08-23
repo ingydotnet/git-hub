@@ -28,7 +28,7 @@ test_command() {
         export GIT_DIR=not-in-git-dir
     fi
     eval set -- "$1"
-    GitHub.get-options "$@"
+    get-opts "$@"
     # subvert git-hub's die
     die () {
         die_msg="$@"

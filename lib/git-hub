@@ -80,7 +80,7 @@ GitHub.main() {
 }
 
 GitHub.run-command() {
-	GitHub.get-options "$@"
+    get-opts "$@"
 	GitHub.assert-env
 
 	callable-or-source GitHub."$command" ||
@@ -1279,7 +1279,7 @@ GitHub.assert-env-var() {
 	done
 }
 
-GitHub.get-options() {
+get-opts() {
 	[ $# -eq 0 ] && set -- --help
 
 	eval "$(
@@ -1466,6 +1466,112 @@ callable-or-source() {
 	callable "$1" ||
 		GitHub.source-ext git-hub-"${1#GitHub.}" &&
 		callable "$1"
+}
+
+#------------------------------------------------------------------------------
+# TEMPORARY ARE DURING REFACTORING
+#------------------------------------------------------------------------------
+
+get-args() {
+	local specs=("$@")
+	local args=("${command_arguments[@]}")
+
+	while [ ${#specs[@]} -gt 0 ]; do
+		local optional=false
+		local spec="${specs[0]}"
+		local arg="${args[0]}"
+		if [[ "$spec" =~ ^\? ]]; then
+			optional=true
+			spec=${spec#\?}
+			if [ ${#args[@]} -lt ${#specs[@]} ]; then
+				arg=''
+				spec-assign
+			else
+				spec-assign
+				args=("${args[@]:1}")
+			fi
+		else
+			if [ ${#args[@]} -eq 0 ]; then
+				spec-assign
+			else
+				spec-assign
+				args=("${args[@]:1}")
+			fi
+		fi
+		specs=("${specs[@]:1}")
+	done
+	if [ ${#args[@]} -gt 0 ]; then
+		die "Unknown arguments '${args[@]}'"
+	fi
+}
+
+spec-assign() {
+	[[ "$spec" =~ / ]] && slash-assign && return
+	local spec="$spec"
+	local value="$arg"
+	local var=${spec/:*/}
+	[[ $spec =~ : ]] && spec=${spec#$var:} || spec=
+	if [ -z "$value" ]; then
+		for func in ${spec/:/ }; do
+			value="$($func)"
+			[ -n "$value" ] && break
+		done
+	fi
+	if [ -n "$value" ]; then
+		printf -v "$var" "$value"
+	else
+		die "Can't find a value for '$var'"
+	fi
+}
+
+slash-assign() {
+	local spec1=${spec/\/*/}
+	local spec2=${spec#$spec1/}
+	local arg1= arg2=
+	if [[ "$arg" =~ / ]]; then
+		local arg1=${arg/\/*/}
+		local arg2=${arg#$arg1/}
+	elif ! $optional; then
+		die "Invalid value '$arg' for '$spec'"
+	fi
+	local spec="$spec1"
+	local arg="$arg1"
+	spec-assign
+	local spec="$spec2"
+	local arg="$arg2"
+	spec-assign
+}
+
+get-login() {
+	get-config login
+}
+
+get-repo() {
+	get-config repo
+}
+
+SED='sed -r'
+get-config() {
+	local url=$(
+		git remote -v 2> /dev/null |
+			$SED 's/\s+\(fetch\)$//' |
+			grep 'github\.com' |
+			head -n1
+	)
+	url=$(shopt -s extglob; echo ${url% (@(fetch|push))})
+	if [ -n "$url" ]; then
+		if [[ "$url" =~ github\.com ]]; then
+			local re1='^[^:/]*[:/](.*)/(.*)\.git$'
+			local re2='^[^:/]*[:/](.*)/(.*)$'
+			if [[ "$url" =~ $re1 ]] || [[ "$url" =~ $re2 ]]; then
+				if [ "$1" == login -o "$1" == owner ]; then
+					echo "${BASH_REMATCH[1]}"
+				elif [ "$1" == repo ]; then
+					echo "${BASH_REMATCH[2]}"
+				fi
+			fi
+		fi
+	fi
 }
 
 #------------------------------------------------------------------------------
