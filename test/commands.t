@@ -10,6 +10,7 @@ GIT_HUB_CONFIG=$PWD/test/githubconfig
 PATH=lib:$PATH
 source $PWD/lib/git-hub
 init-env
+check-config   # XXX temporary while refactoring signatures
 
 foo_git=./test/ricardo-foo.git
 foo_noext=./test/ricardo-foo
@@ -34,7 +35,7 @@ test_command() {
         die_msg="$@"
         died=true
     }
-    "$command"
+    "command:$command"
     local curl="${curl_command[@]}"
     local label="$1"
     label=$(printf "%-40s %s" "$label" "($GIT_DIR)")
@@ -84,6 +85,7 @@ note() {
 diag() {
     echo "# $@" >&2
 }
+
 #----------------------------------------------------------------------------
 note "Test all the permutations of command and arguments and environments"
 

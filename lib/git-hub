@@ -83,13 +83,13 @@ run-command() {
     get-opts "$@"
 	assert-env
 
-	callable-or-source "$command" ||
+	callable-or-source "command:$command" ||
 		die "Unknown 'git hub' command: '$command'\n"
-	"$command" "$@"
+	"command:$command" "$@"
 
 	if OK; then
-		if callable "success-$command"; then
-			"success-$command"
+		if callable "success:$command"; then
+			"success:$command"
 		else
 			if [ "$message_success" != '0' ]; then
 				say ${message_success:-"'git hub $command' successful"}
@@ -98,11 +98,11 @@ run-command() {
 	else
 		local var=message_$status_code
 		local msg=${!var}
-		if [ -n "$status_code" ] && callable "status-$status_code-$command"; then
+		if [ -n "$status_code" ] && callable "status-$status_code:$command"; then
 			"status-$status_code-$command"
 		elif [ -n "$msg" ]; then
 			echo "$msg"
-		elif callable "failure-$command"; then
+		elif callable "failure:$command"; then
 			"failure-$command"
 		else
 			say ${message_failure:-"'git hub $command' failed: $status_code"}
@@ -136,15 +136,13 @@ run-each() {
 #------------------------------------------------------------------------------
 # `git hub` command functions:
 #------------------------------------------------------------------------------
-user() {
-	Get-args user
-	fetch-value user-name "$user"
-	: ${user_name:=$login}
-	api-get "/users/$user_name"
-	message_404="User '$user_name' not found."
+command:user() {
+	get-args ?user:get-user
+	api-get "/users/$user"
+	message_404="User '$user' not found."
 }
 
-success-user() {
+success:user() {
 	fields=(
 		login type name email blog location company bio
 		followers following public_repos public_gists
@@ -152,15 +150,9 @@ success-user() {
 	report-data
 }
 
-user-get() {
-	Get-args user key
-	if [ -z "$key" ]; then
-		key="$user"
-		user=
-	fi
-	fetch-value user-name "$user"
-	: ${user_name:=$login}
-	api-get "/users/$user_name"
+command:user-get() {
+	get-args ?user:get-owner:get-login key
+	api-get "/users/$user"
 	OK || return
 	local value=$(JSON.get -a "/$key" -)
 	[ -n "$value" ] || {
@@ -176,13 +168,13 @@ user-get() {
 	fi
 }
 
-user-edit() {
+command:user-edit() {
 	require-value api-token "$token"
 	Get-args *key_value_pairs
 	api-patch "/user" "$(json-dump-object-pairs)"
 }
 
-orgs() {
+command:orgs() {
 	Get-args user
 	fetch-value user-name "$user"
 	: ${user_name:=$login}
@@ -192,13 +184,13 @@ orgs() {
 		'login'
 }
 
-org() {
+command:org() {
 	Get-args org
 	require-value org-name "$org"
 	api-get "/orgs/$org_name"
 }
 
-success-org() {
+success:org() {
 	fields=(
 		login type name billing_email email blog location company
 		html_url public_repos public
@@ -206,7 +198,7 @@ success-org() {
 	report-data
 }
 
-org-get() {
+command:org-get() {
 	Get-args org key
 	require-value org-name "$org"
 	api-get "/orgs/$org_name"
@@ -225,14 +217,14 @@ org-get() {
 	fi
 }
 
-org-edit() {
+command:org-edit() {
 	require-value api-token "$token"
 	Get-args org *key_value_pairs
 	require-value org-name "$org"
 	api-patch "/orgs/$org_name" "$(json-dump-object-pairs)"
 }
 
-members() {
+command:members() {
 	Get-args org
 	require-value org-name "$org"
 
@@ -241,7 +233,7 @@ members() {
 		'login'
 }
 
-teams() {
+command:teams() {
 	require-value api-token "$token"
 	Get-args org
 	require-value org-name "$org"
@@ -251,7 +243,7 @@ teams() {
 		'name'
 }
 
-followers() {
+command:followers() {
 	Get-args user
 	require-value user-name "${user}"
 	: ${user_name:=$login}
@@ -260,7 +252,7 @@ followers() {
 		'login'
 }
 
-following() {
+command:following() {
 	Get-args user
 	require-value user-name "${user}"
 	: ${user_name:=$login}
@@ -269,21 +261,21 @@ following() {
 		'login'
 }
 
-follow() {
+command:follow() {
 	Get-args user
 	require-value user-name "$user"
 	require-value api-token "$token"
 	api-put "/user/following/$user_name"
 }
 
-unfollow() {
+command:unfollow() {
 	Get-args user
 	require-value user-name "$user"
 	require-value api-token "$token"
 	api-delete "/user/following/$user_name"
 }
 
-clone() {
+command:clone() {
 	Get-args owner-repo dir
 	require-value repo-name "$repo"
 	require-value owner-name "$owner"
@@ -291,7 +283,7 @@ clone() {
 	message_success="Repository '$owner_name/$repo_name' cloned"
 }
 
-repos() {
+command:repos() {
 	Get-args owner
 	fetch-value owner-name "$owner"
 	: ${owner_name:=$login}
@@ -301,7 +293,7 @@ repos() {
 		'pushed_at full_name description'
 }
 
-format-repos-entry() {
+format-entry:repos() {
 	if RAW; then
 		printf "$3\n"
 	else
@@ -309,7 +301,7 @@ format-repos-entry() {
 	fi
 }
 
-repo() {
+command:repo() {
 	Get-args repo
 	check-owner-repo "$repo"
 	require-value repo-name "$repo"
@@ -317,7 +309,7 @@ repo() {
 	api-get "/repos/$owner_name/$repo_name"
 }
 
-success-repo() {
+success:repo() {
 	local fields=(
 		full_name description homepage language \
 		pushed_at \
@@ -328,7 +320,7 @@ success-repo() {
 	report-data
 }
 
-repo-get() {
+command:repo-get() {
 	Get-args owner-repo key
 	require-value repo-name "$repo"
 	require-value owner-name "${owner:-$login}"
@@ -348,7 +340,7 @@ repo-get() {
 	fi
 }
 
-repo-edit() {
+command:repo-edit() {
 	Get-args owner-repo *key_value_pairs
 	require-value repo-name "$repo"
 	require-value owner-name "$owner"
@@ -358,7 +350,7 @@ repo-edit() {
 }
 
 # TODO Support creating repo under an org
-repo-new() {
+command:repo-new() {
 	Get-args repo
 	require-value repo-name "$repo"
 	require-value api-token "$token"
@@ -367,7 +359,7 @@ repo-new() {
 	message_422="Repository name '$repo_name' already exists."
 }
 
-repo-delete() {
+command:repo-delete() {
 	Get-args owner-repo
 	require-value delete-repo-name "$repo"
 	require-value delete-owner-name "$owner"
@@ -376,7 +368,7 @@ repo-delete() {
 	message_success="Repository '$delete_owner_name/$delete_repo_name' deleted"
 }
 
-forks() {
+command:forks() {
 	Get-args repo
 	check-owner-repo "$repo"
 	require-value repo-name "$repo"
@@ -387,7 +379,7 @@ forks() {
 		'pushed_at full_name'
 }
 
-format-forks-entry() {
+format-entry:forks() {
 	if RAW; then
 		printf "$3\n"
 	else
@@ -395,7 +387,7 @@ format-forks-entry() {
 	fi
 }
 
-fork() {
+command:fork() {
 	Get-args owner-repo org
 	require-value repo-name "$repo"
 	require-value owner-name "$owner"
@@ -403,7 +395,7 @@ fork() {
 	api-post "/repos/$owner_name/$repo_name/forks" '{}'
 }
 
-stars() {
+command:stars() {
 	Get-args repo
 	check-owner-repo "$repo"
 	require-value repo-name "$repo"
@@ -413,7 +405,7 @@ stars() {
 		'login'
 }
 
-star() {
+command:star() {
 	Get-args repo
 	check-owner-repo "$repo"
 	require-value repo-name "$repo"
@@ -423,7 +415,7 @@ star() {
 	message_success="'$owner_name/$repo_name' starred"
 }
 
-unstar() {
+command:unstar() {
 	Get-args repo
 	check-owner-repo "$repo"
 	require-value repo-name "$repo"
@@ -433,7 +425,7 @@ unstar() {
 	message_success="'$owner_name/$repo_name' unstarred"
 }
 
-starred() {
+command:starred() {
 	Get-args user
 	require-value user-name "${user:-$login}"
 	report-list \
@@ -441,7 +433,7 @@ starred() {
 		'full_name'
 }
 
-collabs() {
+command:collabs() {
 	Get-args repo
 	check-owner-repo "$repo"
 	require-value repo-name "$repo"
@@ -451,7 +443,7 @@ collabs() {
 		'login'
 }
 
-trust() {
+command:trust() {
 	Get-args owner-repo *collaborators
 	require-value repo-name "$repo"
 	require-value owner-name "$owner"
@@ -461,7 +453,7 @@ trust() {
 	done
 }
 
-untrust() {
+command:untrust() {
 	Get-args owner-repo *collaborators
 	require-value repo-name "$repo"
 	require-value owner-name "$owner"
@@ -471,7 +463,7 @@ untrust() {
 	done
 }
 
-issues() {
+command:issues() {
 	Get-args repo
 	check-owner-repo "$repo"
 	require-value repo-name "$repo"
@@ -482,18 +474,18 @@ issues() {
 		'number updated_at state user/login title'
 }
 
-format-issues-entry() {
+format-entry:issues() {
 	printf "%d) #%d (%s) %-6s @%-16s %s\n" $1 $2 ${3/T*/} $4 $5 "$6"
 }
 
-issue() {
+command:issue() {
 	Get-args owner-repo number
 	require-value repo-name "$repo"
 	require-value owner-name "${owner:-$login}"
 	api-get "/repos/$owner_name/$repo_name/issues/$number"
 }
 
-success-issue() {
+success:issue() {
 	label_title='Issue'
 	label_body='Description:'
 	local fields=(
@@ -501,26 +493,23 @@ success-issue() {
 	)
 	report-data
 	local comments=$(JSON.get -n /comments -)
-	[ $comments -gt 0 ] &&
-		issue-list-comments $(JSON.get -n /number -)
+	if [ $comments -gt 0 ]; then
+		echo Comments:
+		command=comments
+		report-list \
+			"/repos/$owner_name/$repo_name/issues/$number/comments?sort=updated;per_page=PER_PAGE" \
+			'user/login updated_at body'
+		echo
+	fi
 }
 
-issue-list-comments() {
-	echo Comments:
-    command=comments
-	report-list \
-		"/repos/$owner_name/$repo_name/issues/$number/comments?sort=updated;per_page=PER_PAGE" \
-		'user/login updated_at body'
-	echo
-}
-
-format-comments-entry() {
+format-entry:comments() {
 	printf "  %d) %-14s (%s)\n" $1 $2 ${3/T*/}
 	body=$(echo "$4" | $SED 's/\\"/"/g;s/\\r//g;s/\\n\\n */\n\n     /g')
 	echo -e "     $body" | fmt
 }
 
-config() {
+command:config() {
 	Get-args config_key config_value
 	message_success=0
 	if [ -z "$config_key" ]; then
@@ -535,7 +524,7 @@ config() {
 	OK=$?
 }
 
-config-unset() {
+command:config-unset() {
 	Get-args config_key
 	[ -n "$config_key" ] ||
 		die "This command requires a config key"
@@ -544,14 +533,14 @@ config-unset() {
 	message_success="Config key '$config_key' has been unset."
 }
 
-token-list() {
+command:token-list() {
 	basic_auth="1"
 	report-list \
 		'/authorizations' \
 		'token id note app/name'
 }
 
-format-token-list-entry() {
+format-entry:token-list() {
 	if RAW || QUIET; then
 		printf "%-7s  %s\n" $3 "${4:-$5}"
 	else
@@ -559,7 +548,7 @@ format-token-list-entry() {
 	fi
 }
 
-token-new() {
+command:token-new() {
 	local json
 	Get-args note
 	if [ -n "$note" ]; then
@@ -571,7 +560,7 @@ token-new() {
 	api-post '/authorizations' "$json"
 }
 
-success-token-new() {
+success:token-new() {
 	local token=$(JSON.get -s "/token" -)
 	[ -n "$token" ] || die "Can't figure out token value"
 	local id=$(JSON.get -n "/id" -)
@@ -584,7 +573,7 @@ success-token-new() {
 	fi
 }
 
-token-get() {
+command:token-get() {
 	Get-args id key
 	[ -z "$id" ] && die "Command requires token id"
 	[ -z "$key" ] && die "Command requires key"
@@ -605,7 +594,7 @@ token-get() {
 	fi
 }
 
-token-delete() {
+command:token-delete() {
 	Get-args id
 	[ -z "$id" ] && die "Command requires token id"
 	basic_auth="1"
@@ -613,14 +602,14 @@ token-delete() {
 	message_success="Token '$id' deleted"
 }
 
-scope-list() {
+command:scope-list() {
 	Get-args id
 	require-value token-id "$id"
 	basic_auth="1"
 	api-get "/authorizations/$id"
 }
 
-success-scope-list() {
+success:scope-list() {
 	local i=0
 	local scopes scope
 	while true; do
@@ -657,7 +646,7 @@ For more info, see: http://developer.github.com/v3/oauth/#scopes
 eos
 }
 
-scope-add() {
+command:scope-add() {
 	if ALL; then
 		Get-args id
 		# XXX Dedup this array in scope-remove
@@ -678,7 +667,7 @@ scope-add() {
 	message_success="Scopes added."
 }
 
-scope-remove() {
+command:scope-remove() {
 	if ALL; then
 		Get-args id
 		scopes=(
@@ -964,8 +953,8 @@ report-list() {
 				value="$(JSON.get -a "/$ii/$field" -)"
 				values+=("$value")
 			done
-			if callable "format-$command-entry"; then
-				"format-$command-entry" $list_counter "${values[@]}"
+			if callable "format-entry:$command"; then
+				"format-entry:$command" $list_counter "${values[@]}"
 			else
 				default-format-entry $list_counter "${values[@]}"
 			fi
@@ -1219,7 +1208,7 @@ init-env() {
 
 	[ -d "$GIT_HUB_EXT_PATH" ] ||
 		die "Hmm... git-hub does not seem to be properly installed\n"
-	:
+	true
 }
 
 assert-env() {
@@ -1259,7 +1248,7 @@ check-system-commands() {
 		fi
 	done
 	$missing && exit 1
-	:
+	true
 }
 
 source-ext() {
@@ -1335,7 +1324,7 @@ get-opts() {
 	! (callable-or-source "$command") ||
 		check-config
 
-	:
+	true
 }
 
 unset-global-variables() {
@@ -1464,7 +1453,7 @@ callable() {
 
 callable-or-source() {
 	callable "$1" ||
-		source-ext git-hub-"$1" &&
+		source-ext git-hub-"${1/:*/}" &&
 		callable "$1"
 }
 
@@ -1542,15 +1531,25 @@ slash-assign() {
 	spec-assign
 }
 
+get-user() {
+	get-owner || get-login || return 1
+	return 0
+}
+
 get-login() {
-	get-config login
+	[ -z "$GIT_HUB_CONFIG" ] &&
+		die "No GIT_HUB_CONFIG"
+	git config -f "$GIT_HUB_CONFIG" github.login
+}
+
+get-owner() {
+	get-config owner
 }
 
 get-repo() {
 	get-config repo
 }
 
-SED='sed -r'
 get-config() {
 	local url=$(
 		git remote -v 2> /dev/null |
@@ -1564,20 +1563,23 @@ get-config() {
 			local re1='^[^:/]*[:/](.*)/(.*)\.git$'
 			local re2='^[^:/]*[:/](.*)/(.*)$'
 			if [[ "$url" =~ $re1 ]] || [[ "$url" =~ $re2 ]]; then
-				if [ "$1" == login -o "$1" == owner ]; then
+				if [ "$1" == owner ]; then
 					echo "${BASH_REMATCH[1]}"
-				elif [ "$1" == repo ]; then
+				else
 					echo "${BASH_REMATCH[2]}"
 				fi
+				return 0
 			fi
 		fi
 	fi
+	return 1
 }
 
 #------------------------------------------------------------------------------
 # Begin at the end!
 #------------------------------------------------------------------------------
 [ "${BASH_SOURCE[0]}" == "$0" ] && main "$@"
-:
+
+true
 
 # vim: set tabstop=4 shiftwidth=4 noexpandtab:

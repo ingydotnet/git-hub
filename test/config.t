@@ -10,4 +10,4 @@ source git-hub
 init-env
 
 command_arguments=(login)
-ok [ $(config) == tommy ] "Reading login form config works"
+ok [ $(command:config) == tommy ] "Reading login form config works"

@@ -3,7 +3,7 @@
 set -e
 
 PATH=ext/test-simple-bash/lib:$PATH
-source test-simple.bash tests 9
+source test-simple.bash tests 10
 note() {
     echo "# $@"
 }
@@ -56,23 +56,27 @@ run-test-error() {
 }
 
 export GIT_DIR=$PWD/test/not-a-repo
+GIT_HUB_CONFIG=$PWD/test/githubconfig
 RICARDO_FOO=$PWD/test/ricardo-foo
 
-case $goto in '')
-
 run-test \
-    "?user_name:get-login" \
+    "?user_name:get-user" \
     "=billy=" \
     billy
 
+run-test \
+    "?user_name:get-user" \
+    "=tommy=" \
+    # none
+
 GIT_DIR=$RICARDO_FOO run-test \
-    "?user_name:get-login" \
+    "?user_name:get-user" \
     "=ricardo=" \
     # none
 
 run-test-error \
     "Can't find a value for 'user_name'" \
-    "?user_name:get-login" \
+    "?user_name:get-owner" \
     # none
 
 run-test-error \
@@ -87,18 +91,16 @@ run-test \
 
 run-test-error \
     "Can't find a value for 'user_name'" \
-    "user_name:get-login" \
+    "user_name:get-owner" \
     # none
 
 run-test \
-    "?user:get-login/repo:get-repo key" \
+    "?user:get-user/repo:get-repo key" \
     "=jimmy=juju=type=" \
     jimmy/juju type
 
-;&last)
-
 GIT_DIR=$RICARDO_FOO run-test \
-    "?user:get-login/repo:get-repo key" \
+    "?user:get-user/repo:get-repo key" \
     "=ricardo=foo=type=" \
     type
 
@@ -106,5 +108,3 @@ run-test-error \
     "Invalid value 'jimmy' for 'user/repo'" \
     "user/repo key" \
     jimmy type
-
-;;esac
