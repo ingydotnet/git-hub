@@ -9,7 +9,7 @@ GIT_HUB_TEST_COMMAND="1"
 GIT_HUB_CONFIG=$PWD/test/githubconfig
 PATH=lib:$PATH
 source $PWD/lib/git-hub
-GitHub.init-env
+init-env
 
 foo_git=./test/ricardo-foo.git
 foo_noext=./test/ricardo-foo
@@ -34,7 +34,7 @@ test_command() {
         die_msg="$@"
         died=true
     }
-    "GitHub.$command"
+    "$command"
     local curl="${curl_command[@]}"
     local label="$1"
     label=$(printf "%-40s %s" "$label" "($GIT_DIR)")
