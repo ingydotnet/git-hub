@@ -1,35 +1,32 @@
 #!/bin/bash
 
-GitHub.setup() {
-    GitHub.setup-intro
-    GitHub.setup-check-old-config
-    GitHub.setup-login
-    GitHub.setup-api-token
-    GitHub.setup-outro
+command:setup() {
+    setup:intro
+    setup:check-old-config
+    setup:login
+    setup:api-token
+    setup:outro
     exit 0
 }
 
-GitHub.setup-intro() {
+setup:intro() {
     clear
     cat <<...
 
                         The 'git hub' Setup Tool
 
-This dialog will walk you through the various steps involved in creating or
+This dialog will walk you through the couple steps involved in creating or
 updating the configuration needed by the 'git hub' command. It should only
 take a minute.
 
 Your config will be stored here: '$GIT_HUB_CONFIG'.
-
-NOTE: This setup dialog is fairly new, so if it misbehaves please file an issue
-      on GitHub.
 
 ...
     prompt
     mkdir -p "$GIT_HUB_USER_DIR"
 }
 
-GitHub.setup-check-old-config() {
+setup:check-old-config() {
     local a
     local old_config_dir=$(dirname $(dirname "$GIT_HUB_CONFIG"))
     [ -d "$old_config_dir" ] || return 0
@@ -57,7 +54,7 @@ File moved. You can exit now or continue changing your setup.
     fi
 }
 
-GitHub.setup-login() {
+setup:login() {
     clear
     cat <<...
 
@@ -73,11 +70,11 @@ The 'git hub' command needs to know your GitHub login id.
         git config -f "$GIT_HUB_CONFIG" --unset github.user-name
         git config -f "$GIT_HUB_CONFIG" github.login "$user_name"
     fi
-    GitHub_login=$(
+    login=$(
         git config -f "$GIT_HUB_CONFIG" github.login || echo ''
     )
-    if [ -n "$GitHub_login" ]; then
-        echo "Your login is currently set to '$GitHub_login'"
+    if [ -n "$login" ]; then
+        echo "Your login is currently set to '$login'"
         echo
         a=$(prompt "Do you want to keep this value? [Yn] ")
         [ $a == y ] && return
@@ -85,22 +82,22 @@ The 'git hub' command needs to know your GitHub login id.
 
     while true; do
         echo
-        GitHub_login=$(prompt "Enter your GitHub login id: ")
-        [[ "$GitHub_login" =~ ^[a-zA-Z0-9]+$ ]] && break
-        echo "Invalid login value '$GitHub_login'"
+        login=$(prompt "Enter your GitHub login id: ")
+        [[ "$login" =~ ^[a-zA-Z0-9]+$ ]] && break
+        echo "Invalid login value '$login'"
     done
 
-    git config -f "$GIT_HUB_CONFIG" github.login $GitHub_login
+    git config -f "$GIT_HUB_CONFIG" github.login $login
 
     cat <<...
 
-Login changed to '$GitHub_login'.
+Login changed to '$login'.
 
 ...
     prompt
 }
 
-GitHub.setup-api-token() {
+setup:api-token() {
     clear
     cat <<...
 
@@ -132,7 +129,7 @@ To generate a new token, the commands require your GitHub password.
 The password will not be stored after the commands finish running.
 ...
     export GIT_HUB_PASSWORD=$(
-        prompt "Enter your GitHub password (for '$GitHub_login'): "
+        prompt "Enter your GitHub password (for '$login'): "
     )
     echo
     echo
@@ -154,7 +151,7 @@ The password will not be stored after the commands finish running.
     unset GIT_HUB_PASSWORD
 }
 
-GitHub.setup-outro() {
+setup:outro() {
     clear
     cat <<'...'
 

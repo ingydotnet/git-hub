@@ -17,6 +17,12 @@ foo_noext=./test/ricardo-foo
 foo_noorigin=./test/ricardo-foo-no-origin
 fake_token=0123456789ABCDEF
 
+Die() {
+    local GIT_HUB_TEST_COMMAND=
+    local DIE_STACK_LEVEL=1
+    die "$@"
+}
+
 test_command() {
     local TestSimple_CALL_STACK_LEVEL=2
     DIE_STACK_LEVEL=3
@@ -30,13 +36,8 @@ test_command() {
     fi
     eval set -- "$1"
     get-opts "$@"
-    # subvert git-hub's die
-    die () {
-        die_msg="$@"
-        died=true
-    }
-    "command:$command"
-    local curl="${curl_command[@]}"
+    "command:$command" &> /dev/null || echo OK
+    curl="${curl_command[@]}"
     local label="$1"
     label=$(printf "%-40s %s" "$label" "($GIT_DIR)")
     if [ "$expected" = DIE ]; then
@@ -44,6 +45,7 @@ test_command() {
             $died && [[ $die_msg =~ $expect_die_message ]] &&
             echo true || echo false
         )
+        Die $die_msg -- $expect_die_message
         ok $died_properly "$1; dies with '$expect_die_message'" || {
             if $died; then
                 diag "Want: $expect_die_message"
@@ -133,7 +135,7 @@ test_command 'orgs' $foo_git
 expect GET /users/geraldo/orgs
 test_command 'orgs geraldo' $foo_git
 
-expect DIE Unknown argument: ricardo
+expect DIE "Unknown argument\(s\): 'ricardo'"
 test_command 'orgs tommy ricardo'
 
 #----------------------------------------------------------------------------
@@ -142,7 +144,7 @@ note "Test 'org' commands:"
 expect GET /orgs/acmeism
 test_command 'org acmeism'
 
-expect DIE "Can't find value for 'org_name'"
+expect DIE "Can't find value for 'org'"
 test_command 'org'
 
 expect DIE Unknown argument: perl6
@@ -186,43 +188,4 @@ test_command "repo" $foo_noext
 
 expect 'GET' "/repos/ricardo/foo"
 test_command "repo" $foo_noorigin
-
-#----------------------------------------------------------------------------
-note "Test 'forks' commands:"
-
-#----------------------------------------------------------------------------
-note "Test 'fork' commands:"
-
-#----------------------------------------------------------------------------
-note "Test 'stars' commands:"
-
-#----------------------------------------------------------------------------
-note "Test 'star' commands:"
-
-#----------------------------------------------------------------------------
-note "Test 'unstar' commands:"
-
-#----------------------------------------------------------------------------
-note "Test 'starred' commands:"
-
-#----------------------------------------------------------------------------
-note "Test 'collabs' commands:"
-
-#----------------------------------------------------------------------------
-note "Test 'trust' commands:"
-
-#----------------------------------------------------------------------------
-note "Test 'untrust' commands:"
-
-#----------------------------------------------------------------------------
-note "Test 'followers' commands:"
-
-#----------------------------------------------------------------------------
-note "Test 'following' commands:"
-
-#----------------------------------------------------------------------------
-note "Test 'follow' commands:"
-
-#----------------------------------------------------------------------------
-note "Test 'unfollow' commands:"
 

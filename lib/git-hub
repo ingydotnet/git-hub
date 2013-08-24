@@ -6,20 +6,15 @@
 
 set -e
 
-# S=$(date +'%s.%N')
-# bench() {
-# 	local t=$(date +'%s.%N')
-# 	perl -e '($a,$b,$_)=@ARGV;printf "%-20s %s\n",$b-$a,$_' $S $t "$1"
-# }
-
 {
-	version-check() {
+	Bash:version-check() {
 		test $1 -ge 4 && return
 		test $1 -eq 3 -a $2 -ge 2 && return
 		echo "Bash version 3.2 or higher required for 'git hub'" >&2
 		exit 1
 	}
-	version-check "${BASH_VERSINFO[@]}"
+	Bash:version-check "${BASH_VERSINFO[@]}"
+	unset -f Bash:version-check
 }
 
 GIT_HUB_VERSION=0.0.2
@@ -29,12 +24,12 @@ git hub <command> <options> <arguments>
 
 Commands:
   user, user-get, user-edit, orgs, org, org-get, org-edit, members, teams
-  followers, following, follow, unfollow, clone
-  repos, repo, repo-get, repo-edit, repo-new, repo-delete, forks, fork
-  stars, star, unstar, starred, collabs, trust, untrust
+  followers, following, follow, unfollow
+  clone, repos, repo, repo-get, repo-edit, repo-new, repo-delete,
+  forks, fork, stars, star, unstar, starred, collabs, trust, untrust
   issues, issue
 
-  config, config-unset
+  setup, config, config-unset
   token-list, token-new, token-get, token-delete
   scope-list, scope-add, scope-remove
 
@@ -42,20 +37,21 @@ See 'git help hub' for complete documentation and usage of each command.
 
 Options:
 --
+h           Show the command summary
+help        Show the complete documentation
+ 
 c,count=    Number of list items to show
 a,all       Show all list items
-r,raw       Show output data in a raw form
-j,json      Show output data in JSON
-each        Run command for each line of stdin
  
-h           Show this command summary
-help        Show the complete documentation
 q,quiet     Show minimal output
 v,verbose   Show verbose output
-token=      Specify the GitHub v3 API Authentication Token
-d,dryrun    Don't run the API command
-T           Show API token in the verbose output
+r,raw       Show output data in a raw form
+j,json      Show output data in JSON
+ 
 A,use-auth  Force the use of authentication. (Get around rate limits)
+token=      Explicitly specify the GitHub v3 API Authentication Token
+d,dryrun    Check arguments but don't actually run the API command
+T           Show API token in the verbose output
  
 O           Debug - Show response output
 H           Debug - Show reponse headers
@@ -66,12 +62,9 @@ x           Debug - Turn on Bash trace (set -x) output
 
 #------------------------------------------------------------------------------
 main() {
+	local OK=0
 	init-env
-	local each
-	for ((i = 1; i <= $#; i++)); do
-		[ "${!i}" == '-' ] && each=1 && break
-	done
-	if [ -n "$each" ]; then
+	if run-for-each "$@"; then
 		run-each "$@"
 	else
 		run-command "$@"
@@ -80,44 +73,64 @@ main() {
 }
 
 run-command() {
+	local Infinity=9999999
+	local command command_arguments api_token
+	local user org owner repo pairs list_size
+	local msg_ok msg_fail status_code ERROR
+	local do_all=false use_auth=false
+	local quiet_output=false verbose_output=false
+	local raw_output=false json_output=false
+	local show_output=false show_headers=false show_json=false
+	local dry_run=false show_token=false repeat_command=false
+
     get-opts "$@"
 	assert-env
 
-	callable-or-source "command:$command" ||
+	callable-or-source "$command" ||
 		die "Unknown 'git hub' command: '$command'\n"
 	"command:$command" "$@"
 
 	if OK; then
-		if callable "success:$command"; then
-			"success:$command"
+		if callable "ok:$command"; then
+			"ok:$command"
 		else
-			if [ "$message_success" != '0' ]; then
-				say ${message_success:-"'git hub $command' successful"}
+			if [ "$msg_ok" != '0' ]; then
+				say ${msg_ok:-"'git hub $command' command successful"}
 			fi
 		fi
 	else
-		local var=message_$status_code
-		local msg=${!var}
-		if [ -n "$status_code" ] && callable "status-$status_code:$command"; then
-			"status-$status_code-$command"
-		elif [ -n "$msg" ]; then
-			echo "$msg"
-		elif callable "failure:$command"; then
-			"failure-$command"
+		local status_msg=msg_$status_code
+		if [ -n "${!status_msg}" ]; then
+			nay "${!status_msg}"
+		elif [ -n "$status_code" ] && callable "status-$status_code:$command"; then
+			"status-$status_code:$command"
+		elif [ -n "$msg_fail" ]; then
+			nay "$msg_fail"
+		elif callable "fail:$command"; then
+			"fail-$command"
 		else
-			say ${message_failure:-"'git hub $command' failed: $status_code"}
-			say "$ERROR"
+			local msg="Error: 'git hub $command' command failed"
+			! $verbose_output && [ -n "$status_code" ] &&
+				msg+=": $status_code"
+			nay "$msg"
+		fi
+		if $verbose_output && [ -n "$ERROR" ]; then
+			nay
+			[ -n "$status_code" ] &&
+				nay "API status code: $status_code\n"
+			[ -n "$ERROR" ] &&
+				nay "API error output:\n$ERROR\n"
 		fi
 	fi
+	true
 }
 
 run-each() {
-	before=()
-	after=()
+	local i line before after seen=false
 	for ((i = 1; i <= $#; i++)); do
 		if [ ${!i} == '-' ]; then
-			flag=1
-		elif [ -z "$flag" ]; then
+			seen=true
+		elif ! $seen; then
 			before+=( "${!i}" )
 		else
 			after+=("${!i}")
@@ -139,11 +152,11 @@ run-each() {
 command:user() {
 	get-args ?user:get-user
 	api-get "/users/$user"
-	message_404="User '$user' not found."
+	msg_404="User '$user' not found."
 }
 
-success:user() {
-	fields=(
+ok:user() {
+	local fields=(
 		login type name email blog location company bio
 		followers following public_repos public_gists
 	)
@@ -151,47 +164,43 @@ success:user() {
 }
 
 command:user-get() {
-	get-args ?user:get-owner:get-login key
+	get-args ?user:get-user key
 	api-get "/users/$user"
-	OK || return
-	local value=$(JSON.get -a "/$key" -)
-	[ -n "$value" ] || {
-		message_failure="Couldn't get value for '$key'"
-		OK=1
+	OK || {
+		msg_fail="User '$user' not found"
 		return
 	}
-	if OK && [ -n "$value" ]; then
-		message_success="$value"
+	local value=$(JSON.get -a "/$key" -)
+	if [ -n "$value" ]; then
+		msg_ok="$value"
 	else
-		message_failure="Couldn't get value for '$key'"
+		msg_fail="Couldn't get value for '$key'"
 		OK=1
 	fi
 }
 
 command:user-edit() {
-	require-value api-token "$token"
-	Get-args *key_value_pairs
+	require-auth
+	get-args %pairs
 	api-patch "/user" "$(json-dump-object-pairs)"
 }
 
 command:orgs() {
-	Get-args user
-	fetch-value user-name "$user"
-	: ${user_name:=$login}
-
+	get-args user:get-user
+	local title="Organizations for User '$user':"
+	msg_fail="Can't find Organizations for User '$user'"
 	report-list \
-		"/users/$user_name/orgs" \
+		"/users/$user/orgs" \
 		'login'
 }
 
 command:org() {
-	Get-args org
-	require-value org-name "$org"
-	api-get "/orgs/$org_name"
+	get-args org
+	api-get "/orgs/$org"
 }
 
-success:org() {
-	fields=(
+ok:org() {
+	local fields=(
 		login type name billing_email email blog location company
 		html_url public_repos public
 	)
@@ -199,117 +208,95 @@ success:org() {
 }
 
 command:org-get() {
-	Get-args org key
-	require-value org-name "$org"
-	api-get "/orgs/$org_name"
-	OK || return
-	local value=$(JSON.get -a "/$key" -)
-	[ -n "$value" ] || {
-		message_failure="Couldn't get value for '$key'"
-		OK=1
+	get-args org key
+	api-get "/orgs/$org"
+	OK || {
+		msg_fail="Organization '$org' not found"
 		return
 	}
-	if OK && [ -n "$value" ]; then
-		message_success="$value"
+	local value=$(JSON.get -a "/$key" -)
+	if [ -n "$value" ]; then
+		msg_ok="$value"
 	else
-		message_failure="Couldn't get value for '$key'"
+		msg_fail="Couldn't get value for '$key'"
 		OK=1
 	fi
 }
 
 command:org-edit() {
-	require-value api-token "$token"
-	Get-args org *key_value_pairs
-	require-value org-name "$org"
-	api-patch "/orgs/$org_name" "$(json-dump-object-pairs)"
+	require-auth
+	get-args org %pairs
+	api-patch "/orgs/$org" "$(json-dump-object-pairs)"
 }
 
 command:members() {
-	Get-args org
-	require-value org-name "$org"
-
+	get-args org
 	report-list \
-		"/orgs/$org_name/members" \
+		"/orgs/$org/members" \
 		'login'
 }
 
 command:teams() {
-	require-value api-token "$token"
-	Get-args org
-	require-value org-name "$org"
-
+	require-auth
+	get-args org
 	report-list \
-		"/orgs/$org_name/teams" \
+		"/orgs/$org/teams" \
 		'name'
 }
 
 command:followers() {
-	Get-args user
-	require-value user-name "${user}"
-	: ${user_name:=$login}
+	get-args ?user:get-user
 	report-list \
-		"/users/$user_name/followers?per_page=PER_PAGE" \
+		"/users/$user/followers?per_page=PER_PAGE" \
 		'login'
 }
 
 command:following() {
-	Get-args user
-	require-value user-name "${user}"
-	: ${user_name:=$login}
+	get-args ?user:get-user
 	report-list \
-		"/users/$user_name/following?per_page=PER_PAGE" \
+		"/users/$user/following?per_page=PER_PAGE" \
 		'login'
 }
 
 command:follow() {
-	Get-args user
-	require-value user-name "$user"
-	require-value api-token "$token"
-	api-put "/user/following/$user_name"
+	require-auth
+	get-args user:get-owner
+	api-put "/user/following/$user"
 }
 
 command:unfollow() {
-	Get-args user
-	require-value user-name "$user"
-	require-value api-token "$token"
-	api-delete "/user/following/$user_name"
+	require-auth
+	get-args user:get-owner
+	api-delete "/user/following/$user"
 }
 
 command:clone() {
-	Get-args owner-repo dir
-	require-value repo-name "$repo"
-	require-value owner-name "$owner"
-	git clone "git@github.com:$owner_name/$repo_name" $dir
-	message_success="Repository '$owner_name/$repo_name' cloned"
+	get-args owner/repo ?dir
+	git clone "git@github.com:$owner/$repo" $dir
+	msg_ok="Repository '$owner/$repo' cloned"
 }
 
 command:repos() {
-	Get-args owner
-	fetch-value owner-name "$owner"
-	: ${owner_name:=$login}
-
+	get-args owner:get-user
 	report-list \
-		"/users/$owner_name/repos?sort=pushed;per_page=PER_PAGE" \
+		"/users/$owner/repos?sort=pushed;per_page=PER_PAGE" \
 		'pushed_at full_name description'
 }
 
 format-entry:repos() {
-	if RAW; then
-		printf "$3\n"
+	if $raw_output; then
+		out "$3"
 	else
 		printf "%d) (%s)  %-30s %s\n" $1 ${2/T*} $3 "$4"
 	fi
 }
 
 command:repo() {
-	Get-args repo
-	check-owner-repo "$repo"
-	require-value repo-name "$repo"
-	require-value owner-name "${owner:-$login}"
-	api-get "/repos/$owner_name/$repo_name"
+	get-args ?owner:get-user/repo:get-repo
+	api-get "/repos/$owner/$repo"
 }
 
-success:repo() {
+ok:repo() {
 	local fields=(
 		full_name description homepage language \
 		pushed_at \
@@ -321,156 +308,122 @@ success:repo() {
 }
 
 command:repo-get() {
-	Get-args owner-repo key
-	require-value repo-name "$repo"
-	require-value owner-name "${owner:-$login}"
-	api-get "/repos/$owner_name/$repo_name"
-	OK || return
-	local value=$(JSON.get -a "/$key" -)
-	[ -n "$value" ] || {
-		message_failure="Couldn't get value for '$key'"
-		OK=1
+	get-args ?owner:get-user/repo:get-repo key
+	api-get "/repos/$owner/$repo"
+	OK || {
+		msg_fail="Repo '$owner/$repo' not found"
 		return
 	}
-	if OK && [ -n "$value" ]; then
-		message_success="$value"
+	local value=$(JSON.get -a "/$key" -)
+	if [ -n "$value" ]; then
+		msg_ok="$value"
 	else
-		message_failure="Couldn't get value for '$key'"
+		msg_fail="Couldn't get value for '$key'"
 		OK=1
 	fi
 }
 
 command:repo-edit() {
-	Get-args owner-repo *key_value_pairs
-	require-value repo-name "$repo"
-	require-value owner-name "$owner"
-	require-value api-token "$token"
-	key_value_pairs+=(name "$repo_name")
-	api-patch "/repos/$owner_name/$repo_name" "$(json-dump-object-pairs)"
+	require-auth
+	get-args ?owner:get-user/repo:get-repo %pairs
+	# pairs+=(name "$repo")
+	api-patch "/repos/$owner/$repo" "$(json-dump-object-pairs)"
 }
 
 # TODO Support creating repo under an org
 command:repo-new() {
-	Get-args repo
-	require-value repo-name "$repo"
-	require-value api-token "$token"
-	api-post "/user/repos" $(json-dump-object 'name' $repo_name)
-	message_success="Repository '$repo_name' created."
-	message_422="Repository name '$repo_name' already exists."
+	get-args repo
+	api-post "/user/repos" $(json-dump-object 'name' $repo)
+	msg_ok="Repository '$repo' created."
+	msg_422="Repository name '$repo' already exists."
 }
 
 command:repo-delete() {
-	Get-args owner-repo
-	require-value delete-repo-name "$repo"
-	require-value delete-owner-name "$owner"
-	require-value api-token "$token"
-	api-delete "/repos/$delete_owner_name/$delete_repo_name"
-	message_success="Repository '$delete_owner_name/$delete_repo_name' deleted"
+	require-auth
+	get-args owner/repo
+	api-delete "/repos/$owner/$repo"
+	msg_ok="Repository '$owner/$repo' deleted"
 }
 
 command:forks() {
-	Get-args repo
-	check-owner-repo "$repo"
-	require-value repo-name "$repo"
-	require-value owner-name "${owner:-$login}"
-
+	get-args ?owner:get-user/repo:get-repo
 	report-list \
-		"/repos/$owner_name/$repo_name/forks?sort=newest;per_page=PER_PAGE" \
+		"/repos/$owner/$repo/forks?sort=newest;per_page=PER_PAGE" \
 		'pushed_at full_name'
 }
 
 format-entry:forks() {
-	if RAW; then
-		printf "$3\n"
+	if $raw_output; then
+		out "$3"
 	else
 		printf "%d) (%s)  %-30s\n" $1 ${2/T*/} $3
 	fi
 }
 
 command:fork() {
-	Get-args owner-repo org
-	require-value repo-name "$repo"
-	require-value owner-name "$owner"
-	require-value api-token "$token"
-	api-post "/repos/$owner_name/$repo_name/forks" '{}'
+	require-auth
+	get-args ?owner:get-user/repo:get-repo
+	api-post "/repos/$owner/$repo/forks" '{}'
 }
 
 command:stars() {
-	Get-args repo
-	check-owner-repo "$repo"
-	require-value repo-name "$repo"
-	require-value owner-name "${owner:-$login}"
+	get-args ?owner:get-user/repo:get-repo
+	local title="Stargazers for '$owner/$repo':"
 	report-list \
-		"/repos/$owner_name/$repo_name/stargazers?per_page=PER_PAGE" \
+		"/repos/$owner/$repo/stargazers?per_page=PER_PAGE" \
 		'login'
+	msg_fail="Couldn't find Stargazers for '$owner/$repo'"
 }
 
 command:star() {
-	Get-args repo
-	check-owner-repo "$repo"
-	require-value repo-name "$repo"
-	require-value owner-name "${owner:-$login}"
-	require-value api-token "$token"
-	api-put "/user/starred/$owner_name/$repo_name"
-	message_success="'$owner_name/$repo_name' starred"
+	require-auth
+	get-args ?owner:get-user/repo:get-repo
+	api-put "/user/starred/$owner/$repo"
+	msg_ok="'$owner/$repo' starred"
 }
 
 command:unstar() {
-	Get-args repo
-	check-owner-repo "$repo"
-	require-value repo-name "$repo"
-	require-value owner-name "${owner:-$login}"
-	require-value api-token "$token"
-	api-delete "/user/starred/$owner_name/$repo_name"
-	message_success="'$owner_name/$repo_name' unstarred"
+	require-auth
+	get-args ?owner:get-user/repo:get-repo
+	api-delete "/user/starred/$owner/$repo"
+	msg_ok="'$owner/$repo' unstarred"
 }
 
 command:starred() {
-	Get-args user
-	require-value user-name "${user:-$login}"
+	get-args ?user:get-user
 	report-list \
-		"/users/$user_name/starred?sort=updated;per_page=PER_PAGE" \
+		"/users/$user/starred?sort=updated;per_page=PER_PAGE" \
 		'full_name'
 }
 
 command:collabs() {
-	Get-args repo
-	check-owner-repo "$repo"
-	require-value repo-name "$repo"
-	require-value owner-name "${owner:-$login}"
+	get-args ?owner:get-user/repo:get-repo
 	report-list \
-		"/repos/$owner_name/$repo_name/collaborators" \
+		"/repos/$owner/$repo/collaborators" \
 		'login'
 }
 
 command:trust() {
-	Get-args owner-repo *collaborators
-	require-value repo-name "$repo"
-	require-value owner-name "$owner"
-	require-value api-token "$token"
-	for collab_name in ${collaborators[@]}; do
-		api-put "/repos/$owner_name/$repo_name/collaborators/$collab_name"
+	require-auth
+	get-args ?owner:get-user/repo:get-repo @collaborators
+	for collab in ${collaborators[@]}; do
+		api-put "/repos/$owner/$repo/collaborators/$collab"
 	done
 }
 
 command:untrust() {
-	Get-args owner-repo *collaborators
-	require-value repo-name "$repo"
-	require-value owner-name "$owner"
-	require-value api-token "$token"
-	for collab_name in ${collaborators[@]}; do
-		api-delete "/repos/$owner_name/$repo_name/collaborators/$collab_name"
+	require-auth
+	get-args ?owner:get-user/repo:get-repo @collaborators
+	for collab in ${collaborators[@]}; do
+		api-delete "/repos/$owner/$repo/collaborators/$collab"
 	done
 }
 
 command:issues() {
-	Get-args repo
-	check-owner-repo "$repo"
-	require-value repo-name "$repo"
-	require-value owner-name "${owner:-$login}"
+	get-args ?owner:get-owner/repo:get-repo
 
 	report-list \
-		"/repos/$owner_name/$repo_name/issues?sort=updated;per_page=PER_PAGE" \
+		"/repos/$owner/$repo/issues?sort=updated;per_page=PER_PAGE" \
 		'number updated_at state user/login title'
 }
 
@@ -479,27 +432,26 @@ format-entry:issues() {
 }
 
 command:issue() {
-	Get-args owner-repo number
-	require-value repo-name "$repo"
-	require-value owner-name "${owner:-$login}"
-	api-get "/repos/$owner_name/$repo_name/issues/$number"
+	get-args ?owner:get-owner/repo:get-repo number
+	api-get "/repos/$owner/$repo/issues/$number"
 }
 
-success:issue() {
-	label_title='Issue'
-	label_body='Description:'
+ok:issue() {
+	local label_title='Issue'
+	local label_body='Description'
 	local fields=(
 		title number user__login state body
 	)
 	report-data
+
 	local comments=$(JSON.get -n /comments -)
 	if [ $comments -gt 0 ]; then
-		echo Comments:
+		out Comments:
 		command=comments
 		report-list \
-			"/repos/$owner_name/$repo_name/issues/$number/comments?sort=updated;per_page=PER_PAGE" \
+			"/repos/$owner/$repo/issues/$number/comments?sort=updated;per_page=PER_PAGE" \
 			'user/login updated_at body'
-		echo
+		out
 	fi
 }
 
@@ -510,108 +462,104 @@ format-entry:comments() {
 }
 
 command:config() {
-	Get-args config_key config_value
-	message_success=0
+	get-args config_key:empty config_value:empty
+	msg_ok=0
 	if [ -z "$config_key" ]; then
 		[ ! -e $GIT_HUB_CONFIG ] && config-not-setup
+		say "Your git-hub config file (at $GIT_HUB_CONFIG):\n"
 		cat $GIT_HUB_CONFIG
 	elif [ -z "$config_value" ]; then
-		git config -f $GIT_HUB_CONFIG github.$config_key
+		local value=$(git config -f $GIT_HUB_CONFIG github.$config_key) ||
+			return $?
+		msg_ok="$config_key=$value"
 	else
-		message_success="$config_key=$config_value"
 		git config -f $GIT_HUB_CONFIG github.$config_key "$config_value"
+		msg_ok="$config_key=$config_value"
 	fi
 	OK=$?
 }
 
 command:config-unset() {
-	Get-args config_key
-	[ -n "$config_key" ] ||
-		die "This command requires a config key"
+	get-args config_key
 	git config -f $GIT_HUB_CONFIG --unset github.$config_key
 	OK=$?
-	message_success="Config key '$config_key' has been unset."
+	msg_ok="Config key '$config_key' has been unset."
 }
 
 command:token-list() {
-	basic_auth="1"
+	basic-auth
 	report-list \
 		'/authorizations' \
 		'token id note app/name'
 }
 
 format-entry:token-list() {
-	if RAW || QUIET; then
-		printf "%-7s  %s\n" $3 "${4:-$5}"
+	if $raw_output || $quiet_output; then
+		printf "%-7s\t%s\n" $3 "${4:-$5}"
 	else
 		printf "%d) %s %-14s  %s\n" $1 $2 "(id: $3)" "${4:-$5}"
 	fi
 }
 
 command:token-new() {
+	get-args ?note
 	local json
-	Get-args note
 	if [ -n "$note" ]; then
 		json=$(json-dump-object "note" "$note")
 	else
 		json='{}'
 	fi
-	basic_auth="1"
+	basic-auth
 	api-post '/authorizations' "$json"
 }
 
-success:token-new() {
+ok:token-new() {
 	local token=$(JSON.get -s "/token" -)
 	[ -n "$token" ] || die "Can't figure out token value"
 	local id=$(JSON.get -n "/id" -)
 	local note=$(JSON.get -s "/note" -)
 	local name=$(JSON.get "/app/name" -)
-	if RAW || QUIET; then
-		printf "$id"
+	if $raw_output || $quiet_output; then
+		out "$id"
 	else
-		printf "Token created: %s %-14s  %s\n" $token "(id: $id)" "${note:-$name}"
+		# TODO out+ instead of printf?
+		printf "Token created: %s %-14s  %s\n" \
+			"$token" "(id: $id)" "${note:-$name}"
 	fi
 }
 
 command:token-get() {
-	Get-args id key
-	[ -z "$id" ] && die "Command requires token id"
-	[ -z "$key" ] && die "Command requires key"
-	basic_auth="1"
-	api-get "/authorizations/$id"
-	OK || return
-	local value=$(JSON.get -a "/$key" -)
-	[ -n "$value" ] || {
-		message_failure="Couldn't get value for '$key'"
-		OK=1
+	get-args token_id key
+	basic-auth
+	api-get "/authorizations/$token_id"
+	OK || {
+		msg_fail="Can't get token info for token-id=$token_id"
 		return
 	}
-	if OK && [ -n "$value" ]; then
-		message_success="$value"
+	local value=$(JSON.get -a "/$key" -)
+	if [ -n "$value" ]; then
+		msg_ok="$value"
 	else
-		message_failure="Couldn't get value for '$key'"
+		msg_fail="Couldn't get value for '$key'"
 		OK=1
 	fi
 }
 
 command:token-delete() {
-	Get-args id
-	[ -z "$id" ] && die "Command requires token id"
-	basic_auth="1"
-	api-delete "/authorizations/$id"
-	message_success="Token '$id' deleted"
+	get-args token_id
+	basic-auth
+	api-delete "/authorizations/$token_id"
+	msg_ok="Token '$token_id' deleted"
 }
 
 command:scope-list() {
-	Get-args id
-	require-value token-id "$id"
-	basic_auth="1"
-	api-get "/authorizations/$id"
+	get-args token_id
+	basic-auth
+	api-get "/authorizations/$token_id"
 }
 
-success:scope-list() {
-	local i=0
-	local scopes scope
+ok:scope-list() {
+	local i=0 scopes scope
 	while true; do
 		scope=$(JSON.get -s "/scopes/$i" - 2>/dev/null || echo '')
 		[ -z "$scope" ] && break
@@ -619,16 +567,22 @@ success:scope-list() {
 		let i=i+1
 	done
 
-	if RAW; then
+	if $raw_output || $quiet_output; then
 		for scope in "${scopes[@]}"; do
-			echo "$scope"
+			out "$scope"
 		done
 		return
 	fi
 
-	echo
-	echo "The current scopes for token-id:$token_id are:"
-	echo "  ${scopes[*]}"
+	out
+	out "The current scopes for token-id:$token_id are:"
+	if [ ${#scopes[@]} -eq 0 ]; then
+		out --None--
+	else
+		for scope in "${scopes[@]}"; do
+			out "- $scope"
+		done
+	fi
 	cat <<eos
 
 Available scopes are:
@@ -646,44 +600,38 @@ For more info, see: http://developer.github.com/v3/oauth/#scopes
 eos
 }
 
+all_scopes=(
+	user user:email user:follow
+	public_repo repo repo:status delete_repo
+	notifications gist
+)
 command:scope-add() {
-	if ALL; then
-		Get-args id
-		# XXX Dedup this array in scope-remove
-		scopes=(
-			user user:email user:follow
-			public_repo repo repo:status delete_repo
-			notifications gist
-		)
+	scopes=("${all_scopes[@]}")
+	if $do_all; then
+		get-args token_id
 	else
-		Get-args id *scopes
+		get-args token_id @scopes
 	fi
-	require-value token-id "$id"
-	check-token-id "$id"
-	basic_auth="1"
+	check-token-id "$token_id"
+	basic-auth
 	local array=$(json-dump-array ${scopes[*]})
 	local json=$(json-dump-object add_scopes "$array")
-	api-patch "/authorizations/$id" "$json"
-	message_success="Scopes added."
+	api-patch "/authorizations/$token_id" "$json"
+	msg_ok="Scopes added: ${scopes[*]}"
 }
 
 command:scope-remove() {
-	if ALL; then
-		Get-args id
-		scopes=(
-			user user:email user:follow
-			public_repo repo repo:status delete_repo
-			notifications gist
-		)
+	scopes=("${all_scopes[@]}")
+	if $do_all; then
+		get-args token_id
 	else
-		Get-args id *scopes
+		get-args token_id @scopes
 	fi
-	require-value token-id "$id"
-	basic_auth="1"
+	basic-auth
 	local array=$(json-dump-array ${scopes[*]})
 	local json=$(json-dump-object remove_scopes "$array")
-	api-patch "/authorizations/$id" "$json"
-	message_success="Scopes removed"
+	api-patch "/authorizations/$token_id" "$json"
+	msg_ok="Scopes removed: ${scopes[*]}"
 }
 
 #------------------------------------------------------------------------------
@@ -701,35 +649,35 @@ api-call() {
 	format-curl-command "$@"
 	[ -n "$GIT_HUB_TEST_COMMAND" ] && return
 
-	if VERBOSE; then
-		if [ -n "$show_token" ]; then
-			say "${curl_command[@]}"
-		else
-			say "${curl_command[@]/$api_token/********}"
+	if $verbose_output; then
+		local cc="${curl_command[@]}"
+		if ! $show_token; then
+			[ -n "$api_token" ] &&
+				cc="${cc/token $api_token/token ********}"
+			[ -n "$GIT_HUB_PASSWORD" ] &&
+				cc="${cc/$login:$GIT_HUB_PASSWORD/$login:********}"
 		fi
+		nay "$cc\n"
 	fi
 
-	[ -n "$dry_run" ] && {
-		say '*** NOTE: This is a dry run only. ***'
+	if $dry_run; then
+		nay '*** NOTE: This is a dry run only. ***'
 		exit 0
-	}
-
-	if [ -z "$repeat_command" ]; then
-		# Run the curl command!
+	elif $repeat_command; then
+		# Use last command run results.
+		rc=0
+	else
+		# Actually run the curl command!
 		set +e #; set -x  # for debugging the real command
 		"${curl_command[@]}"
 		rc=$?
 		set -e #; set +x  # for debugging the real command
-	else
-		# Use last command run results.
-		rc=0
 	fi
 
-	[ -n "$show_headers" ] && cat $GIT_HUB_HEADER
-	[ -n "$show_output" ] && cat $GIT_HUB_OUTPUT
-	[ -s $GIT_HUB_OUTPUT ] && JSON.load "$(< $GIT_HUB_OUTPUT)"
-	[ -n "$show_json" ] && JSON.cache
-	[ -n "$json_prune_regex" ] && json-prune-cache "$json_prune_regex"
+	$show_headers && cat $GIT_HUB_HEADER >&2
+	$show_output && cat $GIT_HUB_OUTPUT >&2
+	[ -s "$GIT_HUB_OUTPUT" ] && JSON.load "$(< $GIT_HUB_OUTPUT)"
+	$show_json && JSON.cache >&2
 
 	check-api-call-status $rc
 
@@ -743,14 +691,17 @@ format-curl-command() {
 	local url=$2
 	local data=$3
 
-	fetch-value use-auth
+	[[ $url =~ /(/|$) ]] &&
+		die "API url '$url' looks suspiciously wrong"
+
+	# XXX get use-auth from config
+	# XXX Do we really care if this is test?
 	[ -z "$GIT_HUB_TEST_COMMAND" ] &&
-		[ -n "$use_auth" ] &&
-		require-value api-token "$token"
+		$use_auth && require-auth
 
 	user_agent=git-hub-$GIT_HUB_VERSION
 	# Cheap trick to make github pretty-print the JSON output.
-	[ -n "$show_output" ] && user_agent="curl-$user_agent"
+	$show_output && user_agent="curl-$user_agent"
 
 	[[ "$url" =~ ^https?: ]] || url="$GIT_HUB_API_URI$url"
 
@@ -761,6 +712,7 @@ format-curl-command() {
 	)
 	[ -n "$data" ] || [ "$action" = "PUT" ] && curl_command+=(-d "$data")
 	if [ -n "$basic_auth" ]; then
+		local login=$(get-login)
 		if [ -n "$GIT_HUB_PASSWORD" ]; then
 			curl_command+=(-u "$login:$GIT_HUB_PASSWORD")
 		else
@@ -783,10 +735,10 @@ format-curl-command() {
 check-api-call-status() {
 	OK=$1
 	if [ ! -f $GIT_HUB_HEADER ]; then
-		ERROR=$(head -1 $GIT_HUB_ERROR)
+		ERROR=$(head -n1 $GIT_HUB_ERROR)
 		return
 	fi
-	status_code=$(head -1 $GIT_HUB_HEADER | cut -d ' ' -f2)
+	status_code=$(head -n1 $GIT_HUB_HEADER | cut -d ' ' -f2)
 	[[ $status_code =~ ^[0-9]{3}$ ]] || return
 	case "$status_code" in
 		200|201|202|204)
@@ -803,121 +755,171 @@ check-api-call-status() {
 			;;
 		*)
 			OK=1
-			ERROR=$(head -1 $GIT_HUB_HEADER | cut -d ' ' -f3-)
+			ERROR=$(head -n1 $GIT_HUB_HEADER | cut -d ' ' -f3-)
 			;;
 	esac
 }
 
 OK() { return $OK; }
-RAW() { [ -n "$GIT_HUB_RAW" ] && return 0 || return 1; }
-JSON() { [ -n "$GIT_HUB_JSON" ] && return 0 || return 1; }
-QUIET() { [ -n "$GIT_HUB_QUIET" ] && return 0 || return 1; }
-VERBOSE() { [ -n "$GIT_HUB_VERBOSE" ] && return 0 || return 1; }
-ALL() { [ -n "$GIT_HUB_ALL" ] && return 0 || return 1; }
 
 #------------------------------------------------------------------------------
 # Argument parsing functions:
 #------------------------------------------------------------------------------
-Get-args() {
-	local last=${!#}
-	local slurp_index=0
-	if [[ "$1" = "owner-repo" ]]; then
-		if [[ "${command_arguments[0]}" =~ / ]]; then
-			check-owner-repo ${command_arguments[0]}
-			unset command_arguments[0]
-		fi
-		shift
-	fi
-	for arg in "${command_arguments[@]}"; do
-		if [ $slurp_index -gt 0 ]; then
-			eval $slurp_name[\$slurp_index]=\"\$arg\"
-			let slurp_index=slurp_index+1
-		elif [ $# -gt 0 ]; then
-			if [[ "$1" =~ ^\* ]]; then
-				local slurp_name=${1/\*/}
-				eval $slurp_name[\$slurp_index]=\"\$arg\"
-				let slurp_index=slurp_index+1
+get-args() {
+	local specs=("$@")
+	local args=("${command_arguments[@]}")
+
+	while [ ${#specs[@]} -gt 0 ]; do
+		local optional=false
+		local spec="${specs[0]}"
+		local arg="${args[0]}"
+		if [[ "$spec" =~ ^\? ]]; then
+			optional=true
+			spec=${spec#\?}
+			if [[ $spec =~ / ]] && [[ ! $spec =~ : ]] && [[ ! $arg =~ / ]]; then
+				specs=("${specs[@]:1}")
+				continue
+			fi
+			if [ ${#args[@]} -lt ${#specs[@]} ]; then
+				if [[ "$spec" =~ : ]]; then
+					arg=''
+					spec-assign
+				else
+					printf -v "$spec" ""
+				fi
 			else
-				eval $1=\""$arg"\"
-				shift
+				spec-assign
+				args=("${args[@]:1}")
 			fi
 		else
-			die "Unknown argument: $arg"
+			if [ ${#args[@]} -eq 0 ]; then
+				spec-assign
+			else
+				spec-assign
+				args=("${args[@]:1}")
+			fi
 		fi
+		specs=("${specs[@]:1}")
 	done
-	if [ "$last" = "*key_value_pairs" ]; then
-		if [ "${#key_value_pairs[@]}" -eq 0 ]; then
-			die "Command needs key/value pairs, but none given"
-		elif [ $(( ${#key_value_pairs[@]} % 2)) -eq 1 ]; then
-			die "Odd number of items for key/value pairs"
-		fi
+	if [ ${#args[@]} -gt 0 ]; then
+		die "Unknown argument(s): '${args[@]}'"
 	fi
 }
 
-check-owner-repo() {
-	[[ $1 =~ / ]] && owner-repo ${1/\// }
-	true
-}
-
-owner-repo() {
-	owner=$1
-	repo=$2
-}
-
-# Usage: require-value variable-name "possible-user-value"
-#   Fetch $variable_name or die
-require-value() {
-	local key=$1
-	local var=${key//-/_}
-	fetch-value "$@"
-	if [ -z "${!var}" ]; then
-		[ "$var" = "api_token" ] && need-api-token
-		die "Can't find value for '$var'"
+spec-assign() {
+	[[ "$spec" =~ / ]] && slash-assign && return
+	[[ "$spec" =~ ^% ]] && hash-assign && return
+	[[ "$spec" =~ ^@ ]] && array-assign && return
+	local spec="$spec"
+	local arg="$arg"
+	local var=${spec/:*/}
+	[[ $spec =~ : ]] && spec=${spec#$var:} || spec=
+	if [ -z "$arg" ]; then
+		for func in ${spec/:/ }; do
+			if [ "$func" == 'empty' ]; then
+				printf -v "$var" ""
+				return
+			fi
+			arg="$($func)"
+			[ -n "$arg" ] && break
+		done
 	fi
-	true
+	if [ -n "$arg" ]; then
+		printf -v "$var" "$arg"
+	else
+		die "Can't find a value for '$var'\n"
+	fi
 }
 
-# Usage: fetch-value variable-name "possible-user-value"
-#   Sets $variable_name to the first of:
-#   - possible-user-value
-#   - $GIT_HUB_VARIABLE_NAME
-#   - git config github.variable-name
-fetch-value() {
-	local key=$1
-	local var=${key//-/_}
-	local env=GIT_HUB_$(echo $var | tr 'a-z' 'A-Z')
+slash-assign() {
+	local spec1=${spec/\/*/}
+	local spec2=${spec#$spec1/}
+	local arg1= arg2=
+	if [[ "$arg" =~ / ]]; then
+		local arg1=${arg/\/*/}
+		local arg2=${arg#$arg1/}
+	elif $optional; then
+		local arg1=''
+		local arg2="$arg"
+	else
+		die "Invalid value '$arg' for '$spec'"
+	fi
+	local spec="$spec1"
+	local arg="$arg1"
+	spec-assign
+	local spec="$spec2"
+	local arg="$arg2"
+	spec-assign
+}
 
-	[ -n "${!var}" ] && return
-	printf -v "$var" "$2"
-	[ -n "${!var}" ] && return
-	printf -v "$var" "${!env}"
-	[ -n "${!var}" ] && return
-	if [ "$var" = "repo_name" -o \
-		 "$var" = "owner_name" -o \
-		 "$var" = "user_name" ]; then
-		url=$(
-			git remote -v 2> /dev/null |
-				$SED 's/\s+\(fetch\)$//' |
-				grep 'github\.com' |
-				head -n1
-		)
-		url=$(shopt -s extglob; echo ${url% (@(fetch|push))})
-		if [ -n "$url" ]; then
-			if [[ "$url" =~ github\.com ]]; then
-				local re1='^[^:/]*[:/](.*)/(.*)\.git$'
-				local re2='^[^:/]*[:/](.*)/(.*)$'
-				if [[ "$url" =~ $re1 ]] || [[ "$url" =~ $re2 ]]; then
-					: ${owner_name:="${BASH_REMATCH[1]}"}
-					: ${user_name:="${BASH_REMATCH[1]}"}
-					: ${repo_name:="${BASH_REMATCH[2]}"}
-					return
+hash-assign() {
+	if [ $(( ${#args[@]} % 2)) -eq 1 ]; then
+		die "Odd number of items for key/value pairs"
+	fi
+	local spec=${spec#%}
+	eval $spec=\(\"\${args[@]}\"\)
+	args=()
+}
+
+array-assign() {
+	local spec=${spec#@}
+	eval $spec=\(\"\${args[@]}\"\)
+	args=()
+}
+
+get-user() {
+	get-owner || get-login || return 1
+	return 0
+}
+
+get-login() {
+	[ -z "$GIT_HUB_CONFIG" ] &&
+		die "No GIT_HUB_CONFIG"
+	git config -f "$GIT_HUB_CONFIG" github.login
+}
+
+get-owner() {
+	get-config owner
+}
+
+get-repo() {
+	get-config repo
+}
+
+get-config() {
+	local url=$(
+		git remote -v 2> /dev/null |
+			$SED 's/\s+\(fetch\)$//' |
+			grep 'github\.com' |
+			head -n1
+	)
+	url=$(shopt -s extglob; echo ${url% (@(fetch|push))})
+	if [ -n "$url" ]; then
+		if [[ "$url" =~ github\.com ]]; then
+			local re1='^[^:/]*[:/](.*)/(.*)\.git$'
+			local re2='^[^:/]*[:/](.*)/(.*)$'
+			if [[ "$url" =~ $re1 ]] || [[ "$url" =~ $re2 ]]; then
+				if [ "$1" == owner ]; then
+					echo "${BASH_REMATCH[1]}"
+				else
+					echo "${BASH_REMATCH[2]}"
 				fi
+				return 0
 			fi
 		fi
 	fi
-	printf -v "$var" "$(git config --file=$GIT_HUB_CONFIG github.$key || echo '')"
-	[ -n "${!var}" ] && return
+	return 1
+}
+
+require-auth() {
+	[ -z "$api_token" ] &&
+		api_token="$(hub-config-get api-token)"
+	[ -z "$api_token" ] && need-api-token
 	true
+}
+
+basic-auth() {
+	basic_auth=1
 }
 
 check-token-id() {
@@ -930,23 +932,33 @@ check-token-id() {
 	true
 }
 
+hub-config-get() {
+	local value=
+	if [ -e "$GIT_HUB_CONFIG" ]; then
+		value="$(git config -f "$GIT_HUB_CONFIG" github."$1" 2>/dev/null)"
+	fi
+	echo "${value:-$2}"
+}
+
 #------------------------------------------------------------------------------
 # List processing functions:
 #------------------------------------------------------------------------------
 report-list() {
-	message_success=0
+	msg_ok=0
 	local url="$1" fields=($2) ii
-	fetch-value list-size
  	local list_max=${list_size:-${3:-$(($(tput lines) - 3))}}
 	local per_page=${4:-100}
 	[ $per_page -gt $list_max ] && per_page=$list_max
 	url=${url/PER_PAGE/$per_page}
 	local list_counter=1
+	[ -n "$title" ] && say "$title"
 	while true; do
 		api-get $url
+		OK || return 0
 		[ -n "$GIT_HUB_TEST_COMMAND" ] && return
 		json-prune-list "${fields[@]}"
 		local page_size=$(JSON.cache | tail -n1 | cut -d '/' -f2)
+		[ -z "$page_size" ] && say '--None--' && break
 		for ((ii = 0; ii <= page_size && list_counter <= list_max; ii++)); do
 			local -a values=()
 			for field in "${fields[@]}"; do
@@ -979,10 +991,307 @@ get-next-page-url() {
 }
 
 default-format-entry() {
-	if RAW; then
-		printf "$2\n"
+	if $raw_output; then
+		out "$2"
 	else
 		printf "%d) %s\n" "$1" "$2"
+	fi
+}
+
+#------------------------------------------------------------------------------
+# Report formatting functions:
+#------------------------------------------------------------------------------
+report-data() {
+	if $json_output; then
+		pretty-json-object "${fields[@]}"
+	else
+		for field in "${fields[@]}"; do
+			report-value $field
+		done
+		! $raw_output && echo
+	fi
+	unset fields
+}
+
+report-value() {
+	local key=${1//__/\/}
+	local value=$(JSON.get -a "/$key" -)
+	local label="$key"
+	if ! $raw_output; then
+		local var="label_$1"
+		label="${!var}"
+		if [ -z "$label" ]; then
+			label=$(echo "$1" | tr '_' ' ')
+			label=$(
+				for word in $label; do
+					title=`echo "${word:0:1}" | tr a-z A-Z`${word:1}
+					echo -n "$title "
+				done
+			)
+		fi
+	fi
+	if [ -n "$label" -a -n "$value" ]; then
+		if $raw_output; then
+			printf "%s\t%s\n" "$label" "$value"
+		else
+			if [ ${#value} -lt 80 ]; then
+				printf "%-15s %s\n" "$label" "$value"
+			else
+				value=${value//\\r\\n\\r\\n/\\n\\n  }
+				printf "$label\n"
+				printf "  $value" | fmt
+			fi
+		fi
+	fi
+}
+
+label_user__login='User'
+label_blog='Web Site'
+label_watchers='Stars'
+label_homepage='Web Site'
+label_html_url='GitHub Page'
+label_ssh_url='Remote URL'
+label_parent__full_name='Forked From'
+label_source__full_name='Fork Parent'
+label_number='ID #'
+
+#------------------------------------------------------------------------------
+# JSON support functions:
+#------------------------------------------------------------------------------
+# Format a JSON object from an input list of key/value pairs.
+json-dump-object() {
+	local json='{'
+	local regex='(^\[|^null$|^[0-9]+$)'
+	while [ $# -gt 0 ]; do
+		if [[ "$2" =~ $regex ]]; then
+			json="$json\"$1\":$2"
+		else
+			json="$json\"$1\":\"$2\""
+		fi
+		shift; shift
+		if [ $# -gt 0 ]; then
+			json="$json,"
+		fi
+	done
+	json="$json}"
+	echo $json
+}
+
+json-dump-array() {
+	local json='['
+	while [ $# -gt 0 ]; do
+		json="$json\"$1\""
+		shift
+		if [ $# -gt 0 ]; then
+			json="$json,"
+		fi
+	done
+	json="$json]"
+	echo "$json"
+}
+
+# Format a JSON object from an array.
+json-dump-object-pairs() {
+	local regex='(^\[|^null$|^[0-9]+$)'
+	local json='{'
+	for ((i = 0; i < ${#pairs[@]}; i = i+2)); do
+		local value="${pairs[$((i+1))]}"
+		value=${value//\"/\\\"}
+		if [[ "$value" =~ $regex ]]; then
+			json="$json\"${pairs[$i]}\":$value"
+		else
+			json="$json\"${pairs[$i]}\":\"$value\""
+		fi
+		if [ $((${#pairs[@]} - $i)) -gt 2 ]; then
+			json="$json,"
+		fi
+	done
+	json="$json}"
+	echo $json
+}
+
+pretty-json-object() {
+	declare -a keys=("$@")
+
+	echo '{'
+	for (( i = 0; i < ${#keys[@]}; i++)); do
+		local key="${keys[$i]}"
+		local key=${key//__/\/}
+		local value="$(JSON.get "/$key" - || true)"
+		if [ -n "$value" ]; then
+			printf "    \"%s\": %s" "$key" "$value"
+			[[ $(($i+1)) -lt ${#keys[@]} ]] && printf ','
+			printf "\n"
+		fi
+	done
+	echo '}'
+}
+
+
+json-prune-cache() {
+	JSON__cache="$(echo "$JSON__cache" | grep -E "$1" || echo '')"
+}
+
+json-prune-list() {
+	local fields="$@"
+	json-prune-cache "^/[0-9]+/(${fields// /|})\b"
+}
+
+#------------------------------------------------------------------------------
+# Initial setup functions:
+#------------------------------------------------------------------------------
+init-env() {
+	[ -z "$HOME" ] && die "Cannot determine HOME directory"
+
+	check-system-commands curl cut git grep head sed tr
+
+	: ${GIT_HUB_USER_DIR:=$HOME/.git-hub}
+	: ${GIT_HUB_EXEC_PATH:="$(dirname "${BASH_SOURCE[0]}")"}
+	: ${GIT_HUB_EXT_PATH:=$GIT_HUB_EXEC_PATH/git-hub.d}
+	: ${GIT_HUB_API_URI:=https://api.github.com}
+	: ${GIT_HUB_TMP_DIR:=$GIT_HUB_USER_DIR/tmp}
+	: ${GIT_HUB_TMP_PREFIX:=$GIT_HUB_TMP_DIR/git-hub}
+	: ${GIT_HUB_INPUT:=$GIT_HUB_TMP_PREFIX-in-$$}
+	: ${GIT_HUB_OUTPUT:=$GIT_HUB_TMP_PREFIX-out-$$}
+	: ${GIT_HUB_ERROR:=$GIT_HUB_TMP_PREFIX-err-$$}
+	: ${GIT_HUB_HEADER:=$GIT_HUB_TMP_PREFIX-head-$$}
+	: ${GIT_HUB_CONFIG:=$GIT_HUB_USER_DIR/config}
+
+	[ -d "$GIT_HUB_EXT_PATH" ] ||
+		die "Hmm... git-hub does not seem to be properly installed\n"
+	true
+}
+
+run-for-each() {
+	local i
+	for ((i = 1; i <= $#; i++)); do
+		[ "${!i}" == '-' ] && each=true && return 0
+	done
+	return 1
+}
+
+assert-env() {
+	assert-env-var EXEC_PATH EXT_PATH API_URI \
+		TMP_DIR TMP_PREFIX INPUT OUTPUT ERROR HEADER \
+		USER_DIR CONFIG
+
+	source-ext json.bash
+
+	if [ -e "$GIT_HUB_USER_DIR" ]; then
+		if [ ! -e "$GIT_HUB_TMP_DIR" ]; then
+			mkdir "$GIT_HUB_TMP_DIR"
+		fi
+	fi
+
+	if $repeat_command; then
+		[ -f $GIT_HUB_TMP_PREFIX-out-* ] ||
+			die "No previous 'git hub' command to repeat"
+		local old_output=$(echo $GIT_HUB_TMP_PREFIX-out-*)
+		local pid=${old_output/$GIT_HUB_TMP_PREFIX-out-/}
+		GIT_HUB_INPUT=$GIT_HUB_TMP_PREFIX-in-$pid
+		GIT_HUB_OUTPUT=$GIT_HUB_TMP_PREFIX-out-$pid
+		GIT_HUB_ERROR=$GIT_HUB_TMP_PREFIX-err-$pid
+		GIT_HUB_HEADER=$GIT_HUB_TMP_PREFIX-head-$pid
+	else
+		rm -f $GIT_HUB_TMP_PREFIX-* 2> /dev/null || true
+	fi
+}
+
+check-system-commands() {
+	local missing=false
+	local cmd
+	for cmd in $@; do
+		if ! $(type $cmd &> /dev/null); then
+			echo "Required shell command not found: '$cmd'"
+			missing=true
+		fi
+	done
+	$missing && exit 1
+	true
+}
+
+source-ext() {
+	set +e
+	PATH=$GIT_HUB_EXT_PATH:$PATH source "$1" 2> /dev/null
+	local rc=$?
+	set -e
+	return $rc
+}
+
+assert-env-var() {
+	local var
+	for var in $@; do
+		var=GIT_HUB_$var
+		[ -n "${!var}" ] ||
+			die "'$var' is not set"
+	done
+}
+
+get-opts() {
+	[ $# -eq 0 ] && set -- --help
+
+	eval "$(
+		echo "$OPTIONS_SPEC" |
+			git rev-parse --parseopt -- "$@" ||
+		echo exit $?
+	)"
+
+	while [ $# -gt 0 ]; do
+		local option="$1"; shift
+		case "$option" in
+			-c) list_size=$1; shift ;;
+			-a) list_size=$Infinity
+				do_all=true
+				;;
+
+			-q) quiet_output=true ;;
+			-v) verbose_output=true ;;
+			-r) raw_output=true
+				quiet_output=true
+				;;
+			-j) json_output=true ;;
+
+			-A) use_auth=true ;;
+			--token) api_token="$1"; shift ;;
+			-d) dry_run=true ;;
+			-T) show_token=true
+				verbose_output=true
+				quiet_output=false
+				;;
+
+			--) break ;;
+
+			# Debug options:
+			-O) show_output=true ;;
+			-H) show_headers=true ;;
+			-J) show_json=true ;;
+			-x) set -x ;;
+			-R) repeat_command=true ;;
+
+			*) die "Unexpected option: $option" ;;
+		esac
+	done
+
+	command="$1"; shift
+	command_arguments=("$@")
+
+	[[ "$command" == "setup" ]] ||
+	[[ "$command" = "config" ]] ||
+	[[ "$command" = "config-unset" ]] ||
+	! (callable-or-source "$command") ||
+		check-config
+
+	true
+}
+
+check-config() {
+	[ -e "$GIT_HUB_CONFIG" ] || config-not-setup
+	local user_name="$(
+		git config -f "$GIT_HUB_CONFIG" github.user-name || echo ''
+	)"
+	login="$(git config -f "$GIT_HUB_CONFIG" github.login || echo '')"
+	if [[ -n "$user_name" ]] || [[ -z "$login" ]]; then
+		config-not-setup
 	fi
 }
 
@@ -1043,326 +1352,8 @@ Would you like start the 'setup' process right now? (Do it!)
 prompt-to-run-setup() {
 	prompt
 	source-ext git-hub-setup
-	setup
+	command:setup
 	exit 1
-}
-
-#------------------------------------------------------------------------------
-# JSON support functions:
-#------------------------------------------------------------------------------
-# Format a JSON object from an input list of key/value pairs.
-json-dump-object() {
-	local json='{'
-	local regex='(^\[|^null$|^[0-9]+$)'
-	while [ $# -gt 0 ]; do
-		if [[ "$2" =~ $regex ]]; then
-			json="$json\"$1\":$2"
-		else
-			json="$json\"$1\":\"$2\""
-		fi
-		shift; shift
-		if [ $# -gt 0 ]; then
-			json="$json,"
-		fi
-	done
-	json="$json}"
-	echo $json
-}
-
-json-dump-array() {
-	local json='['
-	while [ $# -gt 0 ]; do
-		json="$json\"$1\""
-		shift
-		if [ $# -gt 0 ]; then
-			json="$json,"
-		fi
-	done
-	json="$json]"
-	echo "$json"
-}
-
-# Format a JSON object from an array.
-json-dump-object-pairs() {
-	local regex='(^\[|^null$|^[0-9]+$)'
-	local json='{'
-	for ((i = 0; i < ${#key_value_pairs[@]}; i = i+2)); do
-		local value="${key_value_pairs[$((i+1))]}"
-		value=${value//\"/\\\"}
-		if [[ "$value" =~ $regex ]]; then
-			json="$json\"${key_value_pairs[$i]}\":$value"
-		else
-			json="$json\"${key_value_pairs[$i]}\":\"$value\""
-		fi
-		if [ $((${#key_value_pairs[@]} - $i)) -gt 2 ]; then
-			json="$json,"
-		fi
-	done
-	json="$json}"
-	echo $json
-}
-
-pretty-json-object() {
-	declare -a keys=("$@")
-
-	echo '{'
-	for (( i = 0; i < ${#keys[@]}; i++)); do
-		local key="${keys[$i]}"
-		local key=${key//__/\/}
-		local value="$(JSON.get "/$key" - || true)"
-		if [ -n "$value" ]; then
-			printf "    \"%s\": %s" "$key" "$value"
-			[[ $(($i+1)) -lt ${#keys[@]} ]] && printf ','
-			printf "\n"
-		fi
-	done
-	echo '}'
-}
-
-
-json-prune-cache() {
-	JSON__cache="$(echo "$JSON__cache" | grep -E "$1")"
-}
-
-json-prune-list() {
-	local fields="$@"
-	json-prune-cache "^/[0-9]+/(${fields// /|})\b"
-}
-
-#------------------------------------------------------------------------------
-# Report formatting functions:
-#------------------------------------------------------------------------------
-report-data() {
-	if JSON; then
-		pretty-json-object "${fields[@]}"
-	else
-		for field in "${fields[@]}"; do
-			report-value $field
-		done
-		! RAW && echo
-	fi
-	unset fields
-}
-
-report-value() {
-	local key=${1//__/\/}
-	local value=$(JSON.get -a "/$key" -)
-	local label="$key"
-	if ! RAW; then
-	local var="lable_$1"
-		label="${!var}"
-		if [ -z "$label" ]; then
-			label=$(echo "$1" | tr '_' ' ')
-			label=$(
-				for word in $label; do
-					title=`echo "${word:0:1}" | tr a-z A-Z`${word:1}
-					echo -n "$title "
-				done
-			)
-		fi
-	fi
-	if [ -n "$label" -a -n "$value" ]; then
-		if RAW; then
-			printf "%s\t%s\n" "$label" "$value"
-		else
-			if [ ${#value} -lt 80 ]; then
-				printf "%-15s %s\n" "$label" "$value"
-			else
-				value=${value//\\r\\n\\r\\n/\\n\\n  }
-				printf "$label\n"
-				printf "  $value" | fmt
-			fi
-		fi
-	fi
-}
-
-label_user__login='User'
-label_blog='Web Site'
-label_watchers='Stars'
-label_homepage='Web Site'
-label_html_url='GitHub Page'
-label_ssh_url='Remote URL'
-label_parent__full_name='Forked From'
-label_source__full_name='Fork Parent'
-label_number='ID #'
-
-#------------------------------------------------------------------------------
-# Initial setup functions:
-#------------------------------------------------------------------------------
-init-env() {
-	[ -z "$HOME" ] && die "Cannot determine HOME directory"
-
-	check-system-commands curl cut git grep head sed tr
-
-	: ${GIT_HUB_USER_DIR:=$HOME/.git-hub}
-	: ${GIT_HUB_EXEC_PATH:="$(dirname "${BASH_SOURCE[0]}")"}
-	: ${GIT_HUB_EXT_PATH:=$GIT_HUB_EXEC_PATH/git-hub.d}
-	: ${GIT_HUB_API_URI:=https://api.github.com}
-	: ${GIT_HUB_TMP_DIR:=$GIT_HUB_USER_DIR/tmp}
-	: ${GIT_HUB_TMP_PREFIX:=$GIT_HUB_TMP_DIR/git-hub}
-	: ${GIT_HUB_INPUT:=$GIT_HUB_TMP_PREFIX-in-$$}
-	: ${GIT_HUB_OUTPUT:=$GIT_HUB_TMP_PREFIX-out-$$}
-	: ${GIT_HUB_ERROR:=$GIT_HUB_TMP_PREFIX-err-$$}
-	: ${GIT_HUB_HEADER:=$GIT_HUB_TMP_PREFIX-head-$$}
-	: ${GIT_HUB_CONFIG:=$GIT_HUB_USER_DIR/config}
-
-	[ -d "$GIT_HUB_EXT_PATH" ] ||
-		die "Hmm... git-hub does not seem to be properly installed\n"
-	true
-}
-
-assert-env() {
-	assert-env-var EXEC_PATH EXT_PATH API_URI \
-		TMP_DIR TMP_PREFIX INPUT OUTPUT ERROR HEADER \
-		USER_DIR CONFIG
-
-	source-ext json.bash
-
-	if [ -e "$GIT_HUB_USER_DIR" ]; then
-		if [ ! -e "$GIT_HUB_TMP_DIR" ]; then
-			mkdir "$GIT_HUB_TMP_DIR"
-		fi
-	fi
-
-	if [ -n "$repeat_command" ]; then
-		[ -f $GIT_HUB_TMP_PREFIX-out-* ] ||
-			die "No previous 'git hub' command to repeat"
-		local old_output=$(echo $GIT_HUB_TMP_PREFIX-out-*)
-		local pid=${old_output/$GIT_HUB_TMP_PREFIX-out-/}
-		GIT_HUB_INPUT=$GIT_HUB_TMP_PREFIX-in-$pid
-		GIT_HUB_OUTPUT=$GIT_HUB_TMP_PREFIX-out-$pid
-		GIT_HUB_ERROR=$GIT_HUB_TMP_PREFIX-err-$pid
-		GIT_HUB_HEADER=$GIT_HUB_TMP_PREFIX-head-$pid
-	else
-		rm -f $GIT_HUB_TMP_PREFIX-* 2> /dev/null || true
-	fi
-}
-
-check-system-commands() {
-	local missing=false
-	local cmd
-	for cmd in $@; do
-		if ! $(type $cmd &> /dev/null); then
-			echo "Required shell command not found: '$cmd'"
-			missing=true
-		fi
-	done
-	$missing && exit 1
-	true
-}
-
-source-ext() {
-	set +e
-	PATH=$GIT_HUB_EXT_PATH:$PATH source "$1" 2> /dev/null
-	local rc=$?
-	set -e
-	return $rc
-}
-
-assert-env-var() {
-	local var
-	for var in $@; do
-		var=GIT_HUB_$var
-		[ -n "${!var}" ] ||
-			die "'$var' is not set"
-	done
-}
-
-get-opts() {
-	[ $# -eq 0 ] && set -- --help
-
-	eval "$(
-		echo "$OPTIONS_SPEC" |
-			git rev-parse --parseopt -- "$@" ||
-		echo exit $?
-	)"
-
-	unset-global-variables
-	while [ $# -gt 0 ]; do
-		local option="$1"; shift
-		case "$option" in
-			--token) token="$1"; shift ;;
-			-c) list_size=$1; shift ;;
-			-a)
-				GIT_HUB_ALL="1"
-				list_size=999999
-				;;
-			-A) use_auth="1" ;;
-
-			-r)
-				GIT_HUB_RAW="1"
-				GIT_HUB_QUIET="1"
-				;;
-			-j) GIT_HUB_JSON="1" ;;
-			-q) GIT_HUB_QUIET="1" ;;
-			-v) GIT_HUB_VERBOSE="1" ;;
-			-d) dry_run="1" ;;
-			-T) show_token="1"
-				GIT_HUB_VERBOSE="1"
-				GIT_HUB_QUIET=
-				;;
-
-			--) break ;;
-
-			# Debug options:
-			-O) show_output="1" ;;
-			-H) show_headers="1" ;;
-			-J) show_json="1" ;;
-			-x) set -x ;;
-			-R) repeat_command="1" ;;
-
-			*) die "Unexpected option: $option" ;;
-		esac
-	done
-
-	command="$1"; shift
-	command_arguments=("$@")
-
-	[[ "$command" == "setup" ]] ||
-	[[ "$command" = "config" ]] ||
-	[[ "$command" = "config-unset" ]] ||
-	! (callable-or-source "$command") ||
-		check-config
-
-	true
-}
-
-unset-global-variables() {
-	command=
-	command_arguments=
-	user=
-	user_name=
-	org=
-	org_name=
-	owner=
-	owner_name=
-	repo=
-	repo_name=
-	token=
-	api_token=
-	key_value_pairs=()
-	list_size=
-	GIT_HUB_QUIET=
-	GIT_HUB_VERBOSE=
-	show_token=
-	dry_run=
-	repeat_command=
-	show_output=
-	show_headers=
-	show_json=
-	list_complete=
-	more_message_printed=
-}
-
-check-config() {
-	[ -e "$GIT_HUB_CONFIG" ] || config-not-setup
-	local user_name="$(
-		git config -f "$GIT_HUB_CONFIG" github.user-name || echo ''
-	)"
-	login="$(git config -f "$GIT_HUB_CONFIG" github.login || echo '')"
-	if [[ -n "$user_name" ]] || [[ -z "$login" ]]; then
-		config-not-setup
-	fi
 }
 
 #------------------------------------------------------------------------------
@@ -1376,13 +1367,26 @@ SED='sed -r'
 # General purpose functions:
 #------------------------------------------------------------------------------
 
+warn() {
+	local msg="${@//\\n/$'\n'}"
+	if [ -z "$msg" ]; then
+		err 'Warning'
+	else
+		err "$msg"
+	fi
+}
+
 die() {
 	local c=($(caller ${DIE_STACK_LEVEL:-0}))
-	msg="${@//\\n/$'\n'}"
+	local msg="${@//\\n/$'\n'}"
+	if [ -n "$GIT_HUB_TEST_COMMAND" ]; then
+		die_msg="$msg"
+		died=true
+	fi
 	if [ -z "$msg" ]; then
-		printf 'Died' >&2
+		err- 'Died'
 	else
-		printf '%s' "$msg" >&2
+		err- "$msg"
 	fi
 	local trailing_newline_re=$'\n''$'
 	[[ "$msg" =~ $trailing_newline_re ]] && exit 1
@@ -1395,10 +1399,15 @@ die() {
 	exit 1
 }
 
-say() {
-	[ -z "$GIT_HUB_QUIET" ] &&
-		echo "$@" >&1
-}
+quiet_output=false
+say() { ! $quiet_output && out "$@"; true; }
+say-() { ! $quiet_output && out- "$@"; true; }
+nay() { ! $quiet_output && err "$@"; true; }
+nay-() { ! $quiet_output && err- "$@"; true; }
+out() { echo -e "$@" >&1; }
+out-() { echo -n "$@" >&1; }
+err() { echo -e "$@" >&2; }
+err-() { echo -n "$@" >&2; }
 
 prompt() {
 	local msg answer default yn=false password=false
@@ -1455,124 +1464,7 @@ callable-or-source() {
 	callable "$1" ||
 		source-ext git-hub-"${1/:*/}" &&
 		callable "$1"
-}
-
-#------------------------------------------------------------------------------
-# TEMPORARY ARE DURING REFACTORING
-#------------------------------------------------------------------------------
-
-get-args() {
-	local specs=("$@")
-	local args=("${command_arguments[@]}")
-
-	while [ ${#specs[@]} -gt 0 ]; do
-		local optional=false
-		local spec="${specs[0]}"
-		local arg="${args[0]}"
-		if [[ "$spec" =~ ^\? ]]; then
-			optional=true
-			spec=${spec#\?}
-			if [ ${#args[@]} -lt ${#specs[@]} ]; then
-				arg=''
-				spec-assign
-			else
-				spec-assign
-				args=("${args[@]:1}")
-			fi
-		else
-			if [ ${#args[@]} -eq 0 ]; then
-				spec-assign
-			else
-				spec-assign
-				args=("${args[@]:1}")
-			fi
-		fi
-		specs=("${specs[@]:1}")
-	done
-	if [ ${#args[@]} -gt 0 ]; then
-		die "Unknown arguments '${args[@]}'"
-	fi
-}
-
-spec-assign() {
-	[[ "$spec" =~ / ]] && slash-assign && return
-	local spec="$spec"
-	local value="$arg"
-	local var=${spec/:*/}
-	[[ $spec =~ : ]] && spec=${spec#$var:} || spec=
-	if [ -z "$value" ]; then
-		for func in ${spec/:/ }; do
-			value="$($func)"
-			[ -n "$value" ] && break
-		done
-	fi
-	if [ -n "$value" ]; then
-		printf -v "$var" "$value"
-	else
-		die "Can't find a value for '$var'"
-	fi
-}
-
-slash-assign() {
-	local spec1=${spec/\/*/}
-	local spec2=${spec#$spec1/}
-	local arg1= arg2=
-	if [[ "$arg" =~ / ]]; then
-		local arg1=${arg/\/*/}
-		local arg2=${arg#$arg1/}
-	elif ! $optional; then
-		die "Invalid value '$arg' for '$spec'"
-	fi
-	local spec="$spec1"
-	local arg="$arg1"
-	spec-assign
-	local spec="$spec2"
-	local arg="$arg2"
-	spec-assign
-}
-
-get-user() {
-	get-owner || get-login || return 1
-	return 0
-}
-
-get-login() {
-	[ -z "$GIT_HUB_CONFIG" ] &&
-		die "No GIT_HUB_CONFIG"
-	git config -f "$GIT_HUB_CONFIG" github.login
-}
-
-get-owner() {
-	get-config owner
-}
-
-get-repo() {
-	get-config repo
-}
-
-get-config() {
-	local url=$(
-		git remote -v 2> /dev/null |
-			$SED 's/\s+\(fetch\)$//' |
-			grep 'github\.com' |
-			head -n1
-	)
-	url=$(shopt -s extglob; echo ${url% (@(fetch|push))})
-	if [ -n "$url" ]; then
-		if [[ "$url" =~ github\.com ]]; then
-			local re1='^[^:/]*[:/](.*)/(.*)\.git$'
-			local re2='^[^:/]*[:/](.*)/(.*)$'
-			if [[ "$url" =~ $re1 ]] || [[ "$url" =~ $re2 ]]; then
-				if [ "$1" == owner ]; then
-					echo "${BASH_REMATCH[1]}"
-				else
-					echo "${BASH_REMATCH[2]}"
-				fi
-				return 0
-			fi
-		fi
-	fi
-	return 1
+	:
 }
 
 #------------------------------------------------------------------------------

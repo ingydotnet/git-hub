@@ -3,7 +3,7 @@
 set -e
 
 PATH=ext/test-simple-bash/lib:$PATH
-source test-simple.bash tests 10
+source test-simple.bash tests 18
 note() {
     echo "# $@"
 }
@@ -15,6 +15,7 @@ PATH=lib:$PATH
 source git-hub
 
 run-test() {
+    unset user repo key aaa bbb ccc
     local spec="$1"
     local expect="$2"
     local a=("$@")
@@ -30,12 +31,17 @@ run-test() {
 }
 result() {
     local spec="$@"
-    spec="${spec#\?}"
     spec="${spec/\// }"
     IFS=' ' read -a specs <<< "$spec"
     local format='='
     for s in "${specs[@]}"; do
         s=${s/:*/}
+        s="${s#\?}"
+        if [[ "$s" =~ ^[%@] ]]; then
+            s="${s#%}"
+            s="${s#@}"
+            printf -v "$s" "$(IFS=,; eval echo \"\${$s[*]}\")"
+        fi
         format+="\$$s="
     done
     eval echo $format
@@ -60,38 +66,43 @@ GIT_HUB_CONFIG=$PWD/test/githubconfig
 RICARDO_FOO=$PWD/test/ricardo-foo
 
 run-test \
-    "?user_name:get-user" \
+    "?user:get-user" \
     "=billy=" \
     billy
 
 run-test \
-    "?user_name:get-user" \
+    "?user:get-user" \
     "=tommy=" \
     # none
 
 GIT_DIR=$RICARDO_FOO run-test \
-    "?user_name:get-user" \
+    "?user:get-user" \
     "=ricardo=" \
     # none
 
 run-test-error \
-    "Can't find a value for 'user_name'" \
-    "?user_name:get-owner" \
+    "Can't find a value for 'user'" \
+    "?user:get-owner" \
     # none
 
 run-test-error \
-    "Unknown arguments 'xxx yyy'" \
-    "?user_name:get-login" \
+    "Unknown argument(s): 'xxx yyy'" \
+    "?user:get-login" \
     fred xxx yyy
 
 run-test \
-    "user_name:get-login" \
+    "user:get-login" \
     "=billy=" \
     billy
 
 run-test-error \
-    "Can't find a value for 'user_name'" \
-    "user_name:get-owner" \
+    "Can't find a value for 'user'" \
+    "user" \
+    # none
+
+run-test-error \
+    "Can't find a value for 'user'" \
+    "user:get-owner" \
     # none
 
 run-test \
@@ -108,3 +119,39 @@ run-test-error \
     "Invalid value 'jimmy' for 'user/repo'" \
     "user/repo key" \
     jimmy type
+
+run-test \
+    "foo ?bar" \
+    "=xyz==" \
+    xyz
+
+run-test \
+    "user/repo %pairs" \
+    "=jimmy=juju=name,Jimmy,game,Ju Ju=" \
+    jimmy/juju name Jimmy game "Ju Ju"
+
+run-test-error \
+    "Odd number of items for key/value pairs" \
+    "user/repo %pairs" \
+    jimmy/juju name Jimmy game "Ju Ju" no-no
+
+run-test \
+    "key:empty value:empty" \
+    "===" \
+    # none
+
+GIT_DIR=$RICARDO_FOO run-test \
+    "?user:get-user/repo:get-repo" \
+    "=ricardo=foozle=" \
+    foozle
+
+run-test \
+    "?aaa/bbb @ccc" \
+    "=foo=bar=apple,banana man,carrot=" \
+    foo/bar apple 'banana man' carrot
+
+run-test \
+    "?aaa/bbb @ccc" \
+    "===apple,banana man,carrot=" \
+    apple 'banana man' carrot
+
