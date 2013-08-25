@@ -78,11 +78,15 @@ run-command() {
 	local command command_arguments api_token
 	local user org owner repo pairs fields title list_size
 	local msg_ok msg_fail status_code ERROR
-	local do_all=false use_auth=$(get-var-bool use-auth)
-	local quiet_output=false verbose_output=false
+	local do_all=false use_auth
+	local quiet_output verbose_output
 	local raw_output=false json_output=false
 	local show_output=false show_headers=false show_json=false
 	local dry_run=false show_token=false repeat_command=false
+	get-var list-size
+	get-var-bool use-auth
+	get-var-bool quiet-output
+	get-var-bool verbose-output
 
     get-opts "$@"
 	assert-env
@@ -327,12 +331,13 @@ command:repo-get() {
 command:repo-edit() {
 	require-auth
 	get-args ?owner:get-user/repo:get-repo %pairs
-	# pairs+=(name "$repo")
+	pairs+=(name "$repo")
 	api-patch "/repos/$owner/$repo" "$(json-dump-object-pairs)"
 }
 
 # TODO Support creating repo under an org
 command:repo-new() {
+	require-auth
 	get-args repo
 	api-post "/user/repos" $(json-dump-object 'name' $repo)
 	msg_ok="Repository '$repo' created."
@@ -1157,9 +1162,9 @@ init-env() {
 }
 
 run-for-each() {
-	local i
-	for ((i = 1; i <= $#; i++)); do
-		[ "${!i}" == '-' ] && each=true && return 0
+	local elem
+	for elem in "$@"; do
+		[ "$elem" == '-' ] && return 0
 	done
 	return 1
 }
@@ -1288,14 +1293,22 @@ check-config() {
 	fi
 }
 
-get-var-bool() {
-	local key="$1"
-	local var="${key//-/_}"
+get-var() {
+	local var=${1//-/_}
+	[ -n "${!var}" ] && return
 	local env=GIT_HUB_$(echo $var | tr 'a-z' 'A-Z')
-	[ -z "${!var}" ] && printf -v "$var" "${!env}"
-	[ -z "${!var}" ] && printf -v "$var" "$(hub-config-get "$key")"
-	[ -z "${!var}" ] && printf -v "$var" false
-	[ "${!var}" != false ] && printf -v "$var" true
+	printf -v "$var" "${!env}"
+	[ -n "${!var}" ] && return
+	printf -v "$var" "$(hub-config-get "$1")"
+	true
+}
+
+get-var-bool() {
+	get-var $1
+	local var=${1//-/_}
+	[ -z "${!var}" ] && printf -v $var false
+	[ "${!var}" != false ] && printf -v $var true
+	true
 }
 
 #------------------------------------------------------------------------------
