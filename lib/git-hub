@@ -73,11 +73,12 @@ main() {
 }
 
 run-command() {
+	set -e
 	local Infinity=9999999
 	local command command_arguments api_token
-	local user org owner repo pairs list_size
+	local user org owner repo pairs fields title list_size
 	local msg_ok msg_fail status_code ERROR
-	local do_all=false use_auth=false
+	local do_all=false use_auth=$(get-var-bool use-auth)
 	local quiet_output=false verbose_output=false
 	local raw_output=false json_output=false
 	local show_output=false show_headers=false show_json=false
@@ -156,7 +157,7 @@ command:user() {
 }
 
 ok:user() {
-	local fields=(
+	fields=(
 		login type name email blog location company bio
 		followers following public_repos public_gists
 	)
@@ -200,7 +201,7 @@ command:org() {
 }
 
 ok:org() {
-	local fields=(
+	fields=(
 		login type name billing_email email blog location company
 		html_url public_repos public
 	)
@@ -297,7 +298,7 @@ command:repo() {
 }
 
 ok:repo() {
-	local fields=(
+	fields=(
 		full_name description homepage language \
 		pushed_at \
 		html_url ssh_url \
@@ -439,7 +440,7 @@ command:issue() {
 ok:issue() {
 	local label_title='Issue'
 	local label_body='Description'
-	local fields=(
+	fields=(
 		title number user__login state body
 	)
 	report-data
@@ -647,7 +648,6 @@ api-delete() { api-call DELETE "$1" "$2"; }
 # check the result.
 api-call() {
 	format-curl-command "$@"
-	[ -n "$GIT_HUB_TEST_COMMAND" ] && return
 
 	if $verbose_output; then
 		local cc="${curl_command[@]}"
@@ -666,7 +666,7 @@ api-call() {
 	elif $repeat_command; then
 		# Use last command run results.
 		rc=0
-	else
+	elif [ -z "$GIT_HUB_TEST_COMMAND" ]; then
 		# Actually run the curl command!
 		set +e #; set -x  # for debugging the real command
 		"${curl_command[@]}"
@@ -675,9 +675,12 @@ api-call() {
 	fi
 
 	$show_headers && cat $GIT_HUB_HEADER >&2
-	$show_output && cat $GIT_HUB_OUTPUT >&2
-	[ -s "$GIT_HUB_OUTPUT" ] && JSON.load "$(< $GIT_HUB_OUTPUT)"
-	$show_json && JSON.cache >&2
+
+	if [ -s "$GIT_HUB_OUTPUT" ]; then
+		JSON.load "$(< $GIT_HUB_OUTPUT)"
+		$show_output && cat $GIT_HUB_OUTPUT >&2
+		$show_json && JSON.cache >&2
+	fi
 
 	check-api-call-status $rc
 
@@ -694,10 +697,7 @@ format-curl-command() {
 	[[ $url =~ /(/|$) ]] &&
 		die "API url '$url' looks suspiciously wrong"
 
-	# XXX get use-auth from config
-	# XXX Do we really care if this is test?
-	[ -z "$GIT_HUB_TEST_COMMAND" ] &&
-		$use_auth && require-auth
+	$use_auth && require-auth
 
 	user_agent=git-hub-$GIT_HUB_VERSION
 	# Cheap trick to make github pretty-print the JSON output.
@@ -721,7 +721,6 @@ format-curl-command() {
 	elif [ -n "$api_token" ]; then
 		curl_command+=(--header "Authorization: token $api_token")
 	fi
-	[ -n "$GIT_HUB_TEST_COMMAND" ] && return
 	curl_command+=(
 		--user-agent $user_agent
 		--dump-header $GIT_HUB_HEADER
@@ -873,9 +872,7 @@ get-user() {
 }
 
 get-login() {
-	[ -z "$GIT_HUB_CONFIG" ] &&
-		die "No GIT_HUB_CONFIG"
-	git config -f "$GIT_HUB_CONFIG" github.login
+	hub-config-get login
 }
 
 get-owner() {
@@ -955,7 +952,6 @@ report-list() {
 	while true; do
 		api-get $url
 		OK || return 0
-		[ -n "$GIT_HUB_TEST_COMMAND" ] && return
 		json-prune-list "${fields[@]}"
 		local page_size=$(JSON.cache | tail -n1 | cut -d '/' -f2)
 		[ -z "$page_size" ] && say '--None--' && break
@@ -1010,7 +1006,6 @@ report-data() {
 		done
 		! $raw_output && echo
 	fi
-	unset fields
 }
 
 report-value() {
@@ -1151,10 +1146,9 @@ init-env() {
 	: ${GIT_HUB_API_URI:=https://api.github.com}
 	: ${GIT_HUB_TMP_DIR:=$GIT_HUB_USER_DIR/tmp}
 	: ${GIT_HUB_TMP_PREFIX:=$GIT_HUB_TMP_DIR/git-hub}
-	: ${GIT_HUB_INPUT:=$GIT_HUB_TMP_PREFIX-in-$$}
+	: ${GIT_HUB_HEADER:=$GIT_HUB_TMP_PREFIX-head-$$}
 	: ${GIT_HUB_OUTPUT:=$GIT_HUB_TMP_PREFIX-out-$$}
 	: ${GIT_HUB_ERROR:=$GIT_HUB_TMP_PREFIX-err-$$}
-	: ${GIT_HUB_HEADER:=$GIT_HUB_TMP_PREFIX-head-$$}
 	: ${GIT_HUB_CONFIG:=$GIT_HUB_USER_DIR/config}
 
 	[ -d "$GIT_HUB_EXT_PATH" ] ||
@@ -1172,7 +1166,7 @@ run-for-each() {
 
 assert-env() {
 	assert-env-var EXEC_PATH EXT_PATH API_URI \
-		TMP_DIR TMP_PREFIX INPUT OUTPUT ERROR HEADER \
+		TMP_DIR TMP_PREFIX OUTPUT ERROR HEADER \
 		USER_DIR CONFIG
 
 	source-ext json.bash
@@ -1188,10 +1182,9 @@ assert-env() {
 			die "No previous 'git hub' command to repeat"
 		local old_output=$(echo $GIT_HUB_TMP_PREFIX-out-*)
 		local pid=${old_output/$GIT_HUB_TMP_PREFIX-out-/}
-		GIT_HUB_INPUT=$GIT_HUB_TMP_PREFIX-in-$pid
+		GIT_HUB_HEADER=$GIT_HUB_TMP_PREFIX-head-$pid
 		GIT_HUB_OUTPUT=$GIT_HUB_TMP_PREFIX-out-$pid
 		GIT_HUB_ERROR=$GIT_HUB_TMP_PREFIX-err-$pid
-		GIT_HUB_HEADER=$GIT_HUB_TMP_PREFIX-head-$pid
 	else
 		rm -f $GIT_HUB_TMP_PREFIX-* 2> /dev/null || true
 	fi
@@ -1295,6 +1288,16 @@ check-config() {
 	fi
 }
 
+get-var-bool() {
+	local key="$1"
+	local var="${key//-/_}"
+	local env=GIT_HUB_$(echo $var | tr 'a-z' 'A-Z')
+	[ -z "${!var}" ] && printf -v "$var" "${!env}"
+	[ -z "${!var}" ] && printf -v "$var" "$(hub-config-get "$key")"
+	[ -z "${!var}" ] && printf -v "$var" false
+	[ "${!var}" != false ] && printf -v "$var" true
+}
+
 #------------------------------------------------------------------------------
 # Detailed error messages:
 #------------------------------------------------------------------------------
@@ -1379,10 +1382,6 @@ warn() {
 die() {
 	local c=($(caller ${DIE_STACK_LEVEL:-0}))
 	local msg="${@//\\n/$'\n'}"
-	if [ -n "$GIT_HUB_TEST_COMMAND" ]; then
-		die_msg="$msg"
-		died=true
-	fi
 	if [ -z "$msg" ]; then
 		err- 'Died'
 	else
@@ -1474,4 +1473,4 @@ callable-or-source() {
 
 true
 
-# vim: set tabstop=4 shiftwidth=4 noexpandtab:
+# vim: set tabstop=4 shiftwidth=4 lisp noexpandtab:

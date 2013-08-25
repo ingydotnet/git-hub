@@ -72,7 +72,7 @@ run-test \
 
 run-test \
     "?user:get-user" \
-    "=tommy=" \
+    "=testy=" \
     # none
 
 GIT_DIR=$RICARDO_FOO run-test \

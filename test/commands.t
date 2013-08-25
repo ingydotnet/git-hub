@@ -1,93 +1,46 @@
 #!/bin/bash
 
-# set -ex
+set -e
+
+TEST_DIR="$PWD/test/commands"
+ALL_TESTS=("$TEST_DIR"/*/run.bash)
 
 PATH=ext/test-simple-bash/lib:$PATH
-source test-simple.bash tests 24
+source test-simple.bash tests $(( ${#ALL_TESTS[@]} * 2 ))
+TestSimple_CALL_STACK_LEVEL=2
 
-GIT_HUB_TEST_COMMAND="1"
-GIT_HUB_CONFIG=$PWD/test/githubconfig
-PATH=lib:$PATH
-source $PWD/lib/git-hub
-init-env
-check-config   # XXX temporary while refactoring signatures
-
-foo_git=./test/ricardo-foo.git
-foo_noext=./test/ricardo-foo
-foo_noorigin=./test/ricardo-foo-no-origin
-fake_token=0123456789ABCDEF
-
-Die() {
-    local GIT_HUB_TEST_COMMAND=
-    local DIE_STACK_LEVEL=1
-    die "$@"
+main() {
+    export PATH=$TEST_DIR:$PATH
+    for test_file in "${ALL_TESTS[@]}"; do
+        source setup.bash
+        bash $test_file > "$TEST_DIR/stdout" 2> "$TEST_DIR/stderr"
+        file-test stdout
+        file-test stderr
+        source teardown.bash
+    done
 }
 
-test_command() {
-    local TestSimple_CALL_STACK_LEVEL=2
-    DIE_STACK_LEVEL=3
-    died=false
-    die_msg=
-    [ -n "$D" ] && diag "$expected"
-    if [ -n "$2" ]; then
-        export GIT_DIR="$2"
-    else
-        export GIT_DIR=not-in-git-dir
-    fi
-    eval set -- "$1"
-    get-opts "$@"
-    "command:$command" &> /dev/null || echo OK
-    curl="${curl_command[@]}"
-    local label="$1"
-    label=$(printf "%-40s %s" "$label" "($GIT_DIR)")
-    if [ "$expected" = DIE ]; then
-        died_properly=$(
-            $died && [[ $die_msg =~ $expect_die_message ]] &&
-            echo true || echo false
-        )
-        Die $die_msg -- $expect_die_message
-        ok $died_properly "$1; dies with '$expect_die_message'" || {
-            if $died; then
-                diag "Want: $expect_die_message"
-                diag "Got:  $die_msg"
-            else
-                diag "Did't die. Got: $curl"
-            fi
-        }
-    else
-        ok [ -z "$die_msg" -a "$curl" = "$expected" ] "$label" || {
-            if $died; then
-                diag "Died: $die_msg"
-            else
-                diag "Want: $expected"
-                diag "Got:  $curl"
-            fi
-        }
-        true
-    fi
-    [ -n "$D" ] && exit 1
+file-test() {
+    local file="$1"
+    local label=$test_file
+    label="${label#$TEST_DIR/}"
+    label="${label%/run.bash}"
+    label="git hub $label ($file)"
+    local diff=$(diff -u "$test_dir/$file" "$TEST_DIR/$file")
+    local result
+    [ -z "$diff" ] && result=true || result=false
+    ok $result "$label" || true
+    [ -n "$diff" ] && diag "$diff"
     true
 }
 
-expect() {
-    local action="$1"; shift
-    if [[ $action = DIE ]]; then
-        expected=$action
-        expect_die_message="$@"
-    else
-        suffix=${@/AUTH/--header Authorization: token $fake_token}
-        expected="curl --request $action https://api.github.com$suffix"
-    fi
-}
+# XXX move to test-more.bash
+note() { echo "# $@"; }
+diag() { echo "# $@" >&2; }
 
-note() {
-    echo "# $@"
-}
+main "$@"
 
-diag() {
-    echo "# $@" >&2
-}
-
+: <<...
 #----------------------------------------------------------------------------
 note "Test all the permutations of command and arguments and environments"
 
@@ -188,4 +141,4 @@ test_command "repo" $foo_noext
 
 expect 'GET' "/repos/ricardo/foo"
 test_command "repo" $foo_noorigin
-
+...
