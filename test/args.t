@@ -61,9 +61,10 @@ run-test-error() {
     }
 }
 
-export GIT_DIR=$PWD/test/repo/not-a-repo
-GIT_HUB_CONFIG=$PWD/test/githubconfig
+export GIT_DIR=$PWD/test/repo/not-repo
 RICARDO_FOO=$PWD/test/repo/ricardo-foo
+
+GIT_HUB_CONFIG=$PWD/test/githubconfig
 
 run-test \
     "?user:get-user" \
@@ -72,7 +73,7 @@ run-test \
 
 run-test \
     "?user:get-user" \
-    "=testy=" \
+    "=cdent=" \
     # none
 
 GIT_DIR=$RICARDO_FOO run-test \

@@ -1,5 +1,11 @@
 == Pomodoro!
+- Spurious 141 PIPEFAIL errors (probably in JSON)
+- Add 10 commands tests
+- Support lists in json-clean
+- Test on OSX
+- Release (0.0.3)
 
++ Add GIT_HUB_PAGE_SIZE
 
 == Documentation
 - Build doc/*.asc into man
@@ -63,7 +69,6 @@
 - Parallel requests
 
 == Bugs
-- Spurious 141 PIPEFAIL errors (probably in JSON)
 - Find out why github fails under zsh (rafl)
 - No error msg printed on wrong password
 

@@ -17,8 +17,9 @@ public_repos
 type
 )
 
-file = ARGV.shift or fail 'Usage: clean-json.rb file.json'
-data = JSON.load File.open(file).read
+file = ARGV.shift or fail 'Usage: clean-json.rb .../api-out'
+`cp #{file} /tmp/` or fail
+data = JSON.load File.read(file)
 
 keepers = Regexp.new '^(' + keep.join('|') + ')$'
 data.keys.each do |k|

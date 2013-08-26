@@ -25,7 +25,7 @@ file-test() {
     local label=$test_file
     label="${label#$TEST_DIR/}"
     label="${label%/run.bash}"
-    label="git hub $label ($file)"
+    label+=" ($file)"
     local diff=$(diff -u "$test_dir/$file" "$TEST_DIR/$file")
     local result
     [ -z "$diff" ] && result=true || result=false

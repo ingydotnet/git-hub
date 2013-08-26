@@ -1,0 +1,14 @@
+{
+  "login": "cdent",
+  "type": "User",
+  "name": "Chris Dent",
+  "company": "Peermore Limited",
+  "blog": "http://burningchrome.com/",
+  "location": "Newbury, UK",
+  "email": "chris.dent@gmail.com",
+  "bio": "Web oriented systems designer and developer with a particular orientation toward RESTful services used to help people learn and collaborate.\r\n\r\nhttp://peermore.com/chris_dent_resume.html",
+  "public_repos": 86,
+  "followers": 63,
+  "following": 90,
+  "public_gists": 35
+}
