@@ -1037,9 +1037,11 @@ report-value() {
 			if [ ${#value} -lt 80 ]; then
 				printf "%-15s %s\n" "$label" "$value"
 			else
-				value=${value//\\r\\n\\r\\n/\\n\\n  }
+				value=${value//\\r/}
+				value=${value//\\n\\n/\\n\\n  }
+				value=${value%  }
 				printf "$label\n"
-				printf "  $value" | fmt
+				printf "  $value" | fmt -w75
 			fi
 		fi
 	fi
