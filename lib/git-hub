@@ -704,7 +704,7 @@ format-curl-command() {
 
 	$use_auth && require-auth
 
-	user_agent=git-hub-$GIT_HUB_VERSION
+	local user_agent=git-hub-$GIT_HUB_VERSION
 	# Cheap trick to make github pretty-print the JSON output.
 	$show_output && user_agent="curl-$user_agent"
 

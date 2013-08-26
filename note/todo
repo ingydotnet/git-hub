@@ -63,6 +63,7 @@
 - Parallel requests
 
 == Bugs
+- Spurious 141 PIPEFAIL errors (probably in JSON)
 - Find out why github fails under zsh (rafl)
 - No error msg printed on wrong password
 
