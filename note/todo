@@ -1,11 +1,5 @@
 == Pomodoro!
-- Spurious 141 PIPEFAIL errors (probably in JSON)
-- Add 10 commands tests
-- Support lists in json-clean
-- Test on OSX
-- Release (0.0.3)
-
-+ Add GIT_HUB_PAGE_SIZE
+- Add pagination
 
 == Documentation
 - Build doc/*.asc into man
@@ -15,10 +9,8 @@
 
 == Refactoring
 - Review git/Documentation/CodingGuidelines
-- Switch GitHub.method style naming to GitHub::method
-- Namespace global vars with GitHub.func GitHub_varname
 - Eliminate evals
-- Eliminate todos
+- Eliminate TODO/XXX
 
 == Makefile
 - Redo Makefile based on git itself
@@ -28,12 +20,10 @@
 - Use git-hub-test-user account for dev testing
 - convert all_commands.t to test-simple / prove
 - Write dev-test for installation from git `clone git-hub`
-- Finish the commands.t test
 - Add more commands to all-commands.t
 
 == Commands
 - New commands to add:
-  - help        - show help screen
   - pulls       - list pull requests
   - pull        - issue a pull request
   - search
@@ -47,8 +37,6 @@
 == Output
 - Implement `git hub user --all`
 - Implement `git hub repo --all`
-- Print config file name
-- Be explicit for no scopes on scope-list
 
 == Error Handling
 - Helpful msg when rate limit exceeded
@@ -60,8 +48,7 @@
 - Support a git-hub-shell
 - Add a setup command that walks a user through configuration
   - Should be a plugin
-- Add pagination
-- COmmand completion
+- Command completion
 
 == Performance
 - Cache all results
@@ -77,8 +64,18 @@
 == Plugin
 - Document plugins
 - Write an IRC plugin
+- Move all commands to plugins! (lib/git-hub.d/)
 
 == Done
++ help        - show help screen
++ Print config file name
++ Be explicit for no scopes on scope-list
++ Finish the commands.t test
++ Add 10 commands tests
++ Support lists in json-clean
++ Test on OSX
++ Release (0.0.3)
++ Spurious 141 PIPEFAIL errors (probably in JSON)
 + Check for minimum Bash version
 + setup       - Initial user setup wizard
 + add plugin support

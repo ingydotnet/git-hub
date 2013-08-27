@@ -17,7 +17,7 @@ set -e
 	unset -f Bash:version-check
 }
 
-GIT_HUB_VERSION=0.0.2
+GIT_HUB_VERSION=0.0.3
 
 OPTIONS_SPEC="\
 git hub <command> <options> <arguments>
