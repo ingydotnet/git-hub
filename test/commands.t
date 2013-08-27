@@ -5,13 +5,15 @@ set -e
 
 ostype=${OSTYPE/[0-9]*/}
 TEST_DIR="$PWD/test/commands"
-ALL_TESTS=()
-for dir in $TEST_DIR/*/run.bash; do
-    dir="$(dirname "$dir")"
-    [ ! -e "$dir/skip:${OSTYPE/[0-9]*/}" ] &&
-        ALL_TESTS+=("$dir")
-    :
-done
+if [ -z "$ALL_TESTS" ]; then
+    ALL_TESTS=()
+    for dir in $TEST_DIR/*/run.bash; do
+        dir="$(dirname "$dir")"
+        [ ! -e "$dir/skip:${OSTYPE/[0-9]*/}" ] &&
+            ALL_TESTS+=("$dir")
+        :
+    done
+fi
 
 PATH=ext/test-simple-bash/lib:$PATH
 source test-simple.bash tests $(( ${#ALL_TESTS[@]} * 2 ))

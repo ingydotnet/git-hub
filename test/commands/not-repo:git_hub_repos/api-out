@@ -1,0 +1,62 @@
+[
+  {
+    "name": "tiddlywebplugins.postgresql",
+    "full_name": "cdent/tiddlywebplugins.postgresql",
+    "description": "postgresql store for TiddlyWeb",
+    "pushed_at": "2013-08-26T14:53:26Z"
+  },
+  {
+    "name": "tiddlywebplugins.binarystore",
+    "full_name": "cdent/tiddlywebplugins.binarystore",
+    "description": "A TiddlyWeb store for binary tiddlers, layered above other stores.",
+    "pushed_at": "2013-08-20T20:10:17Z"
+  },
+  {
+    "name": "tank",
+    "full_name": "cdent/tank",
+    "description": "Tiddlers Are N[eo][tw] Knowledge",
+    "pushed_at": "2013-08-20T10:51:00Z"
+  },
+  {
+    "name": "tiddlywebplugins.oauth",
+    "full_name": "cdent/tiddlywebplugins.oauth",
+    "description": "Consumption and Provision oAuth2 for Tiddlyweb (not ready!)",
+    "pushed_at": "2013-08-07T16:17:35Z"
+  },
+  {
+    "name": "testrepo1",
+    "full_name": "cdent/testrepo1",
+    "description": "just testing default creations",
+    "pushed_at": "2013-07-23T12:55:46Z"
+  },
+  {
+    "name": "closet",
+    "full_name": "cdent/closet",
+    "description": "2006 experiment in uri based content storage that may no longer work",
+    "pushed_at": "2013-07-14T17:38:08Z"
+  },
+  {
+    "name": "simper",
+    "full_name": "cdent/simper",
+    "description": "2006 experiment in python content management weirdness using closet",
+    "pushed_at": "2013-07-14T17:30:10Z"
+  },
+  {
+    "name": "tiddlywebplugins.bfw",
+    "full_name": "cdent/tiddlywebplugins.bfw",
+    "description": "Barely Functioning Wiki, emphasizing micro-content",
+    "pushed_at": "2013-07-11T10:59:33Z"
+  },
+  {
+    "name": "manifestopheles",
+    "full_name": "cdent/manifestopheles",
+    "description": "A manifesto contextualizer.",
+    "pushed_at": "2013-07-02T18:23:29Z"
+  },
+  {
+    "name": "tiddlyhoster",
+    "full_name": "cdent/tiddlyhoster",
+    "description": "TiddlyWeb tools for hosting TiddlyWikis",
+    "pushed_at": "2013-06-29T20:22:05Z"
+  }
+]

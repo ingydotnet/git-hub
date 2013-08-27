@@ -948,7 +948,7 @@ hub-config-get() {
 report-list() {
 	msg_ok=0
 	local url="$1" fields=($2) ii
- 	local list_max=${list_size:-${GIT_HUB_PAGE_SIZE:-$(($(tput lines) - 3))}}
+ 	local list_max=${list_size:-$(($(tput lines) - 3))}
 	local per_page=100
 	[ $per_page -gt $list_max ] && per_page=$list_max
 	url=${url/PER_PAGE/$per_page}

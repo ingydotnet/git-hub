@@ -1,6 +1,7 @@
 unset `env | cut -f1 -d= | grep '^GIT_HUB'`
 
 export GIT_HUB_TEST_COMMAND=true
+export GIT_HUB_LIST_SIZE=10
 
 export GIT_HUB_USER_DIR=$PWD/test
 export GIT_HUB_EXEC_PATH=$PWD/lib

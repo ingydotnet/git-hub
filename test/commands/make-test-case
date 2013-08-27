@@ -17,7 +17,7 @@ main() {
 assert-env() {
     TEST_DIR="$PWD/test/commands"
     export GIT_HUB_CONFIG="$PWD/test/githubconfig"
-    export GIT_HUB_PAGE_SIZE=24
+    export GIT_HUB_LIST_SIZE=10
     export PATH=$TEST_DIR:$PATH
 
     [ -z "$GIT_DIR" ] && die "GIT_DIR must be set"
