@@ -10,14 +10,20 @@ description
 email
 followers
 following
+forks
 full_name
+html_url
+language
 location
 login
 name
+open_issues
 public_gists
 public_repos
 pushed_at
+ssh_url
 type
+watchers
 )
 
 $keepers = Regexp.new '^(' + keep.join('|') + ')$'
