@@ -154,6 +154,10 @@ run-each() {
 #------------------------------------------------------------------------------
 # `git hub` command functions:
 #------------------------------------------------------------------------------
+command:help() {
+	exec git help hub
+}
+
 command:user() {
 	get-args ?user:get-user
 	api-get "/users/$user"
