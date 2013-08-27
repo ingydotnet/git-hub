@@ -82,11 +82,12 @@ run-command() {
 	local quiet_output verbose_output
 	local raw_output=false json_output=false
 	local show_output=false show_headers=false show_json=false
-	local dry_run=false show_token=false repeat_command=false
+	local dry_run=false show_token repeat_command=false
 	get-var list-size
 	get-var-bool use-auth
 	get-var-bool quiet-output
 	get-var-bool verbose-output
+	get-var-bool show-token
 
 	get-opts "$@"
 	assert-env
@@ -920,8 +921,7 @@ get-config() {
 }
 
 require-auth() {
-	[ -z "$api_token" ] &&
-		api_token="$(hub-config-get api-token)"
+	[ -z "$api_token" ] && get-var api-token
 	[ -z "$api_token" ] && need-api-token
 	true
 }
