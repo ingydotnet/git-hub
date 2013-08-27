@@ -463,8 +463,11 @@ ok:issue() {
 
 format-entry:comments() {
 	printf "  %d) %-14s (%s)\n" $1 $2 ${3/T*/}
-	body=$(echo "$4" | $SED 's/\\"/"/g;s/\\r//g;s/\\n\\n */\n\n     /g')
-	echo -e "     $body" | fmt
+	body="$4"
+	body=${body//\\\"/\"}
+	body=${body//\\r/}
+	body=${body//\\n\\n/\\n\\n     }
+	printf "     $body" | fmt
 }
 
 command:config() {
@@ -891,7 +894,6 @@ get-repo() {
 get-config() {
 	local url=$(
 		git remote -v 2> /dev/null |
-			$SED 's/\s+\(fetch\)$//' |
 			grep 'github\.com' |
 			head -n1
 	)
@@ -1146,7 +1148,7 @@ json-prune-list() {
 init-env() {
 	[ -z "$HOME" ] && die "Cannot determine HOME directory"
 
-	check-system-commands curl cut git grep head sed tr
+	check-system-commands curl cut git grep head tr
 
 	: ${GIT_HUB_USER_DIR:=$HOME/.git-hub}
 	: ${GIT_HUB_EXEC_PATH:="$(dirname "${BASH_SOURCE[0]}")"}
@@ -1378,9 +1380,7 @@ prompt-to-run-setup() {
 #------------------------------------------------------------------------------
 # System dependent stuff:
 #------------------------------------------------------------------------------
-SED='sed -r'
-[ ${OSTYPE//[0-9.]/} == 'darwin' ] &&
-	SED='sed -E'
+# Currently none! :-)
 
 #------------------------------------------------------------------------------
 # General purpose functions:
