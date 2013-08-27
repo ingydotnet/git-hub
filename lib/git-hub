@@ -375,6 +375,8 @@ command:fork() {
 	require-auth
 	get-args ?owner:get-user/repo:get-repo
 	api-post "/repos/$owner/$repo/forks" '{}'
+	local login=$(get-login)
+	msg_ok="Repository '$owner/$repo' forked to '$login'"
 }
 
 command:stars() {
