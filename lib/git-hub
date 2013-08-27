@@ -24,7 +24,7 @@ git hub <command> <options> <arguments>
 
 Commands:
   user, user-get, user-edit, orgs, org, org-get, org-edit, members, teams
-  followers, following, follow, unfollow
+  followers, following, follows, follow, unfollow
   clone, repos, repo, repo-get, repo-edit, repo-new, repo-delete,
   forks, fork, stars, star, unstar, starred, collabs, trust, untrust
   issues, issue
@@ -266,6 +266,18 @@ command:following() {
 	report-list \
 		"/users/$user/following?per_page=PER_PAGE" \
 		'login'
+}
+
+command:follows() {
+	get-args user ?target:get-login
+	api-get /users/$user/following/$target
+	if OK; then
+		msg_ok="'$user' follows '$target'"
+	else
+		msg_ok="'$user' does not follow '$target'"
+	fi
+	OK=0
+	true
 }
 
 command:follow() {

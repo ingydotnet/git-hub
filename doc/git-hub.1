@@ -416,6 +416,11 @@ followers [<user>]
 List the people who are followers of a user\&.
 .RE
 .PP
+follows <user> [<target\-user>]
+.RS 4
+Check if <user> follows <target\-user>\&. The default target user is you\&.
+.RE
+.PP
 following [<user>]
 .RS 4
 List the people that a user is following\&.
@@ -746,7 +751,7 @@ All the git hub commands dealing with tokens and scopes require you to enter you
 .RE
 .SH "RATE LIMITS"
 .sp
-GitHUb limits unauthenticated API calls to 60 per hour, and authenticated API calls to 5000 per hour\&. For this reason you may wish to use authentication even for calls that don\(cqt need it\&. You can use the \-A/\-\-use\-auth option to make sure a command uses authentication\&. You can also set the config file to always use authentication, with this command:
+GitHub limits unauthenticated API calls to 60 per hour, and authenticated API calls to 5000 per hour\&. For this reason you may wish to use authentication even for calls that don\(cqt need it\&. You can use the \-A/\-\-use\-auth option to make sure a command uses authentication\&. You can also set the config file to always use authentication, with this command:
 .sp
 .if n \{\
 .RS 4
@@ -860,7 +865,7 @@ Or more simply by using PIPE and EACH:
 .RS 4
 .\}
 .nf
-fgit hub followers <your\-login> \-ar | git hub user \-
+git hub followers \-ar | git hub user \-
 .fi
 .if n \{\
 .RE
@@ -872,7 +877,19 @@ Follow all your followers:
 .RS 4
 .\}
 .nf
-git hub followers <your\-login> \-ar | git hub follow \-
+git hub followers \-ar | git hub follow \-
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+Find out if the people you are following, are following you!
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+git hub following \-ar | git hub follows \-
 .fi
 .if n \{\
 .RE
