@@ -1,19 +1,26 @@
 #!/bin/bash
 
+die() { echo "$@"; exit 1; }
 set -e
 
+ostype=${OSTYPE/[0-9]*/}
 TEST_DIR="$PWD/test/commands"
-ALL_TESTS=("$TEST_DIR"/*/run.bash)
+ALL_TESTS=()
+for dir in $TEST_DIR/*/run.bash; do
+    dir="$(dirname "$dir")"
+    [ ! -e "$dir/skip:${OSTYPE/[0-9]*/}" ] &&
+        ALL_TESTS+=("$dir")
+    :
+done
 
 PATH=ext/test-simple-bash/lib:$PATH
 source test-simple.bash tests $(( ${#ALL_TESTS[@]} * 2 ))
 TestSimple_CALL_STACK_LEVEL=2
-
 main() {
     export PATH=$TEST_DIR:$PATH
-    for test_file in "${ALL_TESTS[@]}"; do
+    for test_dir in "${ALL_TESTS[@]}"; do
         source setup.bash
-        bash $test_file > "$TEST_DIR/stdout" 2> "$TEST_DIR/stderr"
+        bash $test_dir/run.bash > "$TEST_DIR/stdout" 2> "$TEST_DIR/stderr"
         file-test stdout
         file-test stderr
         source teardown.bash
@@ -22,9 +29,8 @@ main() {
 
 file-test() {
     local file="$1"
-    local label=$test_file
+    local label=$test_dir
     label="${label#$TEST_DIR/}"
-    label="${label%/run.bash}"
     label+=" ($file)"
     local diff=$(diff -u "$test_dir/$file" "$TEST_DIR/$file")
     local result

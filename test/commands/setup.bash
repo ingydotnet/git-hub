@@ -1,7 +1,5 @@
 unset `env | cut -f1 -d= | grep '^GIT_HUB'`
 
-export test_dir=$(dirname $test_file)
-
 export GIT_HUB_TEST_COMMAND=true
 
 export GIT_HUB_USER_DIR=$PWD/test
