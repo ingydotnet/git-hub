@@ -1,5 +1,6 @@
 == Pomodoro!
 - Add pagination
+- Move all commands to plugins! (lib/git-hub.d/)
 
 == Documentation
 - Build doc/*.asc into man
@@ -64,9 +65,9 @@
 == Plugin
 - Document plugins
 - Write an IRC plugin
-- Move all commands to plugins! (lib/git-hub.d/)
 
 == Done
++ Repo rename doesn't work (repo-edit name …)
 + help        - show help screen
 + Print config file name
 + Be explicit for no scopes on scope-list

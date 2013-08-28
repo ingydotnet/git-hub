@@ -348,7 +348,14 @@ command:repo-get() {
 command:repo-edit() {
 	require-auth
 	get-args ?owner:get-user/repo:get-repo %pairs
-	pairs+=(name "$repo")
+	local adds=(name "$repo")
+	for (( i = 0; i < ${#pairs[@]}; i = i + 2 )); do
+		if [ "${pairs[$i]}" == name ]; then
+			adds=()
+			break
+		fi
+	done
+	pairs+=( "${adds[@]}" )
 	api-patch "/repos/$owner/$repo" "$(json-dump-object-pairs)"
 }
 
