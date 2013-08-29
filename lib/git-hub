@@ -728,7 +728,7 @@ format-curl-command() {
 	local url=$2
 	local data=$3
 
-	[[ $url =~ /(/|$) ]] &&
+	[[ $url =~ [a-zA-Z0-9]/(/|$) ]] &&
 		die "API url '$url' looks suspiciously wrong"
 
 	$use_auth && require-auth
