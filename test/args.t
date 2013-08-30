@@ -3,7 +3,7 @@
 set -e
 
 PATH=ext/test-simple-bash/lib:$PATH
-source test-simple.bash tests 18
+source test-simple.bash tests 19
 note() {
     echo "# $@"
 }
@@ -62,7 +62,6 @@ run-test-error() {
 }
 
 export GIT_DIR=$PWD/test/repo/not-repo
-RICARDO_FOO=$PWD/test/repo/ricardo-foo
 
 GIT_HUB_CONFIG=$PWD/test/githubconfig
 
@@ -76,7 +75,8 @@ run-test \
     "=cdent=" \
     # none
 
-GIT_DIR=$RICARDO_FOO run-test \
+GIT_DIR=$PWD/test/repo/ricardo-foo \
+run-test \
     "?user:get-user" \
     "=ricardo=" \
     # none
@@ -111,7 +111,8 @@ run-test \
     "=jimmy=juju=type=" \
     jimmy/juju type
 
-GIT_DIR=$RICARDO_FOO run-test \
+GIT_DIR=$PWD/test/repo/ricardo-foo \
+run-test \
     "?user:get-user/repo:get-repo key" \
     "=ricardo=foo=type=" \
     type
@@ -141,10 +142,18 @@ run-test \
     "===" \
     # none
 
-GIT_DIR=$RICARDO_FOO run-test \
+GIT_DIR=$PWD/test/repo/ricardo-foo \
+run-test \
     "?user:get-user/repo:get-repo" \
     "=ricardo=foozle=" \
     foozle
+
+GIT_DIR=$PWD/test/repo/git-scheme \
+run-test \
+    "?user:get-user/repo:get-repo" \
+    "=ricky=bar=" \
+    # none
+
 
 run-test \
     "?aaa/bbb @ccc" \

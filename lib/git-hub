@@ -926,6 +926,8 @@ get-config() {
 	url=$(shopt -s extglob; echo ${url% (@(fetch|push))})
 	if [ -n "$url" ]; then
 		if [[ "$url" =~ github\.com ]]; then
+			[[ "$url" =~ .*://(.*) ]] &&
+				url="${BASH_REMATCH[1]}"
 			local re1='^[^:/]*[:/](.*)/(.*)\.git$'
 			local re2='^[^:/]*[:/](.*)/(.*)$'
 			if [[ "$url" =~ $re1 ]] || [[ "$url" =~ $re2 ]]; then
