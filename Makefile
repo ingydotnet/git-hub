@@ -1,14 +1,16 @@
 CMD := git-hub
 
-LOCAL_LIB = lib/$(CMD)
-LOCAL_EXT = $(shell find $(LOCAL_LIB).d -type f) \
-	    $(shell find $(LOCAL_LIB).d -type l)
+LOCAL_LIB := $(shell pwd)/lib/$(CMD)
+LOCAL_EXT = $(LOCAL_LIB).d
+LOCAL_EXTS = $(shell find $(LOCAL_EXT) -type f) \
+	    $(shell find $(LOCAL_EXT) -type l)
 
 # XXX Make these vars look like git.git/Makefile style
 PREFIX ?= /usr/local
 INSTALL_LIB ?= $(shell git --exec-path)
+INSTALL_CMD ?= $(INSTALL_LIB)/$(CMD)
+INSTALL_EXT ?= $(INSTALL_LIB)/$(CMD).d
 INSTALL_MAN ?= $(PREFIX)/share/man/man1
-INSTALL_EXT ?= $(INSTALL_LIB)/git-hub.d
 
 # Submodules
 JSON=ext/json-bash/lib/json.bash
@@ -49,7 +51,7 @@ install: install-lib install-doc
 install-lib: $(SUBMODULE) $(INSTALL_EXT)
 	install -C -m 0755 $(LOCAL_LIB) $(INSTALL_LIB)/
 	install -C -d -m 0755 $(INSTALL_EXT)/
-	install -C -m 0755 $(LOCAL_EXT) $(INSTALL_EXT)/
+	install -C -m 0755 $(LOCAL_EXTS) $(INSTALL_EXT)/
 
 install-doc:
 	install -C -d -m 0755 $(INSTALL_MAN)
@@ -59,7 +61,7 @@ install-doc:
 uninstall: uninstall-lib uninstall-doc
 
 uninstall-lib:
-	rm -f $(INSTALL_LIB)/$(CMD)
+	rm -f $(INSTALL_CMD)
 	rm -fr $(INSTALL_EXT)/
 
 uninstall-doc:
@@ -98,13 +100,9 @@ doc/%.1: %.1
 
 # Install using symlinks so repo changes can be tested live
 .PHONY: dev-install dev-test dev-test-reset check-dev-install
-dev-install: $(SUBMODULE) uninstall-lib $(INSTALL_EXT)
-	ln -s $$PWD/lib/$(CMD) $(INSTALL_LIB)/$(CMD)
-	chmod 0755 $(INSTALL_EXT)/
-	@for ext in $(LOCAL_EXT); do \
-	    echo "ln -s $$PWD/$$ext $(INSTALL_EXT)/$${ext#lib/git-hub.d/}"; \
-	    ln -s $$PWD/$$ext $(INSTALL_EXT)/$${ext#lib/git-hub.d/}; \
-	done
+dev-install: $(SUBMODULE) uninstall-lib
+	ln -s $(LOCAL_LIB) $(INSTALL_CMD)
+	ln -s $(LOCAL_EXT) $(INSTALL_EXT)
 
 # Run a bunch of live tests. Make sure this thing really works. :)
 dev-test:
