@@ -48,7 +48,7 @@ endif
 .PHONY: install install-lib install-doc
 install: install-lib install-doc
 
-install-lib: $(SUBMODULE) $(INSTALL_EXT)
+install-lib: $(SUBMODULE) uninstall-lib $(INSTALL_EXT)
 	install -C -m 0755 $(LOCAL_LIB) $(INSTALL_LIB)/
 	install -C -d -m 0755 $(INSTALL_EXT)/
 	install -C -m 0755 $(LOCAL_EXTS) $(INSTALL_EXT)/
@@ -62,7 +62,7 @@ uninstall: uninstall-lib uninstall-doc
 
 uninstall-lib:
 	rm -f $(INSTALL_CMD)
-	rm -fr $(INSTALL_EXT)/
+	rm -fr $(INSTALL_EXT)
 
 uninstall-doc:
 	rm -f $(INSTALL_MAN)/$(CMD).1
