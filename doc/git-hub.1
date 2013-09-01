@@ -2,12 +2,12 @@
 .\"     Title: git-hub
 .\"    Author: [see the "AUTHOR" section]
 .\" Generator: DocBook XSL Stylesheets v1.76.1 <http://docbook.sf.net/>
-.\"      Date: 08/26/2013
+.\"      Date: 08/31/2013
 .\"    Manual: Git Manual
 .\"    Source: Git 1.7.9.5
 .\"  Language: English
 .\"
-.TH "GIT\-HUB" "1" "08/26/2013" "Git 1\&.7\&.9\&.5" "Git Manual"
+.TH "GIT\-HUB" "1" "08/31/2013" "Git 1\&.7\&.9\&.5" "Git Manual"
 .\" -----------------------------------------------------------------
 .\" * Define some portability stuff
 .\" -----------------------------------------------------------------
@@ -438,7 +438,9 @@ Stop following one or more users\&.
 .PP
 clone <owner>/<repo> [<directory>]
 .RS 4
-Clone a GitHub repo\&.
+Clone a GitHub repo\&. Always uses
+\-\-recursive
+so you get submodules too\&.
 .RE
 .PP
 repos [<user>]

@@ -294,10 +294,11 @@ command:unfollow() {
 
 command:clone() {
 	get-args owner/repo ?dir
-	git clone "git@github.com:$owner/$repo" $dir
-	msg_ok="Repository '$owner/$repo' cloned"
+	git clone --recursive "git@github.com:$owner/$repo" $dir
+	msg_ok=0
 }
 
+# vim: set ft=sh tabstop=4 shiftwidth=4 lisp noexpandtab:
 command:repos() {
 	get-args owner:get-user
 	report-list \
