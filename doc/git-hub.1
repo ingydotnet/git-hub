@@ -2,12 +2,12 @@
 .\"     Title: git-hub
 .\"    Author: [see the "AUTHOR" section]
 .\" Generator: DocBook XSL Stylesheets v1.76.1 <http://docbook.sf.net/>
-.\"      Date: 08/31/2013
+.\"      Date: 09/01/2013
 .\"    Manual: Git Manual
 .\"    Source: Git 1.7.9.5
 .\"  Language: English
 .\"
-.TH "GIT\-HUB" "1" "08/31/2013" "Git 1\&.7\&.9\&.5" "Git Manual"
+.TH "GIT\-HUB" "1" "09/01/2013" "Git 1\&.7\&.9\&.5" "Git Manual"
 .\" -----------------------------------------------------------------
 .\" * Define some portability stuff
 .\" -----------------------------------------------------------------
@@ -64,13 +64,26 @@ You can fork, create, delete and modify repositories\&. You can get information 
 You can also chain commands together using the output of one as the input of another\&. See PIPE AND EACH below\&.
 .SH "INSTALLATION"
 .sp
-Just run (possibly with sudo):
+Get the source code from GitHub (including the submodules):
 .sp
 .if n \{\
 .RS 4
 .\}
 .nf
-make install
+git clone \-\-recursive git@github\&.com:ingydotnet/git\-hub
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+Then run:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+make test
+make install        # Possibly with \*(Aqsudo\*(Aq
 .fi
 .if n \{\
 .RE
@@ -89,17 +102,34 @@ git help hub
 .RE
 .\}
 .sp
-To do a local install, use the DESTDIR environment variable\&.
+To try git\-hub without installing it, run this command:
 .sp
 .if n \{\
 .RS 4
 .\}
 .nf
-make install DESTDIR=$HOME/local/
+export GIT_EXEC_PATH=/path\-to\-git\-hub\-repo/lib:$(git \-\-exec\-path)
 .fi
 .if n \{\
 .RE
 .\}
+.SH "FASTER"
+.sp
+The git\-hub command is written in pure Bash, including a complete JSON parser written in Bash\&. The parser is slow for large API payloads\&.
+.sp
+To make the git\-hub command perform much faster, just run this command:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+git hub config json\-lib json\-perl\&.bash
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+That will enable a Perl replacement, which requires Perl (of course) and the JSON\&.pm Perl module\&. If the JSON::XS Perl module is also installed, it will be even faster\&.
 .SH "OPTIONS"
 .sp
 Commandline options start with a dash and can appear in any order in the command\&.

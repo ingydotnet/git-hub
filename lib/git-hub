@@ -712,7 +712,8 @@ api-call() {
 	$show_headers && cat $GIT_HUB_HEADER >&2
 
 	if [ -s "$GIT_HUB_OUTPUT" ]; then
-		JSON.load "$(< $GIT_HUB_OUTPUT)"
+		# JSON.load "$(< $GIT_HUB_OUTPUT)"
+		JSON__cache="$(cat $GIT_HUB_OUTPUT | JSON.load)"
 		$show_output && cat $GIT_HUB_OUTPUT >&2
 		$show_json && JSON.cache >&2
 	fi
@@ -907,18 +908,18 @@ get-user() {
 }
 
 get-login() {
-	hub-config-get login
+	get-hub-config login
 }
 
 get-owner() {
-	get-config owner
+	get-repo-config owner
 }
 
 get-repo() {
-	get-config repo
+	get-repo-config repo
 }
 
-get-config() {
+get-repo-config() {
 	local url=$(
 		git remote -v 2> /dev/null |
 			grep 'github\.com' |
@@ -964,7 +965,7 @@ check-token-id() {
 	true
 }
 
-hub-config-get() {
+get-hub-config() {
 	local value=
 	if [ -e "$GIT_HUB_CONFIG" ]; then
 		value="$(git config -f "$GIT_HUB_CONFIG" github."$1" 2>/dev/null)"
@@ -1036,6 +1037,7 @@ report-data() {
 	if $json_output; then
 		pretty-json-object "${fields[@]}"
 	else
+		json-prune-hash "${fields[@]}"
 		for field in "${fields[@]}"; do
 			report-value $field
 		done
@@ -1089,88 +1091,6 @@ label_source__full_name='Fork Parent'
 label_number='ID #'
 
 #------------------------------------------------------------------------------
-# JSON support functions:
-#------------------------------------------------------------------------------
-# Format a JSON object from an input list of key/value pairs.
-json-dump-object() {
-	local json='{'
-	local regex='(^\[|^null$|^[0-9]+$)'
-	while [ $# -gt 0 ]; do
-		if [[ "$2" =~ $regex ]]; then
-			json="$json\"$1\":$2"
-		else
-			json="$json\"$1\":\"$2\""
-		fi
-		shift; shift
-		if [ $# -gt 0 ]; then
-			json="$json,"
-		fi
-	done
-	json="$json}"
-	echo $json
-}
-
-json-dump-array() {
-	local json='['
-	while [ $# -gt 0 ]; do
-		json="$json\"$1\""
-		shift
-		if [ $# -gt 0 ]; then
-			json="$json,"
-		fi
-	done
-	json="$json]"
-	echo "$json"
-}
-
-# Format a JSON object from an array.
-json-dump-object-pairs() {
-	local regex='(^\[|^null$|^[0-9]+$)'
-	local json='{'
-	for ((i = 0; i < ${#pairs[@]}; i = i+2)); do
-		local value="${pairs[$((i+1))]}"
-		value=${value//\"/\\\"}
-		if [[ "$value" =~ $regex ]]; then
-			json="$json\"${pairs[$i]}\":$value"
-		else
-			json="$json\"${pairs[$i]}\":\"$value\""
-		fi
-		if [ $((${#pairs[@]} - $i)) -gt 2 ]; then
-			json="$json,"
-		fi
-	done
-	json="$json}"
-	echo $json
-}
-
-pretty-json-object() {
-	declare -a keys=("$@")
-
-	echo '{'
-	for (( i = 0; i < ${#keys[@]}; i++)); do
-		local key="${keys[$i]}"
-		local key=${key//__/\/}
-		local value="$(JSON.get "/$key" - || true)"
-		if [ -n "$value" ]; then
-			printf "    \"%s\": %s" "$key" "$value"
-			[[ $(($i+1)) -lt ${#keys[@]} ]] && printf ','
-			printf "\n"
-		fi
-	done
-	echo '}'
-}
-
-
-json-prune-cache() {
-	JSON__cache="$(echo "$JSON__cache" | grep -E "$1" || echo '')"
-}
-
-json-prune-list() {
-	local fields="$@"
-	json-prune-cache "^/[0-9]+/(${fields// /|})\b"
-}
-
-#------------------------------------------------------------------------------
 # Initial setup functions:
 #------------------------------------------------------------------------------
 init-env() {
@@ -1207,7 +1127,7 @@ assert-env() {
 		TMP_DIR TMP_PREFIX OUTPUT ERROR HEADER \
 		USER_DIR CONFIG
 
-	source-ext json.bash
+	source-ext json-setup.bash
 
 	if [ -e "$GIT_HUB_USER_DIR" ]; then
 		if [ ! -e "$GIT_HUB_TMP_DIR" ]; then
@@ -1242,6 +1162,10 @@ check-system-commands() {
 }
 
 source-ext() {
+	PATH=$GIT_HUB_EXT_PATH:$PATH source "$1"
+}
+
+source-ext-maybe() {
 	set +e
 	PATH=$GIT_HUB_EXT_PATH:$PATH source "$1" 2> /dev/null
 	local rc=$?
@@ -1332,7 +1256,7 @@ get-var() {
 	local env=GIT_HUB_$(echo $var | tr 'a-z' 'A-Z')
 	printf -v "$var" "${!env}"
 	[ -n "${!var}" ] && return
-	printf -v "$var" "$(hub-config-get "$1")"
+	printf -v "$var" "$(get-hub-config "$1")"
 	true
 }
 
@@ -1505,7 +1429,7 @@ callable() {
 
 callable-or-source() {
 	callable "$1" ||
-		source-ext git-hub-"${1/:*/}" &&
+		source-ext-maybe git-hub-"${1/:*/}" &&
 		callable "$1"
 	:
 }

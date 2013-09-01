@@ -1,4 +1,4 @@
-unset `env | cut -f1 -d= | grep '^GIT_HUB'`
+unset `env | cut -f1 -d= | grep '^GIT_HUB' | grep -v 'GIT_HUB_JSON_LIB'`
 
 export GIT_HUB_TEST_COMMAND=true
 export GIT_HUB_LIST_SIZE=10
