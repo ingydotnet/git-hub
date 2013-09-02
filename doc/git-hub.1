@@ -2,12 +2,12 @@
 .\"     Title: git-hub
 .\"    Author: [see the "AUTHOR" section]
 .\" Generator: DocBook XSL Stylesheets v1.76.1 <http://docbook.sf.net/>
-.\"      Date: 09/01/2013
+.\"      Date: 09/02/2013
 .\"    Manual: Git Manual
 .\"    Source: Git 1.7.9.5
 .\"  Language: English
 .\"
-.TH "GIT\-HUB" "1" "09/01/2013" "Git 1\&.7\&.9\&.5" "Git Manual"
+.TH "GIT\-HUB" "1" "09/02/2013" "Git 1\&.7\&.9\&.5" "Git Manual"
 .\" -----------------------------------------------------------------
 .\" * Define some portability stuff
 .\" -----------------------------------------------------------------
@@ -36,7 +36,7 @@ Here is just a few of the things you can do on GitHub with a simple command:
 .nf
 git hub                             # Show the `git hub` cheat sheet
 git hub help                        # Show this awesome documentation
-git hub setup                       # Do this first!
+git hub setup                       # Config wizard dialog\&. Do this first!
 .fi
 .sp
 .nf
@@ -61,7 +61,7 @@ The \fBhub\fR subcommand for git, allows you to perform many of the operations m
 .sp
 You can fork, create, delete and modify repositories\&. You can get information about users, repositories and issues\&. You can \fBstar\fR, \fBwatch\fR and \fBfollow\fR things, and find out who else is doing the same\&. The API is quite extensive\&. With this command you can do many of your day to day GitHub actions without needing a web browser\&.
 .sp
-You can also chain commands together using the output of one as the input of another\&. See PIPE AND EACH below\&.
+You can also chain commands together using the output of one as the input of another\&. For example you could use this technique to clone all the repos of a GitHub user or organization, with one command\&. See PIPE AND EACH below\&.
 .SH "INSTALLATION"
 .sp
 Get the source code from GitHub (including the submodules):
@@ -95,8 +95,8 @@ This will install git\-hub next to your other git commands\&. It will also insta
 .RS 4
 .\}
 .nf
-man git\-hub
 git help hub
+man git\-hub
 .fi
 .if n \{\
 .RE
@@ -113,23 +113,6 @@ export GIT_EXEC_PATH=/path\-to\-git\-hub\-repo/lib:$(git \-\-exec\-path)
 .if n \{\
 .RE
 .\}
-.SH "FASTER"
-.sp
-The git\-hub command is written in pure Bash, including a complete JSON parser written in Bash\&. The parser is slow for large API payloads\&.
-.sp
-To make the git\-hub command perform much faster, just run this command:
-.sp
-.if n \{\
-.RS 4
-.\}
-.nf
-git hub config json\-lib json\-perl\&.bash
-.fi
-.if n \{\
-.RE
-.\}
-.sp
-That will enable a Perl replacement, which requires Perl (of course) and the JSON\&.pm Perl module\&. If the JSON::XS Perl module is also installed, it will be even faster\&.
 .SH "OPTIONS"
 .sp
 Commandline options start with a dash and can appear in any order in the command\&.
@@ -357,15 +340,27 @@ These are the commands you can use to perform most of your daily GitHub interact
 .PP
 setup
 .RS 4
-Before you can use the commands described below, you need to perform some setup/configuration steps\&. The
-git hub setup
-command will walk you through this process with ease\&. You can also use this command to change your configuration at any time in the future\&.
+Before you can use the commands described below, you need to perform some setup/configuration steps\&.
 .sp
 .if n \{\
 .RS 4
 .\}
 .nf
-If you would rather do the steps by hand, see CONFIGURATION COMMANDS below\&.
+This "wizard" style dialog, will walk you through the configuration
+process quickly and painlessly, with lots of explanation\&. You should run
+this command right away\&. You can also re\-run it, and it will allow you to
+change your config, while defaulting to your existing settings\&.
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+If you would rather do the steps by hand, see CONFIGURATION COMMANDS
+below\&.
 .fi
 .if n \{\
 .RE
@@ -585,14 +580,19 @@ These commands are for editing your git\-hub config file and managing your GitHu
 config [<config\-key> [<config\-value>]]
 .RS 4
 With no args, this command will print the contents of
-~/\&.githubconfig\&. With one argument (a key), print the current value of the config key\&. With two arguments (key value), set the value of the config key\&. Only 3 keys are currently supported:
+~/\&.githubconfig\&. With one argument (a key), print the current value of the config key\&. With two arguments (key value), set the value of the config key\&. 4 keys are currently supported:
 login,
-api\-token
-and
-use\-auth\&.
+api\-token,
+use\-auth, and
+json\-lib\&.
 .RE
-.sp
-config\-unset <config\-key> Unset a config key\&. Removes the key from the ~/\&.githubconfig file\&.
+.PP
+config\-unset <config\-key>
+.RS 4
+Unset a config key\&. Removes the key from the
+~/\&.githubconfig
+file\&.
+.RE
 .PP
 token\-list
 .RS 4
@@ -643,6 +643,23 @@ Remove one or more scopes from your API token\&. You can use the
 \-\-all
 option to remove all possible scopes at once\&.
 .RE
+.SH "FASTER"
+.sp
+The git\-hub command is written in pure Bash, including a complete JSON parser written in Bash\&. Unfortunately, this parser is slow\&. It is \fBreally\fR slow for large API payloads\&.
+.sp
+To make the git\-hub command perform much faster, just run this command:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+git hub config json\-lib json\-perl\&.bash
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+That will enable a Perl replacement, which requires Perl (of course) and the JSON\&.pm Perl module\&. If the JSON::XS Perl module is also installed, it will be even faster\&.
 .SH "PIPE AND EACH"
 .sp
 You can pipe the output of one git hub into another and multiply your power\&. The command being piped into should use the EACH option which is a single dash (\fI\-\fR)\&. It will cause the command to be run once for each line of input, inserting the line into the command, in place of the \fI\-\fR\&.
@@ -684,54 +701,7 @@ done
 .if n \{\
 .RE
 .\}
-.SH "CONFIGURATION"
-.sp
-Before using the git hub command, you will need to set a couple configuration options\&. Run these commands:
-.sp
-.if n \{\
-.RS 4
-.\}
-.nf
-git hub config login <your\-github\-login\-id>
-git hub config api\-token <your\-github\-api\-token>
-.fi
-.if n \{\
-.RE
-.\}
-.sp
-.if n \{\
-.sp
-.\}
-.RS 4
-.it 1 an-trap
-.nr an-no-space-flag 1
-.nr an-break-flag 1
-.br
-.ps +1
-\fBNote\fR
-.ps -1
-.br
-.sp
-If you don\(cqt know what your API token is, see the next section\&.
-.sp .5v
-.RE
-.sp
-These values will be stored in ~/\&.githubconfig, like this:
-.sp
-.if n \{\
-.RS 4
-.\}
-.nf
-[github]
-        login = <your\-github\-id>
-        api\-token = <your\-github\-api\-token>
-.fi
-.if n \{\
-.RE
-.\}
-.sp
-You can edit this file by hand or use the git hub config command\&.
-.SH "AUTHENTICATION"
+.SH "TOKEN AUTHENTICATION AND SCOPES"
 .sp
 Many endpoints of the GitHub v3 API require a Personal API Access Token\&. You can list your current tokens with this command:
 .sp
@@ -745,7 +715,7 @@ git hub token\-list
 .RE
 .\}
 .sp
-If you don\(cqt have any tokens or want a new one for the git\-hub command, run these commands:
+If you don\(cqt have any tokens or want a new one for the git\-hub command, run these commands (the git hub setup command automates this):
 .sp
 .if n \{\
 .RS 4
@@ -789,7 +759,7 @@ GitHub limits unauthenticated API calls to 60 per hour, and authenticated API ca
 .RS 4
 .\}
 .nf
-git hub config use\-auth 1
+git hub config use\-auth true
 .fi
 .if n \{\
 .RE
@@ -801,7 +771,7 @@ Another option is to set the GIT_HUB_USE_AUTH environment variable:
 .RS 4
 .\}
 .nf
-export GIT_HUB_USE_AUTH=1
+export GIT_HUB_USE_AUTH=true
 .fi
 .if n \{\
 .RE
@@ -828,8 +798,8 @@ $ git hub repo foo      # Get repo info including the remote address
 $ git remote add origin <new\-remote\-address>
 $ git push origin master
 $ git hub repo\-edit \e
-    description \*(AqThe new foo\*(Aq \e
-    homepage http://example\&.com
+    description  \*(AqThe new foo\*(Aq \e
+    homepage     http://example\&.com
 $ git hub repo
 .fi
 .if n \{\
@@ -874,7 +844,7 @@ $ # etc\&.\&.\&.
 The git hub command tries to be environmentally aware\&. If you are in a GitHub cloned repo directory, and you don\(cqt specify <user> or <owner> or <repo> for a command that needs them, then they will be pulled from the remote url\&. Otherwise, if you don\(cqt specify a <user> it will use the one (presumably yours) that you set with the git hub config login \&.\&.\&. command\&.
 .SH "EXAMPLE 3. BUILDING COMPLEX COMMANDS"
 .sp
-The git hub command can be used to output raw data, which can be fed into other commands; even other git hub commands\&. This lets you do some powerful automation with very little code\&. The \-\-raw (\-r) and \-\-quiet (\-q) flags will make the output of many commands be usable as data, and the \- (EACH) option makes commands read data from stdin\&.
+The git hub command can be used to output raw data, which can be fed into other commands; even other git hub commands\&. This lets you do some powerful automation with very little code\&. The \-\-raw (\-r) flag will make the output of many commands be usable as data, and the \- (EACH) option makes commands read data from stdin\&.
 .sp
 Get information about all your followers:
 .sp
@@ -884,7 +854,6 @@ Get information about all your followers:
 .nf
 for user in $(git hub followers <your\-login> \-ar); do
     git hub user $user
-    echo                # Separate them with a blank line
 done
 .fi
 .if n \{\
@@ -948,7 +917,7 @@ Star the latest 5 repos from all the people you are following that have more tha
 git hub following <your\-login> \-ar |
     git hub user\-get \- public_repos |
     perl \-nle \*(Aqprint if $_ > 50\*(Aq |
-    git hub repos \- \-qc5 |
+    git hub repos \- \-rc5 |
     git hub star \-
 .fi
 .if n \{\

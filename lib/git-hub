@@ -771,6 +771,10 @@ check-api-call-status() {
 	OK=$1
 	if [ ! -f $GIT_HUB_HEADER ]; then
 		ERROR=$(head -n1 $GIT_HUB_ERROR)
+		if [ $OK == 6 ]; then
+			ERROR+=$'\n'$'\n'"Check your internet connection."
+			verbose_output=true
+		fi
 		return
 	fi
 	status_code=$(head -n1 $GIT_HUB_HEADER | cut -d ' ' -f2)

@@ -25,6 +25,7 @@
 
 == Commands
 - New commands to add:
+  - remote (add remote for adding GitHub remotes)
   - pulls       - list pull requests
   - pull        - issue a pull request
   - search
