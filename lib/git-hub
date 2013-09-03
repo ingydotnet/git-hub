@@ -75,7 +75,8 @@ main() {
 run-command() {
 	set -e
 	local Infinity=9999999
-	local command command_arguments api_token
+	local command command_command_sha1 arguments api_token
+	local command_header_file command_output_file command_error_file
 	local user org owner repo pairs fields title list_size
 	local msg_ok msg_fail status_code ERROR
 	local do_all=false use_auth
@@ -699,7 +700,9 @@ api-call() {
 		nay '*** NOTE: This is a dry run only. ***'
 		exit 0
 	elif $repeat_command; then
-		# Use last command run results.
+		# Use the cache
+		[ -e "$command_header_file" ] ||
+			die "-R flag not valid. Command not previously run.\n"
 		rc=0
 	elif [ -z "$GIT_HUB_TEST_COMMAND" ]; then
 		# Actually run the curl command!
@@ -707,14 +710,15 @@ api-call() {
 		"${curl_command[@]}"
 		rc=$?
 		set -e #; set +x  # for debugging the real command
+		cache-response-files
 	fi
 
-	$show_headers && cat $GIT_HUB_HEADER >&2
+	$show_headers && cat $command_header_file >&2
 
-	if [ -s "$GIT_HUB_OUTPUT" ]; then
-		# JSON.load "$(< $GIT_HUB_OUTPUT)"
-		JSON__cache="$(cat $GIT_HUB_OUTPUT | JSON.load)"
-		$show_output && cat $GIT_HUB_OUTPUT >&2
+	if [ -s "$command_output_file" ]; then
+		# JSON.load "$(< $command_output_file)"
+		JSON__cache="$(cat $command_output_file | JSON.load)"
+		$show_output && cat $command_output_file >&2
 		$show_json && JSON.cache >&2
 	fi
 
@@ -757,27 +761,48 @@ format-curl-command() {
 	elif [ -n "$api_token" ]; then
 		curl_command+=(--header "Authorization: token $api_token")
 	fi
+	command_sha1="$(echo "${curl_command[@]}" | $sha1sum | cut -f1 -d ' ')"
+	command_header_file="$GIT_HUB_CACHE/$command_sha1/head"
+	command_output_file="$GIT_HUB_CACHE/$command_sha1/out"
+	command_error_file="$GIT_HUB_CACHE/$command_sha1/err"
+	if [ -e "$command_header_file" ]; then
+		etag="$(grep -Em1 '^ETag:' $command_header_file | tr -d '\r')"
+		if [ -n "$etag" ]; then
+			curl_command+=(--header "${etag/ETag/If-None-Match}")
+		fi
+	fi
 	curl_command+=(
 		--user-agent $user_agent
-		--dump-header $GIT_HUB_HEADER
-		--output $GIT_HUB_OUTPUT
-		--stderr $GIT_HUB_ERROR
+		--dump-header "$GIT_HUB_CACHE/head"
+		--output "$GIT_HUB_CACHE/out"
+		--stderr "$GIT_HUB_CACHE/err"
 		--silent
 		--show-error
 	)
 }
 
+cache-response-files() {
+	local dir="$GIT_HUB_CACHE/$command_sha1"
+	mkdir -p "$dir"
+	grep -E '^Status: 304' "$GIT_HUB_CACHE/head" &> /dev/null || {
+		for f in head out err; do
+			[ -e "$GIT_HUB_CACHE/$f" ] &&
+				mv "$GIT_HUB_CACHE/$f" "$dir"
+		done
+	}
+}
+
 check-api-call-status() {
 	OK=$1
-	if [ ! -f $GIT_HUB_HEADER ]; then
-		ERROR=$(head -n1 $GIT_HUB_ERROR)
+	if [ ! -f $command_header_file ]; then
+		ERROR=$(head -n1 $command_error_file)
 		if [ $OK == 6 ]; then
 			ERROR+=$'\n'$'\n'"Check your internet connection."
 			verbose_output=true
 		fi
 		return
 	fi
-	status_code=$(head -n1 $GIT_HUB_HEADER | cut -d ' ' -f2)
+	status_code=$(head -n1 $command_header_file | cut -d ' ' -f2)
 	[[ $status_code =~ ^[0-9]{3}$ ]] || return
 	case "$status_code" in
 		200|201|202|204)
@@ -794,7 +819,7 @@ check-api-call-status() {
 			;;
 		*)
 			OK=1
-			ERROR=$(head -n1 $GIT_HUB_HEADER | cut -d ' ' -f3-)
+			ERROR=$(head -n1 $command_header_file | cut -d ' ' -f3-)
 			;;
 	esac
 }
@@ -1021,7 +1046,7 @@ report-list() {
 
 get-next-page-url() {
 	local regexp='Link: <(https:[^>]+)>; rel="next"'
-	[[ -e "$GIT_HUB_HEADER" ]] && [[ "$(< $GIT_HUB_HEADER)" =~ $regexp ]] &&
+	[[ -e "$command_header_file" ]] && [[ "$(< $command_header_file)" =~ $regexp ]] &&
 		echo "${BASH_REMATCH[1]}"
 	true
 }
@@ -1100,18 +1125,18 @@ label_number='ID #'
 init-env() {
 	[ -z "$HOME" ] && die "Cannot determine HOME directory"
 
-	check-system-commands curl cut git grep head tr
+	sha1sum=sha1sum
+	[[ "$OSTYPE" =~ ^darwin ]] && sha1sum=shasum
+	check-system-commands curl cut git grep head ln mv readlink $sha1sum tr
 
-	: ${GIT_HUB_USER_DIR:=$HOME/.git-hub}
+	: ${GIT_HUB_API_URI:=https://api.github.com}
+
 	: ${GIT_HUB_EXEC_PATH:="$(dirname "${BASH_SOURCE[0]}")"}
 	: ${GIT_HUB_EXT_PATH:=$GIT_HUB_EXEC_PATH/git-hub.d}
-	: ${GIT_HUB_API_URI:=https://api.github.com}
-	: ${GIT_HUB_TMP_DIR:=$GIT_HUB_USER_DIR/tmp}
-	: ${GIT_HUB_TMP_PREFIX:=$GIT_HUB_TMP_DIR/git-hub}
-	: ${GIT_HUB_HEADER:=$GIT_HUB_TMP_PREFIX-head-$$}
-	: ${GIT_HUB_OUTPUT:=$GIT_HUB_TMP_PREFIX-out-$$}
-	: ${GIT_HUB_ERROR:=$GIT_HUB_TMP_PREFIX-err-$$}
+
+	: ${GIT_HUB_USER_DIR:=$HOME/.git-hub}
 	: ${GIT_HUB_CONFIG:=$GIT_HUB_USER_DIR/config}
+	: ${GIT_HUB_CACHE:=$GIT_HUB_USER_DIR/cache}
 
 	[ -d "$GIT_HUB_EXT_PATH" ] ||
 		die "Hmm... git-hub does not seem to be properly installed\n"
@@ -1128,28 +1153,9 @@ run-for-each() {
 
 assert-env() {
 	assert-env-var EXEC_PATH EXT_PATH API_URI \
-		TMP_DIR TMP_PREFIX OUTPUT ERROR HEADER \
-		USER_DIR CONFIG
+		USER_DIR CONFIG CACHE
 
 	source-ext json-setup.bash
-
-	if [ -e "$GIT_HUB_USER_DIR" ]; then
-		if [ ! -e "$GIT_HUB_TMP_DIR" ]; then
-			mkdir "$GIT_HUB_TMP_DIR"
-		fi
-	fi
-
-	if $repeat_command; then
-		[ -f $GIT_HUB_TMP_PREFIX-out-* ] ||
-			die "No previous 'git hub' command to repeat"
-		local old_output=$(echo $GIT_HUB_TMP_PREFIX-out-*)
-		local pid=${old_output/$GIT_HUB_TMP_PREFIX-out-/}
-		GIT_HUB_HEADER=$GIT_HUB_TMP_PREFIX-head-$pid
-		GIT_HUB_OUTPUT=$GIT_HUB_TMP_PREFIX-out-$pid
-		GIT_HUB_ERROR=$GIT_HUB_TMP_PREFIX-err-$pid
-	else
-		rm -f $GIT_HUB_TMP_PREFIX-* 2> /dev/null || true
-	fi
 }
 
 check-system-commands() {
