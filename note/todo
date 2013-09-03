@@ -1,6 +1,6 @@
 == Pomodoro!
-- Add pagination
-- Move all commands to plugins! (lib/git-hub.d/)
+- Cache responses and etag
+- Chunk list json into an array of texts
 
 == Documentation
 - Build doc/*.asc into man
@@ -12,6 +12,7 @@
 - Review git/Documentation/CodingGuidelines
 - Eliminate evals
 - Eliminate TODO/XXX
+- Move all commands to plugins! (lib/git-hub.d/)
 
 == Makefile
 - Redo Makefile based on git itself
@@ -41,15 +42,16 @@
 - Implement `git hub repo --all`
 
 == Error Handling
+- Validate input data better
 - Helpful msg when rate limit exceeded
 - Don't allow email@address for `git hub config login …`
 - Better error msging for mistakes.
   - Think about what common errors might happen.
 
 == UX
+- Add pagination
+- Support @ as shorthand for login-name
 - Support a git-hub-shell
-- Add a setup command that walks a user through configuration
-  - Should be a plugin
 - Command completion
 
 == Performance
@@ -68,6 +70,8 @@
 - Write an IRC plugin
 
 == Done
++ Add a setup command that walks a user through configuration
+  + Should be a plugin
 + Repo rename doesn't work (repo-edit name …)
 + help        - show help screen
 + Print config file name
