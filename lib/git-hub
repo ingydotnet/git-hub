@@ -1432,10 +1432,14 @@ callable() {
 }
 
 callable-or-source() {
-	callable "$1" ||
-		source-ext-maybe git-hub-"${1/:*/}" &&
-		callable "$1"
-	:
+	if callable "command:$1"; then
+		return 0
+	else
+		if source-ext-maybe git-hub-"${1/:*/}" && callable "command:$1"; then
+			return 0
+		fi
+	fi
+	return 1
 }
 
 #------------------------------------------------------------------------------
