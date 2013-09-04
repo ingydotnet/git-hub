@@ -54,15 +54,19 @@ run-command() {
 }
 
 clean-json() {
-    if [ -s "$TEST_CASE_PATH/api-out" ]; then
-        $TEST_DIR/clean-json.rb $TEST_CASE_PATH/api-out
-    fi
+    for o in $TEST_CASE_PATH/*/out; do
+        if [ -s "$o" ]; then
+            $TEST_BIN/clean-json.rb $o
+        fi
+    done
 }
 
 clean-head() {
-    if [ -s "$TEST_CASE_PATH/api-head" ]; then
-        $TEST_DIR/clean-head.rb $TEST_CASE_PATH/api-head
-    fi
+    for h in $TEST_CASE_PATH/*/head; do
+        if [ -s "$h" ]; then
+            $TEST_BIN/clean-head.rb $h
+        fi
+    done
 }
 
 die() { echo "$@" >&2; exit 1; }

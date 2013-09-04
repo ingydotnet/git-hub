@@ -33,7 +33,7 @@ def clean hash
   end
 end
 
-file = ARGV.shift or fail 'Usage: clean-json.rb .../api-out'
+file = ARGV.shift or fail 'Usage: clean-json.rb .../out'
 `cp #{file} /tmp/` or fail
 data = JSON.load File.read(file)
 if data.kind_of? Array
