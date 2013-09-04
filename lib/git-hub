@@ -75,7 +75,7 @@ main() {
 run-command() {
 	set -e
 	local Infinity=9999999
-	local command command_command_sha1 arguments api_token
+	local command command_arguments command_sha1 api_token
 	local command_header_file command_output_file command_error_file
 	local user org owner repo pairs fields title list_size
 	local msg_ok msg_fail status_code ERROR
@@ -705,6 +705,8 @@ api-call() {
 			die "-R flag not valid. Command not previously run.\n"
 		rc=0
 	elif [ -z "$GIT_HUB_TEST_COMMAND" ]; then
+		local cache_dir="$GIT_HUB_CACHE/$command_sha1"
+		mkdir -p "$cache_dir"
 		# Actually run the curl command!
 		set +e #; set -x  # for debugging the real command
 		"${curl_command[@]}"
@@ -761,10 +763,14 @@ format-curl-command() {
 	elif [ -n "$api_token" ]; then
 		curl_command+=(--header "Authorization: token $api_token")
 	fi
-	command_sha1="$(echo "${curl_command[@]}" | $sha1sum | cut -f1 -d ' ')"
+
+	local sha1seed="${curl_command[@]}"
+	$show_output && sha1seed+=' -O'
+	command_sha1="$(echo "$sha1seed" | $sha1sum | cut -d ' ' -f1)"
 	command_header_file="$GIT_HUB_CACHE/$command_sha1/head"
 	command_output_file="$GIT_HUB_CACHE/$command_sha1/out"
 	command_error_file="$GIT_HUB_CACHE/$command_sha1/err"
+
 	if [ -e "$command_header_file" ]; then
 		etag="$(grep -Em1 '^ETag:' $command_header_file | tr -d '\r')"
 		if [ -n "$etag" ]; then
@@ -782,12 +788,10 @@ format-curl-command() {
 }
 
 cache-response-files() {
-	local dir="$GIT_HUB_CACHE/$command_sha1"
-	mkdir -p "$dir"
 	grep -E '^Status: 304' "$GIT_HUB_CACHE/head" &> /dev/null || {
 		for f in head out err; do
 			[ -e "$GIT_HUB_CACHE/$f" ] &&
-				mv "$GIT_HUB_CACHE/$f" "$dir"
+				mv "$GIT_HUB_CACHE/$f" "$cache_dir"
 		done
 	}
 }
