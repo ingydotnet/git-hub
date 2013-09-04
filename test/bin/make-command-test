@@ -30,6 +30,7 @@ assert-env() {
 }
 
 make-command() {
+    [ $# -lt 3 ] && die "Requires a 'git hub command'"
     TEST_CASE_CMD="$@"
 }
 
@@ -48,9 +49,7 @@ $TEST_CASE_CMD
 }
 
 run-command() {
-    export GIT_HUB_HEADER="$TEST_CASE_PATH/api-head"
-    export GIT_HUB_OUTPUT="$TEST_CASE_PATH/api-out"
-    export GIT_HUB_ERROR="$TEST_CASE_PATH/api-err"
+    export GIT_HUB_CACHE="$TEST_CASE_PATH"
     $TEST_CASE_CMD > "$TEST_CASE_PATH/stdout" 2> "$TEST_CASE_PATH/stderr"
 }
 
