@@ -16,9 +16,11 @@ main() {
 
 assert-env() {
     TEST_DIR="$PWD/test/commands"
+    TEST_BIN="$PWD/test/bin"
+    TEST_LIB="$PWD/test/lib"
     export GIT_HUB_CONFIG="$PWD/test/githubconfig"
     export GIT_HUB_LIST_SIZE=10
-    export PATH=$TEST_DIR:$PATH
+    export PATH=$TEST_BIN:$PATH
 
     [ -z "$GIT_DIR" ] && die "GIT_DIR must be set"
     [[ $GIT_DIR =~ test/repo/(git-hub|perlball|not-repo)/?$ ]] ||
