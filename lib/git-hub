@@ -27,7 +27,7 @@ Commands:
   followers, following, follows, follow, unfollow
   clone, repos, repo, repo-get, repo-edit, repo-new, repo-delete,
   forks, fork, stars, star, unstar, starred, collabs, trust, untrust
-  issues, issue
+  issues, issue, pulls
 
   setup, config, config-unset
   token-list, token-new, token-get, token-delete
@@ -49,6 +49,7 @@ r,raw       Show output data in a raw form
 j,json      Show output data in JSON
  
 A,use-auth  Force the use of authentication. (Get around rate limits)
+C,no-cache  Don't use cached responses.
 token=      Explicitly specify the GitHub v3 API Authentication Token
 d,dryrun    Check arguments but don't actually run the API command
 T           Show API token in the verbose output
@@ -79,13 +80,14 @@ run-command() {
 	local command_header_file command_output_file command_error_file
 	local user org owner repo pairs fields title list_size
 	local msg_ok msg_fail status_code ERROR
-	local do_all=false use_auth
+	local do_all=false use_auth no_cache
 	local quiet_output verbose_output
 	local raw_output=false json_output=false
 	local show_output=false show_headers=false show_json=false
 	local dry_run=false show_token repeat_command=false
 	get-var list-size
 	get-var-bool use-auth
+	get-var-bool no-cache
 	get-var-bool quiet-output
 	get-var-bool verbose-output
 	get-var-bool show-token
@@ -474,8 +476,9 @@ ok:issue() {
 	local label_title='Issue'
 	local label_body='Description'
 	fields=(
-		title number user__login state body
+		title number user__login state body comments
 	)
+	local skip_field_comments=true
 	report-data
 
 	local comments=$(JSON.get -n /comments -)
@@ -496,6 +499,19 @@ format-entry:comments() {
 	body=${body//\\r/}
 	body=${body//\\n\\n/\\n\\n     }
 	printf "     $body" | fmt
+}
+
+command:pulls() {
+	get-args ?owner:get-owner/repo:get-repo
+
+	report-list \
+		"/repos/$owner/$repo/pulls?sort=updated;per_page=PER_PAGE" \
+		'number updated_at state user/login head/label base/label title'
+}
+
+format-entry:pulls() {
+	printf "%d) #%-3d (%s) %-6s @%-10s %-20s %s\n" \
+		$1 $2 ${3/T*/} $4 $5 $6 "$7"
 }
 
 command:config() {
@@ -771,7 +787,7 @@ format-curl-command() {
 	command_output_file="$GIT_HUB_CACHE/$command_sha1/out"
 	command_error_file="$GIT_HUB_CACHE/$command_sha1/err"
 
-	if [ -e "$command_header_file" ]; then
+	if ! $no_cache && [ -e "$command_header_file" ]; then
 		etag="$(grep -Em1 '^ETag:' $command_header_file | tr -d '\r')"
 		if [ -n "$etag" ]; then
 			curl_command+=(--header "${etag/ETag/If-None-Match}")
@@ -1072,6 +1088,8 @@ report-data() {
 	else
 		json-prune-hash "${fields[@]}"
 		for field in "${fields[@]}"; do
+			local skip="skip_field_$field"
+			[ -n "${!skip}" ] && continue
 			report-value $field
 		done
 		! $raw_output && echo
@@ -1221,6 +1239,7 @@ get-opts() {
 			-j) json_output=true ;;
 
 			-A) use_auth=true ;;
+			-C) no_cache=true ;;
 			--token) api_token="$1"; shift ;;
 			-d) dry_run=true ;;
 			-T) show_token=true
