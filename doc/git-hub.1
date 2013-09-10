@@ -781,6 +781,65 @@ export GIT_HUB_USE_AUTH=true
 .if n \{\
 .RE
 .\}
+.SH "ETAG CACHING"
+.sp
+GitHub provides ETag headers in the API responses, and git\-hub uses them to cache responses, by default\&. When you use this feature, your rate\-limit usage is not affected for cached responses\&.
+.sp
+Unfortunately, there is currently a bug in GitHub\(cqs API implementation: ETag values are not always updated for changed response content\&. This means that your cache may get stale\&.
+.sp
+There are a few things you can do, if you suspect the cache is stale:
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+Use the
+\-C
+(\-\-no\-cache) flag on a request to bypass the cache\&.
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+Set
+GIT_HUB_NO_CACHE=true
+to bypass the cache\&.
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+Run
+git hub config no\-cache true
+to never use the cache\&.
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+Run
+git hub cache\-clear
+to erase all the cached values\&.
+.RE
 .SH "EXAMPLES"
 .sp
 The following sections show lots of interesting ways to use git hub\&. Let your imagination be your guide\&.
