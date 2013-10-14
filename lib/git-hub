@@ -969,28 +969,30 @@ get-repo() {
 }
 
 get-repo-config() {
-	local url=$(
-		git remote -v 2> /dev/null |
-			grep 'github\.com' |
-			head -n1
-	)
-	url=$(shopt -s extglob; echo ${url% (@(fetch|push))})
-	if [ -n "$url" ]; then
-		if [[ "$url" =~ github\.com ]]; then
-			[[ "$url" =~ .*://(.*) ]] &&
-				url="${BASH_REMATCH[1]}"
-			local re1='^[^:/]*[:/](.*)/(.*)\.git$'
-			local re2='^[^:/]*[:/](.*)/(.*)$'
-			if [[ "$url" =~ $re1 ]] || [[ "$url" =~ $re2 ]]; then
-				if [ "$1" == owner ]; then
-					echo "${BASH_REMATCH[1]}"
-				else
-					echo "${BASH_REMATCH[2]}"
+	for r in ^origin ^github github\.com; do
+		local url=$(
+				git remote -v 2> /dev/null |
+				grep $r |
+				head -n1
+		)
+		url=$(shopt -s extglob; echo ${url% (@(fetch|push))})
+		if [ -n "$url" ]; then
+				if [[ "$url" =~ github\.com ]]; then
+				[[ "$url" =~ .*://(.*) ]] &&
+						url="${BASH_REMATCH[1]}"
+				local re1='^[^:/]*[:/](.*)/(.*)\.git$'
+				local re2='^[^:/]*[:/](.*)/(.*)$'
+				if [[ "$url" =~ $re1 ]] || [[ "$url" =~ $re2 ]]; then
+						if [ "$1" == owner ]; then
+						echo "${BASH_REMATCH[1]}"
+						else
+						echo "${BASH_REMATCH[2]}"
+						fi
+						return 0
 				fi
-				return 0
-			fi
+				fi
 		fi
-	fi
+	done
 	return 1
 }
 
