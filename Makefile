@@ -70,10 +70,8 @@ uninstall-doc:
 $(INSTALL_EXT):
 	mkdir -p $@
 
-##
-# Sanity checks:
 $(SUBMODULE):
-	git submodule update --init --recursive
+	git submodule update --init
 
 ##
 # Build rules:
