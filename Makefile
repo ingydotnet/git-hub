@@ -73,8 +73,7 @@ $(INSTALL_EXT):
 ##
 # Sanity checks:
 $(SUBMODULE):
-	@echo 'You need to run `git submodule update --init` first.' >&2
-	@exit 1
+	git submodule update --init --recursive
 
 ##
 # Build rules:
