@@ -48,7 +48,7 @@ endif
 .PHONY: install install-lib install-doc
 install: install-lib install-doc
 
-install-lib: $(SUBMODULE) uninstall-lib $(INSTALL_EXT)
+install-lib: $(SUBMODULE) $(INSTALL_EXT)
 	install -C -m 0755 $(LOCAL_LIB) $(INSTALL_LIB)/
 	install -C -d -m 0755 $(INSTALL_EXT)/
 	install -C -m 0755 $(LOCAL_EXTS) $(INSTALL_EXT)/
@@ -100,9 +100,9 @@ doc/%.1: %.1
 
 # Install using symlinks so repo changes can be tested live
 .PHONY: dev-install dev-test dev-test-reset check-dev-install
-dev-install: $(SUBMODULE) uninstall-lib
-	ln -s $(LOCAL_LIB) $(INSTALL_CMD)
-	ln -s $(LOCAL_EXT) $(INSTALL_EXT)
+dev-install: $(SUBMODULE)
+	ln -fs $(LOCAL_LIB) $(INSTALL_CMD)
+	ln -fs $(LOCAL_EXTS) $(INSTALL_EXT)
 
 # Run a bunch of live tests. Make sure this thing really works. :)
 dev-test:
