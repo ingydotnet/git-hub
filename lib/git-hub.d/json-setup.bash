@@ -14,7 +14,7 @@ fi
 # Format a JSON object from an input list of key/value pairs.
 json-dump-object() {
 	local json='{'
-	local regex='(^\[|^null$|^[0-9]+$)'
+        local regex='(^[\[\{]|^(null|true|false)$|^[0-9]+$)'
 	while [ $# -gt 0 ]; do
 		if [[ "$2" =~ $regex ]]; then
 			json="$json\"$1\":$2"
