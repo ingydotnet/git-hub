@@ -26,6 +26,7 @@
 
 == Commands
 - New commands to add:
+  - commands <pattern> - list commands
   - remote (add remote for adding GitHub remotes)
   - pulls       - list pull requests
   - pull        - issue a pull request
@@ -56,6 +57,7 @@
 
 == Performance
 - Cache all results
+  - Check Etag fix
 - Support etag caching
 - Parallel requests
 
