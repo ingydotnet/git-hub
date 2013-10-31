@@ -445,6 +445,7 @@ command:trust() {
 	for collab in ${collaborators[@]}; do
 		api-put "/repos/$owner/$repo/collaborators/$collab"
 	done
+	msg_ok="'$owner/$repo' commit permission added for: ${collaborators[@]}"
 }
 
 command:untrust() {
@@ -453,6 +454,7 @@ command:untrust() {
 	for collab in ${collaborators[@]}; do
 		api-delete "/repos/$owner/$repo/collaborators/$collab"
 	done
+	msg_ok="'$owner/$repo' commit permission removed for: ${collaborators[@]}"
 }
 
 command:issues() {
