@@ -1,46 +1,41 @@
-== Pomodoro!
-- Cache responses and etag
-- Chunk list json into an array of texts
+== Next/Now
+- convert
+  - test-more
+  - bash+
+
+
+== Bugs
+- Find out why github fails under zsh (rafl)
+- No error msg printed on wrong password
+- find right remote
+  - complain if ambiguous
+
+=== Bugs (OSX)
+
+== Commands
+- New commands to add:
+  - commands <pattern> - list commands
+  - remote (add remote for adding GitHub remotes)
+  - push-all    - push to all gh remotes
+  - pulls       - list pull requests
+  - pull        - issue a pull request
+  - search
+  - commits     - show gh urls
+  - keys        - show public keys
+  - rate-limit
+  - repo-watch
+  - issue-close
+  - issue-new
+  - issue-comment
+    - git hub log    -- show urls for commits
+    - git hub url <file>  -- show url for file/branch/raw
+  - Make a plan for all actions to support
 
 == Documentation
 - Build doc/*.asc into man
 - Add an Environment Variables section
 - Add a prerequisites section to doc
 - Add a DEVELOPMENT document to the repo
-
-== Refactoring
-- Review git/Documentation/CodingGuidelines
-- Eliminate evals
-- Eliminate TODO/XXX
-- Move all commands to plugins! (lib/git-hub.d/)
-
-== Makefile
-- Redo Makefile based on git itself
-- Support DESTDIR
-
-== Testing
-- Use git-hub-test-user account for dev testing
-- convert all_commands.t to test-simple / prove
-- Write dev-test for installation from git `clone git-hub`
-- Add more commands to all-commands.t
-
-== Commands
-- New commands to add:
-  - commands <pattern> - list commands
-  - remote (add remote for adding GitHub remotes)
-  - pulls       - list pull requests
-  - pull        - issue a pull request
-  - search
-  - rate-limit
-  - repo-watch
-  - issue-close
-  - issue-new
-  - issue-comment
-  - Make a plan for all actions to support
-
-== Output
-- Implement `git hub user --all`
-- Implement `git hub repo --all`
 
 == Error Handling
 - Validate input data better
@@ -49,11 +44,13 @@
 - Better error msging for mistakes.
   - Think about what common errors might happen.
 
-== UX
-- Add pagination
-- Support @ as shorthand for login-name
-- Support a git-hub-shell
-- Command completion
+== Makefile
+- Redo Makefile based on git itself
+- Support DESTDIR
+
+== Output
+- Implement `git hub user --all`
+- Implement `git hub repo --all`
 
 == Performance
 - Cache all results
@@ -61,15 +58,35 @@
 - Support etag caching
 - Parallel requests
 
-== Bugs
-- Find out why github fails under zsh (rafl)
-- No error msg printed on wrong password
-
-== Mac Bugs
-
 == Plugin
 - Document plugins
-- Write an IRC plugin
+- git-hub-travis-irc
+- git-hub-irc
+
+== Refactoring
+- Try loading git-hub-foo plugin for git-hub-foo-bar command
+- Review git/Documentation/CodingGuidelines
+- Eliminate evals
+- Eliminate TODO/XXX
+- Move all commands to plugins! (lib/git-hub.d/)
+- detect '|' and output raw (-r)
+- Chunk list json into an array of texts
+
+== Testing
+- Check github etag fix.
+  - https://gist.github.com/ingydotnet/6472496
+- Use git-hub-test-user account for dev testing
+- convert all_commands.t to test-simple / prove
+- Write dev-test for installation from git `clone git-hub`
+- Add more commands to all-commands.t
+
+== UX
+- git hub clone repo  (no owner/repo)
+- Add pagination
+- Support @ as shorthand for login-name
+- Support a git-hub-shell
+- Command completion
+- support multiple args on commands like trust
 
 == Done
 + Add a setup command that walks a user through configuration
