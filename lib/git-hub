@@ -296,9 +296,41 @@ command:unfollow() {
 }
 
 command:clone() {
-	get-args owner/repo ?dir
-	git clone --recursive "git@github.com:$owner/$repo" $dir
+	set -- "${command_arguments[@]}"
+	while (($#)); do
+		if [[ $# == 1 ]] || [[ ! "$2" =~ ^\.?/ ]]; then
+			exec:clone "$1"
+			shift
+		else
+			exec:clone "$1" "$2"
+			shift; shift
+		fi
+	done
 	msg_ok=0
+}
+
+exec:clone() {
+	owner_repo=$1
+	dir=$2
+	if [[ ! $owner_repo =~ / ]]; then
+		owner=`get-user` ||
+			die "Can't determine owner for '$owner_repo'"
+		owner_repo=$owner/$owner_repo
+	fi
+	cmd="git clone --recursive git@github.com:$owner_repo $dir"
+	(
+		if $verbose_output; then
+			set -x
+			$cmd
+		else
+			$cmd &> /dev/null
+		fi
+	)
+	if [ -n "$dir" ]; then
+		say "$owner_repo cloned into $dir"
+	else
+		say "$owner_repo cloned"
+	fi
 }
 
 # vim: set ft=sh tabstop=4 shiftwidth=4 lisp noexpandtab:
@@ -1407,9 +1439,9 @@ say-() { ! $quiet_output && out- "$@"; true; }
 nay() { ! $quiet_output && err "$@"; true; }
 nay-() { ! $quiet_output && err- "$@"; true; }
 out() { echo -e "$@" >&1; }
-out-() { echo -n "$@" >&1; }
+out-() { echo -en "$@" >&1; }
 err() { echo -e "$@" >&2; }
-err-() { echo -n "$@" >&2; }
+err-() { echo -en "$@" >&2; }
 
 prompt() {
 	local msg answer default yn=false password=false

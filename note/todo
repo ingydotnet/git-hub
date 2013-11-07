@@ -3,7 +3,6 @@
   - test-more
   - bash+
 
-
 == Bugs
 - Find out why github fails under zsh (rafl)
 - No error msg printed on wrong password
@@ -32,6 +31,7 @@
   - Make a plan for all actions to support
 
 == Documentation
+- Convert asciidoc to markdown
 - Build doc/*.asc into man
 - Add an Environment Variables section
 - Add a prerequisites section to doc
@@ -64,6 +64,9 @@
 - git-hub-irc
 
 == Refactoring
+- rename files for new layout (ReadMe, etc)
+- Remove tab indentation and adopt bash+ standard
+- Use bash+
 - Try loading git-hub-foo plugin for git-hub-foo-bar command
 - Review git/Documentation/CodingGuidelines
 - Eliminate evals
@@ -81,6 +84,7 @@
 - Add more commands to all-commands.t
 
 == UX
+- repo-new should print repo url
 - git hub clone repo  (no owner/repo)
 - Add pagination
 - Support @ as shorthand for login-name
