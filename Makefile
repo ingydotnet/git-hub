@@ -43,7 +43,7 @@ ifeq ($(shell which prove),)
 	@echo '`make test` requires the `prove` utility'
 	@exit 1
 endif
-	prove $(PROVE_OPTIONS) test/
+	prove $(PROVEOPT:%=% )test/
 
 .PHONY: install install-lib install-doc
 install: install-lib install-doc
