@@ -14,8 +14,9 @@ INSTALL_MAN ?= $(PREFIX)/share/man/man1
 
 # Submodules
 JSON=ext/json-bash/lib/json.bash
-TEST_SIMPLE=ext/test-simple-bash/lib/test-simple.bash
-SUBMODULE := $(JSON) $(TEST_SIMPLE)
+BASHPLUS=ext/bashplus/lib/bash+.bash
+TEST_MORE=ext/test-more-bash/lib/test/more.bash
+SUBMODULE := $(JSON) $(BASHPLUS) $(TEST_MORE)
 
 ## XXX assert good bash
 

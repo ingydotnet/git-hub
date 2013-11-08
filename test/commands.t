@@ -21,10 +21,6 @@ else
     done
 fi
 
-PATH=ext/test-simple-bash/lib:$PATH \
-source test-simple.bash tests $(( ${#ALL_TESTS[@]} * 2 ))
-TestSimple_CALL_STACK_LEVEL=2
-
 main() {
     export PATH=$TEST_LIB:$PATH
     for test_dir in "${ALL_TESTS[@]}"; do
@@ -36,6 +32,7 @@ main() {
         file-test stderr
         source teardown.bash
     done
+    done_testing
 }
 
 file-test() {

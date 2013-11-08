@@ -61,6 +61,17 @@ R           Debug - Repeat last command without contacting server
 x           Debug - Turn on Bash trace (set -x) output
 "
 
+export BASHLIB="$(
+  shopt -s globstar
+  set -- ${0%/*}/**/{lib,git-hub.d}
+  IFS=':'; echo "$*"
+)"
+export PATH="$BASHLIB:$PATH"
+# echo "${PATH//:/$'\n'}"; exit 1
+
+source bash+.bash :std
+
+
 #------------------------------------------------------------------------------
 main() {
 	local OK=0

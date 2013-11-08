@@ -4,3 +4,6 @@
 [submodule "ext/test-more-bash"]
 	path = ext/test-more-bash
 	url = https://github.com/ingydotnet/test-more-bash.git
+[submodule "ext/bashplus"]
+	path = ext/bashplus
+	url = https://github.com/ingydotnet/bashplus.git
