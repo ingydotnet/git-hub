@@ -1,4 +1,6 @@
 == Next/Now
+- rename files for new layout (ReadMe, etc)
+- Remove tab indentation and adopt bash+ standard
 - convert
   - test-more
   - bash+
@@ -64,8 +66,6 @@
 - git-hub-irc
 
 == Refactoring
-- rename files for new layout (ReadMe, etc)
-- Remove tab indentation and adopt bash+ standard
 - Use bash+
 - Try loading git-hub-foo plugin for git-hub-foo-bar command
 - Review git/Documentation/CodingGuidelines

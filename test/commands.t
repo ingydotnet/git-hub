@@ -2,7 +2,9 @@
 
 set -e
 
-die() { echo "$@" >&2; exit 1; }
+source test/setup
+
+use Test::More
 
 export TEST_DIR="$PWD/test/commands"
 export TEST_BIN="$PWD/test/bin"
@@ -41,16 +43,7 @@ file-test() {
     local label=$test_dir
     label="${label#$TEST_DIR/}"
     label+=" ($file)"
-    local diff=$(diff -u "$test_dir/$file" "$TEST_DIR/$file")
-    local result
-    [ -z "$diff" ] && result=true || result=false
-    ok $result "$label" || true
-    [ -n "$diff" ] && diag "$diff"
-    true
+    is "$(< "$test_dir/$file")" "$(< "$TEST_DIR/$file")" "$label"
 }
-
-# XXX move to test-more.bash
-note() { echo "# $@"; }
-diag() { echo "# $@" >&2; }
 
 main "$@"

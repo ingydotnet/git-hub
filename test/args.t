@@ -2,16 +2,11 @@
 
 set -e
 
-PATH=ext/test-simple-bash/lib:$PATH
-source test-simple.bash tests 19
-note() {
-    echo "# $@"
-}
-diag() {
-    echo "# $@" >&2
-}
+source test/setup
 
-PATH=lib:$PATH
+use Test::More
+
+# use git-hub
 source git-hub
 
 run-test() {
@@ -24,10 +19,7 @@ run-test() {
     get-opts "${opts[@]}"
     get-args $spec
     local got="$(result $spec)"
-    ok [ "$got" == "$expect" ] "$label" || {
-        diag "Want: $expect"
-        diag "Got:  $got"
-    }
+    is "$got" "$expect" "$label"
 }
 result() {
     local spec="$@"
@@ -53,12 +45,7 @@ run-test-error() {
     local opts=('<cmd>' "${a[@]:2}")
     local label="ERROR: git hub ${opts[@]}"
     local error=$(run-test "$@" 2>&1)
-    local ok
-    [[ "$error" =~ "$expect" ]] && ok=true || ok=false
-    ok $ok "$label" || {
-        diag "Pattern: $expect"
-        diag "Not in:  $error"
-    }
+    like "$error" "$expect" "$label"
 }
 
 export GIT_DIR=$PWD/test/repo/not-repo
@@ -165,3 +152,4 @@ run-test \
     "===apple,banana man,carrot=" \
     apple 'banana man' carrot
 
+done_testing

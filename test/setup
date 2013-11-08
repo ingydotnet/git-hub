@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+
+set -e
+
+export BASHLIB="$(
+  shopt -s globstar
+  set -- $PWD/**/{bin,lib}
+  IFS=':'; echo "$*"
+)"
+export PATH="$BASHLIB:$PATH"
+
+source bash+ :std
