@@ -2,12 +2,12 @@
 .\"     Title: git-hub
 .\"    Author: [see the "AUTHOR" section]
 .\" Generator: DocBook XSL Stylesheets v1.76.1 <http://docbook.sf.net/>
-.\"      Date: 09/10/2013
+.\"      Date: 11/08/2013
 .\"    Manual: Git Manual
 .\"    Source: Git 1.7.9.5
 .\"  Language: English
 .\"
-.TH "GIT\-HUB" "1" "09/10/2013" "Git 1\&.7\&.9\&.5" "Git Manual"
+.TH "GIT\-HUB" "1" "11/08/2013" "Git 1\&.7\&.9\&.5" "Git Manual"
 .\" -----------------------------------------------------------------
 .\" * Define some portability stuff
 .\" -----------------------------------------------------------------
@@ -380,8 +380,11 @@ and
 \-\-json
 options show the data in different formats than normal output\&.
 .RE
-.sp
-user\-get <user> <data\-key> Get a specific data value for a particular user\&.
+.PP
+user\-get <user> <data\-key>
+.RS 4
+Get a specific data value for a particular user\&.
+.RE
 .PP
 user\-edit <user> <key\-value\-pair>\&...
 .RS 4
@@ -412,8 +415,11 @@ and
 \-\-json
 options show the data in different formats than normal output\&.
 .RE
-.sp
-org\-get <org> <data\-key> Get a specific data value for a particular organization\&.
+.PP
+org\-get <org> <data\-key>
+.RS 4
+Get a specific data value for a particular organization\&.
+.RE
 .PP
 org\-edit <org> <key\-value\-pairs>\&...
 .RS 4
@@ -466,11 +472,15 @@ unfollow <user>\&...
 Stop following one or more users\&.
 .RE
 .PP
-clone <owner>/<repo> [<directory>]
+clone ([<owner>/]<repo> [<directory>])\&...
 .RS 4
 Clone a GitHub repo\&. Always uses
 \-\-recursive
-so you get submodules too\&.
+so you get submodules too\&. You can specifiy a list of repos\&. If you specify a directory for a repo, it should be an absolute path name or else begin with
+\fI\&./\fR
+or
+\fI\&.\&./\fR
+so that it can be distinguished from another repo name\&.
 .RE
 .PP
 repos [<user>]
@@ -486,8 +496,11 @@ and
 \-\-json
 options show the data in different formats than normal output\&.
 .RE
-.sp
-repo\-get <owner>/<repo> <data\-key> Get a specific data value for a particular repository\&.
+.PP
+repo\-get <owner>/<repo> <data\-key>
+.RS 4
+Get a specific data value for a particular repository\&.
+.RE
 .PP
 repo\-edit [<owner>/<repo>] <key\-value\-pair>\&...
 .RS 4
@@ -572,12 +585,23 @@ issue [<owner>/<repo>] <issue\-id\-number>
 .RS 4
 Show info (including any comments) for a specific issue\&.
 .RE
-.sp
-issue\-new [<owner>/<repo>] Create a new issue for a repository\&.
-.sp
-issue\-comment [<owner>/<repo>] <issue\-id\-number> [<comment\-text\-string>] Add a comment to an issue\&. If no comment string is given, the command will open your default editor and let you enter the text\&.
-.sp
-issue\-close [<owner>/<repo>] <issue\-id\-number> [<comment\-text\-string>] Close an issue with an option comment\&. If you use the string \fI\&...\fR as your comment, your ediitor will be opened to allow you to type in your comment text\&.
+.PP
+issue\-new [<owner>/<repo>]
+.RS 4
+Create a new issue for a repository\&.
+.RE
+.PP
+issue\-comment [<owner>/<repo>] <issue\-id\-number> [<comment\-text\-string>]
+.RS 4
+Add a comment to an issue\&. If no comment string is given, the command will open your default editor and let you enter the text\&.
+.RE
+.PP
+issue\-close [<owner>/<repo>] <issue\-id\-number> [<comment\-text\-string>]
+.RS 4
+Close an issue with an option comment\&. If you use the string
+\fI\&...\fR
+as your comment, your ediitor will be opened to allow you to type in your comment text\&.
+.RE
 .SH "CONFIGURATION COMMANDS"
 .sp
 These commands are for editing your git\-hub config file and managing your GitHub authentication tokens\&.

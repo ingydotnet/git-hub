@@ -298,7 +298,7 @@ command:unfollow() {
 command:clone() {
 	set -- "${command_arguments[@]}"
 	while (($#)); do
-		if [[ $# == 1 ]] || [[ ! "$2" =~ ^\.?/ ]]; then
+		if [[ $# == 1 ]] || [[ ! "$2" =~ ^\.?\.?/ ]]; then
 			exec:clone "$1"
 			shift
 		else
