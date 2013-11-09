@@ -68,7 +68,9 @@ export BASHLIB="$(
 )"
 export PATH="$BASHLIB:$PATH"
 
-source bash+.bash :std
+# source bash+ :std
+source bash+.bash
+bash+:import :std
 
 
 #------------------------------------------------------------------------------
@@ -1414,34 +1416,6 @@ prompt-to-run-setup() {
 #------------------------------------------------------------------------------
 # General purpose functions:
 #------------------------------------------------------------------------------
-
-warn() {
-  local msg="${@//\\n/$'\n'}"
-  if [ -z "$msg" ]; then
-    err 'Warning'
-  else
-    err "$msg"
-  fi
-}
-
-die() {
-  local c=($(caller ${DIE_STACK_LEVEL:-0}))
-  local msg="${@//\\n/$'\n'}"
-  if [ -z "$msg" ]; then
-    err- 'Died'
-  else
-    err- "$msg"
-  fi
-  local trailing_newline_re=$'\n''$'
-  [[ "$msg" =~ $trailing_newline_re ]] && exit 1
-
-  if [ ${#c[@]} -eq 2 ]; then
-    printf " at line %d of %s\n" ${c[@]} >&2
-  else
-    printf " at line %d in %s of %s\n" ${c[@]} >&2
-  fi
-  exit 1
-}
 
 quiet_output=false
 say() { ! $quiet_output && out "$@"; true; }
