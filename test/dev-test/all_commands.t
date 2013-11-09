@@ -8,8 +8,8 @@ set -ex
 
 ## Reset section
 if [ -n "$GIT_HUB_TEST_RESET" ]; then
-    git hub repo-delete ingydotnet/git-hub-api-test
-    exit 0
+  git hub repo-delete ingydotnet/git-hub-api-test
+  exit 0
 fi
 
 export GIT_HUB_LIST_SIZE=5
@@ -23,8 +23,8 @@ git hub repo cdent/simper
 git hub repo-new git-hub-api-test
 git hub repos
 git hub repo-edit ingydotnet/git-hub-api-test \
-    description "This is just a test repo" \
-    homepage http://example.com
+  description "This is just a test repo" \
+  homepage http://example.com
 git hub star git-hub-api-test
 git hub stars git-hub-api-test
 git hub unstar git-hub-api-test
@@ -39,4 +39,4 @@ set +x
 echo
 echo All commands ran seemingly without error.
 
-# vim: set ft=sh :
+# vim: set ft=sh:

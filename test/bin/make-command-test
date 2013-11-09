@@ -3,70 +3,70 @@
 set -e
 
 main() {
-    assert-env "$@"
-    make-command "$@"
-    make-test-case-dir
-    make-run-bash
-    run-command
-    clean-json
-    clean-head
+  assert-env "$@"
+  make-command "$@"
+  make-test-case-dir
+  make-run-bash
+  run-command
+  clean-json
+  clean-head
 
-    echo "Created '$TEST_CASE_PATH'"
+  echo "Created '$TEST_CASE_PATH'"
 }
 
 assert-env() {
-    TEST_DIR="$PWD/test/commands"
-    TEST_BIN="$PWD/test/bin"
-    TEST_LIB="$PWD/test/lib"
-    export GIT_HUB_CONFIG="$PWD/test/githubconfig"
-    export GIT_HUB_LIST_SIZE=10
-    export PATH=$TEST_BIN:$PATH
+  TEST_DIR="$PWD/test/commands"
+  TEST_BIN="$PWD/test/bin"
+  TEST_LIB="$PWD/test/lib"
+  export GIT_HUB_CONFIG="$PWD/test/githubconfig"
+  export GIT_HUB_LIST_SIZE=10
+  export PATH=$TEST_BIN:$PATH
 
-    [ -z "$GIT_DIR" ] && die "GIT_DIR must be set"
-    [[ $GIT_DIR =~ test/repo/(git-hub|perlball|not-repo)/?$ ]] ||
-        die 'Invalid value for $GIT_DIR'
-    GIT_DIR_DIR="${GIT_DIR%/}"
-    GIT_DIR_DIR="${GIT_DIR_DIR/*\//}"
+  [ -z "$GIT_DIR" ] && die "GIT_DIR must be set"
+  [[ $GIT_DIR =~ test/repo/(git-hub|perlball|not-repo)/?$ ]] ||
+    die 'Invalid value for $GIT_DIR'
+  GIT_DIR_DIR="${GIT_DIR%/}"
+  GIT_DIR_DIR="${GIT_DIR_DIR/*\//}"
 }
 
 make-command() {
-    [ $# -lt 3 ] && die "Requires a 'git hub command'"
-    TEST_CASE_CMD="$@"
+  [ $# -lt 3 ] && die "Requires a 'git hub command'"
+  TEST_CASE_CMD="$@"
 }
 
 make-test-case-dir() {
-    test_dir="$TEST_DIR/${test_dir// /_}"
-    TEST_CASE_DIR="${GIT_DIR_DIR}:${TEST_CASE_CMD// /_}"
-    TEST_CASE_PATH="$TEST_DIR/$TEST_CASE_DIR"
-    mkdir -p "$TEST_CASE_PATH"
+  test_dir="$TEST_DIR/${test_dir// /_}"
+  TEST_CASE_DIR="${GIT_DIR_DIR}:${TEST_CASE_CMD// /_}"
+  TEST_CASE_PATH="$TEST_DIR/$TEST_CASE_DIR"
+  mkdir -p "$TEST_CASE_PATH"
 }
 
 make-run-bash() {
-    cat <<... > $TEST_CASE_PATH/run.bash
+  cat <<... > $TEST_CASE_PATH/run.bash
 export GIT_DIR=\$TEST_DIR/../repo/$GIT_DIR_DIR
 $TEST_CASE_CMD
 ...
 }
 
 run-command() {
-    export GIT_HUB_CACHE="$TEST_CASE_PATH"
-    $TEST_CASE_CMD > "$TEST_CASE_PATH/stdout" 2> "$TEST_CASE_PATH/stderr"
+  export GIT_HUB_CACHE="$TEST_CASE_PATH"
+  $TEST_CASE_CMD > "$TEST_CASE_PATH/stdout" 2> "$TEST_CASE_PATH/stderr"
 }
 
 clean-json() {
-    for o in $TEST_CASE_PATH/*/out; do
-        if [ -s "$o" ]; then
-            $TEST_BIN/clean-json.rb $o
-        fi
-    done
+  for o in $TEST_CASE_PATH/*/out; do
+    if [ -s "$o" ]; then
+      $TEST_BIN/clean-json.rb $o
+    fi
+  done
 }
 
 clean-head() {
-    for h in $TEST_CASE_PATH/*/head; do
-        if [ -s "$h" ]; then
-            $TEST_BIN/clean-head.rb $h
-        fi
-    done
+  for h in $TEST_CASE_PATH/*/head; do
+    if [ -s "$h" ]; then
+      $TEST_BIN/clean-head.rb $h
+    fi
+  done
 }
 
 die() { echo "$@" >&2; exit 1; }
