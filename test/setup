@@ -2,11 +2,8 @@
 
 set -e
 
-export BASHLIB="$(
-  shopt -s globstar
-  set -- $PWD/**/{bin,lib}
-  IFS=':'; echo "$*"
-)"
+export BASHLIB="`find $PWD -type d | grep -E '/(bin|lib)$' | xargs -n1 printf "%s:"`"
+
 export PATH="$BASHLIB:$PATH"
 
 source bash+ :std
