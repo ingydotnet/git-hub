@@ -72,7 +72,7 @@ $(INSTALL_EXT):
 	mkdir -p $@
 
 $(SUBMODULE):
-	git submodule update --init
+	git submodule update --init --recursive
 
 ##
 # Build rules:
