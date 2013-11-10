@@ -79,7 +79,7 @@ $(SUBMODULE):
 .PHONY: doc
 doc: doc/$(CMD).1
 
-$(CMD).txt: readme.asc
+$(CMD).txt: ReadMe.asc
 	cp $< $@
 
 %.xml: %.txt
