@@ -932,7 +932,7 @@ get-args() {
     specs=("${specs[@]:1}")
   done
   if [ ${#args[@]} -gt 0 ]; then
-    die "Unknown argument(s): '${args[@]}'"
+    die "Unknown argument(s): '${args[*]}'"
   fi
 }
 
