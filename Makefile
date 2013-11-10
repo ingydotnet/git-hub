@@ -7,7 +7,11 @@ LOCAL_EXTS = $(shell find $(LOCAL_EXT) -type f) \
 
 # XXX Make these vars look like git.git/Makefile style
 PREFIX ?= /usr/local
-INSTALL_LIB ?= $(shell git --exec-path)
+
+# XXX Using sed for now. Would like to use bash or make syntax.
+# If GIT_EXEC_PATH is set, `git --exec-path` will contain that appended to the
+# front. We just want the path where git is actually installed:
+INSTALL_LIB ?= $(shell git --exec-path | sed 's/.*://')
 INSTALL_CMD ?= $(INSTALL_LIB)/$(CMD)
 INSTALL_EXT ?= $(INSTALL_LIB)/$(CMD).d
 INSTALL_MAN ?= $(PREFIX)/share/man/man1
