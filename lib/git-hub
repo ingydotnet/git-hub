@@ -404,10 +404,15 @@ command:repo-edit() {
 # TODO Support creating repo under an org
 command:repo-new() {
   require-auth
-  get-args repo
-  api-post "/user/repos" $(json-dump-object 'name' $repo)
-  msg_ok="Repository '$repo' created."
-  msg_422="Repository name '$repo' already exists."
+  get-args ?org:get-user/repo:get-repo
+  local login=$(get-login)
+  if [ "$org" == "$login" ]; then
+    api-post "/user/repos" $(json-dump-object 'name' $repo)
+  else
+    api-post "/orgs/$org/repos" $(json-dump-object 'name' $repo)
+  fi
+  msg_ok="Repository 'git@github.com:$org/$repo' created."
+  msg_422="Repository name 'git@github.com:$org/$repo' already exists."
 }
 
 command:repo-delete() {
