@@ -293,12 +293,14 @@ command:follow() {
   require-auth
   get-args user:get-owner
   api-put "/user/following/$user"
+  msg_ok="'$login' is now following '$user'"
 }
 
 command:unfollow() {
   require-auth
   get-args user:get-owner
   api-delete "/user/following/$user"
+  msg_ok="'$login' is no longer following '$user'"
 }
 
 command:clone() {
