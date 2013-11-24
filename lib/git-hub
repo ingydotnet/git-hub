@@ -64,7 +64,7 @@ x           Debug - Turn on Bash trace (set -x) output
 
 # source bash+ :std
 source "${BASH_SOURCE%/*}/git-hub.d/bash+.bash"
-bash+:import :std
+bash+:import :std can
 
 
 #------------------------------------------------------------------------------
@@ -106,7 +106,7 @@ run-command() {
   "command:$command" "$@"
 
   if OK; then
-    if callable "ok:$command"; then
+    if can "ok:$command"; then
       "ok:$command"
     else
       if [ "$msg_ok" != '0' ]; then
@@ -117,11 +117,11 @@ run-command() {
     local status_msg=msg_$status_code
     if [ -n "${!status_msg}" ]; then
       nay "${!status_msg}"
-    elif [ -n "$status_code" ] && callable "status-$status_code:$command"; then
+    elif [ -n "$status_code" ] && can "status-$status_code:$command"; then
       "status-$status_code:$command"
     elif [ -n "$msg_fail" ]; then
       nay "$msg_fail"
-    elif callable "fail:$command"; then
+    elif can "fail:$command"; then
       "fail-$command"
     else
       local msg="Error: 'git hub $command' command failed"
@@ -771,10 +771,12 @@ api-call() {
     local cache_dir="$GIT_HUB_CACHE/$command_sha1"
     mkdir -p "$cache_dir"
     # Actually run the curl command!
-    set +e #; set -x  # for debugging the real command
-    "${curl_command[@]}"
+    (
+      set +e
+      # set -x  # for debugging the real command
+      "${curl_command[@]}"
+    )
     rc=$?
-    set -e #; set +x  # for debugging the real command
     cache-response-files
   fi
 
@@ -1093,7 +1095,7 @@ report-list() {
         value="$(JSON.get -a "/$ii/$field" -)"
         values+=("$value")
       done
-      if callable "format-entry:$command"; then
+      if can "format-entry:$command"; then
         "format-entry:$command" $list_counter "${values[@]}"
       else
         default-format-entry $list_counter "${values[@]}"
@@ -1474,16 +1476,11 @@ prompt() {
   fi
 }
 
-# Check if a function exists:
-callable() {
-  [ -n "$(type "$1" 2> /dev/null)" ]
-}
-
 callable-or-source() {
-  if callable "command:$1"; then
+  if can "command:$1"; then
     return 0
   else
-    if source-ext-maybe git-hub-"${1/:*/}" && callable "command:$1"; then
+    if source-ext-maybe git-hub-"${1/:*/}" && can "command:$1"; then
       return 0
     fi
   fi
