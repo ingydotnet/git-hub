@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #
 # git-hub: Do GitHub operations from the `git` command
 #

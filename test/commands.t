@@ -1,6 +1,4 @@
-#!/bin/bash
-
-set -e
+#!/usr/bin/env bash
 
 source test/setup
 
