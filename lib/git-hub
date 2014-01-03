@@ -169,7 +169,7 @@ command:help() {
 }
 
 command:user() {
-  get-args ?user:get-user
+  get-args '?user:get-user'
   api-get "/users/$user"
   msg_404="User '$user' not found."
 }
@@ -183,7 +183,7 @@ ok:user() {
 }
 
 command:user-get() {
-  get-args ?user:get-user key
+  get-args '?user:get-user' key
   api-get "/users/$user"
   OK || {
     msg_fail="User '$user' not found"
@@ -264,21 +264,21 @@ command:teams() {
 }
 
 command:followers() {
-  get-args ?user:get-user
+  get-args '?user:get-user'
   report-list \
     "/users/$user/followers?per_page=PER_PAGE" \
     'login'
 }
 
 command:following() {
-  get-args ?user:get-user
+  get-args '?user:get-user'
   report-list \
     "/users/$user/following?per_page=PER_PAGE" \
     'login'
 }
 
 command:follows() {
-  get-args user ?target:get-login
+  get-args user '?target:get-login'
   api-get /users/$user/following/$target
   if OK; then
     msg_ok="'$user' follows '$target'"
@@ -358,7 +358,7 @@ format-entry:repos() {
 }
 
 command:repo() {
-  get-args ?owner:get-user/repo:get-repo
+  get-args '?owner:get-user/repo:get-repo'
   api-get "/repos/$owner/$repo"
 }
 
@@ -374,7 +374,7 @@ ok:repo() {
 }
 
 command:repo-get() {
-  get-args ?owner:get-user/repo:get-repo key
+  get-args '?owner:get-user/repo:get-repo' key
   api-get "/repos/$owner/$repo"
   OK || {
     msg_fail="Repo '$owner/$repo' not found"
@@ -391,7 +391,7 @@ command:repo-get() {
 
 command:repo-edit() {
   require-auth
-  get-args ?owner:get-user/repo:get-repo %pairs
+  get-args '?owner:get-user/repo:get-repo' %pairs
   local adds=(name "$repo")
   for (( i = 0; i < ${#pairs[@]}; i = i + 2 )); do
     if [ "${pairs[$i]}" == name ]; then
@@ -406,7 +406,7 @@ command:repo-edit() {
 # TODO Support creating repo under an org
 command:repo-new() {
   require-auth
-  get-args ?org:get-user/repo:get-repo
+  get-args '?org:get-user/repo:get-repo'
   local login=$(get-login)
   if [ "$org" == "$login" ]; then
     api-post "/user/repos" $(json-dump-object 'name' $repo)
@@ -425,7 +425,7 @@ command:repo-delete() {
 }
 
 command:forks() {
-  get-args ?owner:get-user/repo:get-repo
+  get-args '?owner:get-user/repo:get-repo'
   report-list \
     "/repos/$owner/$repo/forks?sort=newest;per_page=PER_PAGE" \
     'pushed_at full_name'
@@ -441,14 +441,14 @@ format-entry:forks() {
 
 command:fork() {
   require-auth
-  get-args ?owner:get-user/repo:get-repo
+  get-args '?owner:get-user/repo:get-repo'
   api-post "/repos/$owner/$repo/forks" '{}'
   local login=$(get-login)
   msg_ok="Repository '$owner/$repo' forked to '$login'"
 }
 
 command:stars() {
-  get-args ?owner:get-user/repo:get-repo
+  get-args '?owner:get-user/repo:get-repo'
   local title="Stargazers for '$owner/$repo':"
   report-list \
     "/repos/$owner/$repo/stargazers?per_page=PER_PAGE" \
@@ -458,27 +458,27 @@ command:stars() {
 
 command:star() {
   require-auth
-  get-args ?owner:get-user/repo:get-repo
+  get-args '?owner:get-user/repo:get-repo'
   api-put "/user/starred/$owner/$repo"
   msg_ok="'$owner/$repo' starred"
 }
 
 command:unstar() {
   require-auth
-  get-args ?owner:get-user/repo:get-repo
+  get-args '?owner:get-user/repo:get-repo'
   api-delete "/user/starred/$owner/$repo"
   msg_ok="'$owner/$repo' unstarred"
 }
 
 command:starred() {
-  get-args ?user:get-user
+  get-args '?user:get-user'
   report-list \
     "/users/$user/starred?sort=updated;per_page=PER_PAGE" \
     'full_name'
 }
 
 command:collabs() {
-  get-args ?owner:get-user/repo:get-repo
+  get-args '?owner:get-user/repo:get-repo'
   report-list \
     "/repos/$owner/$repo/collaborators" \
     'login'
@@ -486,7 +486,7 @@ command:collabs() {
 
 command:trust() {
   require-auth
-  get-args ?owner:get-user/repo:get-repo @collaborators
+  get-args '?owner:get-user/repo:get-repo' @collaborators
   for collab in ${collaborators[@]}; do
     api-put "/repos/$owner/$repo/collaborators/$collab"
   done
@@ -495,7 +495,7 @@ command:trust() {
 
 command:untrust() {
   require-auth
-  get-args ?owner:get-user/repo:get-repo @collaborators
+  get-args '?owner:get-user/repo:get-repo' @collaborators
   for collab in ${collaborators[@]}; do
     api-delete "/repos/$owner/$repo/collaborators/$collab"
   done
@@ -503,7 +503,7 @@ command:untrust() {
 }
 
 command:issues() {
-  get-args ?owner:get-owner/repo:get-repo
+  get-args '?owner:get-owner/repo:get-repo'
 
   report-list \
     "/repos/$owner/$repo/issues?sort=updated;per_page=PER_PAGE" \
@@ -515,7 +515,7 @@ format-entry:issues() {
 }
 
 command:issue() {
-  get-args ?owner:get-owner/repo:get-repo number
+  get-args '?owner:get-owner/repo:get-repo' number
   api-get "/repos/$owner/$repo/issues/$number"
 }
 
@@ -549,7 +549,7 @@ format-entry:comments() {
 }
 
 command:pulls() {
-  get-args ?owner:get-owner/repo:get-repo
+  get-args '?owner:get-owner/repo:get-repo'
 
   report-list \
     "/repos/$owner/$repo/pulls?sort=updated;per_page=PER_PAGE" \
@@ -602,7 +602,7 @@ format-entry:token-list() {
 }
 
 command:token-new() {
-  get-args ?note
+  get-args '?note'
   local json
   if [ -n "$note" ]; then
     json=$(json-dump-object "note" "$note")
