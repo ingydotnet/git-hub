@@ -87,7 +87,7 @@ The 'git hub' command needs to know your GitHub login id.
     while true; do
         echo
         login=$(prompt "Enter your GitHub login id: ")
-        [[ "$login" =~ ^[a-zA-Z0-9]+$ ]] && break
+        [[ "$login" =~ ^[-a-zA-Z0-9]+$ ]] && break
         echo "Invalid login value '$login'"
     done
 
