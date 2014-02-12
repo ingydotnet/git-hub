@@ -1,5 +1,11 @@
 use strict;
-eval "use JSON; 1" or die <<'...';
+
+my $JSON;
+for ( qw/JSON JSON::PP/ ) {
+    last if $JSON = eval "use $_; '$_'";
+}
+
+$JSON or die <<'...';
 
 ERROR: 'JSON.pm' Perl module not installed.
 
