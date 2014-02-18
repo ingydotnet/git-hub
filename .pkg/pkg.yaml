@@ -1,0 +1,12 @@
+pkg:
+  submodule: ./ext
+  repo:
+  - url: git://github.com:ingydotnet/bash-pkg.git
+  - url: git://github.com:ingydotnet/ingy-pkg.git
+
+name: json-bash
+abstract: JSON Loader/Dumper for Bash
+version: 0.0.1
+description: |
+  This library provides functions to load JSON into an internal format, and to
+  dump the internal format into JSON.
