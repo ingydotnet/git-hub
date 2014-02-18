@@ -16,12 +16,6 @@ INSTALL_CMD ?= $(INSTALL_LIB)/$(CMD)
 INSTALL_EXT ?= $(INSTALL_LIB)/$(CMD).d
 INSTALL_MAN ?= $(PREFIX)/share/man/man1
 
-# Submodules
-JSON=ext/json-bash/lib/json.bash
-BASHPLUS=ext/bashplus/lib/bash+.bash
-TEST_MORE=ext/test-more-bash/lib/test/more.bash
-SUBMODULE := $(JSON) $(BASHPLUS) $(TEST_MORE)
-
 ## XXX assert good bash
 
 ##
@@ -43,7 +37,7 @@ help:
 	@echo 'install    Install $(CMD)'
 	@echo 'uninstall  Uninstall $(CMD)'
 
-test: $(SUBMODULE)
+test:
 ifeq ($(shell which prove),)
 	@echo '`make test` requires the `prove` utility'
 	@exit 1
@@ -53,7 +47,7 @@ endif
 .PHONY: install install-lib install-doc
 install: install-lib install-doc
 
-install-lib: $(SUBMODULE) $(INSTALL_EXT)
+install-lib: $(INSTALL_EXT)
 	install -C -m 0755 $(LOCAL_LIB) $(INSTALL_LIB)/
 	install -C -d -m 0755 $(INSTALL_EXT)/
 	install -C -m 0755 $(LOCAL_EXTS) $(INSTALL_EXT)/
@@ -74,9 +68,6 @@ uninstall-doc:
 
 $(INSTALL_EXT):
 	mkdir -p $@
-
-$(SUBMODULE):
-	git submodule update --init --recursive
 
 ##
 # Build rules:
@@ -102,7 +93,7 @@ doc/%.1: %.1
 
 # Install using symlinks so repo changes can be tested live
 .PHONY: dev-install dev-test dev-test-reset check-dev-install
-dev-install: $(SUBMODULE)
+dev-install:
 	ln -fs $(LOCAL_LIB) $(INSTALL_CMD)
 	ln -fs $(LOCAL_EXTS) $(INSTALL_EXT)
 
