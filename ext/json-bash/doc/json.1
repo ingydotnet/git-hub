@@ -1,0 +1,293 @@
+.\" generated with Ronn/v0.7.3
+.\" http://github.com/rtomayko/ronn/tree/0.7.3
+.
+.TH "JSON" "1" "October 2013" "" ""
+.
+.SH "NAME"
+\fBJSON\fR \- JSON for Bash
+.
+.SH "Synopsis"
+.
+.nf
+
+source json\.bash
+
+json=\'{"name":"Jason","friends":["Jimmy","Joe"]}\'
+JSON\.load "$json"
+joe=$(JSON\.get /friends/1)
+JSON\.put /friends/2 Jeff
+new_json=$(JSON\.dump)
+.
+.fi
+.
+.SH "Description"
+The \fBjson\.bash\fR library provides functions for loading, manipulating and dumping JSON data\.
+.
+.P
+Bash doesn\'t have nestable hashes and arrays to load JSON data into\. This library provides a different data model called a "linear tree"\. A linear tree is simply a sequence of text lines, each containing a key\-path and a leaf\-value (separated by a tab):
+.
+.IP "" 4
+.
+.nf
+
+    /key/path<HARD\-TAB>"leaf value"
+.
+.fi
+.
+.IP "" 0
+.
+.P
+Thus this JSON:
+.
+.IP "" 4
+.
+.nf
+
+{
+    "name": {
+        "first": "Jimmy",
+        "last": "James"
+    },
+    "list": [
+        "A string",
+        42,
+        [ true, false, null ]
+    ]
+}
+.
+.fi
+.
+.IP "" 0
+.
+.P
+Would be loaded as this linear tree:
+.
+.IP "" 4
+.
+.nf
+
+/name/first "Jimmy"
+/name/last  "James"
+/list/0 "A string"
+/list/1 42
+/list/2/0   true
+/list/2/1   false
+/list/2/2   null
+.
+.fi
+.
+.IP "" 0
+.
+.P
+Since Bash has many tools for searching and manipulating text, the linear form works fairly well for common JSON data operations\.
+.
+.SH "Installation"
+Just run:
+.
+.IP "" 4
+.
+.nf
+
+make install
+.
+.fi
+.
+.IP "" 0
+.
+.P
+This may require \fBsudo\fR permission\.
+.
+.P
+By default, this will install:
+.
+.IP "" 4
+.
+.nf
+
+/usr/local/lib/bash/test\-simple\.bash
+/usr/local/share/man/man1/test\-simple\.1
+.
+.fi
+.
+.IP "" 0
+.
+.P
+You can change the install locations with these environment variables:
+.
+.IP "\(bu" 4
+\fBPREFIX\fR \- default is \fB/usr/local\fR
+.
+.IP "\(bu" 4
+\fBINSTALL_LIB\fR
+.
+.IP "\(bu" 4
+\fBINSTALL_MAN\fR
+.
+.IP "" 0
+.
+.P
+Run \fBmake help\fR to see all the \fBmake\fR targets that are available\.
+.
+.SH "API Functions"
+The library contains functions to \fIload\fR JSON to the linear form and to \fIdump\fR that form back into JSON\. It also has functions to retrieve, modify, add and remove data from the linear form\.
+.
+.IP "\(bu" 4
+\fBJSON\.load [ <json\-string> [<linear\-var\-name>]]\fR
+.
+.IP
+This function takes JSON as input and generates a linear tree as output\.
+.
+.IP
+With no arguments, input is read from stdin and output is written to stdout\. With one argument, the input is provided as a string argument and the output is stored in an internal cache variable\. With two arguments the input is again provided as a string argument, and the output is copied into the variable name provided\.
+.
+.IP "\(bu" 4
+\fBJSON\.dump [<linear\-var\-name>]\fR
+.
+.IP
+This function takes a linear tree as input and generates JSON as output\.
+.
+.IP
+With no arguments, input is read from stdin\. With one argument, input is taken from the provided variable name\. To use the internal cache, use \fB\-\fR as the variable name\. Output is always written to stdout\.
+.
+.IP "\(bu" 4
+\fBJSON\.get [\-a|\-s|\-b|\-n|\-z] <key\-path> [<linear\-var\-name>]\fR
+.
+.IP
+This function takes a key path and returns the corresponding value\. If the key is found, the exit status is 0, otherwise it is 1\. If the value is a string, it will be enclosed in double quotes\. Otherwise it will be a number or the unquoted strings: \fBtrue\fR, \fBfalse\fR or \fBnull\fR\.
+.
+.IP
+With just the one required argument, the linear tree will be obtained from stdin\. Otherwise it can be provided with a variable name (or \fB\-\fR for the cache)\. The value (if any) is written to stdout\.
+.
+.IP
+See FLAGS below for an explanation of the flag options\.
+.
+.IP "\(bu" 4
+\fBJSON\.put [\-s|\-b|\-n|\-z] <key\-path> <new\-value> [<linear\-var\-name>]\fR
+.
+.IP
+This function adds a path/value pair to the linear tree\. If the path already exists, the value will be replaced, otherwise it will be added\.
+.
+.IP
+With just the two required arguments, the linear tree will be obtained from stdin\. Otherwise it can be provided with a variable name (or \fB\-\fR for the cache)\. Nothing will be written to stdout and the exit status will always be 0\.
+.
+.IP "\(bu" 4
+\fBJSON\.del <key\-path> <new\-value> [<linear\-var\-name>]\fR
+.
+.IP
+This function removes a path/value pair from the linear tree, if it exists\.
+.
+.IP
+With just the one required argument, the linear tree will be obtained from stdin\. Otherwise it can be provided with a variable name (or \fB\-\fR for the cache)\. Nothing will be written to stdout and the exit status will always be 0\.
+.
+.IP
+Heuristics will be used to determine what type the value is\. The \-s flag indicates the value is a string, the \-n flag indicates a number,the \-b flag indicates a boolean and the \-z flag indicates a null value\.
+.
+.IP "\(bu" 4
+\fBJSON\.cache [<linear\-var\-name>]\fR
+.
+.IP
+Outputs the value of the internal linear tree cache string\.
+.
+.IP
+With no arguments, the value is written to stdout\. With one argument, the value is copied to the variable name provided\.
+.
+.IP "" 0
+.
+.SH "Flags"
+The command flags \fB\-a\fR, \fB\-s\fR, \fB\-n\fR, \fB\-b\fR and \fB\-z\fR indicate the \fItype\fR of value provided or expected, and they refer to Any, String, Number, Boolean and Null respectively\. If the type of data doesn\'t look like the type indicated by the flag, the command will return with a status code of 2\.
+.
+.P
+If \fB\-a\fR is used, the double quotes at each end (if any) will be removed for a \fBJSON\.get\fR\.
+.
+.P
+If \fB\-s\fR is used and the data is a string, the double quotes will be removed for a \fBJSON\.get\fR or added for a \fBJSON\.put\fR\.
+.
+.P
+The \fB\-n\fR flag requires no value transformation, but it will cause the command to fail (status 2) if the value is not a number\.
+.
+.P
+If \fB\-b\fR is used for a \fBJSON\.get\fR, true will become 0 and false will become 1\. \fBJSON\.put\fR will do the reverse\. This follows Bash\'s idea of using 0 for a successful return code\.
+.
+.P
+The \fB\-z\fR flag on a \fBJSON\.get\fR will turn \fBnull\fR into the empty string, and for a \fBJSON\.put\fR will turn any value into \fBnull\fR\.
+.
+.SH "Examples"
+.
+.nf
+
+# Load JSON to linear tree
+JSON\.load "$(< file\.json)" tree
+# or:
+tree=$(cat file\.json | JSON\.load)
+
+# Get a value
+first_name=$(JSON\.get /name/first tree)
+# or:
+first_name=$(echo "$tree" | JSON\.get /name/first)
+
+# Change a value
+JSON\.put /name/first Jimmy tree
+# or:
+tree=(echo "$tree" | JSON\.put /name/first Jimmy)
+
+# Delete a value
+JSON\.del /name/middle tree
+# or:
+tree=(echo "$tree" | JSON\.del /name/middle)
+
+# Dump a linear tree to JSON
+JSON\.dump tree > new\-file\.json
+# or:
+echo "$tree" | JSON\.dump > new\-file\.json
+.
+.fi
+.
+.SH "Problems"
+This library is meant to be useful for solving common problems involving JSON\. However, without the native JSON object model in Bash, it becomes problematic the further you stray from the norm\.
+.
+.P
+Here is a list of known issues\. Some may be addressed, some are very likely to stay out of scope:
+.
+.IP "\(bu" 4
+No support for empty arrays and empty objects\.
+.
+.IP "\(bu" 4
+No support for key\-paths that refer to objects or arrays\.
+.
+.IP "\(bu" 4
+No support for common array operations like \fBpush\fR, \fBpop\fR, \fBsplice\fR, etc\.
+.
+.IP "" 0
+.
+.SH "Todo"
+.
+.IP "\(bu" 4
+.
+.IP "\(bu" 4
+Contain whitespace
+.
+.IP "\(bu" 4
+Consist of all digit characters
+.
+.IP "\(bu" 4
+Contain backslashes
+.
+.IP "" 0
+
+.
+.IP "\(bu" 4
+Implement JSON\.dump
+.
+.IP "" 0
+.
+.SH "Status"
+This library is very new, contains bugs and will almost certainly have API changes\.
+.
+.P
+Please report any issues to https://github\.com/ingydotnet/json\-bash/issues
+.
+.P
+Or find me on ingy@irc\.freenode\.net\.
+.
+.SH "Author"
+Written by Ingy döt Net \fIingy@ingy\.net\fR

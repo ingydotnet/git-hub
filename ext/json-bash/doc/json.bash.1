@@ -1,0 +1,500 @@
+'\" t
+.\"     Title: json.bash
+.\"    Author: [see the "AUTHOR" section]
+.\" Generator: DocBook XSL Stylesheets v1.76.1 <http://docbook.sf.net/>
+.\"      Date: 08/06/2013
+.\"    Manual: Git Manual
+.\"    Source: Git
+.\"  Language: English
+.\"
+.TH "JSON\&.BASH" "" "08/06/2013" "Git" "Git Manual"
+.\" -----------------------------------------------------------------
+.\" * Define some portability stuff
+.\" -----------------------------------------------------------------
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.\" http://bugs.debian.org/507673
+.\" http://lists.gnu.org/archive/html/groff/2009-02/msg00013.html
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.ie \n(.g .ds Aq \(aq
+.el       .ds Aq '
+.\" -----------------------------------------------------------------
+.\" * set default formatting
+.\" -----------------------------------------------------------------
+.\" disable hyphenation
+.nh
+.\" disable justification (adjust text to left margin only)
+.ad l
+.\" -----------------------------------------------------------------
+.\" * MAIN CONTENT STARTS HERE *
+.\" -----------------------------------------------------------------
+.SH "NAME"
+json.bash \- Load, Dump and Manipulate JSON in Bash
+.SH "SYNOPSIS"
+.sp
+.nf
+source json\&.bash
+.fi
+.sp
+.nf
+json=\*(Aq{"name":"Jason","friends":["Jimmy","Joe"]}\*(Aq
+JSON\&.load "$json"
+joe=$(JSON\&.get /friends/1)
+JSON\&.put /friends/2 Jeff
+new_json=$(JSON\&.dump)
+.fi
+.SH "DESCRIPTION"
+.sp
+The json\&.bash library provides functions for loading, manipulating and dumping JSON data\&.
+.sp
+Bash doesn\(cqt have nestable hashes and arrays to load JSON data into\&. This library provides a different data model called a "linear tree"\&. A linear tree is simply a sequence of text lines, each containing a key\-path and a leaf\-value (separated by a tab):
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+/key/path<HARD\-TAB>"leaf value"
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+Thus this JSON:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+{
+    "name": {
+        "first": "Jimmy",
+        "last": "James"
+    },
+    "list": [
+        "A string",
+        42,
+        [ true, false, null ]
+    ]
+}
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+Would be loaded as this linear tree:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+/name/first "Jimmy"
+/name/last  "James"
+/list/0     "A string"
+/list/1     42
+/list/2/0   true
+/list/2/1   false
+/list/2/2   null
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+Since Bash has many tools for searching and manipulating text, the linear form works fairly well for common JSON data operations\&.
+.SH "INSTALLATION"
+.sp
+Just run:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+make install
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+This may require sudo permission\&.
+.sp
+By default, this will install:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+/usr/local/lib/bash/test\-simple\&.bash
+/usr/local/share/man/man1/test\-simple\&.1
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+You can change the install locations with these environment variables:
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+
+PREFIX
+\- default is
+/usr/local
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+
+INSTALL_LIB
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+
+INSTALL_MAN
+.RE
+.sp
+Run make help to see all the make targets that are available\&.
+.SH "API FUNCTIONS"
+.sp
+The library contains functions to \fBload\fR JSON to the linear form and to \fBdump\fR that form back into JSON\&. It also has functions to retrieve, modify, add and remove data from the linear form\&.
+.PP
+JSON\&.load [ <json\-string> [<linear\-var\-name>]]
+.RS 4
+This function takes JSON as input and generates a linear tree as output\&.
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+With no arguments, input is read from stdin and output is written to
+stdout\&. With one argument, the input is provided as a string argument and
+the output is stored in an internal cache variable\&. With two arguments the
+input is again provided as a string argument, and the output is copied
+into the variable name provided\&.
+.fi
+.if n \{\
+.RE
+.\}
+.RE
+.PP
+JSON\&.dump [<linear\-var\-name>]
+.RS 4
+This function takes a linear tree as input and generates JSON as output\&.
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+With no arguments, input is read from stdin\&. With one argument, input is
+taken from the provided variable name\&. To use the internal cache, use `\-`
+as the variable name\&. Output is always written to stdout\&.
+.fi
+.if n \{\
+.RE
+.\}
+.RE
+.PP
+JSON\&.get [\-s|\-b|\-n|\-z] <key\-path> [<linear\-var\-name>]
+.RS 4
+This function takes a key path and returns the corresponding value\&. If the key is found, the exit status is 0, otherwise it is 1\&. If the value is a string, it will be enclosed in double quotes\&. Otherwise it will be a number or the unquoted strings:
+true,
+false
+or
+null\&.
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+With just the one required argument, the linear tree will be obtained from
+stdin\&. Otherwise it can be provided with a variable name (or `\-` for the
+cache)\&. The value (if any) is written to stdout\&.
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+See FLAGS below for an explanation of the flag options\&.
+.fi
+.if n \{\
+.RE
+.\}
+.RE
+.PP
+JSON\&.put [\-s|\-b|\-n|\-z] <key\-path> <new\-value> [<linear\-var\-name>]
+.RS 4
+This function adds a path/value pair to the linear tree\&. If the path already exists, the value will be replaced, otherwise it will be added\&.
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+With just the two required arguments, the linear tree will be obtained
+from stdin\&. Otherwise it can be provided with a variable name (or `\-` for
+the cache)\&. Nothing will be written to stdout and the exit status will
+always be 0\&.
+.fi
+.if n \{\
+.RE
+.\}
+.RE
+.PP
+JSON\&.del <key\-path> <new\-value> [<linear\-var\-name>]
+.RS 4
+This function removes a path/value pair from the linear tree, if it exists\&.
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+With just the one required argument, the linear tree will be obtained from
+stdin\&. Otherwise it can be provided with a variable name (or `\-` for the
+cache)\&. Nothing will be written to stdout and the exit status will always
+be 0\&.
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+Heuristics will be used to determine what type the value is\&. The \-s flag
+indicates the value is a string, the \-n flag indicates a number,the \-b
+flag indicates a boolean and the \-z flag indicates a null value\&.
+.fi
+.if n \{\
+.RE
+.\}
+.RE
+.PP
+JSON\&.cache [<linear\-var\-name>]
+.RS 4
+Outputs the value of the internal linear tree cache string\&.
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+With no arguments, the value is written to stdout\&. With one argument, the
+value is copied to the variable name provided\&.
+.fi
+.if n \{\
+.RE
+.\}
+.RE
+.SH "FLAGS"
+.sp
+The command flags \-s, \-n, \-b and \-z indicate the \fBtype\fR of value provided or expected, and they refer to String, Number, Boolean and Null respectively\&. If the type of data doesn\(cqt look like the type indicated by the flag, the command will return with a status code of 2\&.
+.sp
+If \-s is used and the data is a string, the double quotes will be removed for a JSON\&.get or added for a JSON\&.put\&.
+.sp
+The \-n flag requires no value transformation, but it will cause the command to fail (status 2) if the value is not a number\&.
+.sp
+If \-b is used for a JSON\&.get, true will become 0 and false will become 1\&. JSON\&.put will do the reverse\&. This follows Bash\(cqs idea of using 0 for a successful return code\&.
+.sp
+The \-z flag on a JSON\&.get will turn null into the empty string, and for a JSON\&.put will turn any value into null\&.
+.SH "EXAMPLES"
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+# Load JSON to linear tree
+JSON\&.load "$(< file\&.json)" tree
+# or:
+tree=$(cat file\&.json | JSON\&.load)
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+# Get a value
+first_name=$(JSON\&.get /name/first tree)
+# or:
+first_name=$(echo "$tree" | JSON\&.get /name/first)
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+# Change a value
+JSON\&.put /name/first Jimmy tree
+# or:
+tree=(echo "$tree" | JSON\&.put /name/first Jimmy)
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+# Delete a value
+JSON\&.del /name/middle tree
+# or:
+tree=(echo "$tree" | JSON\&.del /name/middle)
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+# Dump a linear tree to JSON
+JSON\&.dump tree > new\-file\&.json
+# or:
+echo "$tree" | JSON\&.dump > new\-file\&.json
+.fi
+.if n \{\
+.RE
+.\}
+.SH "PROBLEMS"
+.sp
+This library is meant to be useful for solving common problems involving JSON\&. However, without the native JSON object model in Bash, it becomes problematic the further you stray from the norm\&.
+.sp
+Here is a list of known issues\&. Some may be addressed, some are very likely to stay out of scope:
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+No support for empty arrays and empty objects\&.
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+No support for key\-paths that refer to objects or arrays\&.
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+No support for common array operations like
+push,
+pop,
+splice, etc\&.
+.RE
+.SH "TODO"
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+Support object keys that:
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+Contain whitespace
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+Consist of all digit characters
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+Contain backslashes
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+Implement JSON\&.dump
+.RE
+.SH "STATUS"
+.sp
+This library is very new, contains bugs and will almost certainly have API changes\&.
+.sp
+Please report any issues to \m[blue]\fBhttps://github\&.com/ingydotnet/json\-bash/issues\fR\m[]
+.sp
+Or find me on \m[blue]\fBingy@irc\&.freenode\&.net\fR\m[]\&\s-2\u[1]\d\s+2\&.
+.SH "AUTHOR"
+.sp
+Written by Ingy d\(:ot Net <\m[blue]\fBingy@ingy\&.net\fR\m[]\&\s-2\u[2]\d\s+2>
+.SH "NOTES"
+.IP " 1." 4
+ingy@irc.freenode.net
+.RS 4
+\%mailto:ingy@irc.freenode.net
+.RE
+.IP " 2." 4
+ingy@ingy.net
+.RS 4
+\%mailto:ingy@ingy.net
+.RE

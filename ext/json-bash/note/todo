@@ -1,0 +1,15 @@
+
+
++ Add tests for get bugs
++ Allow status code in test-simple
++ support -n -b -z flags for JSON.get
++ remove the perl flag handling
++ get make install-man to work
+  + need asciidoc conf
++ use space around ' = ' and ' ?= ' in Makefile
++ Ensure JSON.get sets proper status code
++ support -s flag for JSON.get
++ Test JSON.get
++ get make install to work
++ Add INSTALL to doc
++ Add submodule checker to Makefile
