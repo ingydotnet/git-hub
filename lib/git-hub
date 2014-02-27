@@ -326,6 +326,7 @@ exec:clone() {
     owner_repo=$owner/$owner_repo
   fi
   cmd="git clone --recursive git@github.com:$owner_repo $dir"
+  local OK=0
   (
     if $verbose_output; then
       set -x
@@ -333,11 +334,18 @@ exec:clone() {
     else
       $cmd &> /dev/null
     fi
-  )
-  if [ -n "$dir" ]; then
-    say "$owner_repo cloned into $dir"
+  ) || OK=1
+  if OK; then
+    if [ -n "$dir" ]; then
+      say "$owner_repo cloned into $dir"
+    else
+      say "$owner_repo cloned"
+    fi
   else
-    say "$owner_repo cloned"
+    say "Failed: 'git hub clone $@'"
+    if ! $verbose_output; then
+      say "  Try using -v for more info"
+    fi
   fi
 }
 
