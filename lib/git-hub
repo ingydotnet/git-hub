@@ -361,7 +361,7 @@ format-entry:repos() {
   if $raw_output; then
     out "$3"
   else
-    printf "%d) (%s)  %-30s %s\n" $1 ${2/T*} $3 "$4"
+    printf -v output_line "%d) (%s)  %-30s %s" $1 ${2/T*} $3 "$4"
   fi
 }
 
@@ -1085,7 +1085,8 @@ get-hub-config() {
 report-list() {
   msg_ok=0
   local url="$1" fields=($2) ii
-   local list_max=${list_size:-$(($(tput lines) - 3))}
+  local list_max=${list_size:-$(($(tput lines) - 3))}
+  local line_max=$(tput cols)
   local per_page=100
   [ $per_page -gt $list_max ] && per_page=$list_max
   url=${url/PER_PAGE/$per_page}
@@ -1103,10 +1104,18 @@ report-list() {
         value="$(JSON.get -a "/$ii/$field" -)"
         values+=("$value")
       done
+      local output_line=
       if can "format-entry:$command"; then
         "format-entry:$command" $list_counter "${values[@]}"
       else
         default-format-entry $list_counter "${values[@]}"
+      fi
+      if [ -n "$output_line" ]; then
+        if [ -z "$GIT_HUB_TEST_COMMAND" ]; then
+          out "$output_line" | cut -c 1-$line_max
+        else
+          out "$output_line"
+        fi
       fi
       let list_counter=list_counter+1
     done
