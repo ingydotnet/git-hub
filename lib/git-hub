@@ -209,7 +209,7 @@ command:orgs() {
   local title="Organizations for User '$user':"
   msg_fail="Can't find Organizations for User '$user'"
   report-list \
-    "/users/$user/orgs" \
+    "/users/$user/orgs?per_page=PER_PAGE" \
     'login'
 }
 
@@ -251,7 +251,7 @@ command:org-edit() {
 command:members() {
   get-args org
   report-list \
-    "/orgs/$org/members" \
+    "/orgs/$org/members?per_page=PER_PAGE" \
     'login'
 }
 
@@ -259,7 +259,7 @@ command:teams() {
   require-auth
   get-args org
   report-list \
-    "/orgs/$org/teams" \
+    "/orgs/$org/teams?per_page=PER_PAGE" \
     'name'
 }
 
@@ -1085,20 +1085,21 @@ get-hub-config() {
 report-list() {
   msg_ok=0
   local url="$1" fields=($2) ii
-  local list_max=${list_size:-$(($(tput lines) - 3))}
+  local list_max=${list_size:-$(($(tput lines) - 2))}
   local line_max=$(tput cols)
   local per_page=100
   [ $per_page -gt $list_max ] && per_page=$list_max
   url=${url/PER_PAGE/$per_page}
-  local list_counter=1
   [ -n "$title" ] && say "$title"
+  local list_counter=1
   while true; do
     api-get $url
     OK || return 0
     json-prune-list "${fields[@]}"
     local page_size=$(JSON.cache | tail -n1 | cut -d '/' -f2)
     [ -z "$page_size" ] && say '--None--' && break
-    for ((ii = 0; ii <= page_size && list_counter <= list_max; ii++)); do
+    local counter=0
+    for ((ii = 0; ii <= page_size && counter < list_max; ii++)); do
       local -a values=()
       for field in "${fields[@]}"; do
         value="$(JSON.get -a "/$ii/$field" -)"
@@ -1117,14 +1118,16 @@ report-list() {
           out "$output_line"
         fi
       fi
+      let counter=counter+1
       let list_counter=list_counter+1
     done
+    [ -n "$GIT_HUB_TEST_COMMAND" ] && break
     url=$(get-next-page-url)
     if [ $list_counter -gt $list_max ]; then
       if [ -n "$url" -o $ii -lt $page_size ]; then
-        say --More--
+        local prompt_msg=--More--
+        prompt
       fi
-      break
     fi
     [ -z "$url" ] && break
   done
@@ -1452,7 +1455,7 @@ err-() { echo -en "$@" >&2; }
 prompt() {
   local msg answer default yn=false password=false
   case $# in
-    0) msg='Press <ENTER> to continue, or <CTL>-C to exit.' ;;
+    0) msg=${prompt_msg:-'Press <ENTER> to continue, or <CTL>-C to exit.'} ;;
     1)
       msg="$1"
       if [[ "$msg" =~ \[yN\] ]]; then
