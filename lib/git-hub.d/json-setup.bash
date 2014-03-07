@@ -80,6 +80,23 @@ pretty-json-object() {
   echo '}'
 }
 
+json-var-list() {
+  local fields="$@"
+  while IFS='\n' read line; do
+    if [[ "$line" =~ ^/([0-9]+)/([^\	]+)\	(.*) ]]; then
+      local value="${BASH_REMATCH[3]}"
+      [ "$value" == null ] && value=''
+      value="${value#\"}"
+      value="${value%\"}"
+      printf -v "${BASH_REMATCH[2]}_${BASH_REMATCH[1]}" "$value"
+    else
+      die "Unexpected line '$line'"
+    fi
+  done < <(
+    echo "$JSON__cache" |
+      grep -E "^/[0-9]+/(${fields// /|})\b" || echo ''
+    )
+}
 
 json-prune-cache() {
   JSON__cache="$(echo "$JSON__cache" | grep -E "$1" || echo '')"
@@ -96,3 +113,4 @@ json-prune-list() {
   json-prune-cache "^/[0-9]+/(${fields// /|})\b"
 }
 
+# vim: set lisp:

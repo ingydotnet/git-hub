@@ -1095,15 +1095,15 @@ report-list() {
   while true; do
     api-get $url
     OK || return 0
-    json-prune-list "${fields[@]}"
+    json-var-list "${fields[@]}"
     local page_size=$(JSON.cache | tail -n1 | cut -d '/' -f2)
     [ -z "$page_size" ] && say '--None--' && break
     local counter=0
     for ((ii = 0; ii <= page_size && counter < list_max; ii++)); do
       local -a values=()
       for field in "${fields[@]}"; do
-        value="$(JSON.get -a "/$ii/$field" -)"
-        values+=("$value")
+        var="$field"_"$ii"
+        values+=("${!var}")
       done
       local output_line=
       if can "format-entry:$command"; then
@@ -1515,3 +1515,5 @@ callable-or-source() {
 [ "${BASH_SOURCE[0]}" == "$0" ] && main "$@"
 
 true
+
+# vim: set lisp:
