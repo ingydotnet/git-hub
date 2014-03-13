@@ -88,7 +88,9 @@ json-var-list() {
       [ "$value" == null ] && value=''
       value="${value#\"}"
       value="${value%\"}"
-      printf -v "${BASH_REMATCH[2]}_${BASH_REMATCH[1]}" "$value"
+      key="${BASH_REMATCH[2]}_${BASH_REMATCH[1]}"
+      key="${key//\//__}"
+      printf -v "$key" "$value"
     else
       die "Unexpected line '$line'"
     fi

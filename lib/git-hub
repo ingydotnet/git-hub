@@ -1102,7 +1102,7 @@ report-list() {
     for ((ii = 0; ii <= page_size && counter < list_max; ii++)); do
       local -a values=()
       for field in "${fields[@]}"; do
-        var="$field"_"$ii"
+        var="${field//\//__}"_"$ii"
         values+=("${!var}")
       done
       local output_line=
