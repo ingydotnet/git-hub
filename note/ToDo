@@ -1,0 +1,183 @@
+== !!!
+- support multiple args on commands like trust
+- add remote for repo-new and fork
+- remove remote for repo-delete
+
+== Bugs
+- Find out why github fails under zsh (rafl)
+- No error msg printed on wrong password
+- find right remote
+  - complain if ambiguous
+
+=== Bugs (OSX)
+
+== Commands
+- New commands to add:
+  - commands <pattern> - list commands
+  - keys
+  - remote (add remote for adding GitHub remotes)
+  - push-all    - push to all gh remotes
+  - pulls       - list pull requests
+  - pull        - issue a pull request
+  - search
+  - commits     - show gh urls
+  - keys        - show public keys
+  - rate-limit
+  - repo-watch
+  - issue-close
+  - issue-new
+  - issue-comment
+    - git hub log    -- show urls for commits
+    - git hub url <file>  -- show url for file/branch/raw
+  - Make a plan for all actions to support
+
+== Documentation
+- Convert asciidoc to markdown
+- Build doc/*.asc into man
+- Add an Environment Variables section
+- Add a prerequisites section to doc
+- Add a DEVELOPMENT document to the repo
+
+== Error Handling
+- Validate input data better
+- Helpful msg when rate limit exceeded
+- Don't allow email@address for `git hub config login …`
+- Better error msging for mistakes.
+  - Think about what common errors might happen.
+
+== Makefile
+- Redo Makefile based on git itself
+- Support DESTDIR
+
+== Output
+- Implement `git hub user --all`
+- Implement `git hub repo --all`
+
+== Performance
+- Cache all results
+  - Check Etag fix
+- Parallel requests
+
+== Plugin
+- Document plugins
+- git-hub-travis-irc
+- git-hub-irc
+
+== Refactoring
+- Move json and test-more to subrepo
+- Try loading git-hub-foo plugin for git-hub-foo-bar command
+- Review git/Documentation/CodingGuidelines
+- Eliminate evals
+- Eliminate TODO/XXX
+- Move all commands to plugins! (lib/git-hub.d/)
+- Chunk list json into an array of texts
+
+== Testing
+- Add more commands to all-commands.t
+- Check github etag fix.
+  - https://gist.github.com/ingydotnet/6472496
+- Use git-hub-test-user account for dev testing
+- convert all_commands.t to test-simple / prove
+- Write dev-test for installation from git `clone git-hub`
+
+== UX
+- Support @ as shorthand for login-name
+- Support a git-hub-shell
+- Command completion
+
+== Done
++ Use bash+
++ Support etag caching
++ repo-new should print repo url
++ git hub clone repo  (no owner/repo)
++ Use bash+:can instead of callable.
++ Write more tests
++ /usr/bin/env
++ Add a setup command that walks a user through configuration
+  + Should be a plugin
++ Repo rename doesn't work (repo-edit name …)
++ help        - show help screen
++ Print config file name
++ Be explicit for no scopes on scope-list
++ Finish the commands.t test
++ Add 10 commands tests
++ Support lists in json-clean
++ Test on OSX
++ Release (0.0.3)
++ Spurious 141 PIPEFAIL errors (probably in JSON)
++ Check for minimum Bash version
++ setup       - Initial user setup wizard
++ add plugin support
++ Write setup detection
++ Write setup command
++ Change -create commands to -new
++ Move /tmp stuff to ~/.git-hub/tmp/
++ Move ~/.githubconfig to ~/.git-hub/config
++ Extra exec files should go under lib/git-hub.d/
++ Remove 'create' alias
++ clone       - clone a repo using github info
++ Separate key/value with <tab> in --raw output
++ Support piping between commands:
+        git hub followers --get=user | git hub user ---
++ Not removing (fetch) from values.
++ dev-test/all_commands.t is broken
++ Replace local JSON stuff with json.bash stuff
++ `git hub followers` not honoring current repo
++ `git hub stars` not printing -More-
++ Mac only printing first page (first 100)
++ Makefile should check for `prove` on test
++ Add --json/-j flag for json view of user/org/repo
++ User -r drops paragraphs after first one
++ JSON.load is expanding \n in linear tree
++ Move follow commands next to user/org in code and doc
++ Don't source git-sh-setup. Can't trust functionality.
++ use .git/config from anywhere inside a repo (not just ./.git/config)
+  + test "$(git rev-parse --is-inside-work-tree 2>/dev/null)" = true ||
++ Don't allow `make build` to be run under `sudo make install`
++ make install needs to uninstall first if dev-install in place
++ Fix repo-edit
+  + Shell escaping of ["$`\n\t] on json object strings
+  + Check user-edit
++ Fix star and unstar
++ Implement org-* commands
++ Add GIT_HUB_PASSWORD support
++ Change -U to -A
++ Use --raw instead of --quiet for sparse views
++ Change GIT_{QUIET,VERBOSE} GIT_HUB_*
++ Make doc for `make dev-test` command.
++ git hub scope-add --all
++ git hub scope-remove --all
++ Add quiet versions to output
++ Detect rate-limit failure
++ Show when there are more elements in a list
++ Add bash-tap support to test suite
++ repo-fork
++ Add owner-name concept
++ Add org-name concept
++ change -a to -U and add --all/-a
++ Detect no network
++ user-followers
++ user-following
++ user-follow
++ user-unfollow
++ Pregenerate nroff file for doc and install with `make install`
++ repo-stars
++ repo-star
++ git hub scope-list
++ git hub scope-add <scopes>
++ git hub scope-remove <scopes>
++ Refactor listing functions
++ Support 'login' for your personal 'user-name'
++ Don't always require token
++ Detect old `user-name` and die.
++ Detect config user-name or die with helpful text
++ Make grepping results faster
++ Add --user-agent=git-hub-v0.0.1
++ switch github-foo-success to success-github-foo
++ Get more pages for lists
++ Install man page like git-subtree
++ Add json.sh support
++ Add success and failure functions
++ parse json with JSON.sh
++ detect '|' and output raw (-r)
++ Add pagination
