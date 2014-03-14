@@ -303,56 +303,6 @@ command:unfollow() {
   msg_ok="'$login' is no longer following '$user'"
 }
 
-command:clone() {
-  set -- "${command_arguments[@]}"
-  while (($#)); do
-    if [[ $# == 1 ]] || [[ ! "$2" =~ ^\.?\.?/ ]]; then
-      exec:clone "$1"
-      shift
-    else
-      exec:clone "$1" "$2"
-      shift; shift
-    fi
-  done
-  msg_ok=0
-}
-
-exec:clone() {
-  owner_repo=$1
-  dir=$2
-  if [[ ! $owner_repo =~ / ]]; then
-    owner=`get-user` ||
-      die "Can't determine owner for '$owner_repo'"
-    owner_repo=$owner/$owner_repo
-  fi
-  cmd="git clone --recursive git@github.com:$owner_repo $dir"
-  local OK=0
-  (
-    if $quiet_output; then
-      $cmd &> /dev/null
-    elif $verbose_output; then
-      (
-        set -x
-        $cmd
-      )
-    else
-      $cmd
-    fi
-  ) || OK=1
-  if OK; then
-    if [ -n "$dir" ]; then
-      say "$owner_repo cloned into $dir"
-    else
-      say "$owner_repo cloned"
-    fi
-  else
-    say "Failed: 'git hub clone $@'"
-    if ! $verbose_output; then
-      say "  Try using -v for more info"
-    fi
-  fi
-}
-
 # vim: set ft=sh tabstop=4 shiftwidth=4 lisp noexpandtab:
 command:repos() {
   get-args owner:get-user
