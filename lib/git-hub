@@ -328,11 +328,15 @@ exec:clone() {
   cmd="git clone --recursive git@github.com:$owner_repo $dir"
   local OK=0
   (
-    if $verbose_output; then
-      set -x
-      $cmd
-    else
+    if $quiet_output; then
       $cmd &> /dev/null
+    elif $verbose_output; then
+      (
+        set -x
+        $cmd
+      )
+    else
+      $cmd
     fi
   ) || OK=1
   if OK; then
