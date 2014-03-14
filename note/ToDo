@@ -16,9 +16,11 @@
   - commands <pattern> - list commands
   - keys
   - remote (add remote for adding GitHub remotes)
+  - remotes (list github remotes)
   - push-all    - push to all gh remotes
   - pulls       - list pull requests
-  - pull        - issue a pull request
+  - pull-request - issue a pull request
+  - pull        - merge a pull request
   - search
   - commits     - show gh urls
   - keys        - show public keys
@@ -27,7 +29,7 @@
   - issue-close
   - issue-new
   - issue-comment
-    - git hub log    -- show urls for commits
+    - git hub log         -- show urls for commits
     - git hub url <file>  -- show url for file/branch/raw
   - Make a plan for all actions to support
 
@@ -64,13 +66,11 @@
 - git-hub-irc
 
 == Refactoring
-- Move json and test-more to subrepo
 - Try loading git-hub-foo plugin for git-hub-foo-bar command
 - Review git/Documentation/CodingGuidelines
 - Eliminate evals
 - Eliminate TODO/XXX
 - Move all commands to plugins! (lib/git-hub.d/)
-- Chunk list json into an array of texts
 
 == Testing
 - Add more commands to all-commands.t
@@ -181,3 +181,5 @@
 + parse json with JSON.sh
 + detect '|' and output raw (-r)
 + Add pagination
++ Move json and test-more to subrepo
+x Chunk list json into an array of texts
