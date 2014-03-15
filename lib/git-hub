@@ -42,6 +42,7 @@ help        Show the complete documentation
  
 c,count=    Number of list items to show
 a,all       Show all list items
+remote=     Remote name (like 'origin')
  
 q,quiet     Show minimal output
 v,verbose   Show verbose output
@@ -84,7 +85,7 @@ run-command() {
   local Infinity=9999999
   local command command_arguments command_sha1 api_token
   local command_header_file command_output_file command_error_file
-  local user org owner repo pairs fields title list_size
+  local user org owner repo pairs fields title list_size remote_name
   local msg_ok msg_fail status_code ERROR
   local do_all=false use_auth no_cache
   local quiet_output verbose_output
@@ -318,14 +319,15 @@ command:clone() {
 }
 
 exec:clone() {
-  owner_repo=$1
-  dir=$2
+  owner_repo="$1"
+  dir="$2"
   if [[ ! $owner_repo =~ / ]]; then
     owner=`get-user` ||
       die "Can't determine owner for '$owner_repo'"
     owner_repo=$owner/$owner_repo
   fi
-  cmd="git clone --recursive git@github.com:$owner_repo $dir"
+  url="git@github.com:$owner_repo"
+  cmd="git clone --recursive $url $dir"
   local OK=0
   (
     if $quiet_output; then
@@ -457,6 +459,11 @@ command:fork() {
   api-post "/repos/$owner/$repo/forks" '{}'
   local login=$(get-login)
   msg_ok="Repository '$owner/$repo' forked to '$login'"
+  if OK && [ -n "$remote_name" ] && inside-git-repo; then
+    url="git@github.com:$login/$repo.git"
+    git remote add "$remote_name" "$url"
+    say "git remote add $remote_name $url"
+  fi
 }
 
 command:stars() {
@@ -587,6 +594,13 @@ format-entry:keys() {
     say "Public SSH keys for '$owner':"
     printf "%d) %s\n" "$1" "$2"
   fi
+}
+
+command:keys-add() {
+  require-auth
+  get-args title key
+  api-post "/user/keys" "$(json-dump-object title "$title" key "$key")"
+  msg_ok="Public key successfully added."
 }
 
 
@@ -1316,23 +1330,36 @@ get-opts() {
   while [ $# -gt 0 ]; do
     local option="$1"; shift
     case "$option" in
-      -c) list_size=$1; shift ;;
-      -a) list_size=$Infinity
+      -c)
+        list_size=$1
+        shift
+        ;;
+      -a)
+        list_size=$Infinity
         do_all=true
+        ;;
+      --remote)
+        set-var remote_name "$1"
+        shift
         ;;
 
       -q) quiet_output=true ;;
       -v) verbose_output=true ;;
-      -r) raw_output=true
+      -r)
+        raw_output=true
         quiet_output=true
         ;;
       -j) json_output=true ;;
 
       -A) use_auth=true ;;
       -C) no_cache=true ;;
-      --token) api_token="$1"; shift ;;
+      --token)
+        api_token="$1"
+        shift
+        ;;
       -d) dry_run=true ;;
-      -T) show_token=true
+      -T)
+        show_token=true
         verbose_output=true
         quiet_output=false
         ;;
@@ -1362,6 +1389,16 @@ get-opts() {
     check-config
 
   true
+}
+
+set-var() {
+  local name="$1"
+  local value="$2"
+  if [ "$value" == '@' ]; then
+    login="$(git config -f "$GIT_HUB_CONFIG" github.login || echo '')"
+    value="$login"
+  fi
+  printf -v "$name" "$value"
 }
 
 check-config() {
@@ -1528,6 +1565,10 @@ callable-or-source() {
     fi
   fi
   return 1
+}
+
+inside-git-repo() {
+  (git rev-parse --git-dir &> /dev/null)
 }
 
 #------------------------------------------------------------------------------
