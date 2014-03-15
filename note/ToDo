@@ -14,7 +14,6 @@
 == Commands
 - New commands to add:
   - commands <pattern> - list commands
-  - keys
   - remote (add remote for adding GitHub remotes)
   - remotes (list github remotes)
   - push-all    - push to all gh remotes
@@ -23,7 +22,6 @@
   - pull        - merge a pull request
   - search
   - commits     - show gh urls
-  - keys        - show public keys
   - rate-limit
   - repo-watch
   - issue-close
@@ -183,3 +181,4 @@
 + Add pagination
 + Move json and test-more to subrepo
 x Chunk list json into an array of texts
++ keys        - show public keys
