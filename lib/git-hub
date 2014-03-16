@@ -1386,7 +1386,7 @@ get-opts() {
     esac
   done
 
-  [ -z "$list_size" ] && interactive && list_size=$Infinity
+  [ -z "$list_size" ] && ! interactive && list_size=$Infinity
 
   command="$1"; shift
   command_arguments=("$@")
