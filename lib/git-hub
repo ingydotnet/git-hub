@@ -92,12 +92,8 @@ run-command() {
   local raw_output=false json_output=false
   local show_output=false show_headers=false show_json=false
   local dry_run=false show_token repeat_command=false
-  get-var list-size
-  get-var-bool use-auth
-  get-var-bool no-cache
-  get-var-bool quiet-output
-  get-var-bool verbose-output
-  get-var-bool show-token
+  local terminal_lines terminal_cols
+  init-vars
 
   get-opts "$@"
   assert-env
@@ -1120,8 +1116,8 @@ get-hub-config() {
 report-list() {
   msg_ok=0
   local url="$1" fields=($2) ii
-  local list_max=${list_size:-$(($(tput lines) - 2))}
-  local line_max=$(tput cols)
+  local list_max=${list_size:-$(($terminal_lines - 2))}
+  local line_max=$terminal_cols
   local per_page=100
   [ $per_page -gt $list_max ] && per_page=$list_max
   url=${url/PER_PAGE/$per_page}
@@ -1156,7 +1152,9 @@ report-list() {
       let counter=counter+1
       let list_counter=list_counter+1
     done
+    # echo "list_counter=$list_counter list_max=$list_max page_size=$page_size"
     [ -n "$GIT_HUB_TEST_COMMAND" ] && break
+    # [ -n "$list_size" ] && [ $list_counter > $list_size ] && break
     url=$(get-next-page-url)
     if [ $list_counter -gt $list_max ]; then
       if [ -n "$url" -o $ii -lt $page_size ]; then
@@ -1269,6 +1267,17 @@ init-env() {
   true
 }
 
+init-vars() {
+  terminal_cols=${GIT_HUB_TEST_COLS:-$(tput cols)}
+  terminal_lines=${GIT_HUB_TEST_LINES:-$(tput lines)}
+  get-var list-size
+  get-var-bool use-auth
+  get-var-bool no-cache
+  get-var-bool quiet-output
+  get-var-bool verbose-output
+  get-var-bool show-token
+}
+
 run-for-each() {
   local elem
   for elem in "$@"; do
@@ -1377,7 +1386,7 @@ get-opts() {
     esac
   done
 
-  [ -z "$list_size" -a ! -t 1 ] && list_size=$Infinity
+  [ -z "$list_size" ] && interactive && list_size=$Infinity
 
   command="$1"; shift
   command_arguments=("$@")
@@ -1389,6 +1398,14 @@ get-opts() {
     check-config
 
   true
+}
+
+interactive() {
+  if [ -t 0 -a -t 1 ]; then
+    return 0
+  else
+    return 1
+  fi
 }
 
 set-var() {
