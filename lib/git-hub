@@ -22,27 +22,22 @@ GIT_HUB_VERSION=0.0.3
 OPTIONS_SPEC="\
 git hub <command> <options> <arguments>
 
-Commands:
-  user, user-get, user-edit, orgs, org, org-get, org-edit, members, teams
-  followers, following, follows, follow, unfollow
-  clone, repos, repo, repo-get, repo-edit, repo-new, repo-delete,
-  forks, fork, stars, star, unstar, starred, collabs, trust, untrust
-  issues, issue, pulls, keys
+Common Commands:
+  user, org, orgs, members, teams
+  repos, repo, repo-new, repo-delete
+  new, clone, fork, collabs, trust
+  issues, issue, pulls, pull-req, pull
+  follow, followers, following, star, stars
+  setup, config
 
-  setup, config, config-unset
-  token-list, token-new, token-get, token-delete
-  scope-list, scope-add, scope-remove
-
-See 'git help hub' for complete documentation and usage of each command.
+See 'git hub help' for complete documentation and usage of each command.
+See 'git hub commands' for list of all commands.
+See 'git hub help <command>' for documentation about a command.
 
 Options:
 --
-h           Show the command summary
-help        Show the complete documentation
- 
 c,count=    Number of list items to show
 a,all       Show all list items
-remote=     Remote name (like 'origin')
  
 q,quiet     Show minimal output
 v,verbose   Show verbose output
@@ -85,7 +80,7 @@ run-command() {
   local Infinity=9999999
   local command command_arguments command_sha1 api_token
   local command_header_file command_output_file command_error_file
-  local user org owner repo pairs fields title list_size remote_name
+  local user org owner repo pairs fields title list_size
   local msg_ok msg_fail status_code ERROR
   local do_all=false use_auth no_cache
   local quiet_output verbose_output
@@ -459,11 +454,6 @@ command:fork() {
   api-post "/repos/$owner/$repo/forks" '{}'
   local login=$(get-login)
   msg_ok="Repository '$owner/$repo' forked to '$login'"
-  if OK && [ -n "$remote_name" ] && inside-git-repo; then
-    url="git@github.com:$login/$repo.git"
-    git remote add "$remote_name" "$url"
-    say "git remote add $remote_name $url"
-  fi
 }
 
 command:stars() {
@@ -1337,10 +1327,6 @@ get-opts() {
       -a)
         list_size=$Infinity
         do_all=true
-        ;;
-      --remote)
-        set-var remote_name "$1"
-        shift
         ;;
 
       -q) quiet_output=true ;;
