@@ -1,0 +1,10 @@
+git-hub commands should try to be extensible in the many of the same ways that
+Git commands are:
+
+* foo-bar command is in git-hub-foo-bar or git-hub-foo
+* Command can be written in any language
+  * Core commands are in Bash
+* Each command has a manpage
+* Each command has `git hub help <cmd>`
+* `git hub commands` lists all commands
+
