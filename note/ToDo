@@ -1,10 +1,16 @@
-== !!!
-- support multiple args on commands like trust
-- add remote for repo-new and fork
-- remove remote for repo-delete
+== !!! Next hacks in priority order
+
+- Write a test recording mode
+- pull-request - issue a pull request
+- issue-close
+- issue-new
+- issue-comment
+- Support @ as shorthand for login-name
+- Command completion # but frew uses zsh so...
+
+#------------------------------------------------------------------------------
 
 == Bugs
-- Find out why github fails under zsh (rafl)
 - No error msg printed on wrong password
 - find right remote
   - complain if ambiguous
@@ -77,6 +83,7 @@
 - Use git-hub-test-user account for dev testing
 - convert all_commands.t to test-simple / prove
 - Write dev-test for installation from git `clone git-hub`
+- Test under zsh (rafl had bugs)
 
 == UX
 - Support @ as shorthand for login-name
