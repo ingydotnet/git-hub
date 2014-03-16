@@ -1141,10 +1141,9 @@ report-list() {
       fi
       let counter=counter+1
       let list_counter=list_counter+1
+      [ -n "$list_size" ] && [ $list_counter -gt $list_size ] && return
     done
-    # echo "list_counter=$list_counter list_max=$list_max page_size=$page_size"
     [ -n "$GIT_HUB_TEST_COMMAND" ] && break
-    # [ -n "$list_size" ] && [ $list_counter > $list_size ] && break
     url=$(get-next-page-url)
     if [ $list_counter -gt $list_max ]; then
       if [ -n "$url" -o $ii -lt $page_size ]; then
