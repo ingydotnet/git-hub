@@ -4,7 +4,6 @@ source test/setup
 
 use Test::More
 
-
 export TEST_DIR="$PWD/test/commands"
 export TEST_BIN="$PWD/test/bin"
 export TEST_LIB="$PWD/test/lib"
