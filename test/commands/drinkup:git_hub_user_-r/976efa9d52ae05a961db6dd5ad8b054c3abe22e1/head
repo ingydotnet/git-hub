@@ -1,0 +1,21 @@
+HTTP/1.1 200 OK
+Server: GitHub.com
+Date: Mon, 17 Mar 2014 04:44:33 GMT
+Content-Type: application/json; charset=utf-8
+Status: 200 OK
+X-RateLimit-Limit: 60
+X-RateLimit-Remaining: 54
+X-RateLimit-Reset: 1395034989
+Cache-Control: public, max-age=60, s-maxage=60
+Last-Modified: Sun, 16 Mar 2014 22:30:30 GMT
+ETag: "13af81d93445a52f3eab7224183ca71e"
+Vary: Accept
+X-GitHub-Media-Type: github.beta
+X-Content-Type-Options: nosniff
+Content-Length: 1258
+Access-Control-Allow-Credentials: true
+Access-Control-Expose-Headers: ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval
+Access-Control-Allow-Origin: *
+X-GitHub-Request-Id: 0F7D58FA:40EA:52756F:53267DB1
+Vary: Accept-Encoding
+

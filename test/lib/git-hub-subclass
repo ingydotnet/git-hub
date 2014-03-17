@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+
+interactive() {
+  [ -n "$GIT_HUB_TEST_INTERACTIVE" ] && return 0
+
+  if [ -t 0 -a -t 1 ]; then
+    return 0
+  else
+    return 1
+  fi
+}
+
+prompt() {
+  echo "$prompt_msg"
+  exit 0
+}

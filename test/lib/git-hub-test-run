@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+source git-hub-subclass
+
 api-call() {
   format-curl-command "$@"
 

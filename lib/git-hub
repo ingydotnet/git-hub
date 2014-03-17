@@ -868,6 +868,7 @@ format-curl-command() {
   fi
 
   local sha1seed="${curl_command[@]}"
+  # echo "$sha1seed" >> sha1seed
   $show_output && sha1seed+=' -O'
   command_sha1="$(echo "$sha1seed" | $sha1sum | cut -d ' ' -f1)"
   command_header_file="$GIT_HUB_CACHE/$command_sha1/head"
@@ -1152,21 +1153,23 @@ report-list() {
       let list_counter=list_counter+1
       [ -n "$list_size" ] && [ $list_counter -gt $list_size ] && return
     done
-    interactive || break
     url=$(get-next-page-url)
-    if [ $list_counter -gt $list_max ]; then
-      if [ -n "$url" -o $ii -lt $page_size ]; then
-        local prompt_msg=--More--
-        prompt
+    if interactive; then
+      if [ $list_counter -gt $list_max ]; then
+        if [ -n "$url" -o $ii -lt $page_size ]; then
+          local prompt_msg=--More--
+          prompt
+        fi
       fi
     fi
-    [ -z "$url" ] && break
+    [ -n "$url" ] || break
   done
 }
 
 get-next-page-url() {
   local regexp='Link: <(https:[^>]+)>; rel="next"'
-  [[ -e "$command_header_file" ]] && [[ "$(< $command_header_file)" =~ $regexp ]] &&
+  [[ -e "$command_header_file" ]] &&
+    [[ "$(< $command_header_file)" =~ $regexp ]] &&
     echo "${BASH_REMATCH[1]}"
   true
 }
@@ -1589,8 +1592,12 @@ inside-git-repo() {
 #------------------------------------------------------------------------------
 # Test overrides:
 #------------------------------------------------------------------------------
-if [ -n "$GIT_HUB_TEST_COMMAND" ]; then
-  source git-hub-test-command
+if [ -n "$GIT_HUB_TEST_RUN" ]; then
+  source git-hub-test-run
+fi
+
+if [ -n "$GIT_HUB_TEST_MAKE" ]; then
+  source git-hub-subclass
 fi
 
 #------------------------------------------------------------------------------
