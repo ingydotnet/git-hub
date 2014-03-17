@@ -976,6 +976,7 @@ spec-assign() {
   [[ "$spec" =~ ^@ ]] && array-assign && return
   local spec="$spec"
   local arg="$arg"
+  [ "$arg" == '@' ] && arg="$login"
   local var=${spec/:*/}
   [[ $spec =~ : ]] && spec=${spec#$var:} || spec=
   if [ -z "$arg" ]; then
