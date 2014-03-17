@@ -1,12 +1,11 @@
 == !!! Next hacks in priority order
 
-- Write a test recording mode
 - pull-request - issue a pull request
 - issue-close
 - issue-new
 - issue-comment
-- Support @ as shorthand for login-name
-- Command completion # but frew uses zsh so...
+- Command completion
+  - See if we can do it for zsh too
 
 #------------------------------------------------------------------------------
 
@@ -77,7 +76,6 @@
 - Move all commands to plugins! (lib/git-hub.d/)
 
 == Testing
-- Add more commands to all-commands.t
 - Check github etag fix.
   - https://gist.github.com/ingydotnet/6472496
 - Use git-hub-test-user account for dev testing
@@ -86,7 +84,6 @@
 - Test under zsh (rafl had bugs)
 
 == UX
-- Support @ as shorthand for login-name
 - Support a git-hub-shell
 - Command completion
 
@@ -189,3 +186,6 @@
 + Move json and test-more to subrepo
 x Chunk list json into an array of texts
 + keys        - show public keys
++ Write a test recording mode
++ Add more commands to all-commands.t
++ Support @ as shorthand for login-name
