@@ -38,7 +38,9 @@ file-test() {
   local label=$test_dir
   label="${label#$TEST_DIR/}"
   label+=" ($file)"
-  is "$(< "$test_dir/$file")" "$(< "$TEST_DIR/$file")" "$label"
+  is "$(< "$TEST_DIR/$file")" "$(< "$test_dir/$file")" "$label"
 }
 
 main "$@"
+
+# vim: set ft=sh:
