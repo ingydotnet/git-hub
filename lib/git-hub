@@ -796,8 +796,7 @@ api-call() {
     [ -e "$command_header_file" ] ||
       die "-R flag not valid. Command not previously run.\n"
     rc=0
-  # Move all test stuff out of this lib and into a test/override file
-  elif [ -z "$GIT_HUB_TEST_COMMAND" ]; then
+  else
     local cache_dir="$GIT_HUB_CACHE/$command_sha1"
     mkdir -p "$cache_dir"
     # Actually run the curl command!
@@ -813,7 +812,6 @@ api-call() {
   $show_headers && cat $command_header_file >&2
 
   if [ -s "$command_output_file" ]; then
-    # JSON.load "$(< $command_output_file)"
     JSON__cache="$(cat $command_output_file | JSON.load)"
     $show_output && cat $command_output_file >&2
     $show_json && JSON.cache >&2
@@ -1134,8 +1132,7 @@ report-list() {
         default-format-entry $list_counter "${values[@]}"
       fi
       if [ -n "$output_line" ]; then
-        # XXX This can be removed after tests are refactored
-        if [ -z "$GIT_HUB_TEST_COMMAND" ]; then
+        if interactive; then
           out "$output_line" | cut -c 1-$line_max
         else
           out "$output_line"
@@ -1145,8 +1142,7 @@ report-list() {
       let list_counter=list_counter+1
       [ -n "$list_size" ] && [ $list_counter -gt $list_size ] && return
     done
-    # TODO This can (maybe) be moved to 'prompt' function
-    [ -n "$GIT_HUB_TEST_COMMAND" ] && break
+    interactive || break
     url=$(get-next-page-url)
     if [ $list_counter -gt $list_max ]; then
       if [ -n "$url" -o $ii -lt $page_size ]; then
@@ -1575,6 +1571,13 @@ callable-or-source() {
 inside-git-repo() {
   (git rev-parse --git-dir &> /dev/null)
 }
+
+#------------------------------------------------------------------------------
+# Test overrides:
+#------------------------------------------------------------------------------
+if [ -n "$GIT_HUB_TEST_COMMAND" ]; then
+  source git-hub-test-command
+fi
 
 #------------------------------------------------------------------------------
 # Begin at the end!
