@@ -868,6 +868,8 @@ format-curl-command() {
   fi
 
   local sha1seed="${curl_command[@]}"
+  [ -n "$api_token" ] && [ -n "$GIT_HUB_TEST_MAKE" ] &&
+    sha1seed="${sha1seed/$api_token/0123456789abcdef0123456789abcdef01234567}"
   # echo "$sha1seed" >> sha1seed
   $show_output && sha1seed+=' -O'
   command_sha1="$(echo "$sha1seed" | $sha1sum | cut -d ' ' -f1)"
