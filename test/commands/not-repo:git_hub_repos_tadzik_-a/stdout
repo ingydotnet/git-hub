@@ -1,0 +1,103 @@
+1) (2014-03-15)  tadzik/panda                   Perl 6 module management solutio
+2) (2014-03-13)  tadzik/gmpup                   Synchronise single ports from Ge
+3) (2014-03-09)  tadzik/tabs                    Songs I like to sing with chords
+4) (2014-03-09)  tadzik/File-Find               File::Find Perl 6 module
+5) (2014-02-28)  tadzik/rakudobrew              Polar bears are left-handed
+6) (2014-02-26)  tadzik/Template-Mojo           A templating system similar to P
+7) (2014-02-17)  tadzik/dotfiles                Boring things
+8) (2014-02-01)  tadzik/Shell-Command           Shell::Command Perl 6 module
+9) (2014-01-27)  tadzik/p6steroids              bla bla ble ble
+10) (2014-01-19)  tadzik/perl6-http-easy         Make HTTP servers (with PSGI su
+11) (2014-01-19)  tadzik/Bailador                An initial clone of Dancer to P
+12) (2014-01-18)  tadzik/MoarVM                  A 6model-based VM for NQP and R
+13) (2013-12-27)  tadzik/SDL6                    SDL for perl6 with bindings for
+14) (2013-12-22)  tadzik/WWW-Steam               something something I play too 
+15) (2013-12-22)  tadzik/Set-Object              Release history of Set-Object
+16) (2013-10-26)  tadzik/p6-pb                   protobuf support for Perl 6
+17) (2013-10-04)  tadzik/mario                   nothing too see here (yet)
+18) (2013-10-03)  tadzik/perl6-Term-ANSIColor    Term::ANSIColor for Perl6
+19) (2013-09-08)  tadzik/Perlcasts               good stuff
+20) (2013-09-01)  tadzik/asteroids               as boring as it sounds
+21) (2013-08-03)  tadzik/JSON-Unmarshal          
+22) (2013-07-13)  tadzik/perl6-File-Tools        File::Tools – common shell co
+23) (2013-07-13)  tadzik/perl6-Acme-Meow         It's the Perl 6 kitty you've al
+24) (2013-06-26)  tadzik/psi-password-decoder    Something I found on the intern
+25) (2013-06-25)  tadzik/MinimalneAutogramyLiterowe bla bla ple ple
+26) (2013-06-19)  tadzik/wipi                    Wiring Wrapper in Go for the Ra
+27) (2013-06-14)  tadzik/IO-Select               
+28) (2013-06-14)  tadzik/promela                 boring, nevermind
+29) (2013-06-09)  tadzik/emmentaler              Perl 6 module smoketesting serv
+30) (2013-06-02)  tadzik/Test-Harness            TAP harness for Perl 6
+31) (2013-05-05)  tadzik/simpleaes               Make encryption in Go easy
+32) (2013-05-04)  tadzik/yarn                    A proof-of-concept blogging app
+33) (2013-05-03)  tadzik/test-mock               Test::Mock - a module for simpl
+34) (2013-05-03)  tadzik/perl6-Config-INI        ini files parser for Perl 6
+35) (2013-04-30)  tadzik/reddit.go               Reddit API access for golang
+36) (2013-04-30)  tadzik/go-gtk                  Go binding for GTK
+37) (2013-04-16)  tadzik/pandabrew               Make it easier to work with pan
+38) (2013-04-01)  tadzik/File-HomeDir            File-HomeDir Perl 6 port
+39) (2013-03-11)  tadzik/hello-world             Hello world in every programmin
+40) (2013-03-07)  tadzik/perl6-Imlib2            Perl 6 interface to the Imlib2 
+41) (2013-02-24)  tadzik/Module-Starter          
+42) (2013-02-22)  tadzik/gouda                   A dirt-simple documentation pro
+43) (2013-02-22)  tadzik/forvalve                Nevermind
+44) (2013-02-06)  tadzik/plpw-website            
+45) (2013-02-05)  tadzik/nqp-jvm-prep            Preparatory work for NQP and Ra
+46) (2013-01-16)  tadzik/acme-rafl-everywhere    rafl is so everywhere, he has h
+47) (2013-01-10)  tadzik/Task-Star               Meta-package for modules includ
+48) (2013-01-08)  tadzik/neutro                  Simple module installer for Per
+49) (2013-01-03)  tadzik/GetThingsDone           A Maemo application for organiz
+50) (2012-12-26)  tadzik/perl6-lwp-simple        LWP::Simple quick & dirty imple
+51) (2012-12-23)  tadzik/d0x3d-the-game          Source materials for [d0x3d!], 
+52) (2012-12-22)  tadzik/Threads                 Threads in Perl 6. Yeah, really
+53) (2012-12-13)  tadzik/Coroutines              The only fake threads in Perl 6
+54) (2012-11-26)  tadzik/MuEvent                 AnyEvent lookalike for Perl 6
+55) (2012-10-12)  tadzik/WebNano6                Port of https://github.com/zby/
+56) (2012-09-16)  tadzik/soonish                 Ideas for a web service that co
+57) (2012-09-05)  tadzik/Term--ProgressBar       Progress bar implementation for
+58) (2012-08-24)  tadzik/Net--IRC                A simple and easy to use IRC Bo
+59) (2012-08-20)  tadzik/rakudo-debugger         A debugger for Rakudo.
+60) (2012-08-15)  tadzik/gorduino                Go to C compiler
+61) (2012-08-04)  tadzik/yapsi                   A Perl 6 compiler-and-runtime w
+62) (2012-07-02)  tadzik/Typed-Subroutines       Better type checking for first-
+63) (2012-06-22)  tadzik/zblog                   źblog: example blog-ish applic
+64) (2012-06-10)  tadzik/a8bot                   Extensible irc bot
+65) (2012-06-09)  tadzik/Test-Junkie             Continuous test runner for Perl
+66) (2012-06-08)  tadzik/TIN                     University assigment (boring cr
+67) (2012-06-08)  tadzik/Text-T9                 Guess words basing on a T9 key 
+68) (2012-05-18)  tadzik/Test-PSGI               
+69) (2012-05-13)  tadzik/Kreski                  My algorithms project. Boring c
+70) (2012-05-13)  tadzik/todo                    Todo list manager, modeled afte
+71) (2012-04-16)  tadzik/IO-Capture-Simple       IO can be captured.
+72) (2012-04-14)  tadzik/csv                     A parser for CSV (comma-separat
+73) (2012-04-01)  tadzik/perl6-MPD               Perl 6 bindings to libmpdclient
+74) (2012-03-19)  tadzik/Courriel--MMS           Courriel extension for dealing 
+75) (2012-02-21)  tadzik/giraffe                 Random lines of Go which interp
+76) (2011-12-29)  tadzik/web                     A Perl 6 web framework
+77) (2011-11-03)  tadzik/luasnake                Completely uninteresting snake 
+78) (2011-10-14)  tadzik/luatris                 Tetris with no bullshit
+79) (2011-09-30)  tadzik/distroquiz              Experimental new linux distribu
+80) (2011-08-25)  tadzik/perl6-ioc               Inversion of control in Perl 6
+81) (2011-08-25)  tadzik/ack                     A replacement for grep for prog
+82) (2011-08-24)  tadzik/benchmark               Simple Perl 6 version of Benchm
+83) (2011-08-18)  tadzik/Pod-To-HTML             Convert Perl6 Pod to shiny HTML
+84) (2011-08-10)  tadzik/powaur                  An AUR helper with a pacman-lik
+85) (2011-08-06)  tadzik/Plis                    Stupid LISP-alike interpreter
+86) (2011-07-31)  tadzik/pacnet                  A perl frontend for categorised
+87) (2011-07-06)  tadzik/gsocmess                Random things about my gsoc wor
+88) (2011-05-22)  tadzik/Pies                    What was named Pies is now name
+89) (2011-05-21)  tadzik/lenovo-sl-laptop        Linux kernel support for the Le
+90) (2011-05-17)  tadzik/popolnik-client         A girrafe's tongue is 18 inches
+91) (2011-04-28)  tadzik/mpdclient               KDE4 plasmoid displaying mpd so
+92) (2011-03-20)  tadzik/gtkabber-vala           Gtkabber rewrite in Vala
+93) (2011-03-16)  tadzik/tadzik.github.com       I has a webpage
+94) (2011-03-02)  tadzik/parrot-deprecation-detector 
+95) (2011-02-17)  tadzik/Close                   C-like programming language for
+96) (2011-02-06)  tadzik/simpleburner            CLI tool ment to simplify Your 
+97) (2011-01-08)  tadzik/perl6-Module-Tools      Module mangling in Perl 6
+98) (2011-01-02)  tadzik/gtkabber                Gtk+ xmpp client, still in deve
+99) (2010-08-17)  tadzik/xmpbot                  Extensible xmpp bot, written in
+100) (2010-07-26)  tadzik/Perl6-slides            My slides about Perl 6 from Wa
+101) (2010-07-17)  tadzik/notworks                Wired and wireless network man
+102) (2010-05-30)  tadzik/feed2mbox               Fetch RSS/Atom feeds and deliv
+103) (2010-05-30)  tadzik/l                       Launching applications faster 

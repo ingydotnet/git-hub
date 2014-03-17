@@ -12,8 +12,6 @@ if [ -n "$GIT_HUB_TEST_RESET" ]; then
   exit 0
 fi
 
-export GIT_HUB_LIST_SIZE=5
-
 git hub user
 git hub user cdent
 git hub repo pegex-pm

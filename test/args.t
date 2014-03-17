@@ -57,7 +57,7 @@ run-test \
 
 run-test \
   "?user:get-user" \
-  "=cdent=" \
+  "=aocole=" \
   # none
 
 GIT_DIR=$PWD/test/repo/ricardo-foo \
