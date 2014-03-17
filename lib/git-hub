@@ -70,7 +70,7 @@ bash+:import :std can
 
 #------------------------------------------------------------------------------
 main() {
-  local OK=0
+  local OK=0 split_words=false
   init-env
   if run-for-each "$@"; then
     run-each "$@"
@@ -140,7 +140,7 @@ run-command() {
 run-each() {
   local i line before=() after=() seen=false
   for ((i = 1; i <= $#; i++)); do
-    if [ ${!i} == '-' ]; then
+    if [[ ${!i} =~ ^[-=]$ ]]; then
       seen=true
     elif ! $seen; then
       before+=( "${!i}" )
@@ -149,12 +149,17 @@ run-each() {
     fi
   done
   while read line; do
-    options=()
-    options+=("${before[@]}")
-    options+=($line)
-    options+=("${after[@]}")
-    run-command "${options[@]}"
-    OK || return
+    local lines=("$line")
+    $split_words && lines=($line)
+    local arg
+    for arg in "${lines[@]}"; do
+      options=()
+      options+=("${before[@]}")
+      options+=($arg)
+      options+=("${after[@]}")
+      run-command "${options[@]}"
+      OK || return
+    done
   done
 }
 
@@ -1285,7 +1290,8 @@ init-vars() {
 run-for-each() {
   local elem
   for elem in "$@"; do
-    [ "$elem" == '-' ] && return 0
+    [ "$elem" == '=' ] && split_words=true
+    [[ "$elem" =~ ^[-=]$ ]] && return 0
   done
   return 1
 }
