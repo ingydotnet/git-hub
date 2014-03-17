@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+
+command:fork() {
+  require-auth
+  get-args '?owner:get-user/repo:get-repo'
+  api-post "/repos/$owner/$repo/forks" '{}'
+  local login=$(get-login)
+  msg_ok="Repository '$owner/$repo' forked to '$login'"
+  if OK && [ -n "$remote_name" ] && inside-git-repo; then
+    url="git@github.com:$login/$repo.git"
+    git remote add "$remote_name" "$url"
+    say "git remote add $remote_name $url"
+  fi
+}
+
+command:forks() {
+  get-args '?owner:get-user/repo:get-repo'
+  report-list \
+    "/repos/$owner/$repo/forks?sort=newest;per_page=PER_PAGE" \
+    'pushed_at full_name'
+}
+
+format-entry:forks() {
+  if $raw_output; then
+    out "$3"
+  else
+    printf "%d) (%s)  %-30s\n" $1 ${2/T*/} $3
+  fi
+}
+

@@ -429,29 +429,6 @@ command:repo-delete() {
   msg_ok="Repository '$owner/$repo' deleted"
 }
 
-command:forks() {
-  get-args '?owner:get-user/repo:get-repo'
-  report-list \
-    "/repos/$owner/$repo/forks?sort=newest;per_page=PER_PAGE" \
-    'pushed_at full_name'
-}
-
-format-entry:forks() {
-  if $raw_output; then
-    out "$3"
-  else
-    printf "%d) (%s)  %-30s\n" $1 ${2/T*/} $3
-  fi
-}
-
-command:fork() {
-  require-auth
-  get-args '?owner:get-user/repo:get-repo'
-  api-post "/repos/$owner/$repo/forks" '{}'
-  local login=$(get-login)
-  msg_ok="Repository '$owner/$repo' forked to '$login'"
-}
-
 command:stars() {
   get-args '?owner:get-user/repo:get-repo'
   local title="Stargazers for '$owner/$repo':"
@@ -1564,13 +1541,10 @@ prompt() {
 }
 
 callable-or-source() {
-  if can "command:$1"; then
-    return 0
-  else
-    if source-ext-maybe git-hub-"${1/:*/}" && can "command:$1"; then
-      return 0
-    fi
-  fi
+  cmd="$1"
+  can "command:$cmd" && return 0
+  source-ext-maybe git-hub-"${cmd/:*/}" && can "command:$cmd" && return 0
+  source-ext-maybe git-hub-"${cmd%s}" && can "command:$cmd" && return 0
   return 1
 }
 
