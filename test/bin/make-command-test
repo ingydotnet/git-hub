@@ -21,7 +21,6 @@ assert-env() {
   TEST_BIN="$PWD/test/bin"
   TEST_LIB="$PWD/test/lib"
 
-  export GIT_HUB_CONFIG="$PWD/test/githubconfig"
   export PATH=$TEST_BIN:$TEST_LIB:$PATH
 
   export GIT_HUB_TEST_MAKE=true

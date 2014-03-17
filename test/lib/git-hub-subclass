@@ -14,3 +14,23 @@ prompt() {
   echo "$prompt_msg"
   exit 0
 }
+
+get-hub-config() {
+  if [ -n "$GIT_HUB_TEST_MAKE" ]; then
+    if [ "$1" == "login" ]; then
+      echo "aocole"
+      return
+    fi
+    if [ "$1" == "use-auth" ]; then
+      echo ""
+      return
+    fi
+  fi
+  local value=
+  if [ -e "$GIT_HUB_CONFIG" ]; then
+    value="$(git config -f "$GIT_HUB_CONFIG" github."$1" 2>/dev/null)"
+  fi
+  echo "${value:-$2}"
+}
+
+
