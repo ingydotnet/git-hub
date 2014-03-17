@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+
+set -ex
+
+spec=${1:?"$0 requires a repo spec"}
+[[ "$spec" =~ / ]] || {
+  echo "Invalid repo spec"
+  exit 1
+}
+
+repo=${spec#*/}
+
+(
+  set -ex
+
+  cd $(dirname $0)/../
+
+  git hub clone "$spec" -q
+
+  cp -r repo/git-hub repo/$repo
+
+  cp $repo/.git/config repo/$repo/config
+
+  [[ $repo =~ ^[a-zA-Z] ]] && rm -fr "$repo"
+)
