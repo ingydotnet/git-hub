@@ -4,9 +4,8 @@ set -e
 
 command:repo-init() {
   get-args dir
-  local need_dir=true need_init=true need_repo=true need_remote=true
+  local need_init=true need_repo=true need_remote=true
   if [ -d "$dir" ]; then
-    need_dir=false
     if [ -d "$dir/.git" ]; then
       need_init=false
       if [ -n "$(GIT_DIR="$dir/.git" git remote)" ]; then
@@ -15,21 +14,14 @@ command:repo-init() {
       fi
     fi
   fi
-  $need_dir || $need_init || $need_repo || $need_remote || {
+  $need_init || $need_repo || $need_remote || {
     say "Nothing to do."
     exit 0
   }
-  if $need_dir; then
-    (
-      set -x
-      mkdir $dir
-    )
-  fi
   if $need_init; then
     (
-      cd $dir
       set -x
-      git init
+      git init $dir
     )
   fi
   if $need_repo; then
