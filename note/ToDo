@@ -84,6 +84,7 @@
 - Test under zsh (rafl had bugs)
 
 == UX
+- Support two phase auth
 - Support a git-hub-shell
 - Command completion
 
