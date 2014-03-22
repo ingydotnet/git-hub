@@ -7,14 +7,14 @@ command:open() {
 
   get-browser
 
-  "$browser" "http://github.com/$owner/$repo"
+  "$browser" "http://github.com/$owner/$repo" &
 }
 
 get-browser() {
   browser="$(get-hub-config browser)"
   [ -n "$browser" ] && return
 
-  for browser in firefox chromium; do
+  for browser in firefox chromium-browser; do
     [ -n "$(type $browser)" ] && return
   done
 
