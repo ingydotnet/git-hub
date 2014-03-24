@@ -7,9 +7,12 @@
 set -e
 
 command:open() {
+  local options=()
+  $raw_output && options+=(--raw)
+
   set -- "${command_arguments[@]}"
 
-  url="$(git hub url $@)"
+  url="$(git hub url $@ ${options[@]})"
 
   get-browser
 
