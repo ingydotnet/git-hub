@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 
 # Try this vim command:
-# map \gho :let $l=line(".")<cr>:let $p=@%<cr>:!git hub open $p $l<cr>
+#
+# map \gho :let $l=line(".")<cr>:let $p=@%<cr>:!git hub open $p $l<cr><cr>
 
 set -e
 
