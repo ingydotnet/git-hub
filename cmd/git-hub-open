@@ -3,11 +3,14 @@
 set -e
 
 command:open() {
-  get-args '?owner:get-user/repo:get-repo'
+  set -- "${command_arguments[@]}"
+
+  url="$(git hub url $@)"
 
   get-browser
 
-  "$browser" "http://github.com/$owner/$repo" &
+  "$browser" "$url" &
+  msg_ok="$browser $url"
 }
 
 get-browser() {

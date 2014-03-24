@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+
+set -e
+
+command:url() {
+  set -- "${command_arguments[@]}"
+
+  local path= line=
+  if inside-git-repo && [ $# -gt 0 ] && [ -e "$1" ]; then
+    path="$1"
+    path="${path%/}"
+    [ -n "$2" ] && line="$2"
+    command_arguments=()
+  fi
+
+  get-args '?owner:get-user/repo:get-repo'
+
+  url="http://github.com/$owner/$repo"
+
+  if [ -n "$path" ]; then
+    branch="$(git rev-parse --abbrev-ref HEAD)"
+    url+="/blob/$branch/$path"
+    if [ -n "$line" ]; then
+      url+="L#$line"
+    fi
+  fi
+
+  msg_ok="$url"
+}
+
+# vim: set lisp:
