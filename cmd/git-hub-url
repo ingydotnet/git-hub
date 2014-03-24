@@ -21,7 +21,7 @@ command:url() {
     branch="$(git rev-parse --abbrev-ref HEAD)"
     url+="/blob/$branch/$path"
     if [ -n "$line" ]; then
-      url+="L#$line"
+      url+="#L$line"
     fi
   fi
 
