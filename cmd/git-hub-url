@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+# Try this vim command:
+# map \ghu :let $l=line(".")<cr>:let $p=@%<cr>:!git hub url $p $l \| xsel -b<cr>
 set -e
 
 command:url() {
