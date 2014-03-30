@@ -1418,6 +1418,14 @@ interactive() {
   fi
 }
 
+pipeline() {
+  if [ -t 0 -a -t 1 ]; then
+    return 1
+  else
+    return 0
+  fi
+}
+
 set-var() {
   local name="$1"
   local value="$2"

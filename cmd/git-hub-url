@@ -34,7 +34,13 @@ command:url() {
     fi
   fi
 
-  msg_ok="$url"
+  if pipeline; then
+    echo -n "$url"
+  else
+    echo "$url"
+  fi
+
+  msg_ok=0
 }
 
 # vim: set lisp:
