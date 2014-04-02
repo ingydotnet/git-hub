@@ -68,12 +68,13 @@ bash+:findlib() {
 }
 
 bash+:die() {
-  local msg="${1:-Died}"
-  printf "${msg//\\n/$'\n'}" >&2
+  local msg="$@"
+  [ -z "$msg" ] && msg=Died
+  echo -n "${msg//\\n/$'\n'}" >&2
   local trailing_newline_re=$'\n''$'
   [[ "$msg" =~ $trailing_newline_re ]] && exit 1
 
-  local c=($(caller ${DIE_STACK_LEVEL:-${2:-0}}))
+  local c=($(caller ${DIE_STACK_LEVEL:-0}))
   [ ${#c[@]} -eq 2 ] &&
     msg=" at line %d of %s" ||
     msg=" at line %d in %s of %s"
