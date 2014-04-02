@@ -43,6 +43,7 @@ help        Show the complete documentation
 c,count=    Number of list items to show
 a,all       Show all list items
 remote=     Remote name (like 'origin')
+org=        GitHub organization name
  
 q,quiet     Show minimal output
 v,verbose   Show verbose output
@@ -457,7 +458,13 @@ format-entry:forks() {
 command:fork() {
   require-auth
   get-args '?owner:get-user/repo:get-repo'
-  api-post "/repos/$owner/$repo/forks" '{}'
+  local data='{}'
+  if [ -n "$organization" ]; then
+    api-post "/repos/$owner/$repo/forks" \
+      "$(json-dump-object organization "$organization")"
+  else
+    api-post "/repos/$owner/$repo/forks" '{}'
+  fi
   local login=$(get-login)
   msg_ok="Repository '$owner/$repo' forked to '$login'"
   if OK && [ -n "$remote_name" ] && inside-git-repo; then
@@ -970,6 +977,8 @@ get-args() {
         spec-assign
         args=("${args[@]:1}")
       fi
+    elif [[ "$spec" =~ ^-- ]]; then
+      keyword-assign
     else
       if [ ${#args[@]} -eq 0 ]; then
         spec-assign
@@ -983,6 +992,27 @@ get-args() {
   if [ ${#args[@]} -gt 0 ]; then
     die "Unknown argument(s): '${args[*]}'"
   fi
+}
+
+keyword-assign() {
+  local kargs=(${args[@]})
+  args=()
+  for ((i = 0; i < ${#kargs[@]}; i++)); do
+    if [ "${kargs[$i]}" == "$spec" ]; then
+      i=$((i + 1))
+      local var="${spec#--}"
+      local val="${kargs[$i]}"
+      [ "$val" == '@' ] && val="$login"
+      printf -v "$var" "$val"
+    elif [[ "${kargs[$i]}" =~ ^$spec=(.*) ]]; then
+      local var="${spec#--}"
+      local val="${BASH_REMATCH[1]}"
+      [ "$val" == '@' ] && val="$login"
+      printf -v "$var" "$val"
+    else
+      args+=("${kargs[$i]}")
+    fi
+  done
 }
 
 spec-assign() {
@@ -1356,6 +1386,10 @@ get-opts() {
       -a)
         list_size=$Infinity
         do_all=true
+        ;;
+      --org)
+        set-var organization "$1"
+        shift
         ;;
       --remote)
         set-var remote_name "$1"
