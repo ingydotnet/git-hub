@@ -43,6 +43,7 @@ help        Show the complete documentation
 c,count=    Number of list items to show
 a,all       Show all list items
 remote=     Remote name (like 'origin')
+branch=     Branch name (like 'master')
 org=        GitHub organization name
  
 q,quiet     Show minimal output
@@ -307,27 +308,11 @@ command:unfollow() {
 }
 
 command:clone() {
-  set -- "${command_arguments[@]}"
-  while (($#)); do
-    if [[ $# == 1 ]] || [[ ! "$2" =~ ^\.?\.?/ ]]; then
-      exec:clone "$1"
-      shift
-    else
-      exec:clone "$1" "$2"
-      shift; shift
-    fi
-  done
+  get-args '?owner:get-user/repo:get-repo' '?dir'
   msg_ok=0
-}
 
-exec:clone() {
-  owner_repo="$1"
-  dir="$2"
-  if [[ ! $owner_repo =~ / ]]; then
-    owner=`get-user` ||
-      die "Can't determine owner for '$owner_repo'"
-    owner_repo=$owner/$owner_repo
-  fi
+  owner_repo="$owner/$repo"
+
   url="git@github.com:$owner_repo"
   cmd="git clone --recursive $url $dir"
   local OK=0
@@ -1630,6 +1615,8 @@ callable-or-source() {
     return 0
   else
     if source-ext-maybe git-hub-"${1/:*/}" && can "command:$1"; then
+      return 0
+    elif source-ext-maybe git-hub-"${1/-*/}" && can "command:$1"; then
       return 0
     fi
   fi

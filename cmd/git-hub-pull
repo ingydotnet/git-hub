@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+
+command:pull-new() {
+  # Check:
+  # - Repo is clean
+  # - HEAD is pushed
+  # Need:
+  # - Remote owner/repo
+  # - Remote branch
+  # Fetch remote repo
+  # Check if branch exists
+  # Invoke editor with:
+  # - Remote info
+  # - Instructions
+  # - Diff of HEAD and remote branch
+  # Get Title and Body from editor file
+  # Issue pull request
+
+  get-args '?owner:get-user/repo:get-repo' '?branch'
+
+  die "owner=$owner repo=$repo branch=$branch"
+}
+
+
+# vim: set ft=sh lisp:

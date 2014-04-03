@@ -1,6 +1,9 @@
 == !!! Next hacks in priority order
 
-- pull-request - issue a pull request
+- repo-delete repo
+  (don't require user/repo)
+- pull-new - issue a pull request
+- pull-edit
 - issue-close
 - issue-new
 - issue-comment
