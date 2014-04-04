@@ -1,9 +1,9 @@
 == !!! Next hacks in priority order
 
-- repo-delete repo
-  (don't require user/repo)
 - pull-new - issue a pull request
 - pull-edit
+- find right remote
+  - complain if ambiguous
 - issue-close
 - issue-new
 - issue-comment
@@ -14,8 +14,6 @@
 
 == Bugs
 - No error msg printed on wrong password
-- find right remote
-  - complain if ambiguous
 
 === Bugs (OSX)
 
@@ -72,7 +70,7 @@
 - git-hub-irc
 
 == Refactoring
-- Try loading git-hub-foo plugin for git-hub-foo-bar command
+- Support dryrun for non-api commands like clone
 - Review git/Documentation/CodingGuidelines
 - Eliminate evals
 - Eliminate TODO/XXX
@@ -193,3 +191,5 @@ x Chunk list json into an array of texts
 + Write a test recording mode
 + Add more commands to all-commands.t
 + Support @ as shorthand for login-name
++ Try loading git-hub-foo plugin for git-hub-foo-bar command
++ repo-delete repo (don't require user/repo)
