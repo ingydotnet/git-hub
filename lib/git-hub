@@ -315,6 +315,14 @@ command:clone() {
 
   url="git@github.com:$owner_repo"
   cmd="git clone --recursive $url $dir"
+
+  # TODO Make this dry_run on non-API command be reusable
+  $verbose_output && nay "$cmd"
+  $dry_run && {
+    nay '*** NOTE: This is a dry run only. ***'
+    exit 0
+  }
+
   local OK=0
   (
     if $quiet_output; then
@@ -951,7 +959,7 @@ get-args() {
         specs=("${specs[@]:1}")
         continue
       fi
-      if [ ${#args[@]} -lt ${#specs[@]} ]; then
+      if [ ${#args[@]} -lt ${#specs[@]} ] && [[ ! "${specs[1]}" =~ ^\? ]]; then
         if [[ "$spec" =~ : ]]; then
           arg=''
           spec-assign
