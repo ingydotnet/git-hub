@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 command:pull-new() {
+  echo "This command still under development"
   # Check:
   # - Repo is clean
   # - HEAD is pushed
@@ -16,7 +17,13 @@ command:pull-new() {
   # Get Title and Body from editor file
   # Issue pull request
 
-  get-args '?owner:get-user/repo:get-repo' '?branch'
+  assert-inside-git-repo
+  assert-git-repo-is-clean
+  assert-git-head-is-pushed
+
+  get-upstream-repo
+  get-upstream-branch
+  assert-upstream-has-branch "$branch"
 
   die "owner=$owner repo=$repo branch=$branch"
 }

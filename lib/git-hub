@@ -1388,6 +1388,10 @@ get-opts() {
         set-var remote_name "$1"
         shift
         ;;
+      --branch)
+        set-var branch_name "$1"
+        shift
+        ;;
 
       -q) quiet_output=true ;;
       -v) verbose_output=true ;;
@@ -1631,8 +1635,18 @@ callable-or-source() {
   return 1
 }
 
+assert-inside-git-repo() {
+  inside-git-repo ||
+    die "Not inside a git repo"
+}
+
+assert-git-repo-is-clean() {
+  true ||
+    die "Not inside a git repo"
+}
+
 inside-git-repo() {
-  (git rev-parse --git-dir &> /dev/null)
+  (git rev-parse --is-inside-work-tree &> /dev/null)
 }
 
 #------------------------------------------------------------------------------
