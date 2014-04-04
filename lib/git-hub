@@ -428,7 +428,7 @@ command:repo-new() {
 
 command:repo-delete() {
   require-auth
-  get-args owner/repo
+  get-args '?owner:get-user/repo:get-repo'
   api-delete "/repos/$owner/$repo"
   msg_ok="Repository '$owner/$repo' deleted"
 }
