@@ -3,7 +3,7 @@
 set -e
 
 command:repo-init() {
-  get-args dir
+  get-args dir:set-dot
   local need_init=true need_repo=true need_remote=true
   if [ -d "$dir" ]; then
     if [ -d "$dir/.git" ]; then

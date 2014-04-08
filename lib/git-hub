@@ -22,29 +22,24 @@ GIT_HUB_VERSION=0.0.3
 OPTIONS_SPEC="\
 git hub <command> <options> <arguments>
 
-Commands:
-  user, user-get, user-edit, orgs, org, org-get, org-edit, members, teams
-  followers, following, follows, follow, unfollow
-  clone, repos, repo, repo-get, repo-edit, repo-new, repo-delete,
-  forks, fork, stars, star, unstar, starred, collabs, trust, untrust
-  issues, issue, pulls, keys
+Common Commands:
+  setup, user, orgs, org, teams, members, followers, following, follow,
+  clone, repos, repo, repo-new, repo-delete, forks, fork, stars, star,
+  collabs, trust, issues, issue, pulls, pull-request, config, url, open
 
-  setup, config, config-unset
-  token-list, token-new, token-get, token-delete
-  scope-list, scope-add, scope-remove
-
-See 'git help hub' for complete documentation and usage of each command.
+See 'git help hub' for complete documentation of all the commands.
 
 Options:
 --
 h           Show the command summary
 help        Show the complete documentation
  
-c,count=    Number of list items to show
-a,all       Show all list items
 remote=     Remote name (like 'origin')
 branch=     Branch name (like 'master')
 org=        GitHub organization name
+ 
+c,count=    Number of list items to show
+a,all       Show all list items
  
 q,quiet     Show minimal output
 v,verbose   Show verbose output
@@ -1111,6 +1106,10 @@ get-repo-config() {
     fi
   fi
   return 1
+}
+
+set-dot() {
+  echo '.'
 }
 
 require-auth() {
