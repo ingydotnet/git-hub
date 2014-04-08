@@ -1,5 +1,6 @@
 == !!! Next hacks in priority order
 
+- Add PAGER support for some commands
 - pull-new - issue a pull request
 - pull-edit
 - find right remote
