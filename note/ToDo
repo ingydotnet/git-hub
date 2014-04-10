@@ -1,5 +1,10 @@
 == !!! Next hacks in priority order
 
+
+- Add upgrade command
+- Newlines in description of PR
+
+
 - Add PAGER support for some commands
 - pull-new - issue a pull request
 - pull-edit

@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+
+command:upgrade() {
+  local path=$0
+  if [[ ! "$path" =~ ^/ ]] || [[ ! "$path" =~ ^(.*/git-hub)/lib/git-hub$ ]]; then
+    die "Sorry. Your installation can't use the 'upgrade' command."
+  fi
+  (
+    set -x
+    cd "${BASH_REMATCH[1]}"
+    git pull --rebase
+  )
+}
