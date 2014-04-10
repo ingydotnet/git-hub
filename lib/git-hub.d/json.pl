@@ -33,6 +33,6 @@ sub walk {
     }
     else {
         my $value = encode_json([$node]);
-        print "$path\t", substr($value,1,-1), "\n"
+        print "$path\t", substr($value,1,-1), "\n";
     }
 }

@@ -1,0 +1,40 @@
+#!/usr/bin/env bash
+
+command:issue-list() {
+  get-args '?owner:get-owner/repo:get-repo'
+
+  report-list \
+    "/repos/$owner/$repo/issues?sort=updated;per_page=PER_PAGE" \
+    'number updated_at state user/login title'
+}
+
+format-entry:issue-list() {
+  printf "%d) #%d (%s) %-6s @%-16s %s\n" $1 $2 ${3/T*/} $4 $5 "$6"
+}
+
+command:issue() {
+  get-args '?owner:get-owner/repo:get-repo' number
+  api-get "/repos/$owner/$repo/issues/$number"
+}
+
+ok:issue() {
+  local label_title='Issue'
+  local label_body='Description'
+  fields=(
+    title number user__login state body comments
+  )
+  local skip_field_comments=true
+  report-data
+
+  local comments=$(JSON.get -n /comments -)
+  if [ $comments -gt 0 ]; then
+    out Comments:
+    command=comments
+    report-list \
+      "/repos/$owner/$repo/issues/$number/comments?sort=updated;per_page=PER_PAGE" \
+      'user/login updated_at body'
+    out
+  fi
+}
+
+# vim: set lisp:

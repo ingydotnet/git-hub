@@ -81,7 +81,7 @@ pretty-json-object() {
 
 json-var-list() {
   local fields="$@"
-  while IFS='\n' read line; do
+  while IFS='\n' read -r line; do
     if [[ "$line" =~ ^/([0-9]+)/([^\	]+)\	(.*) ]]; then
       local value="${BASH_REMATCH[3]}"
       [ "$value" == null ] && value=''

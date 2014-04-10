@@ -23,9 +23,10 @@ OPTIONS_SPEC="\
 git hub <command> <options> <arguments>
 
 Common Commands:
-  setup, user, orgs, org, teams, members, followers, following, follow,
-  clone, repos, repo, repo-new, repo-delete, forks, fork, stars, star,
-  collabs, trust, issues, issue, pulls, pull-request, config, url, open
+  help, setup, upgrade, config, url, open
+  user, orgs, org, teams, members, followers, following, follow, stars, star,
+  clone, repos, repo, repo-new, repo-delete, forks, fork, collabs, trust,
+  issue-list, issue, pull-request, pull-list, pull, pull-update, pull-merge
 
 See 'git help hub' for complete documentation of all the commands.
 
@@ -517,49 +518,12 @@ command:untrust() {
   msg_ok="'$owner/$repo' commit permission removed for: ${collaborators[@]}"
 }
 
-command:issues() {
-  get-args '?owner:get-owner/repo:get-repo'
-
-  report-list \
-    "/repos/$owner/$repo/issues?sort=updated;per_page=PER_PAGE" \
-    'number updated_at state user/login title'
-}
-
-format-entry:issues() {
-  printf "%d) #%d (%s) %-6s @%-16s %s\n" $1 $2 ${3/T*/} $4 $5 "$6"
-}
-
-command:issue() {
-  get-args '?owner:get-owner/repo:get-repo' number
-  api-get "/repos/$owner/$repo/issues/$number"
-}
-
-ok:issue() {
-  local label_title='Issue'
-  local label_body='Description'
-  fields=(
-    title number user__login state body comments
-  )
-  local skip_field_comments=true
-  report-data
-
-  local comments=$(JSON.get -n /comments -)
-  if [ $comments -gt 0 ]; then
-    out Comments:
-    command=comments
-    report-list \
-      "/repos/$owner/$repo/issues/$number/comments?sort=updated;per_page=PER_PAGE" \
-      'user/login updated_at body'
-    out
-  fi
-}
-
 format-entry:comments() {
   printf "  %d) %-14s (%s)\n" $1 $2 ${3/T*/}
   body="$4"
   body=${body//\\\"/\"}
-  body=${body//\\r/}
-  body=${body//\\n\\n/\\n\\n     }
+  body=${body//$'\r'/}
+  body=${body//$'\n\n'/$'\n\n'     }
   printf "     $body" | fmt
 }
 
@@ -1252,13 +1216,14 @@ report-value() {
     if $raw_output; then
       printf "%s\t%s\n" "$label" "$value"
     else
-      if [ ${#value} -lt 80 ]; then
+      value="${value%%\\n}"
+      if [ ${#value} -lt 80 ] && [[ ! "$value" =~ \\n ]]; then
         printf "%-15s %s\n" "$label" "$value"
       else
-        value="${value//\\r/}"
-        value="${value//\\n\\n/\\n\\n  }"
-        value="${value%  }"
-        printf "$label\n"
+        echo "$label"
+        value=${value//\\\"/\"}
+        value=${value//$'\r'/}
+        value=${value//$'\n\n'/$'\n\n'  }
         printf "  $value" | fmt
       fi
     fi
