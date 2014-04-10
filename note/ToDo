@@ -1,19 +1,13 @@
-== !!! Next hacks in priority order
+== Next hacks in priority order
 
-
-- Add PAGER support for some commands
-- find right remote
-  - complain if ambiguous
-- issue-new
-- issue-close
-- issue-update
-- Command completion
-  - See if we can do it for zsh too
+- Show if PR mergable
 
 #------------------------------------------------------------------------------
 
 == Bugs
 - No error msg printed on wrong password
+- Find right remote
+  - Complain if ambiguous
 
 === Bugs (OSX)
 
@@ -23,16 +17,13 @@
   - remote (add remote for adding GitHub remotes)
   - remotes (list github remotes)
   - push-all    - push to all gh remotes
-  - pulls       - list pull requests
-  - pull-request - issue a pull request
-  - pull        - merge a pull request
   - search
   - commits     - show gh urls
   - rate-limit
   - repo-watch
-  - issue-close
   - issue-new
-  - issue-comment
+  - issue-close
+  - issue-update
     - git hub log         -- show urls for commits
     - git hub url <file>  -- show url for file/branch/raw
   - Make a plan for all actions to support
@@ -86,8 +77,10 @@
 
 == UX
 - Support two phase auth
+- Add PAGER support for some commands
 - Support a git-hub-shell
 - Command completion
+  - See if we can do it for zsh too
 
 == Done
 + Use bash+
@@ -193,3 +186,6 @@ x Chunk list json into an array of texts
 + Support @ as shorthand for login-name
 + Try loading git-hub-foo plugin for git-hub-foo-bar command
 + repo-delete repo (don't require user/repo)
++ pull-list - list pull requests
++ pull-request - issue a pull request
++ pull-merge - merge a pull request
