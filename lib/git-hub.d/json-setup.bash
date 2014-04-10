@@ -14,12 +14,11 @@ fi
 # Format a JSON object from an input list of key/value pairs.
 json-dump-object() {
   local json='{'
-  local regex='(^[\[\{]|^(null|true|false)$|^[0-9]+$)'
   while [ $# -gt 0 ]; do
-    if [[ "$2" =~ $regex ]]; then
+    if [[ "$2" =~ (^[\[\{]|^(null|true|false)$|^[0-9]+$) ]]; then
       json="$json\"$1\":$2"
     else
-      json="$json\"$1\":\"$2\""
+      json="$json\"$1\":\"${2//$'\n'/\\n}\""
     fi
     shift; shift
     if [ $# -gt 0 ]; then
@@ -108,11 +107,6 @@ json-prune-hash() {
   local fields="$@"
   fields="${fields//__/\/}"
   json-prune-cache "^/(${fields// /|})\b"
-}
-
-json-prune-list() {
-  local fields="$@"
-  json-prune-cache "^/[0-9]+/(${fields// /|})\b"
 }
 
 # vim: set lisp:

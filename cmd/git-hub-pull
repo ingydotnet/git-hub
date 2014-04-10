@@ -1,32 +1,121 @@
 #!/usr/bin/env bash
 
-command:pull-new() {
-  echo "This command still under development"
-  # Check:
-  # - Repo is clean
-  # - HEAD is pushed
-  # Need:
-  # - Remote owner/repo
-  # - Remote branch
-  # Fetch remote repo
-  # Check if branch exists
-  # Invoke editor with:
-  # - Remote info
-  # - Instructions
-  # - Diff of HEAD and remote branch
-  # Get Title and Body from editor file
-  # Issue pull request
+command:pull-list() {
+  get-args '?owner:get-owner/repo:get-repo'
 
-  assert-inside-git-repo
-  assert-git-repo-is-clean
-  assert-git-head-is-pushed
+  state=open
+  $do_all && state=all
 
-  get-upstream-repo
-  get-upstream-branch
-  assert-upstream-has-branch "$branch"
-
-  die "owner=$owner repo=$repo branch=$branch"
+  report-list \
+    "/repos/$owner/$repo/pulls?state=$state;sort=updated;per_page=PER_PAGE" \
+    'number updated_at state user/login head/label base/label title'
 }
 
+format-entry:pull-list() {
+  printf "%d) #%-3d (%s) %-6s @%-10s %-20s %s\n" \
+    $1 $2 ${3/T*/} $4 $5 $6 "$7"
+}
+
+command:pull-request() {
+  require-auth
+  get-args 'owner/repo' "branch:'master'"
+
+  msg_ok=0
+  assert-inside-git-repo
+  assert-repo-top-level
+  assert-git-repo-is-clean
+  get-remote-name
+  assert-git-head-is-pushed
+  git fetch "git@github.com:$owner/$repo" "$branch" &> /dev/null ||
+    die "Cannot fetch repo='git@github.com:$owner/$repo' branch='$branch'."
+
+  local diff="$(git diff FETCH_HEAD)"
+  if [ -z "$diff" ]; then
+    echo "No changes between this repo and specified remote."
+    return
+  fi
+
+  if [ -z "$branch_name" ]; then
+    branch_name=$(git rev-parse --abbrev-ref HEAD)
+  fi
+  local head="$login:$branch_name"
+  local base="$branch"
+  local url="/repos/$owner/$repo/pulls"
+
+  editor-title-body "
+# New GitHub Pull Request for
+#   repo: git@github.com:$owner/$repo
+#   branch: $branch
+$diff"
+
+  api-post "$url" "$(
+    json-dump-object head "$head" base "$base" title "$title" body "$body"
+  )"
+}
+
+command:pull-update() {
+  require-auth
+  get-args 'owner/repo' "branch:'master'"
+
+  msg_ok=0
+  assert-inside-git-repo
+  assert-repo-top-level
+  assert-git-repo-is-clean
+  get-remote-name
+  assert-git-head-is-pushed
+  git fetch "git@github.com:$owner/$repo" "$branch" &> /dev/null ||
+    die "Cannot fetch repo='git@github.com:$owner/$repo' branch='$branch'."
+
+  local diff="$(git diff FETCH_HEAD)"
+  if [ -z "$diff" ]; then
+    echo "No changes between this repo and specified remote."
+    return
+  fi
+
+  if [ -z "$branch_name" ]; then
+    branch_name=$(git rev-parse --abbrev-ref HEAD)
+  fi
+  local head="$login:$branch_name"
+  local base="$branch"
+  local url="/repos/$owner/$repo/pulls"
+
+  editor-title-body "
+# New GitHub Pull Request for
+#   repo: git@github.com:$owner/$repo
+#   branch: $branch
+$diff"
+
+  api-post "$url" "$(
+    json-dump-object head "$head" base "$base" title "$title" body "$body"
+  )"
+}
+
+editor-title-body() {
+  local pull_request_msg_file=.git/GIT_HUB_PULL_REQUEST_EDIT_MSG
+
+  echo "$1" > $pull_request_msg_file
+
+  $GIT_HUB_EDITOR $pull_request_msg_file
+  body=''
+  title="$(head "$pull_request_msg_file" -n1)"
+  if [[ ! "$title" =~ [^[:space:]] ]]; then
+    msg_fail="No pull-request title provided. Aborting."
+    die "$msg_fail"
+    return 1
+  fi
+  local line="$(head "$pull_request_msg_file" -n2 | tail -n1)"
+  if [[ ! "$line" =~ ^\s*$ ]] && [[ ! "$line" =~ ^\# ]]; then
+    msg_fail="Malformed pull-request message"
+    die "$msg_fail"
+    return 1
+  fi
+  local count=0
+  while read line; do
+    [[ $((count++)) < 2 ]] && continue
+    [[ "$line" =~ ^\# ]] && break
+    body+="$line"$'\n'
+  done < $pull_request_msg_file
+  rm -f $pull_request_msg_file
+}
 
 # vim: set ft=sh lisp:

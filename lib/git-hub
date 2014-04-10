@@ -413,9 +413,9 @@ command:repo-new() {
   get-args '?org:get-user/repo:get-repo'
   local login=$(get-login)
   if [ "$org" == "$login" ]; then
-    api-post "/user/repos" $(json-dump-object 'name' $repo)
+    api-post "/user/repos" "$(json-dump-object name "$repo")"
   else
-    api-post "/orgs/$org/repos" $(json-dump-object 'name' $repo)
+    api-post "/orgs/$org/repos" "$(json-dump-object name "$repo")"
   fi
   msg_ok="Repository 'git@github.com:$org/$repo' created."
   msg_422="Repository name 'git@github.com:$org/$repo' already exists."
@@ -563,19 +563,6 @@ format-entry:comments() {
   printf "     $body" | fmt
 }
 
-command:pulls() {
-  get-args '?owner:get-owner/repo:get-repo'
-
-  report-list \
-    "/repos/$owner/$repo/pulls?sort=updated;per_page=PER_PAGE" \
-    'number updated_at state user/login head/label base/label title'
-}
-
-format-entry:pulls() {
-  printf "%d) #%-3d (%s) %-6s @%-10s %-20s %s\n" \
-    $1 $2 ${3/T*/} $4 $5 $6 "$7"
-}
-
 command:keys() {
   get-args owner:get-user
   report-list \
@@ -644,7 +631,7 @@ command:token-new() {
   get-args '?note'
   local json
   if [ -n "$note" ]; then
-    json=$(json-dump-object "note" "$note")
+    json="$(json-dump-object note "$note")"
   else
     json='{}'
   fi
@@ -753,8 +740,8 @@ command:scope-add() {
   fi
   check-token-id "$token_id"
   basic-auth
-  local array=$(json-dump-array ${scopes[*]})
-  local json=$(json-dump-object add_scopes "$array")
+  local array="$(json-dump-array ${scopes[*]})"
+  local json="$(json-dump-object add_scopes "$array")"
   api-patch "/authorizations/$token_id" "$json"
   msg_ok="Scopes added: ${scopes[*]}"
 }
@@ -767,8 +754,8 @@ command:scope-remove() {
     get-args token_id @scopes
   fi
   basic-auth
-  local array=$(json-dump-array ${scopes[*]})
-  local json=$(json-dump-object remove_scopes "$array")
+  local array="$(json-dump-array ${scopes[*]})"
+  local json="$(json-dump-object remove_scopes "$array")"
   api-patch "/authorizations/$token_id" "$json"
   msg_ok="Scopes removed: ${scopes[*]}"
 }
@@ -795,7 +782,7 @@ api-call() {
       [ -n "$GIT_HUB_PASSWORD" ] &&
         cc="${cc/$login:$GIT_HUB_PASSWORD/$login:********}"
     fi
-    nay "$cc\n"
+    echo "$cc"$'\n' >&2
   fi
 
   if $dry_run; then
@@ -1017,6 +1004,9 @@ spec-assign() {
       if [ "$func" == 'empty' ]; then
         printf -v "$var" ""
         return
+      elif [[ "$func" =~ ^\'(.*)\'$ ]]; then
+        printf -v "$var" "${BASH_REMATCH[1]}"
+        return
       fi
       arg="$($func)"
       [ -n "$arg" ] && break
@@ -1108,8 +1098,19 @@ get-repo-config() {
   return 1
 }
 
-set-dot() {
-  echo '.'
+get-remote-name() {
+  [ -n "$remote_name" ] && return
+  local remotes=($(git config --get-regex 'remote\..*\.fetch' | cut -d ' ' -f1))
+  local num="${#remotes[@]}"
+  if [ $num -eq 1 ]; then
+    remote_name="${remotes[0]}"
+    remote_name=${remote_name#remote.}
+    remote_name=${remote_name%.fetch}
+  elif [ $num -eq 0 ]; then
+    die "This command requires a remote name, but the current repo has no remotes. Add a remote or use the --remote= option."
+  else
+    die "This command requires a remote name, but the current repo has more than one remote. Use the --remote= option to specify which one."
+  fi
 }
 
 require-auth() {
@@ -1292,6 +1293,9 @@ init-env() {
   : ${GIT_HUB_USER_DIR:=$HOME/.git-hub}
   : ${GIT_HUB_CONFIG:=$GIT_HUB_USER_DIR/config}
   : ${GIT_HUB_CACHE:=$GIT_HUB_USER_DIR/cache}
+
+  : ${GIT_HUB_EDITOR:=${EDITOR:-nano}}
+  : ${GIT_HUB_PAGER:=${PAGER:-less}}
 
   [ -d "$GIT_HUB_EXT_PATH" ] ||
     die "Hmm... git-hub does not seem to be properly installed\n"
@@ -1639,9 +1643,37 @@ assert-inside-git-repo() {
     die "Not inside a git repo"
 }
 
+assert-repo-top-level() {
+  [ "$(git rev-parse --git-dir)" == '.git' ] ||
+    die "Not at top level directory of repo"
+}
+
 assert-git-repo-is-clean() {
-  true ||
-    die "Not inside a git repo"
+  # Repo is in a clean state:
+  git update-index -q --ignore-submodules --refresh
+  git diff-files --quiet --ignore-submodules ||
+    die "Unstaged changes."
+  git diff-index --quiet --ignore-submodules HEAD ||
+    die "Working tree has changes."
+  git diff-index --quiet --cached --ignore-submodules HEAD ||
+    die "Index has changes."
+}
+
+assert-git-on-branch() {
+  local branch=$(git rev-parse --abbrev-ref HEAD)
+  [ -n "$branch" -a "$branch" != "HEAD" ] ||
+    die "Repo HEAD is not currently on a branch"
+}
+
+assert-git-head-is-pushed() {
+  local ref=$(git rev-parse HEAD)
+  local branch=$(git rev-parse --abbrev-ref HEAD)
+  local text="$(
+    git branch -r --contains $ref 2> /dev/null |
+      grep "$remote_name/$branch"
+  )"
+  [ -n "$text" ] ||
+    die "Current HEAD is not pushed to remote '$remote_name'"
 }
 
 inside-git-repo() {
