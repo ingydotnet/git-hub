@@ -1,21 +1,5 @@
 #!/usr/bin/env bash
 
-command:pull-list() {
-  get-args '?owner:get-owner/repo:get-repo'
-
-  state=open
-  $do_all && state=all
-
-  report-list \
-    "/repos/$owner/$repo/pulls?state=$state;sort=updated;per_page=PER_PAGE" \
-    'number updated_at state user/login head/label base/label title'
-}
-
-format-entry:pull-list() {
-  printf "%d) #%-3d (%s) %-6s @%-10s %-20s %s\n" \
-    $1 $2 ${3/T*/} $4 $5 $6 "$7"
-}
-
 command:pull-request() {
   require-auth
   get-args 'owner/repo' "branch:'master'"
@@ -53,41 +37,20 @@ $diff"
   )"
 }
 
-command:pull-update() {
-  require-auth
-  get-args 'owner/repo' "branch:'master'"
+command:pull-list() {
+  get-args '?owner:get-owner/repo:get-repo'
 
-  msg_ok=0
-  assert-inside-git-repo
-  assert-repo-top-level
-  assert-git-repo-is-clean
-  get-remote-name
-  assert-git-head-is-pushed
-  git fetch "git@github.com:$owner/$repo" "$branch" &> /dev/null ||
-    die "Cannot fetch repo='git@github.com:$owner/$repo' branch='$branch'."
+  state=open
+  $do_all && state=all
 
-  local diff="$(git diff FETCH_HEAD)"
-  if [ -z "$diff" ]; then
-    echo "No changes between this repo and specified remote."
-    return
-  fi
+  report-list \
+    "/repos/$owner/$repo/pulls?state=$state;sort=updated;per_page=PER_PAGE" \
+    'number updated_at state user/login head/label base/label title'
+}
 
-  if [ -z "$branch_name" ]; then
-    branch_name=$(git rev-parse --abbrev-ref HEAD)
-  fi
-  local head="$login:$branch_name"
-  local base="$branch"
-  local url="/repos/$owner/$repo/pulls"
-
-  editor-title-body "
-# New GitHub Pull Request for
-#   repo: git@github.com:$owner/$repo
-#   branch: $branch
-$diff"
-
-  api-post "$url" "$(
-    json-dump-object head "$head" base "$base" title "$title" body "$body"
-  )"
+format-entry:pull-list() {
+  printf "%d) #%-3d (%s) %-6s @%-15s %s → %s\n" \
+    $1 $2 ${3/T*/} $4 $5 $6 "$7"
 }
 
 editor-title-body() {
@@ -116,6 +79,32 @@ editor-title-body() {
     body+="$line"$'\n'
   done < $pull_request_msg_file
   rm -f $pull_request_msg_file
+}
+
+command:pull-diff() {
+  get-args '?owner:get-owner/repo:get-repo' number
+  api-get "/repos/$owner/$repo/pulls/$number"
+}
+
+ok:pull-diff() {
+  head_url="$(JSON.get -s /head/repo/ssh_url -)"
+  head_sha="$(JSON.get -s /head/sha -)"
+  head_ref="$(JSON.get -s /head/ref -)"
+  git fetch "$head_url" "$head_ref" &> /dev/null
+
+  base_url="$(JSON.get -s /base/repo/ssh_url -)"
+  base_sha="$(JSON.get -s /base/sha -)"
+  base_ref="$(JSON.get -s /base/ref -)"
+  git fetch "$base_url" "$base_ref" &> /dev/null
+
+  git diff "$base_sha" "$head_sha"
+}
+
+command:pull-merge() {
+  get-args '?owner:get-owner/repo:get-repo' number '?message'
+  # TODO Support merge message
+  local json='{}'
+  api-put "/repos/$owner/$repo/pulls/$number/merge" "$json"
 }
 
 # vim: set ft=sh lisp:

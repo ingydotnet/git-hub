@@ -26,7 +26,8 @@ Common Commands:
   help, setup, upgrade, config, url, open
   user, orgs, org, teams, members, followers, following, follow, stars, star,
   clone, repos, repo, repo-new, repo-delete, forks, fork, collabs, trust,
-  issue-list, issue, pull-request, pull-list, pull, pull-update, pull-merge
+  issue-new, issue-list, issue, issue-update, issue-close
+  pull-request, pull-list, pull-diff, pull-merge
 
 See 'git help hub' for complete documentation of all the commands.
 
@@ -1221,9 +1222,13 @@ report-value() {
         printf "%-15s %s\n" "$label" "$value"
       else
         echo "$label"
-        value=${value//\\\"/\"}
-        value=${value//$'\r'/}
-        value=${value//$'\n\n'/$'\n\n'  }
+        # XXX This is a crazy little Bash formatting dance :\
+        value="${value//\\\"/\"}"
+        value="${value//\\r/}"
+        value="${value//\\n\\n/☬☮  }"
+        value="${value//\\n/$'\n\n'  ☂}"
+        value="${value//☬☮/$'\n\n'}"
+        value="${value//$'\n\n'  ☂/$'\n'  }"
         printf "  $value" | fmt
       fi
     fi

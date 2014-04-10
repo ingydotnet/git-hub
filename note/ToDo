@@ -1,18 +1,12 @@
 == !!! Next hacks in priority order
 
 
-- Add upgrade command
-- Newlines in description of PR
-
-
 - Add PAGER support for some commands
-- pull-new - issue a pull request
-- pull-edit
 - find right remote
   - complain if ambiguous
-- issue-close
 - issue-new
-- issue-comment
+- issue-close
+- issue-update
 - Command completion
   - See if we can do it for zsh too
 

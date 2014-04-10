@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
 
+command:issue-new() {
+  die "$command not yet implemented"
+}
+
 command:issue-list() {
   get-args '?owner:get-owner/repo:get-repo'
 
@@ -35,6 +39,14 @@ ok:issue() {
       'user/login updated_at body'
     out
   fi
+}
+
+command:issue-update() {
+  die "$command not yet implemented"
+}
+
+command:issue-close() {
+  die "$command not yet implemented"
 }
 
 # vim: set lisp:
