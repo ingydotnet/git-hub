@@ -317,7 +317,7 @@ command:clone() {
   $verbose_output && nay "$cmd"
   $dry_run && {
     nay '*** NOTE: This is a dry run only. ***'
-    exit 0
+    return 0
   }
 
   local OK=0
@@ -752,7 +752,8 @@ api-call() {
 
   if $dry_run; then
     nay '*** NOTE: This is a dry run only. ***'
-    exit 0
+    msg_ok=0
+    return 0
   elif $repeat_command; then
     # Use the cache
     [ -e "$command_header_file" ] ||
