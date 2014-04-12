@@ -82,6 +82,7 @@ pretty-json-object() {
 json-var-list() {
   local fields="$@"
   while IFS='\n' read -r line; do
+    [[ -z "$line" ]] && break
     if [[ "$line" =~ ^/([0-9]+)/([^\	]+)\	(.*) ]]; then
       local value="${BASH_REMATCH[3]}"
       [ "$value" == null ] && value=''
@@ -96,7 +97,7 @@ json-var-list() {
   done < <(
     echo "$JSON__cache" |
       grep -E "^/[0-9]+/(${fields// /|})\b" || echo ''
-    )
+  )
 }
 
 json-prune-cache() {
