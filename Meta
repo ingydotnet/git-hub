@@ -1,0 +1,30 @@
+name: git-hub
+version: 0.1.0
+abstract: The Git command for GitHub
+homepage: http://bpan.org/package/git-hub/
+
+license: MIT
+copyright: 2013, 2014
+author:
+  name: Ingy döt Net
+  email: ingy@ingy.net
+  github: ingydotnet
+  twitter: ingydotnet
+  freenode: ingy
+  homepage: http://ingy.net
+
+requires:
+- bash: 3.2.0
+- git: 1.7.0
+- bashplus: 0.0.1
+- json-bash: 0.0.1
+test:
+  cmd: make test
+  requires:
+  - test-more-bash: 0.0.1
+install:
+  cmd: make install
+
+devel:
+  git: git@github.org:ingydotnet/git-hub.git
+  irc: irc.freenode.net/git-commands
