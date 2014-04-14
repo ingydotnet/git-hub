@@ -17,7 +17,7 @@ requires:
 - bash: 3.2.0
 - git: 1.7.0
 - bashplus: 0.0.1
-- json-bash: 0.0.1
+- json: 0.0.1
 test:
   cmd: make test
   requires:
