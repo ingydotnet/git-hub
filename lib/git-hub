@@ -6,6 +6,16 @@
 
 set -e
 
+timer() {
+  : ${start_timer:=$(date "+%s.%N")}
+  : ${prev_timer:=$start_timer}
+  local now=$(date "+%s.%N")
+  local total=$(echo "( $now - $start_timer )" | bc)
+  local split=$(echo "( $now - $prev_timer )" | bc)
+  printf "(P=$BASHPID) T=%3.5f S=%3.5f %s\n" $total $split "$@" >&2
+  prev_timer=$now
+}
+
 {
   Bash:version-check() {
     test $1 -ge 4 && return
@@ -69,6 +79,7 @@ bash+:import :std can
 
 #------------------------------------------------------------------------------
 main() {
+  timer 'command start'
   local OK=0 split_words=false
   init-env
   if run-for-each "$@"; then
@@ -76,6 +87,7 @@ main() {
   else
     run-command "$@"
   fi
+  timer 'command end'
   exit $OK
 }
 
@@ -763,11 +775,13 @@ api-call() {
     local cache_dir="$GIT_HUB_CACHE/$command_sha1"
     mkdir -p "$cache_dir"
     # Actually run the curl command!
+  timer 'before curl'
     (
       set +e
       # set -x  # for debugging the real command
       "${curl_command[@]}"
     )
+  timer 'after curl'
     rc=$?
     cache-response-files
   fi

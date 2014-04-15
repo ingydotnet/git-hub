@@ -1,0 +1,4 @@
+(P=24080) T=0.00262 S=0.00262 command start
+(P=24080) T=0.17602 S=0.17340 before curl
+(P=24080) T=1.33535 S=1.15933 after curl
+(P=24080) T=1.69187 S=0.35652 command end
