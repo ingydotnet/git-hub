@@ -54,6 +54,7 @@
 - Cache all results
   - Check Etag fix
 - Parallel requests
+- Make plugin for http://stedolan.github.io/jq/ (frew++)
 
 == Plugin
 - Document plugins
