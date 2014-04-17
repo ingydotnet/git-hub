@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+
+command:comment() {
+  [ $# -ge 1 ] || die "Comment requires at least an issue #"
+
+  get-args '?owner:get-user/repo:get-repo' number
+
+  local url="/repos/$owner/$repo/issues/$number/comments"
+
+  editor-title-body comment "
+# Add a comment for the issue above this line."
+
+  api-post "$url" "$(
+    json-dump-object body "$body"
+  )"
+}
+
+# vim: set lisp:

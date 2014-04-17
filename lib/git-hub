@@ -1542,25 +1542,34 @@ editor-title-body() {
 
   rm -f $msg_file
 
+  local comment=false
+  if [ $# -eq 2 -a "$1" == comment ]; then
+    comment=true
+    shift
+  fi
+
   echo "$1" > $msg_file
 
   $GIT_HUB_EDITOR $msg_file
+  local line
   body=''
-  title="$(head -n1 "$msg_file")"
-  if [[ ! "$title" =~ [^[:space:]] ]]; then
-    msg_fail="No title provided. Aborting. See '$msg_file'."
-    die "$msg_fail"
-    return 1
-  fi
-  local line="$(head -n2 "$msg_file" | tail -n1)"
-  if [[ ! "$line" =~ ^\s*$ ]] && [[ ! "$line" =~ ^\# ]]; then
-    msg_fail="Malformed message in '$msg_file'"
-    die "$msg_fail"
-    return 1
+  if ! $comment; then
+    title="$(head -n1 "$msg_file")"
+    if [[ ! "$title" =~ [^[:space:]] ]]; then
+      msg_fail="No title provided. Aborting. See '$msg_file'."
+      die "$msg_fail"
+      return 1
+    fi
+    line="$(head -n2 "$msg_file" | tail -n1)"
+    if [[ ! "$line" =~ ^\s*$ ]] && [[ ! "$line" =~ ^\# ]]; then
+      msg_fail="Malformed message in '$msg_file'"
+      die "$msg_fail"
+      return 1
+    fi
   fi
   local count=0
   while read line; do
-    [[ $((count++)) < 2 ]] && continue
+    ! $comment && [[ $((count++)) < 2 ]] && continue
     [[ "$line" =~ ^\# ]] && break
     body+="$line"$'\n'
   done < $msg_file
