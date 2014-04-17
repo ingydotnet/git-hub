@@ -39,6 +39,14 @@ command:issue() {
   api-get "/repos/$owner/$repo/issues/$number"
 }
 
+command:issue-close() {
+  get-args '?owner:get-owner/repo:get-repo' number
+  api-patch "/repos/$owner/$repo/issues/$number" "$(
+    json-dump-object state closed
+  )"
+
+}
+
 ok:issue() {
   local label_title='Issue'
   local label_body='Description'
@@ -60,10 +68,6 @@ ok:issue() {
 }
 
 command:issue-update() {
-  die "$command not yet implemented"
-}
-
-command:issue-close() {
   die "$command not yet implemented"
 }
 
