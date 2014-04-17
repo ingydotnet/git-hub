@@ -30,6 +30,17 @@ command:pull-request() {
 # New GitHub Pull Request for
 #   repo: git@github.com:$owner/$repo
 #   branch: $branch
+#
+# Enter your pull request info above in this form:
+#
+#   First line is the pull request subject
+#
+#   The pull request body comes here, after a blank line separating it from
+#   the subject.
+#
+#   The body can be as many lines as needed, and is optional. Only the pull
+#   request subject is required.
+#
 $diff"
 
   api-post "$url" "$(
@@ -51,34 +62,6 @@ command:pull-list() {
 format-entry:pull-list() {
   printf "%d) #%-3d (%s) %-6s @%-15s %s → %s\n" \
     $1 $2 ${3/T*/} $4 $5 $6 "$7"
-}
-
-editor-title-body() {
-  local pull_request_msg_file=.git/GIT_HUB_PULL_REQUEST_EDIT_MSG
-
-  echo "$1" > $pull_request_msg_file
-
-  $GIT_HUB_EDITOR $pull_request_msg_file
-  body=''
-  title="$(head "$pull_request_msg_file" -n1)"
-  if [[ ! "$title" =~ [^[:space:]] ]]; then
-    msg_fail="No pull-request title provided. Aborting."
-    die "$msg_fail"
-    return 1
-  fi
-  local line="$(head "$pull_request_msg_file" -n2 | tail -n1)"
-  if [[ ! "$line" =~ ^\s*$ ]] && [[ ! "$line" =~ ^\# ]]; then
-    msg_fail="Malformed pull-request message"
-    die "$msg_fail"
-    return 1
-  fi
-  local count=0
-  while read line; do
-    [[ $((count++)) < 2 ]] && continue
-    [[ "$line" =~ ^\# ]] && break
-    body+="$line"$'\n'
-  done < $pull_request_msg_file
-  rm -f $pull_request_msg_file
 }
 
 command:pull-diff() {

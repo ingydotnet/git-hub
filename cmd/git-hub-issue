@@ -1,7 +1,30 @@
 #!/usr/bin/env bash
 
 command:issue-new() {
-  die "$command not yet implemented"
+  require-auth
+  get-args '?owner:get-user/repo:get-repo'
+
+  if [ -z "$branch_name" ]; then
+    branch_name=$(git rev-parse --abbrev-ref HEAD)
+  fi
+  local head="$login:$branch_name"
+  local base="$branch"
+  local url="/repos/$owner/$repo/issues"
+
+  editor-title-body "
+# Enter your issue info above in this form:
+#
+#   First line is the issue subject
+#
+#   The issue body comes here, after a blank line separating it from the
+#   subject.
+#
+#   The body can be as many lines as needed, and is optional. Only the issue
+#   subject is required."
+
+  api-post "$url" "$(
+    json-dump-object title "$title" body "$body"
+  )"
 }
 
 command:issue-list() {
