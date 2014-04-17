@@ -4,11 +4,6 @@ command:issue-new() {
   require-auth
   get-args '?owner:get-user/repo:get-repo'
 
-  if [ -z "$branch_name" ]; then
-    branch_name=$(git rev-parse --abbrev-ref HEAD)
-  fi
-  local head="$login:$branch_name"
-  local base="$branch"
   local url="/repos/$owner/$repo/issues"
 
   editor-title-body "
