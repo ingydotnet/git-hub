@@ -35,16 +35,12 @@ format-entry:issue-list() {
 }
 
 command:issue() {
-  get-args '?owner:get-owner/repo:get-repo' number
-  api-get "/repos/$owner/$repo/issues/$number"
-}
-
-command:issue-close() {
-  get-args '?owner:get-owner/repo:get-repo' number
-  api-patch "/repos/$owner/$repo/issues/$number" "$(
-    json-dump-object state closed
-  )"
-
+  get-args '?owner:get-owner/repo:get-repo' "number:'none'"
+  if [ "$number" == none ]; then
+    command:issue-new
+  else
+    api-get "/repos/$owner/$repo/issues/$number"
+  fi
 }
 
 ok:issue() {
@@ -65,6 +61,14 @@ ok:issue() {
       'user/login updated_at body'
     out
   fi
+}
+
+command:issue-close() {
+  get-args '?owner:get-owner/repo:get-repo' number
+  api-patch "/repos/$owner/$repo/issues/$number" "$(
+    json-dump-object state closed
+  )"
+
 }
 
 command:issue-update() {

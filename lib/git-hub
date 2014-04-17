@@ -1409,6 +1409,10 @@ get-opts() {
   command="$1"; shift
   command_arguments=("$@")
 
+  # A few aliases here for now:
+  [ "$command" == pulls ] && command=pull-list
+  [ "$command" == issues ] && command=issue-list
+
   [[ "$command" == "setup" ]] ||
   [[ "$command" = "config" ]] ||
   [[ "$command" = "config-unset" ]] ||
