@@ -37,6 +37,7 @@ format-entry:issue-list() {
 command:issue() {
   get-args '?owner:get-owner/repo:get-repo' "number:'none'"
   if [ "$number" == none ]; then
+    command=issue-new
     command:issue-new
   else
     api-get "/repos/$owner/$repo/issues/$number"
