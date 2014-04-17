@@ -1265,7 +1265,7 @@ init-env() {
   : ${GIT_HUB_CONFIG:=$GIT_HUB_USER_DIR/config}
   : ${GIT_HUB_CACHE:=$GIT_HUB_USER_DIR/cache}
 
-  : ${GIT_HUB_EDITOR:=${EDITOR:-nano}}
+  : ${GIT_HUB_EDITOR:=${EDITOR:-vim}}
   : ${GIT_HUB_PAGER:=${PAGER:-less}}
 
   [ -d "$GIT_HUB_EXT_PATH" ] ||
@@ -1537,19 +1537,21 @@ prompt-to-run-setup() {
 editor-title-body() {
   local msg_file=.git/GIT_HUB_EDIT_MSG
 
+  rm -f $msg_file
+
   echo "$1" > $msg_file
 
   $GIT_HUB_EDITOR $msg_file
   body=''
-  title="$(head "$msg_file" -n1)"
+  title="$(head -n1 "$msg_file")"
   if [[ ! "$title" =~ [^[:space:]] ]]; then
-    msg_fail="No pull-request title provided. Aborting."
+    msg_fail="No title provided. Aborting. See '$msg_file'."
     die "$msg_fail"
     return 1
   fi
-  local line="$(head "$msg_file" -n2 | tail -n1)"
+  local line="$(head -n2 "$msg_file" | tail -n1)"
   if [[ ! "$line" =~ ^\s*$ ]] && [[ ! "$line" =~ ^\# ]]; then
-    msg_fail="Malformed pull-request message"
+    msg_fail="Malformed message in '$msg_file'"
     die "$msg_fail"
     return 1
   fi
@@ -1559,7 +1561,6 @@ editor-title-body() {
     [[ "$line" =~ ^\# ]] && break
     body+="$line"$'\n'
   done < $msg_file
-  rm -f $msg_file
 }
 
 #------------------------------------------------------------------------------

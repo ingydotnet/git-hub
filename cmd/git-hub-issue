@@ -12,7 +12,7 @@ command:issue-new() {
   local url="/repos/$owner/$repo/issues"
 
   editor-title-body "
-# Enter your issue info above in this form:
+# Enter your issue info at the top like this:
 #
 #   First line is the issue subject
 #
