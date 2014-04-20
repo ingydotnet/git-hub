@@ -53,6 +53,8 @@ ok:issue() {
   local skip_field_comments=true
   report-data
 
+  echo
+
   local comments=$(JSON.get -n /comments -)
   if [ $comments -gt 0 ]; then
     out Comments:

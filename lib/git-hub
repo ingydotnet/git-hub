@@ -524,11 +524,47 @@ command:untrust() {
 
 format-entry:comments() {
   printf "  %d) %-14s (%s)\n" $1 $2 ${3/T*/}
-  body="$4"
-  body=${body//\\\"/\"}
-  body=${body//$'\r'/}
-  body=${body//$'\n\n'/$'\n\n'     }
-  printf "     $body" | fmt
+  local text
+  normalize-multiline-text-output "$4" "     "
+  printf "$text"$'\n\n'
+}
+
+normalize-multiline-text-output() {
+  text="$1"
+  local indent="$2"
+  text=${text//\\\"/\"}
+  text=${text//$'\r'/}
+  text=${text//\\n/$'\n'}
+  text="$(
+    echo "$text" | (
+      local start=false blank=false para=false code=false output=''
+      IFS=''
+      while read -r line; do
+        if [[ "$line" =~ [^[:space:]] ]]; then
+          if $blank && $start; then
+            output+=$'\n'
+          fi
+          if [[ "$line" =~ ^\  ]]; then
+            output+="$indent$line"$'\n'
+            code=true para=false
+          else
+            output+="$( echo "$indent$line" | fmt -w 81 )"$'\n'
+            para=true code=false
+          fi
+          start=true blank=false
+        else
+          if $para || $code; then
+            para=false code=false
+          fi
+          blank=true
+        fi
+      done
+      if [ -n "$output" ] && ! $code; then
+        output+=$'\n'
+      fi
+      echo -n "$output"
+    )
+  )"
 }
 
 command:keys() {
@@ -553,7 +589,6 @@ command:keys-add() {
   api-post "/user/keys" "$(json-dump-object title "$title" key "$key")"
   msg_ok="Public key successfully added."
 }
-
 
 command:config() {
   get-args config_key:empty config_value:empty
@@ -881,7 +916,7 @@ check-api-call-status() {
       if [[ "$ERROR" =~ "$regex" ]]; then
         ERROR="$ERROR Try the --use-auth option."
       fi
-      ERROR=$(echo "$ERROR" | fmt)
+      ERROR=$(echo "$ERROR" | fmt -w 81)
       ;;
     *)
       OK=1
@@ -1226,14 +1261,8 @@ report-value() {
         printf "%-15s %s\n" "$label" "$value"
       else
         echo "$label"
-        # XXX This is a crazy little Bash formatting dance :\
-        value="${value//\\\"/\"}"
-        value="${value//\\r/}"
-        value="${value//\\n\\n/☬☮  }"
-        value="${value//\\n/$'\n\n'  ☂}"
-        value="${value//☬☮/$'\n\n'}"
-        value="${value//$'\n\n'  ☂/$'\n'  }"
-        printf "  $value" | fmt
+        normalize-multiline-text-output "$value" "  "
+        printf "$text" "  "
       fi
     fi
   fi
