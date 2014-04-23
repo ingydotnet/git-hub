@@ -27,8 +27,11 @@ command:issue-new() {
 command:issue-list() {
   get-args '?owner:get-owner/repo:get-repo'
 
+  state=open
+  $do_all && state=all
+
   report-list \
-    "/repos/$owner/$repo/issues?sort=updated;per_page=PER_PAGE" \
+    "/repos/$owner/$repo/issues?state=$state;sort=updated;per_page=PER_PAGE" \
     'number updated_at state user/login title'
 }
 
