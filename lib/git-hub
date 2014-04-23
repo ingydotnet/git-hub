@@ -522,51 +522,6 @@ command:untrust() {
   msg_ok="'$owner/$repo' commit permission removed for: ${collaborators[@]}"
 }
 
-format-entry:comments() {
-  printf "  %d) %-14s (%s)\n" $1 $2 ${3/T*/}
-  local text
-  normalize-multiline-text-output "$4" "     "
-  printf "$text"$'\n\n'
-}
-
-normalize-multiline-text-output() {
-  text="$1"
-  local indent="$2"
-  text=${text//\\\"/\"}
-  text=${text//$'\r'/}
-  text=${text//\\n/$'\n'}
-  text="$(
-    echo "$text" | (
-      local start=false blank=false para=false code=false output=''
-      IFS=''
-      while read -r line; do
-        if [[ "$line" =~ [^[:space:]] ]]; then
-          if $blank && $start; then
-            output+=$'\n'
-          fi
-          if [[ "$line" =~ ^\  ]]; then
-            output+="$indent$line"$'\n'
-            code=true para=false
-          else
-            output+="$( echo "$indent$line" | fmt -w 81 )"$'\n'
-            para=true code=false
-          fi
-          start=true blank=false
-        else
-          if $para || $code; then
-            para=false code=false
-          fi
-          blank=true
-        fi
-      done
-      if [ -n "$output" ] && ! $code; then
-        output+=$'\n'
-      fi
-      echo -n "$output"
-    )
-  )"
-}
-
 command:keys() {
   get-args owner:get-user
   report-list \
@@ -1217,6 +1172,44 @@ default-format-entry() {
   fi
 }
 
+normalize-multiline-text-output() {
+  text="$1"
+  local indent="$2"
+  text=${text//\\\"/\"}
+  text=${text//$'\r'/}
+  text=${text//\\n/$'\n'}
+  text="$(
+    echo "$text" | (
+      local start=false blank=false para=false code=false output=''
+      IFS=''
+      while read -r line; do
+        if [[ "$line" =~ [^[:space:]] ]]; then
+          if $blank && $start; then
+            output+=$'\n'
+          fi
+          if [[ "$line" =~ ^\  ]]; then
+            output+="$indent$line"$'\n'
+            code=true para=false
+          else
+            output+="$( echo "$indent$line" | fmt -w 81 )"$'\n'
+            para=true code=false
+          fi
+          start=true blank=false
+        else
+          if $para || $code; then
+            para=false code=false
+          fi
+          blank=true
+        fi
+      done
+      if [ -n "$output" ] && ! $code; then
+        output+=$'\n'
+      fi
+      echo -n "$output"
+    )
+  )"
+}
+
 #------------------------------------------------------------------------------
 # Report formatting functions:
 #------------------------------------------------------------------------------
@@ -1257,11 +1250,11 @@ report-value() {
       printf "%s\t%s\n" "$label" "$value"
     else
       value="${value%%\\n}"
-      if [ ${#value} -lt 80 ] && [[ ! "$value" =~ \\n ]]; then
+      if [ "$label" != Description: ]; then
         printf "%-15s %s\n" "$label" "$value"
       else
         echo "$label"
-        normalize-multiline-text-output "$value" "  "
+        normalize-multiline-text-output "$value" " "
         printf "$text" "  "
       fi
     fi

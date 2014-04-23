@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+set -e
+
 command:issue-new() {
   require-auth
   get-args '?owner:get-user/repo:get-repo'
@@ -46,24 +48,32 @@ command:issue() {
 
 ok:issue() {
   local label_title='Issue'
-  local label_body='Description'
+  local label_body='Description:'
   fields=(
     title number user__login state body comments
   )
   local skip_field_comments=true
   report-data
 
-  echo
-
   local comments=$(JSON.get -n /comments -)
   if [ $comments -gt 0 ]; then
-    out Comments:
+    echo Comments:
     command=comments
     report-list \
       "/repos/$owner/$repo/issues/$number/comments?sort=updated;per_page=PER_PAGE" \
       'user/login updated_at body'
-    out
+  else
+    echo
   fi
+}
+
+format-entry:comments() {
+  printf "%d) %-14s (%s)\n" $1 $2 ${3/T*/}
+  local text
+  normalize-multiline-text-output "$4" " "
+  echo "$text"
+  echo
+  :
 }
 
 command:issue-close() {
