@@ -1256,7 +1256,7 @@ report-value() {
       then
         echo "$label:"
         normalize-multiline-text-output "$value" " "
-        printf "$text\n" "  "
+        echo "$text"
       else
         printf "%-15s %s\n" "$label" "$value"
       fi
