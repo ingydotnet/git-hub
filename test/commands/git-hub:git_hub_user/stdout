@@ -5,16 +5,16 @@ Email           ingy@ingy.net
 Web Site        http://ingy.net
 Location        Seattle
 Company         Oui Code Software
-Bio
-  Ingy döt Net is a hacker who started programming in Assembler on
-  punchcards, switched over to Perl and has since become enlightened
-  to the goodness of all the OSDC languages and the people who hack,
-  support and evangelize them. He is one of the creators of YAML, a
-  major CPAN contributor, a founder of Oui Code Software, the father of
-  Acmeism and is drinking a double americano as you read this.
+Bio:
+ Ingy döt Net is a hacker who started programming in Assembler on punchcards,
+ switched over to Perl and has since become enlightened to the goodness of all
+ the OSDC languages and the people who hack, support and evangelize them. He
+ is one of the creators of YAML, a major CPAN contributor, a founder of Oui
+ Code Software, the father of Acmeism and is drinking a double americano as
+ you read this.
 
-  Ingy is a citizen of the Earth who currently lives in Seattle and
-  visits Taiwan every chance he can. He loves to make things DRY.
+ Ingy is a citizen of the Earth who currently lives in Seattle and visits
+ Taiwan every chance he can. He loves to make things DRY.
 Followers       299
 Following       135
 Public Repos    354

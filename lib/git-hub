@@ -1176,7 +1176,7 @@ normalize-multiline-text-output() {
   text="$1"
   local indent="$2"
   text=${text//\\\"/\"}
-  text=${text//$'\r'/}
+  text=${text//\\r/}
   text=${text//\\n/$'\n'}
   text="$(
     echo "$text" | (
@@ -1250,12 +1250,15 @@ report-value() {
       printf "%s\t%s\n" "$label" "$value"
     else
       value="${value%%\\n}"
-      if [ "$label" != Description: ]; then
-        printf "%-15s %s\n" "$label" "$value"
-      else
-        echo "$label"
+      if [ ${#value} -ge 80 ] ||
+         [[ "$value" =~ \\n ]] ||
+         [ "$label" == Description ]
+      then
+        echo "$label:"
         normalize-multiline-text-output "$value" " "
-        printf "$text" "  "
+        printf "$text\n" "  "
+      else
+        printf "%-15s %s\n" "$label" "$value"
       fi
     fi
   fi

@@ -48,7 +48,7 @@ command:issue() {
 
 ok:issue() {
   local label_title='Issue'
-  local label_body='Description:'
+  local label_body='Description'
   fields=(
     title number user__login state body comments
   )
@@ -62,8 +62,6 @@ ok:issue() {
     report-list \
       "/repos/$owner/$repo/issues/$number/comments?sort=updated;per_page=PER_PAGE" \
       'user/login updated_at body'
-  else
-    echo
   fi
 }
 
