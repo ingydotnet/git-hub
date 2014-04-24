@@ -36,7 +36,11 @@ command:issue-list() {
 }
 
 format-entry:issue-list() {
-  printf "#%-3d (%s) %-6s @%-16s %s\n" $2 ${3/T*/} $4 $5 "$6"
+  if $raw_output; then
+    echo "$2"
+  else
+    printf "#%-3d (%s) %-6s @%-16s %s\n" $2 ${3/T*/} $4 $5 "$6"
+  fi
 }
 
 command:issue() {
