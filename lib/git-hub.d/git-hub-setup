@@ -138,7 +138,16 @@ The password will not be stored after the commands finish running.
     echo
     echo
     echo 'Generating a new authentication token...'
-    local token_id=$(git hub token-new -qr "API Token for git-hub") || exit $?
+
+    local rc=0 token_id= desc="API Token for git-hub ($(date "+%s"))"
+
+    token_id=$(git hub token-new -qr "$desc") || rc=$?
+    if [ "$rc" -eq 2 ]; then
+      export GIT_HUB_2FA_OTP=$(
+        prompt "Enter your 2 Factor Auth Code (2FA password): "
+      )
+      token_id=$(git hub token-new -qr "$desc") || true
+    fi
     [ -n "$token_id" ] || die "Command failed"
     echo "Token successfully generated (token id: $token_id)."
     echo

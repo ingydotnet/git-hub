@@ -612,6 +612,13 @@ ok:token-new() {
   fi
 }
 
+status-401:token-new() {
+  if [ -n "$(grep "X-GitHub-OTP: required;" "$command_header_file")" ]; then
+    err "2 Factor Auth needed"
+    exit 2
+  fi
+}
+
 command:token-get() {
   get-args token_id key
   basic-auth
@@ -808,6 +815,9 @@ format-curl-command() {
       curl_command+=(-u "$login:$GIT_HUB_PASSWORD")
     else
       curl_command+=(-u "$login")
+    fi
+    if [ -n "$GIT_HUB_2FA_OTP" ]; then
+      curl_command+=(--header "X-GitHub-OTP: $GIT_HUB_2FA_OTP")
     fi
   elif [ -n "$api_token" ]; then
     curl_command+=(--header "Authorization: token $api_token")
@@ -1548,7 +1558,14 @@ which will guide you through the setup process. Press <ENTER> to run it now.
 
 NOTE: You can also do the setup process by hand using the 'config', 'token'
       and 'scope' commands. See the 'git help hub' documentation for more
-      information on these commands.
+      information on these commands. Or just manually create a config file
+      in ~/.git-hub/config that looks like this:
+
+    [github]
+            login = your-github-login-id
+            api-token = c956f87abab2da54882cc1f1ade42efcc2b15dc7
+            json-lib = json-perl.bash
+            use-auth = 1
 
 Would you like start the 'setup' process right now? (Do it!)
 
