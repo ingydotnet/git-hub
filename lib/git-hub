@@ -22,14 +22,14 @@ GIT_HUB_VERSION=0.0.3
 OPTIONS_SPEC="\
 git hub <command> <options> <arguments>
 
-Common Commands:
-  help, setup, upgrade, config, url, open
+The most commonly used commands:
+  help, setup, upgrade, config, url, open,
   user, orgs, org, teams, members, followers, following, follow, stars, star,
   clone, repos, repo, repo-new, repo-delete, forks, fork, collabs, trust,
-  issue-new, issue-list, issue, issue-update, issue-close
+  issues, issue, issue-update, issue-close, comment,
   pull-request, pull-list, pull-diff, pull-merge
 
-See 'git help hub' for complete documentation of all the commands.
+See 'git help hub' for complete documentation of *all* the commands.
 
 Options:
 --
@@ -1240,8 +1240,11 @@ report-value() {
   local key=${1//__/\/}
   local value=$(JSON.get -a "/$key" -)
   local label="$key"
-  if [[ "$key" =~ _at$ ]]; then
+  if [ "$key" == created_at ]; then
     value="${value%T*}"
+  elif [ "$key" == pushed_at ]; then
+    value="${value/T/ }"
+    value="${value/Z/}"
   fi
   if ! $raw_output; then
     local var="label_$1"
@@ -1551,8 +1554,12 @@ Would you like to run it now?
 config-not-setup() {
   cat <<...
 
-It appears that your 'git hub' config is not properly set up. The best thing
-to do is run:
+Greetings!!!
+
+You seem to be a a brand new 'git hub' user, since your config is not setup.
+
+The 'git-hub' should soon be your new best friend. Configuration is really
+easy. Just run the following command and answer a few simple questions:
 
   git hub setup
 
@@ -1563,13 +1570,13 @@ NOTE: You can also do the setup process by hand using the 'config', 'token'
       information on these commands. Or just manually create a config file
       in ~/.git-hub/config that looks like this:
 
-    [github]
-            login = your-github-login-id
-            api-token = c956f87abab2da54882cc1f1ade42efcc2b15dc7
-            json-lib = json-perl.bash
-            use-auth = 1
+  [github]
+          login = your-github-login-id
+          api-token = c956f87abab2da54882cc1f1ade42efcc2b15dc7
+          json-lib = json-perl.bash
+          use-auth = 1
 
-Would you like start the 'setup' process right now? (Do it!)
+Would you like start the automated 'setup' process right now? (Do it!)
 
 ...
   prompt-to-run-setup
@@ -1578,8 +1585,8 @@ Would you like start the 'setup' process right now? (Do it!)
 prompt-to-run-setup() {
   prompt
   source-ext git-hub-setup
-  command:setup
-  exit 1
+  command:setup || exit 1
+  exit 0
 }
 
 #------------------------------------------------------------------------------
