@@ -1,6 +1,8 @@
 CMD := git-hub
 
 LOCAL_LIB := $(shell pwd)/lib/$(CMD)
+LOCAL_MAN := $(shell pwd)/man
+LOCAL_MAN1 := $(LOCAL_MAN)/man1
 LOCAL_EXT = $(LOCAL_LIB).d
 LOCAL_EXTS = $(shell find $(LOCAL_EXT) -type f) \
 	    $(shell find $(LOCAL_EXT) -type l)
@@ -54,7 +56,7 @@ install-lib: $(INSTALL_EXT)
 
 install-doc:
 	install -C -d -m 0755 $(INSTALL_MAN)
-	install -C -m 0644 doc/$(CMD).1 $(INSTALL_MAN)
+	install -C -m 0644 $(LOCAL_MAN1)/$(CMD).1 $(INSTALL_MAN)
 
 .PHONY: uninstall uninstall-lib uninstall-doc
 uninstall: uninstall-lib uninstall-doc
@@ -72,7 +74,7 @@ $(INSTALL_EXT):
 ##
 # Build rules:
 .PHONY: doc
-doc: doc/$(CMD).1
+doc: $(LOCAL_MAN1)/$(CMD).1
 
 $(CMD).txt: ReadMe.asc
 	cp $< $@
@@ -85,7 +87,7 @@ $(CMD).txt: ReadMe.asc
 %.1: %.xml
 	xmlto -m doc/manpage-normal.xsl man $^
 
-doc/%.1: %.1
+$(LOCAL_MAN1)/%.1: %.1
 	mv $< $@
 
 ##
