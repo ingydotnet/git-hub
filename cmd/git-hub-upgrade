@@ -2,12 +2,24 @@
 
 command:upgrade() {
   local path=$0
-  if [[ ! "$path" =~ ^/ ]] || [[ ! "$path" =~ ^(.*/git-hub)/lib/git-hub$ ]]; then
-    die "Sorry. Your installation can't use the 'upgrade' command."
+  if [[ "$path" =~ ^/ ]] && [[ "$path" =~ ^(.*/git-hub)/lib/git-hub$ ]]; then
+    (
+      set -x
+      cd "${BASH_REMATCH[1]}"
+      git pull --rebase
+    )
+  else
+    die "\
+
+Sorry. Your installation can't use the 'git hub upgrade' command. The command
+only works if you installed git hub by adding '/path/to/git-hub' to your PATH.
+
+If you used 'make install' to install git-hub, then just do this:
+
+    cd /path/to/git-hub
+    git pull
+    make install
+
+"
   fi
-  (
-    set -x
-    cd "${BASH_REMATCH[1]}"
-    git pull --rebase
-  )
 }
