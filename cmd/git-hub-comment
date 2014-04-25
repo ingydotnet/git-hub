@@ -7,8 +7,12 @@ command:comment() {
 
   local url="/repos/$owner/$repo/issues/$number/comments"
 
+  local issue_report="$(git hub issue $owner/$repo $number | sed 's/^/# /')"
+
   editor-title-body comment "
-# Add a comment for the issue above this line."
+# Add a comment for the issue above this line.
+#
+$issue_report"
 
   api-post "$url" "$(
     json-dump-object body "$body"
