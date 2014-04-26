@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+
+set -e
+
+command:members() {
+  get-args org
+  report-list \
+    "/orgs/$org/members?per_page=PER_PAGE" \
+    login
+}
+
+command:member-add() {
+  require-auth
+  get-args team_id user
+  api-put "/teams/$team_id/members/$user"
+  msg_ok="'$user' is now on team (id) '$team_id'"
+}
+
+command:member-remove() {
+  require-auth
+  get-args team_id user
+  api-delete "/teams/$team_id/members/$user"
+  msg_ok="'$user' is no longer on team (id) '$team_id'"
+}
+
+# vim: set lisp:

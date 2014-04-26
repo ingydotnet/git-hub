@@ -249,33 +249,18 @@ command:org-edit() {
   api-patch "/orgs/$org" "$(json-dump-object-pairs)"
 }
 
-command:members() {
-  get-args org
-  report-list \
-    "/orgs/$org/members?per_page=PER_PAGE" \
-    'login'
-}
-
-command:teams() {
-  require-auth
-  get-args org
-  report-list \
-    "/orgs/$org/teams?per_page=PER_PAGE" \
-    'name'
-}
-
 command:followers() {
   get-args '?user:get-user'
   report-list \
     "/users/$user/followers?per_page=PER_PAGE" \
-    'login'
+    login
 }
 
 command:following() {
   get-args '?user:get-user'
   report-list \
     "/users/$user/following?per_page=PER_PAGE" \
-    'login'
+    login
 }
 
 command:follows() {

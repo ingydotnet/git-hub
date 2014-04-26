@@ -494,14 +494,46 @@ You can edit the following organization keys: `name`, `email`,
 .\}
 .RE
 .PP
+teams <org>
+.RS 4
+List the teams in an organization\&.
+.RE
+.PP
+team <team_id>
+.RS 4
+Get information about a team\&.
+.RE
+.PP
+team\-repos <team_id>
+.RS 4
+List repos of a team\&.
+.RE
+.PP
+team\-new <org> <name> <perm>
+.RS 4
+Add a new team (name) to an organization\&. The
+\fIperm\fR
+arg must be pull, push or admin\&.
+.RE
+.PP
+team\-delete <team_id>
+.RS 4
+Delete a team\&.
+.RE
+.PP
 members <org>
 .RS 4
 List the members of an organization\&.
 .RE
 .PP
-teams <org>
+member\-add <team_id> <user>
 .RS 4
-List the teams in an organization\&.
+Add a user to a team\&.
+.RE
+.PP
+member\-remove <team_id> <user>
+.RS 4
+Remove a user from a team\&.
 .RE
 .PP
 followers [<user>]
