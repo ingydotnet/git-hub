@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+set -e
+
 command:team() {
   get-args team_id
   api-get "/teams/$team_id"

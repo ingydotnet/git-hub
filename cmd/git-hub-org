@@ -8,7 +8,7 @@ command:orgs() {
   msg_fail="Can't find Organizations for User '$user'"
   report-list \
     "/users/$user/orgs?per_page=PER_PAGE" \
-    'login'
+    login
 }
 
 command:org() {

@@ -93,7 +93,7 @@ command:stars() {
   local title="Stargazers for '$owner/$repo':"
   report-list \
     "/repos/$owner/$repo/stargazers?per_page=PER_PAGE" \
-    'login'
+    login
   msg_fail="Couldn't find Stargazers for '$owner/$repo'"
 }
 
@@ -129,14 +129,14 @@ command:starred() {
   get-args '?user:get-user'
   report-list \
     "/users/$user/starred?sort=updated;per_page=PER_PAGE" \
-    'full_name'
+    full_name
 }
 
 command:collabs() {
   get-args '?owner:get-user/repo:get-repo'
   report-list \
     "/repos/$owner/$repo/collaborators" \
-    'login'
+    login
 }
 
 command:trust() {

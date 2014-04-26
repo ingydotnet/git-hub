@@ -6,7 +6,7 @@ command:keys() {
   get-args owner:get-user
   report-list \
     "/users/$owner/keys" \
-    'key'
+    key
 }
 
 format-entry:keys() {

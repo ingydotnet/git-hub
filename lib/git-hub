@@ -417,7 +417,7 @@ spec-assign() {
   [[ "$spec" =~ : ]] && spec="${spec#$var:}" || spec=
   if [ -z "$arg" ]; then
     for func in ${spec/:/ }; do
-      if [ "$func" == 'empty' ]; then
+      if [ "$func" == empty ]; then
         printf -v "$var" ""
         return
       elif [[ "$func" =~ ^\'(.*)\'$ ]]; then
@@ -1095,10 +1095,10 @@ prompt() {
     1)
       msg="$1"
       if [[ "$msg" =~ \[yN\] ]]; then
-        default='n'
+        default=n
         yn=true
       elif [[ "$msg" =~ \[Yn\] ]]; then
-        default='y'
+        default=y
         yn=true
       fi
       ;;
