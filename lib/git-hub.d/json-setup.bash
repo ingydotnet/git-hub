@@ -48,7 +48,7 @@ json-dump-object-pairs() {
   local json='{'
   for ((i = 0; i < ${#pairs[@]}; i = i+2)); do
     local value="${pairs[$((i+1))]}"
-    value=${value//\"/\\\"}
+    value="${value//\"/\\\"}"
     if [[ "$value" =~ $regex ]]; then
       json="$json\"${pairs[$i]}\":$value"
     else
@@ -59,7 +59,7 @@ json-dump-object-pairs() {
     fi
   done
   json="$json}"
-  echo $json
+  echo "$json"
 }
 
 pretty-json-object() {
@@ -68,7 +68,7 @@ pretty-json-object() {
   echo '{'
   for (( i = 0; i < ${#keys[@]}; i++)); do
     local key="${keys[$i]}"
-    local key=${key//__/\/}
+    local key="${key//__/\/}"
     local value="$(JSON.get "/$key" - || true)"
     if [ -n "$value" ]; then
       printf "    \"%s\": %s" "$key" "$value"

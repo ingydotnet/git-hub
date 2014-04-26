@@ -11,13 +11,13 @@ command:scopes() {
 ok:scopes() {
   local i=0 scopes scope
   while true; do
-    scope=$(JSON.get -s "/scopes/$i" - 2>/dev/null || echo '')
+    scope="$(JSON.get -s "/scopes/$i" - 2>/dev/null || echo '')"
     [ -z "$scope" ] && break
-    scopes+=($scope)
+    scopes+=("$scope")
     let i=i+1
   done
 
-  if $raw_output || $quiet_output; then
+  if "$raw_output" || "$quiet_output"; then
     for scope in "${scopes[@]}"; do
       out "$scope"
     done
@@ -57,7 +57,7 @@ all_scopes=(
 )
 command:scope-add() {
   scopes=("${all_scopes[@]}")
-  if $do_all; then
+  if "$do_all"; then
     get-args token_id
   else
     get-args token_id @scopes
@@ -72,7 +72,7 @@ command:scope-add() {
 
 command:scope-remove() {
   scopes=("${all_scopes[@]}")
-  if $do_all; then
+  if "$do_all"; then
     get-args token_id
   else
     get-args token_id @scopes

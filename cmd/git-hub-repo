@@ -10,10 +10,10 @@ command:repos() {
 }
 
 format-entry:repos() {
-  if $raw_output; then
+  if "$raw_output"; then
     out "$3"
   else
-    printf -v output_line "%d) (%s)  %-30s %s" $1 ${2/T*} $3 "$4"
+    printf -v output_line "%d) (%s)  %-30s %s" "$1" "${2/T*}" "$3" "$4"
   fi
 }
 
@@ -39,7 +39,7 @@ command:repo-get() {
     msg_fail="Repo '$owner/$repo' not found"
     return
   }
-  local value=$(JSON.get -a "/$key" -)
+  local value="$(JSON.get -a "/$key" -)"
   if [ -n "$value" ]; then
     msg_ok="$value"
   else

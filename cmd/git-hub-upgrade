@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 command:upgrade() {
-  local path=$0
+  local path="$0"
   if [[ "$path" =~ ^/ ]] && [[ "$path" =~ ^(.*/git-hub)/lib/git-hub$ ]]; then
     (
       set -x

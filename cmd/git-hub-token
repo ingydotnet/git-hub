@@ -10,10 +10,10 @@ command:tokens() {
 }
 
 format-entry:tokens() {
-  if $raw_output || $quiet_output; then
-    printf "%-7s\t%s\n" $3 "${4:-$5}"
+  if "$raw_output" || "$quiet_output"; then
+    printf "%-7s\t%s\n" "$3" "${4:-$5}"
   else
-    printf "%d) %s %-14s  %s\n" $1 $2 "(id: $3)" "${4:-$5}"
+    printf "%d) %s %-14s  %s\n" "$1" "$2" "(id: $3)" "${4:-$5}"
   fi
 }
 
@@ -30,12 +30,12 @@ command:token-new() {
 }
 
 ok:token-new() {
-  local token=$(JSON.get -s "/token" -)
+  local token="$(JSON.get -s "/token" -)"
   [ -n "$token" ] || die "Can't figure out token value"
-  local id=$(JSON.get -n "/id" -)
-  local note=$(JSON.get -s "/note" -)
-  local name=$(JSON.get "/app/name" -)
-  if $raw_output || $quiet_output; then
+  local id="$(JSON.get -n "/id" -)"
+  local note="$(JSON.get -s "/note" -)"
+  local name="$(JSON.get "/app/name" -)"
+  if "$raw_output" || "$quiet_output"; then
     out "$id"
   else
     # TODO out+ instead of printf?
@@ -59,7 +59,7 @@ command:token-get() {
     msg_fail="Can't get token info for token-id=$token_id"
     return
   }
-  local value=$(JSON.get -a "/$key" -)
+  local value="$(JSON.get -a "/$key" -)"
   if [ -n "$value" ]; then
     msg_ok="$value"
   else

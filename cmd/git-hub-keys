@@ -10,7 +10,7 @@ command:keys() {
 }
 
 format-entry:keys() {
-  if $raw_output; then
+  if "$raw_output"; then
     out "$2"
   else
     say "Public SSH keys for '$owner':"
@@ -21,7 +21,7 @@ format-entry:keys() {
 command:keys-add() {
   require-auth
   get-args title key
-  api-post "/user/keys" "$(json-dump-object title "$title" key "$key")"
+  api-post /user/keys "$(json-dump-object title "$title" key "$key")"
   msg_ok="Public key successfully added."
 }
 

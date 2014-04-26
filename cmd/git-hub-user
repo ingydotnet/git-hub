@@ -23,7 +23,7 @@ command:user-get() {
     msg_fail="User '$user' not found"
     return
   }
-  local value=$(JSON.get -a "/$key" -)
+  local value="$(JSON.get -a "/$key" -)"
   if [ -n "$value" ]; then
     msg_ok="$value"
   else
@@ -35,7 +35,7 @@ command:user-get() {
 command:user-edit() {
   require-auth
   get-args %pairs
-  api-patch "/user" "$(json-dump-object-pairs)"
+  api-patch /user "$(json-dump-object-pairs)"
 }
 
 # vim: set lisp:

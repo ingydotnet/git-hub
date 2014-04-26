@@ -21,10 +21,10 @@ command:teams() {
 }
 
 format-entry:teams() {
-  if $raw_output; then
+  if "$raw_output"; then
     out "$3"
   else
-    printf -v output_line "%-20s (ID %s)" "$2" "$3"
+    printf -v output_line "%2d) %-12s (ID %s)" "$1" "$2" "$3"
   fi
 }
 

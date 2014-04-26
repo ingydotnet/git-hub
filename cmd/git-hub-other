@@ -18,7 +18,7 @@ command:following() {
 
 command:follows() {
   get-args user '?target:get-login'
-  api-get /users/$user/following/$target
+  api-get "/users/$user/following/$target"
   if OK; then
     msg_ok="'$user' follows '$target'"
   else
@@ -55,17 +55,17 @@ command:clone() {
   fi
 
   # TODO Make this dry_run on non-API command be reusable
-  $verbose_output && nay "$cmd"
-  $dry_run && {
+  "$verbose_output" && nay "$cmd"
+  "$dry_run" && {
     nay '*** NOTE: This is a dry run only. ***'
     return 0
   }
 
   local OK=0
   (
-    if $quiet_output; then
+    if "$quiet_output"; then
       $cmd &> /dev/null
-    elif $verbose_output; then
+    elif "$verbose_output"; then
       (
         set -x
         $cmd
@@ -82,7 +82,7 @@ command:clone() {
     fi
   else
     say "Failed: 'git hub clone $@'"
-    if ! $verbose_output; then
+    if ! "$verbose_output"; then
       say "  Try using -v for more info"
     fi
   fi
@@ -141,20 +141,16 @@ command:collabs() {
 
 command:trust() {
   require-auth
-  get-args '?owner:get-user/repo:get-repo' @collaborators
-  for collab in ${collaborators[@]}; do
-    api-put "/repos/$owner/$repo/collaborators/$collab"
-  done
-  msg_ok="'$owner/$repo' commit permission added for: ${collaborators[@]}"
+  get-args '?owner:get-user/repo:get-repo' collaborator
+  api-put "/repos/$owner/$repo/collaborators/$collaborator"
+  msg_ok="'$owner/$repo' commit permission added for: $collaborator"
 }
 
 command:untrust() {
   require-auth
-  get-args '?owner:get-user/repo:get-repo' @collaborators
-  for collab in ${collaborators[@]}; do
-    api-delete "/repos/$owner/$repo/collaborators/$collab"
-  done
-  msg_ok="'$owner/$repo' commit permission removed for: ${collaborators[@]}"
+  get-args '?owner:get-user/repo:get-repo' collaborator
+  api-delete "/repos/$owner/$repo/collaborators/$collaborator"
+  msg_ok="'$owner/$repo' commit permission removed for: $collaborator"
 }
 
 # vim: set lisp:

@@ -14,29 +14,29 @@ command:repo-init() {
       fi
     fi
   fi
-  $need_init || $need_repo || $need_remote || {
+  "$need_init" || "$need_repo" || "$need_remote" || {
     say "Nothing to do."
     exit 0
   }
-  if $need_init; then
+  if "$need_init"; then
     (
       set -x
-      git init $dir
+      git init "$dir"
     )
   fi
-  if $need_repo; then
+  if "$need_repo"; then
     (
-      cd $dir
-      local name="$(basename $PWD)"
+      cd "$dir"
+      local name="$(basename "$PWD")"
       set -x
       git hub repo-new "$name"
     )
   fi
-  if $need_remote; then
+  if "$need_remote"; then
     get-var login
     (
-      cd $dir
-      local name="$(basename $PWD)"
+      cd "$dir"
+      local name="$(basename "$PWD")"
       set -x
       git remote add origin "git@github.com:$login/$name.git"
     )

@@ -8,7 +8,7 @@ set -e
 
 command:open() {
   local options=()
-  $raw_output && options+=(--raw)
+  "$raw_output" && options+=(--raw)
 
   set -- "${command_arguments[@]}"
 

@@ -28,7 +28,7 @@ command:issues() {
   get-args '?owner:get-owner/repo:get-repo'
 
   state=open
-  $do_all && state=all
+  "$do_all" && state=all
 
   report-list \
     "/repos/$owner/$repo/issues?state=$state;sort=updated;per_page=PER_PAGE" \
@@ -36,10 +36,10 @@ command:issues() {
 }
 
 format-entry:issues() {
-  if $raw_output; then
+  if "$raw_output"; then
     echo "$2"
   else
-    printf "#%-3d (%s) %-6s @%-16s %s\n" $2 ${3/T*/} $4 $5 "$6"
+    printf "#%-3d (%s) %-6s @%-16s %s\n" "$2" "${3/T*/}" "$4" "$5" "$6"
   fi
 }
 
@@ -62,8 +62,8 @@ ok:issue() {
   local skip_field_comments=true
   report-data
 
-  local comments=$(JSON.get -n /comments -)
-  if [ $comments -gt 0 ]; then
+  local comments="$(JSON.get -n /comments -)"
+  if [ "$comments" -gt 0 ]; then
     echo Comments:
     command=comments
     report-list \
@@ -73,7 +73,7 @@ ok:issue() {
 }
 
 format-entry:comments() {
-  printf "%d) %-14s (%s)\n" $1 $2 ${3/T*/}
+  printf "%d) %-14s (%s)\n" "$1" "$2" "${3/T*/}"
   local text
   normalize-multiline-text-output "$4" " "
   echo "$text"

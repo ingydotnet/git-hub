@@ -10,10 +10,10 @@ command:forks() {
 }
 
 format-entry:forks() {
-  if $raw_output; then
+  if "$raw_output"; then
     out "$3"
   else
-    printf "%d) (%s)  %-30s\n" $1 ${2/T*/} $3
+    printf "%d) (%s)  %-30s\n" "$1" "${2/T*/}" "$3"
   fi
 }
 
@@ -27,7 +27,7 @@ command:fork() {
   else
     api-post "/repos/$owner/$repo/forks" '{}'
   fi
-  local login=$(get-login)
+  local login="$(get-login)"
   msg_ok="Repository '$owner/$repo' forked to '$login'"
   if OK && [ -n "$remote_name" ] && inside-git-repo; then
     url="git@github.com:$login/$repo.git"

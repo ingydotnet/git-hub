@@ -32,7 +32,7 @@ Your config will be stored here: '$GIT_HUB_CONFIG'.
 
 setup:check-old-config() {
   local a
-  local old_config_dir=$(dirname $(dirname "$GIT_HUB_CONFIG"))
+  local old_config_dir="$(dirname $(dirname "$GIT_HUB_CONFIG"))"
   [ -d "$old_config_dir" ] || return 0
   local old_config="$old_config_dir/.githubconfig"
   [ -f "$old_config" ] || return 0
@@ -43,9 +43,9 @@ You have an outdated config file: '$old_config'.
 I can move this file to: '$GIT_HUB_CONFIG'.
 
 ...
-  a=$(prompt "Would you like to use this as your new config file? [Yn] ")
-  if [ $a == y ]; then
-    mv $old_config "$GIT_HUB_CONFIG"
+  a="$(prompt "Would you like to use this as your new config file? [Yn] ")"
+  if [ "$a" == y ]; then
+    mv "$old_config" "$GIT_HUB_CONFIG"
     cat <<...
 
 File moved. You can exit now or continue changing your setup.
@@ -54,7 +54,7 @@ File moved. You can exit now or continue changing your setup.
     prompt
   else
     echo
-    a=$(prompt "Would you like to delete the old config file? [Yn] ")
+    a="$(prompt "Would you like to delete the old config file? [Yn] ")"
   fi
 }
 
@@ -67,9 +67,9 @@ setup:login() {
 The 'git hub' command needs to know your GitHub login id.
 
 ...
-  local user_name=$(
+  local user_name="$(
     git config -f "$GIT_HUB_CONFIG" github.user-name || echo ''
-  )
+  )"
   if [ -n "$user_name" ]; then
     git config -f "$GIT_HUB_CONFIG" --unset github.user-name
     git config -f "$GIT_HUB_CONFIG" github.login "$user_name"
@@ -80,18 +80,18 @@ The 'git hub' command needs to know your GitHub login id.
   if [ -n "$login" ]; then
     echo "Your login is currently set to '$login'".
     echo
-    a=$(prompt "Do you want to keep this value? [Yn] ")
-    [ $a == y ] && return
+    a="$(prompt "Do you want to keep this value? [Yn] ")"
+    [ "$a" == y ] && return
   fi
 
   while true; do
     echo
-    login=$(prompt "Enter your GitHub login id: ")
+    login="$(prompt "Enter your GitHub login id: ")"
     [[ "$login" =~ ^[-a-zA-Z0-9]+$ ]] && break
     echo "Invalid login value '$login'"
   done
 
-  git config -f "$GIT_HUB_CONFIG" github.login $login
+  git config -f "$GIT_HUB_CONFIG" github.login "$login"
 
   cat <<...
 
@@ -123,8 +123,8 @@ Verify that this is the correct token, If not, we will generate a new token
 for you and put it in the config file.
 
 ...
-    a=$(prompt "Is this the correct token? [Yn]")
-    [ $a == y ] && return
+    a="$(prompt "Is this the correct token? [Yn]")"
+    [ "$a" == y ] && return
   fi
   cat <<...
 
@@ -132,21 +132,21 @@ To generate a new token, the commands require your GitHub password.
 
 The password will not be stored after the commands finish running.
 ...
-  export GIT_HUB_PASSWORD=$(
+  export GIT_HUB_PASSWORD="$(
     prompt "Enter your GitHub password (for '$login'): "
-  )
+  )"
   echo
   echo
   echo 'Generating a new authentication token...'
 
   local rc=0 token_id= desc="API Token for git-hub ($(date "+%s"))"
 
-  token_id=$(git hub token-new -qr "$desc") || rc=$?
+  token_id="$(git hub token-new -qr "$desc")" || rc=$?
   if [ "$rc" -eq 2 ]; then
-    export GIT_HUB_2FA_OTP=$(
-    prompt "Enter your 2 Factor Auth Code (2FA password): "
-    )
-    token_id=$(git hub token-new -qr "$desc") || true
+    export GIT_HUB_2FA_OTP="$(
+      prompt "Enter your 2 Factor Auth Code (2FA password): "
+    )"
+    token_id="$(git hub token-new -qr "$desc")" || true
   fi
   [ -n "$token_id" ] || die "Command failed"
   echo "Token successfully generated (token id: $token_id)."
@@ -156,7 +156,7 @@ The password will not be stored after the commands finish running.
   echo "Scopes successfully added."
   echo
   echo "Adding the new token to your config file..."
-  local token_value=$(git hub token-get $token_id token) || exit $?
+  local token_value="$(git hub token-get $token_id token)" || exit $?
   git config -f "$GIT_HUB_CONFIG" github.api-token $token_value
   echo "Token successfully added to config file."
   echo
@@ -184,21 +184,21 @@ There is a config option called 'use-auth' that you can set to always send the
 authentication token.
 
 ...
-  local auth=$(git config -f "$GIT_HUB_CONFIG" github.use-auth)
+  local auth="$(git config -f "$GIT_HUB_CONFIG" github.use-auth)"
   if [ -z "$auth" ]; then
-    a=$(prompt "Would you like to turn this option on? [Yn]")
-    [ $a == n ] && return
+    a="$(prompt "Would you like to turn this option on? [Yn]")"
+    [ "$a" == n ] && return
   elif [ "$auth" == false ]; then
     echo 'You have this option turned off.'
     echo
-    a=$(prompt "Would you like to turn this option on? [yN]")
+    a="$(prompt "Would you like to turn this option on? [yN]")"
   else
     git config -f "$GIT_HUB_CONFIG" github.use-auth true
     echo 'You already have this option turned on.'
     echo
-    a=$(prompt "Would you like to keep this option on? [Yn]")
+    a="$(prompt "Would you like to keep this option on? [Yn]")"
   fi
-  if [ $a == y ]; then
+  if [ "$a" == y ]; then
     git config -f "$GIT_HUB_CONFIG" github.use-auth true
   else
     git config -f "$GIT_HUB_CONFIG" github.use-auth false
@@ -210,8 +210,8 @@ setup:json-perl() {
 
   local perl="$(perl -e 'print "OK"' 2> /dev/null)"
   local perl_json="$(perl -MJSON -e 'print "OK"' 2> /dev/null)"
-  local perl_json_xs=$(perl -MJSON::XS -e 'print "OK"' 2> /dev/null)
-  local set=$(git config -f "$GIT_HUB_CONFIG" github.json-lib)
+  local perl_json_xs="$(perl -MJSON::XS -e 'print "OK"' 2> /dev/null)"
+  local set="$(git config -f "$GIT_HUB_CONFIG" github.json-lib)"
   local a=
 
   cat <<...
@@ -231,14 +231,14 @@ You already have this option set to '$set'.
 
 ...
     prompt
-  elif [ "$perl" == "OK" ]; then
-    if [ "$perl_json" == "OK" ]; then
+  elif [ "$perl" == OK ]; then
+    if [ "$perl_json" == OK ]; then
       cat <<...
 You seem to have the prerequisites to speed up your 'git-hub' experience.
 
 ...
-      a=$(prompt "Would you like to turn this setting on? [Yn]")
-      [ $a == y ] &&
+      a="$(prompt "Would you like to turn this setting on? [Yn]")"
+      [ "$a" == y ] &&
         git config -f "$GIT_HUB_CONFIG" github.json-lib json-perl.bash
     else
       cat <<...

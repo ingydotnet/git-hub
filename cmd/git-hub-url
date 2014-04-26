@@ -23,7 +23,7 @@ command:url() {
 
   if [ -n "$path" ]; then
     branch="$(git rev-parse --abbrev-ref HEAD)"
-    if $raw_output; then
+    if "$raw_output"; then
       quiet_output=false
       url+="/raw/$branch/$path"
     else
