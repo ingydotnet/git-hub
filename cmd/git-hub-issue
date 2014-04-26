@@ -57,7 +57,7 @@ ok:issue() {
   local label_title='Issue'
   local label_body='Description'
   fields=(
-    title number user__login state body comments
+    title number user__login state created_at body comments
   )
   local skip_field_comments=true
   report-data

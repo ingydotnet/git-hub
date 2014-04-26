@@ -1,0 +1,78 @@
+#!/usr/bin/env bash
+
+set -e
+
+command:tokens() {
+  basic-auth
+  report-list \
+    '/authorizations' \
+    'token id note app/name'
+}
+
+format-entry:tokens() {
+  if $raw_output || $quiet_output; then
+    printf "%-7s\t%s\n" $3 "${4:-$5}"
+  else
+    printf "%d) %s %-14s  %s\n" $1 $2 "(id: $3)" "${4:-$5}"
+  fi
+}
+
+command:token-new() {
+  get-args '?note'
+  local json
+  if [ -n "$note" ]; then
+    json="$(json-dump-object note "$note")"
+  else
+    json='{}'
+  fi
+  basic-auth
+  api-post '/authorizations' "$json"
+}
+
+ok:token-new() {
+  local token=$(JSON.get -s "/token" -)
+  [ -n "$token" ] || die "Can't figure out token value"
+  local id=$(JSON.get -n "/id" -)
+  local note=$(JSON.get -s "/note" -)
+  local name=$(JSON.get "/app/name" -)
+  if $raw_output || $quiet_output; then
+    out "$id"
+  else
+    # TODO out+ instead of printf?
+    printf "Token created: %s %-14s  %s\n" \
+      "$token" "(id: $id)" "${note:-$name}"
+  fi
+}
+
+status-401:token-new() {
+  if [ -n "$(grep "X-GitHub-OTP: required;" "$command_header_file")" ]; then
+    err "2 Factor Auth needed"
+    exit 2
+  fi
+}
+
+command:token-get() {
+  get-args token_id key
+  basic-auth
+  api-get "/authorizations/$token_id"
+  OK || {
+    msg_fail="Can't get token info for token-id=$token_id"
+    return
+  }
+  local value=$(JSON.get -a "/$key" -)
+  if [ -n "$value" ]; then
+    msg_ok="$value"
+  else
+    msg_fail="Couldn't get value for '$key'"
+    OK=1
+  fi
+}
+
+command:token-delete() {
+  get-args token_id
+  basic-auth
+  api-delete "/authorizations/$token_id"
+  msg_ok="Token '$token_id' deleted"
+}
+
+# vim: set lisp:
