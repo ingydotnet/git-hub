@@ -489,6 +489,20 @@ command:unstar() {
   msg_ok="'$owner/$repo' unstarred"
 }
 
+command:watch() {
+  require-auth
+  get-args '?owner:get-user/repo:get-repo'
+  api-put "/user/subscriptions/$owner/$repo"
+  msg_ok="You are watching '$owner/$repo'"
+}
+
+command:unwatch() {
+  require-auth
+  get-args '?owner:get-user/repo:get-repo'
+  api-delete "/user/subscriptions/$owner/$repo"
+  msg_ok="You are no longer watching '$owner/$repo'"
+}
+
 command:starred() {
   get-args '?user:get-user'
   report-list \
