@@ -23,11 +23,11 @@ OPTIONS_SPEC="\
 git hub <command> <options> <arguments>
 
 The most commonly used commands:
-  help, setup, upgrade, config, url, open,
+  help, setup, upgrade, config, url, open, keys,
   user, orgs, org, teams, members, followers, following, follow, stars, star,
   clone, repos, repo, repo-new, repo-delete, forks, fork, collabs, trust,
   issues, issue, issue-update, issue-close, comment,
-  pull-request, pull-list, pull-diff, pull-merge
+  pull-request, pulls, pull-diff, pull-merge
 
 See 'git help hub' for complete documentation of *all* the commands.
 
@@ -583,14 +583,14 @@ command:config-unset() {
   msg_ok="Config key '$config_key' has been unset."
 }
 
-command:token-list() {
+command:tokens() {
   basic-auth
   report-list \
     '/authorizations' \
     'token id note app/name'
 }
 
-format-entry:token-list() {
+format-entry:tokens() {
   if $raw_output || $quiet_output; then
     printf "%-7s\t%s\n" $3 "${4:-$5}"
   else
@@ -656,13 +656,13 @@ command:token-delete() {
   msg_ok="Token '$token_id' deleted"
 }
 
-command:scope-list() {
+command:scopes() {
   get-args token_id
   basic-auth
   api-get "/authorizations/$token_id"
 }
 
-ok:scope-list() {
+ok:scopes() {
   local i=0 scopes scope
   while true; do
     scope=$(JSON.get -s "/scopes/$i" - 2>/dev/null || echo '')
@@ -1463,10 +1463,6 @@ get-opts() {
   command="$1"; shift
   command_arguments=("$@")
 
-  # A few aliases here for now:
-  [ "$command" == pulls ] && command=pull-list
-  [ "$command" == issues ] && command=issue-list
-
   [[ "$command" == "setup" ]] ||
   [[ "$command" = "config" ]] ||
   [[ "$command" = "config-unset" ]] ||
@@ -1547,7 +1543,7 @@ the GIT_HUB_API_TOKEN environment variable.
 
 To list your API tokens:
 
-  git hub token-list
+  git hub tokens
 
 To create a new api token:
 
@@ -1709,6 +1705,8 @@ callable-or-source() {
     return 0
   else
     if source-ext-maybe git-hub-"${1/:*/}" && can "command:$1"; then
+      return 0
+    elif source-ext-maybe git-hub-"${1%s}" && can "command:$1"; then
       return 0
     elif source-ext-maybe git-hub-"${1/-*/}" && can "command:$1"; then
       return 0

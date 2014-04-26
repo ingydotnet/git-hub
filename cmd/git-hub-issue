@@ -24,7 +24,7 @@ command:issue-new() {
   )"
 }
 
-command:issue-list() {
+command:issues() {
   get-args '?owner:get-owner/repo:get-repo'
 
   state=open
@@ -35,7 +35,7 @@ command:issue-list() {
     'number updated_at state user/login title'
 }
 
-format-entry:issue-list() {
+format-entry:issues() {
   if $raw_output; then
     echo "$2"
   else

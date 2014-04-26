@@ -50,6 +50,7 @@ git hub repo\-edit <repo> description \*(AqJust another GitHub repo\*(Aq
 git hub repo\-delete <owner>/<repo>  # Delete a repository
 git hub followers <user>            # List a user\*(Aqs followers
 git hub star ingydotnet/git\-hub     # Star this repository
+git hub watch ingydotnet/git\-hub    # Watch this repository
 git hub follow ingydotnet           # Follow this author
 git hub trust ingydotnet            # Add collaborators to repo
                                     # Stalk all your followers
@@ -129,7 +130,18 @@ make install
 .\}
 .SH "OPTIONS"
 .sp
-Commandline options start with a dash and can appear in any order in the command\&.
+Commandline options start with a dash and can appear in any order in the command\&. Long form commands that require an argument can use \fI=\fR or not:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+\-\-count=5
+\-\-count 5
+.fi
+.if n \{\
+.RE
+.\}
 .PP
 \-c <number>, \-\-count=<number>
 .RS 4
@@ -189,7 +201,7 @@ Show detailed output\&. Notably, show the raw command that is used for the GitHu
 Set or override the api\-token required by the command\&. This value can also come from the
 GIT_HUB_API_TOKEN
 environment variable\&. Usually this value comes from your
-~/\&.githubconfig
+~/\&.git\-hub/config
 file\&.
 .RE
 .PP
@@ -240,7 +252,7 @@ Repeat the last command, using the previous API server response\&. Useful for de
 .RS 4
 Turn on Bash
 \-x
-debugging\&. This will show every bash command executed in the program\&.
+debugging\&. This will show every bash command executed in the program\&. This is extremely useful to track down nasty bugs\&.
 .RE
 .SH "ARGUMENTS"
 .sp
@@ -357,12 +369,29 @@ of a token (not the 40 hex\-character value)\&.
 <scope\-name>
 .RS 4
 One of the GitHub scopes that you can apply to a token\&. The
-git hub scope\-list
+git hub scopes
 command will tell you all of these, and what they mean\&.
 .RE
+.SH "PLUGINS"
+.sp
+You get tons of useful commands by default, and they are all listed and documented in the next section below\&. But git\-hub also supports third party plugin commands\&. The ones I know about are list here:
+.PP
+git\-hub\-travis
+.RS 4
+
+\m[blue]\fBhttps://github\&.com/carloslima/git\-hub\-travis\fR\m[]
+Enable and/or disable travis\-ci testing from the command line\&.
+.RE
+.sp
+Well OK, I only know about this one, and yes, I helped Carlos write it\&. But trust me, it\(cqs easy\&. What are you waiting for?
 .SH "COMMANDS"
 .sp
-These are the commands you can use to perform most of your daily GitHub interactions from the command line\&.
+These are the commands you can use to perform most of your daily GitHub interactions from the command line\&. They are installed by default\&.
+.PP
+help
+.RS 4
+Show this manpage\&.
+.RE
 .PP
 setup
 .RS 4
@@ -391,6 +420,13 @@ below\&.
 .if n \{\
 .RE
 .\}
+.RE
+.PP
+upgrade
+.RS 4
+Upgrade the
+git\-hub
+installation to the latest version\&.
 .RE
 .PP
 user [<user>]
@@ -582,6 +618,16 @@ starred [<user>]
 List repositories that a user has starred\&.
 .RE
 .PP
+watch [<owner>/<repo>]
+.RS 4
+Start watching a repo\&.
+.RE
+.PP
+unwatch [<owner>/<repo>]
+.RS 4
+Stop watching a repo\&.
+.RE
+.PP
 collabs [<owner>/<repo>]
 .RS 4
 List current collaborators for a repository\&.
@@ -604,7 +650,9 @@ List the issues for a repo\&.
 .PP
 issue [<owner>/<repo>] <issue\-id\-number>
 .RS 4
-Show info (including any comments) for a specific issue\&.
+Show info (including any comments) for a specific issue\&. If no issue number is given, this command will call
+issue\-new
+instead\&.
 .RE
 .PP
 issue\-new [<owner>/<repo>]
@@ -612,21 +660,59 @@ issue\-new [<owner>/<repo>]
 Create a new issue for a repository\&.
 .RE
 .PP
-issue\-comment [<owner>/<repo>] <issue\-id\-number> [<comment\-text\-string>]
+comment [<owner>/<repo>] <issue\-id\-number>
 .RS 4
-Add a comment to an issue\&. If no comment string is given, the command will open your default editor and let you enter the text\&.
+Add a comment to an issue\&.
 .RE
 .PP
-issue\-close [<owner>/<repo>] <issue\-id\-number> [<comment\-text\-string>]
+issue\-close [<owner>/<repo>] <issue\-id\-number>
 .RS 4
-Close an issue with an option comment\&. If you use the string
-\fI\&...\fR
-as your comment, your ediitor will be opened to allow you to type in your comment text\&.
+Close an issue\&.
+.RE
+.PP
+pulls [<owner>/<repo>]
+.RS 4
+List the pull requests for a repo\&.
+.RE
+.PP
+pull\-request [<owner>/<repo>]
+.RS 4
+Create a new pull request for a repository\&.
+.RE
+.PP
+pull\-diff [<owner>/<repo>] <issue\-id\-number>
+.RS 4
+Show the diff for a pull request\&.
+.RE
+.PP
+pull\-merge [<owner>/<repo>] <issue\-id\-number>
+.RS 4
+Merge and close a pull request\&.
 .RE
 .PP
 keys [<user>]
 .RS 4
 List public SSH keys for a user\&.
+.RE
+.PP
+keys\-add <title> <key>
+.RS 4
+Add a public ssh key for your user\&.
+.RE
+.PP
+cache\-clear
+.RS 4
+Clear your API response cache\&.
+.RE
+.PP
+open [<owner>/<repo>] [<file\-path>]
+.RS 4
+Open a browser window to a repo or a file in a repo\&.
+.RE
+.PP
+url [<owner>/<repo>] [<file\-path>]
+.RS 4
+Print the URL of a repo or a file in a repo\&.
 .RE
 .SH "CONFIGURATION COMMANDS"
 .sp
@@ -649,7 +735,7 @@ Unset a config key\&. Removes the key from the
 file\&.
 .RE
 .PP
-token\-list
+tokens
 .RS 4
 List all the API tokens for your GitHub account\&. Use the
 \-\-raw
@@ -674,11 +760,11 @@ token\-delete <api\-token\-id>
 Delete one of your API tokens for your GitHub login id\&. Note: You need to delete tokens by
 \fBid\fR
 (listed by the
-token\-list
+tokens
 command), not by token value\&.
 .RE
 .PP
-scope\-list <api\-token\-id>
+scopes <api\-token\-id>
 .RS 4
 List the scopes assigned to your API token, and also list all the possible scope values that you can assign\&. Use the
 \-\-raw
@@ -717,7 +803,7 @@ git hub config json\-lib json\-perl\&.bash
 That will enable a Perl replacement, which requires Perl (of course) and the JSON\&.pm Perl module\&. If the JSON::XS Perl module is also installed, it will be even faster\&.
 .SH "PIPE AND EACH"
 .sp
-You can pipe the output of one git hub into another and multiply your power\&. The command being piped into should use the EACH option which is a single dash (\fI\-\fR)\&. It will cause the command to be run once for each line of input, inserting the line into the command, in place of the \fI\-\fR\&.
+You can pipe the output of one git hub into another and multiply your power\&. The command being piped into should use the EACH option which is a single dash (\fI\-\fR)\&. It will cause the command to be run once for each line of input, inserting the line into the command, in place of the \fI\-\fR\&. If you use a \fI=\fR it will do the same thing except for each "word" of input\&.
 .sp
 This command:
 .sp
@@ -756,6 +842,20 @@ done
 .if n \{\
 .RE
 .\}
+.sp
+For \fI=\fR you can do things like:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+echo alice bob chelsea | git hub trust =
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+to trust a list of users in one go\&.
 .SH "TOKEN AUTHENTICATION AND SCOPES"
 .sp
 Many endpoints of the GitHub v3 API require a Personal API Access Token\&. You can list your current tokens with this command:
@@ -764,7 +864,7 @@ Many endpoints of the GitHub v3 API require a Personal API Access Token\&. You c
 .RS 4
 .\}
 .nf
-git hub token\-list
+git hub tokens
 .fi
 .if n \{\
 .RE
@@ -778,7 +878,7 @@ If you don\(cqt have any tokens or want a new one for the git\-hub command, run 
 .nf
 git hub token\-new "my git\-hub command token"
 git hub scope\-add <token\-id> user repo
-git hub scope\-list <token\-id>
+git hub scopes <token\-id>
 git hub config api\-token <token\-value>
 .fi
 .if n \{\
@@ -789,7 +889,7 @@ You can also see all your tokens on the web at \m[blue]\fBthis page\fR\m[]\&\s-2
 .sp
 You can specify your API token to git hub on the commandline with \-\-token=\&.\&.\&. or in the GIT_HUB_API_TOKEN environment variable, but the easiest thing to do is just set it in the git\-hub config\&.
 .sp
-Certain token \fBscopes\fR are required for various GitHub API operations\&. Make sure your token has the scopes turned on for the things you want to do\&. See the scope\-list, scope\-add and scope\-remove git hub subcommands\&.
+Certain token \fBscopes\fR are required for various GitHub API operations\&. Make sure your token has the scopes turned on for the things you want to do\&. See the scopes, scope\-add and scope\-remove git hub subcommands\&.
 .if n \{\
 .sp
 .\}
