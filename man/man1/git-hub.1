@@ -2,12 +2,12 @@
 .\"     Title: git-hub
 .\"    Author: [see the "AUTHOR" section]
 .\" Generator: DocBook XSL Stylesheets v1.76.1 <http://docbook.sf.net/>
-.\"      Date: 04/25/2014
+.\"      Date: 04/26/2014
 .\"    Manual: Git Manual
 .\"    Source: Git 1.7.9.5
 .\"  Language: English
 .\"
-.TH "GIT\-HUB" "1" "04/25/2014" "Git 1\&.7\&.9\&.5" "Git Manual"
+.TH "GIT\-HUB" "1" "04/26/2014" "Git 1\&.7\&.9\&.5" "Git Manual"
 .\" -----------------------------------------------------------------
 .\" * Define some portability stuff
 .\" -----------------------------------------------------------------
@@ -1098,7 +1098,7 @@ Get information about all your followers:
 .RS 4
 .\}
 .nf
-for user in $(git hub followers <your\-login> \-ar); do
+for user in $(git hub followers <your\-login> \-r); do
     git hub user $user
 done
 .fi
@@ -1112,7 +1112,7 @@ Or more simply by using PIPE and EACH:
 .RS 4
 .\}
 .nf
-git hub followers \-ar | git hub user \-
+git hub followers \-r | git hub user \-
 .fi
 .if n \{\
 .RE
@@ -1124,7 +1124,7 @@ Follow all your followers:
 .RS 4
 .\}
 .nf
-git hub followers \-ar | git hub follow \-
+git hub followers \-r | git hub follow \-
 .fi
 .if n \{\
 .RE
@@ -1136,7 +1136,19 @@ Find out if the people you are following, are following you!
 .RS 4
 .\}
 .nf
-git hub following \-ar | git hub follows \-
+git hub following \-r | git hub follows \-
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+View all the open issues on a repository at once:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+git hub issues \-r | git hub issue \-
 .fi
 .if n \{\
 .RE
@@ -1148,7 +1160,7 @@ Clone all the repos in an organization:
 .RS 4
 .\}
 .nf
-git hub repos <org> \-ar | git hub clone \-
+git hub repos <org> \-r | git hub clone \-
 .fi
 .if n \{\
 .RE
@@ -1160,7 +1172,7 @@ Star the latest 5 repos from all the people you are following that have more tha
 .RS 4
 .\}
 .nf
-git hub following <your\-login> \-ar |
+git hub following <your\-login> \-r |
     git hub user\-get \- public_repos |
     perl \-nle \*(Aqprint if $_ > 50\*(Aq |
     git hub repos \- \-rc5 |
