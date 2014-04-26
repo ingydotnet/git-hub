@@ -3,19 +3,19 @@
 set -e
 
 command:setup() {
-    setup:intro
-    setup:check-old-config
-    setup:login
-    setup:api-token
-    setup:use-auth
-    setup:json-perl
-    setup:outro
-    exit 0
+  setup:intro
+  setup:check-old-config
+  setup:login
+  setup:api-token
+  setup:use-auth
+  setup:json-perl
+  setup:outro
+  exit 0
 }
 
 setup:intro() {
-    clear
-    cat <<...
+  clear
+  cat <<...
 
                         The 'git hub' Setup Tool
 
@@ -26,93 +26,93 @@ minute.
 Your config will be stored here: '$GIT_HUB_CONFIG'.
 
 ...
-    prompt
-    mkdir -p "$GIT_HUB_USER_DIR"
+  prompt
+  mkdir -p "$GIT_HUB_USER_DIR"
 }
 
 setup:check-old-config() {
-    local a
-    local old_config_dir=$(dirname $(dirname "$GIT_HUB_CONFIG"))
-    [ -d "$old_config_dir" ] || return 0
-    local old_config="$old_config_dir/.githubconfig"
-    [ -f "$old_config" ] || return 0
-    cat <<...
+  local a
+  local old_config_dir=$(dirname $(dirname "$GIT_HUB_CONFIG"))
+  [ -d "$old_config_dir" ] || return 0
+  local old_config="$old_config_dir/.githubconfig"
+  [ -f "$old_config" ] || return 0
+  cat <<...
 
 You have an outdated config file: '$old_config'.
 
 I can move this file to: '$GIT_HUB_CONFIG'.
 
 ...
-    a=$(prompt "Would you like to use this as your new config file? [Yn] ")
-    if [ $a == y ]; then
-        mv $old_config "$GIT_HUB_CONFIG"
-        cat <<...
+  a=$(prompt "Would you like to use this as your new config file? [Yn] ")
+  if [ $a == y ]; then
+    mv $old_config "$GIT_HUB_CONFIG"
+    cat <<...
 
 File moved. You can exit now or continue changing your setup.
 
 ...
-        prompt
-    else
-        echo
-        a=$(prompt "Would you like to delete the old config file? [Yn] ")
-    fi
+    prompt
+  else
+    echo
+    a=$(prompt "Would you like to delete the old config file? [Yn] ")
+  fi
 }
 
 setup:login() {
-    clear
-    cat <<...
+  clear
+  cat <<...
 
                         Step #1 - Login ID
 
 The 'git hub' command needs to know your GitHub login id.
 
 ...
-    local user_name=$(
-        git config -f "$GIT_HUB_CONFIG" github.user-name || echo ''
-    )
-    if [ -n "$user_name" ]; then
-        git config -f "$GIT_HUB_CONFIG" --unset github.user-name
-        git config -f "$GIT_HUB_CONFIG" github.login "$user_name"
-    fi
-    login=$(
-        git config -f "$GIT_HUB_CONFIG" github.login || echo ''
-    )
-    if [ -n "$login" ]; then
-        echo "Your login is currently set to '$login'".
-        echo
-        a=$(prompt "Do you want to keep this value? [Yn] ")
-        [ $a == y ] && return
-    fi
+  local user_name=$(
+    git config -f "$GIT_HUB_CONFIG" github.user-name || echo ''
+  )
+  if [ -n "$user_name" ]; then
+    git config -f "$GIT_HUB_CONFIG" --unset github.user-name
+    git config -f "$GIT_HUB_CONFIG" github.login "$user_name"
+  fi
+  login=$(
+    git config -f "$GIT_HUB_CONFIG" github.login || echo ''
+  )
+  if [ -n "$login" ]; then
+    echo "Your login is currently set to '$login'".
+    echo
+    a=$(prompt "Do you want to keep this value? [Yn] ")
+    [ $a == y ] && return
+  fi
 
-    while true; do
-        echo
-        login=$(prompt "Enter your GitHub login id: ")
-        [[ "$login" =~ ^[-a-zA-Z0-9]+$ ]] && break
-        echo "Invalid login value '$login'"
-    done
+  while true; do
+    echo
+    login=$(prompt "Enter your GitHub login id: ")
+    [[ "$login" =~ ^[-a-zA-Z0-9]+$ ]] && break
+    echo "Invalid login value '$login'"
+  done
 
-    git config -f "$GIT_HUB_CONFIG" github.login $login
+  git config -f "$GIT_HUB_CONFIG" github.login $login
 
-    cat <<...
+  cat <<...
 
 Login changed to '$login'.
 
 ...
-    prompt
+  prompt
 }
 
 setup:api-token() {
-    clear
-    cat <<...
+  clear
+  cat <<...
 
                         Step #2 - API Token
 
 More advanced commands require an authentication token (with the appropriate
 scopes added).
 ...
-    local token=$(git config -f "$GIT_HUB_CONFIG" github.api-token)
-    if [ -n "$token" ]; then
-        cat <<...
+  local token=$(git config -f "$GIT_HUB_CONFIG" github.api-token)
+  if [ -n "$token" ]; then
+    cat <<...
 
 It seems that you already have a token. To see your token, run these commands:
 
@@ -123,50 +123,50 @@ Verify that this is the correct token, If not, we will generate a new token
 for you and put it in the config file.
 
 ...
-        a=$(prompt "Is this the correct token? [Yn]")
-        [ $a == y ] && return
-    fi
-    cat <<...
+    a=$(prompt "Is this the correct token? [Yn]")
+    [ $a == y ] && return
+  fi
+  cat <<...
 
 To generate a new token, the commands require your GitHub password.
 
 The password will not be stored after the commands finish running.
 ...
-    export GIT_HUB_PASSWORD=$(
-        prompt "Enter your GitHub password (for '$login'): "
+  export GIT_HUB_PASSWORD=$(
+    prompt "Enter your GitHub password (for '$login'): "
+  )
+  echo
+  echo
+  echo 'Generating a new authentication token...'
+
+  local rc=0 token_id= desc="API Token for git-hub ($(date "+%s"))"
+
+  token_id=$(git hub token-new -qr "$desc") || rc=$?
+  if [ "$rc" -eq 2 ]; then
+    export GIT_HUB_2FA_OTP=$(
+    prompt "Enter your 2 Factor Auth Code (2FA password): "
     )
-    echo
-    echo
-    echo 'Generating a new authentication token...'
-
-    local rc=0 token_id= desc="API Token for git-hub ($(date "+%s"))"
-
-    token_id=$(git hub token-new -qr "$desc") || rc=$?
-    if [ "$rc" -eq 2 ]; then
-      export GIT_HUB_2FA_OTP=$(
-        prompt "Enter your 2 Factor Auth Code (2FA password): "
-      )
-      token_id=$(git hub token-new -qr "$desc") || true
-    fi
-    [ -n "$token_id" ] || die "Command failed"
-    echo "Token successfully generated (token id: $token_id)."
-    echo
-    echo "Adding the 'user', 'repo' and 'gist' scopes to the token..."
-    $(git hub scope-add $token_id user repo gist &> /dev/null) || exit $?
-    echo "Scopes successfully added."
-    echo
-    echo "Adding the new token to your config file..."
-    local token_value=$(git hub token-get $token_id token) || exit $?
-    git config -f "$GIT_HUB_CONFIG" github.api-token $token_value
-    echo "Token successfully added to config file."
-    echo
-    prompt
-    unset GIT_HUB_PASSWORD
+    token_id=$(git hub token-new -qr "$desc") || true
+  fi
+  [ -n "$token_id" ] || die "Command failed"
+  echo "Token successfully generated (token id: $token_id)."
+  echo
+  echo "Adding the 'user', 'repo' and 'gist' scopes to the token..."
+  $(git hub scope-add $token_id user repo gist &> /dev/null) || exit $?
+  echo "Scopes successfully added."
+  echo
+  echo "Adding the new token to your config file..."
+  local token_value=$(git hub token-get $token_id token) || exit $?
+  git config -f "$GIT_HUB_CONFIG" github.api-token $token_value
+  echo "Token successfully added to config file."
+  echo
+  prompt
+  unset GIT_HUB_PASSWORD
 }
 
 setup:use-auth() {
-    clear
-    cat <<...
+  clear
+  cat <<...
 
                         Step #3 - Use Authentication
 
@@ -184,37 +184,37 @@ There is a config option called 'use-auth' that you can set to always send the
 authentication token.
 
 ...
-    local auth=$(git config -f "$GIT_HUB_CONFIG" github.use-auth)
-    if [ -z "$auth" ]; then
-        a=$(prompt "Would you like to turn this option on? [Yn]")
-        [ $a == n ] && return
-    elif [ "$auth" == false ]; then
-        echo 'You have this option turned off.'
-        echo
-        a=$(prompt "Would you like to turn this option on? [yN]")
-    else
-        git config -f "$GIT_HUB_CONFIG" github.use-auth true
-        echo 'You already have this option turned on.'
-        echo
-        a=$(prompt "Would you like to keep this option on? [Yn]")
-    fi
-    if [ $a == y ]; then
-        git config -f "$GIT_HUB_CONFIG" github.use-auth true
-    else
-        git config -f "$GIT_HUB_CONFIG" github.use-auth false
-    fi
+  local auth=$(git config -f "$GIT_HUB_CONFIG" github.use-auth)
+  if [ -z "$auth" ]; then
+    a=$(prompt "Would you like to turn this option on? [Yn]")
+    [ $a == n ] && return
+  elif [ "$auth" == false ]; then
+    echo 'You have this option turned off.'
+    echo
+    a=$(prompt "Would you like to turn this option on? [yN]")
+  else
+    git config -f "$GIT_HUB_CONFIG" github.use-auth true
+    echo 'You already have this option turned on.'
+    echo
+    a=$(prompt "Would you like to keep this option on? [Yn]")
+  fi
+  if [ $a == y ]; then
+    git config -f "$GIT_HUB_CONFIG" github.use-auth true
+  else
+    git config -f "$GIT_HUB_CONFIG" github.use-auth false
+  fi
 }
 
 setup:json-perl() {
-    clear
+  clear
 
-    local perl="$(perl -e 'print "OK"' 2> /dev/null)"
-    local perl_json="$(perl -MJSON -e 'print "OK"' 2> /dev/null)"
-    local perl_json_xs=$(perl -MJSON::XS -e 'print "OK"' 2> /dev/null)
-    local set=$(git config -f "$GIT_HUB_CONFIG" github.json-lib)
-    local a=
+  local perl="$(perl -e 'print "OK"' 2> /dev/null)"
+  local perl_json="$(perl -MJSON -e 'print "OK"' 2> /dev/null)"
+  local perl_json_xs=$(perl -MJSON::XS -e 'print "OK"' 2> /dev/null)
+  local set=$(git config -f "$GIT_HUB_CONFIG" github.json-lib)
+  local a=
 
-    cat <<...
+  cat <<...
 
                         Step #4 - Faster JSON
 
@@ -225,33 +225,33 @@ There is a setting to use Perl to handle the JSON which is much faster. It
 requires Perl and the JSON modules for Perl.
 
 ...
-    if [ -n "$set" ]; then
-        cat <<...
+  if [ -n "$set" ]; then
+    cat <<...
 You already have this option set to '$set'.
 
 ...
-        prompt
-    elif [ "$perl" == "OK" ]; then
-        if [ "$perl_json" == "OK" ]; then
-            cat <<...
+    prompt
+  elif [ "$perl" == "OK" ]; then
+    if [ "$perl_json" == "OK" ]; then
+      cat <<...
 You seem to have the prerequisites to speed up your 'git-hub' experience.
 
 ...
-            a=$(prompt "Would you like to turn this setting on? [Yn]")
-            [ $a == y ] &&
-                git config -f "$GIT_HUB_CONFIG" github.json-lib json-perl.bash
-        else
-            cat <<...
+      a=$(prompt "Would you like to turn this setting on? [Yn]")
+      [ $a == y ] &&
+        git config -f "$GIT_HUB_CONFIG" github.json-lib json-perl.bash
+    else
+      cat <<...
 You seem to have Perl, but not the JSON module, so we can't use the setting at
 this time.
 
 Try installing the JSON module from CPAN and then run 'git hub setup' again.
 
 ...
-            prompt
-        fi
-    else
-        cat <<...
+      prompt
+    fi
+  else
+    cat <<...
 Perl seems to not be installed on your system, so we can't use the setting at
 this time.
 
@@ -259,13 +259,13 @@ If you want to use this speedup in the future, try installing Perl and the JSON
 module from CPAN and then run 'git hub setup' again.
 
 ...
-        prompt
-    fi
+    prompt
+  fi
 }
 
 setup:outro() {
-    clear
-    cat <<'...'
+  clear
+  cat <<'...'
 
                         Setup Complete
 

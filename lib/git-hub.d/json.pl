@@ -2,7 +2,7 @@ use strict;
 
 my $JSON;
 for ( qw/JSON JSON::PP/ ) {
-    last if $JSON = eval "use $_; '$_'";
+  last if $JSON = eval "use $_; '$_'";
 }
 
 $JSON or die <<'...';
@@ -19,26 +19,26 @@ For extra speed, you can also install the 'JSON::XS' module.
 ...
 
 {
-    my $data = decode_json(do {local $/; <>});
-    die "Unknown JSON result" unless
-        ref($data) =~ /^(HASH|ARRAY)$/;
-    walk($data, '');
+  my $data = decode_json(do {local $/; <>});
+  die "Unknown JSON result" unless
+    ref($data) =~ /^(HASH|ARRAY)$/;
+  walk($data, '');
 };
 
 sub walk {
-    my ($node, $path) = @_;
-    if (ref($node) eq 'HASH') {
-        for my $key (keys %$node) {
-            walk($node->{$key}, "$path/$key");
-        }
+  my ($node, $path) = @_;
+  if (ref($node) eq 'HASH') {
+    for my $key (keys %$node) {
+      walk($node->{$key}, "$path/$key");
     }
-    elsif (ref($node) eq 'ARRAY') {
-        for (my $i = 0; $i < @$node; $i++) {
-            walk($node->[$i], "$path/$i");
-        }
+  }
+  elsif (ref($node) eq 'ARRAY') {
+    for (my $i = 0; $i < @$node; $i++) {
+      walk($node->[$i], "$path/$i");
     }
-    else {
-        my $value = encode_json([$node]);
-        print "$path\t", substr($value,1,-1), "\n";
-    }
+  }
+  else {
+    my $value = encode_json([$node]);
+    print "$path\t", substr($value,1,-1), "\n";
+  }
 }
