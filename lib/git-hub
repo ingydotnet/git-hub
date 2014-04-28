@@ -698,7 +698,9 @@ report-value() {
     local var="label_$1"
     label="${!var}"
     if [ -z "$label" ]; then
-      label="$(echo "$1" | tr '_' ' ')"
+      label="$1"
+      label="${label/__*/}"
+      label="$(echo "$label" | tr '_' ' ')"
       label="$(
         for word in $label; do
           title=`echo "${word:0:1}" | tr a-z A-Z`${word:1}
@@ -727,7 +729,6 @@ report-value() {
   fi
 }
 
-label_user__login='User'
 label_blog='Web Site'
 label_watchers='Stars'
 label_homepage='Web Site'
