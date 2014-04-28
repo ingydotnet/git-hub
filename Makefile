@@ -90,20 +90,16 @@ $(CMD).txt: ReadMe.asc
 $(LOCAL_MAN1)/%.1: %.1
 	mv $< $@
 
-##
-# Undocumented dev rules
+#------------------------------------------------------------------------------
+# BPAN Rules
+#------------------------------------------------------------------------------
+BPAN_INSTALL_LIB=$(shell bpan env BPAN_LIB)
+BPAN_INSTALL_EXT ?= $(BPAN_INSTALL_LIB)/$(CMD).d
+BPAN_INSTALL_MAN1=$(shell bpan env BPAN_MAN1)
 
-# Install using symlinks so repo changes can be tested live
-.PHONY: dev-install dev-test dev-test-reset check-dev-install
-dev-install:
-	ln -fs $(LOCAL_LIB) $(INSTALL_CMD)
-	ln -fs $(LOCAL_EXTS) $(INSTALL_EXT)
-
-# Run a bunch of live tests. Make sure this thing really works. :)
-dev-test:
-	bash test/dev-test/all_commands.t
-	bash test/dev-test/each.t
-
-# Run this to reset if `make dev-test` fails.
-dev-test-reset: check-dev-install
-	GIT_HUB_TEST_RESET=1 bash test/dev-test/all_commands.t
+bpan-install:
+	install -C -m 0755 $(LOCAL_LIB) $(BPAN_INSTALL_LIB)/
+	install -C -d -m 0755 $(BPAN_INSTALL_EXT)/
+	install -C -m 0755 $(LOCAL_EXTS) $(BPAN_INSTALL_EXT)/
+	install -C -d -m 0755 $(BPAN_INSTALL_MAN1)
+	install -C -m 0644 $(LOCAL_MAN1)/$(CMD).1 $(BPAN_INSTALL_MAN1)

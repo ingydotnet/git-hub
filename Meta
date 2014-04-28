@@ -24,7 +24,7 @@ test:
   cmd: make test
   requires:
     test-more: 0.0.1
-install: make install
+install: make bpan-install
 
 devel:
   git: git@github.org:ingydotnet/git-hub.git
