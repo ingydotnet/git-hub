@@ -125,6 +125,14 @@ command:unwatch() {
   msg_ok="You are no longer watching '$owner/$repo'"
 }
 
+command:watching() {
+  get-args '?user:get-user'
+  say "'$user' is watching:"
+  report-list \
+    "/users/$user/subscriptions?sort=updated;per_page=PER_PAGE" \
+    full_name
+}
+
 command:starred() {
   get-args '?user:get-user'
   report-list \
