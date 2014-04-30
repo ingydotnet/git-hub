@@ -133,6 +133,14 @@ command:watching() {
     full_name
 }
 
+command:watchers() {
+  get-args '?owner:get-user/repo:get-repo'
+  say "'$owner/$repo' is being watched by:"
+  report-list \
+    "/repos/$owner/$repo/subscribers" \
+    login
+}
+
 command:starred() {
   get-args '?user:get-user'
   report-list \
