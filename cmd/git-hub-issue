@@ -9,6 +9,10 @@ command:issue-new() {
   local url="/repos/$owner/$repo/issues"
 
   editor-title-body "
+# Creating a new issue for '$owner/$repo':
+#
+#   https://github.com/$owner/$repo/issues
+#
 # Enter your issue info at the top like this:
 #
 #   First line is the issue subject
@@ -22,6 +26,8 @@ command:issue-new() {
   api-post "$url" "$(
     json-dump-object title "$title" body "$body"
   )"
+
+  msg_ok="New issue created: '$(JSON.get -s /html_url -)'"
 }
 
 command:issues() {
@@ -94,7 +100,89 @@ command:issue-close() {
   api-patch "/repos/$owner/$repo/issues/$number" "$(
     json-dump-object state closed
   )"
+}
 
+command:issue-edit() {
+  get-args '?owner:get-owner/repo:get-repo' number
+  api-get "/repos/$owner/$repo/issues/$number"
+
+  old_title="$(JSON.get -s /title -)"
+  old_state="$(JSON.get -s /state -)"
+  old_assignee="$(JSON.get -s /assignee -)"
+  old_milestone="$(JSON.get -n /milestone -)"
+
+  local issue_report="$(git hub issue "$owner/$repo" "$number" | sed 's/^/# /')"
+
+  editor-comment-state "
+---
+title: $old_title
+state: $old_state
+assignee: $old_assignee
+milestone: $old_milestone
+---
+# You can edit the variables above, and even add a comment at the top.
+#
+# Valid values are:
+#
+#   title -- A string
+#   state -- open | closed
+#   assignee -- GitHub login of a user with push access
+#   milestone -- The id # of the milestone
+#
+$issue_report"
+
+  msg_ok=0
+
+  if [ -z "$comment" ] &&
+    [ "$title" == "$old_title" ] &&
+    [ "$state" == "$old_state" ] &&
+    [ "$assignee" == "$old_assignee" ] &&
+    [ "$milestone" == "$old_milestone" ]
+  then
+    say "No changes made."
+    return
+  fi
+
+  if [ -n "$comment" ]; then
+    say "Comment added"
+    api-post "/repos/$owner/$repo/issues/$number/comments" "$(
+      json-dump-object body "$comment"
+    )"
+  fi
+
+  if [ "$title" != "$old_title" ] ||
+    [ "$state" != "$old_state" ] ||
+    [ "$assignee" != "$old_assignee" ] ||
+    [ "$milestone" != "$old_milestone" ]
+  then
+    [ -z "$title" ] && die "Title can't be empty"
+    (
+      [ -z "$state" ] && state=open
+      [ -z "$assignee" ] && assignee=null
+      [ -z "$milestone" ] && milestone=null
+
+      api-patch "/repos/$owner/$repo/issues/$number" "$( \
+        json-dump-object \
+          title "$title" \
+          state "$state" \
+          assignee "$assignee" \
+          milestone "$milestone" \
+      )"
+    ) || return 1
+
+    if [[ "$title" != "$old_title" ]]; then
+      say "Changed title to '$title'"
+    fi
+    if [[ "$state" != "$old_state" ]]; then
+      say "Changed state to '$state'"
+    fi
+    if [[ "$assignee" != "$old_assignee" ]]; then
+      say "Changed assignee to '$assignee'"
+    fi
+    if [[ "$milestone" != "$old_milestone" ]]; then
+      say "Changed milestone to '$milestone'"
+    fi
+  fi
 }
 
 command:issue-update() {

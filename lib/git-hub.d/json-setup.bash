@@ -20,7 +20,7 @@ json-dump-object() {
     else
       json="$json\"$1\":\"${2//$'\n'/\\n}\""
     fi
-    shift; shift
+    shift; shift || true
     if [ $# -gt 0 ]; then
       json="$json,"
     fi

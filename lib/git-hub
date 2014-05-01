@@ -147,7 +147,7 @@ run-each() {
       after+=("${!i}")
     fi
   done
-  while read line; do
+  while read -r line; do
     local lines=("$line")
     "$split_words" && lines=("$line")
     local arg
@@ -760,6 +760,10 @@ init-env() {
   : "${GIT_HUB_EDITOR:=${EDITOR:-vim}}"
   : "${GIT_HUB_PAGER:=${PAGER:-less}}"
 
+  if [[ $GIT_HUB_EDITOR =~ ^g?vim?$ ]]; then
+    GIT_HUB_EDITOR+=' +1'
+  fi
+
   [ -d "$GIT_HUB_EXT_PATH" ] ||
     die "Hmm... git-hub does not seem to be properly installed\n"
   true
@@ -1050,7 +1054,7 @@ editor-title-body() {
 
   echo "$1" > "$msg_file"
 
-  "$GIT_HUB_EDITOR" "$msg_file"
+  $GIT_HUB_EDITOR "$msg_file"
   local line
   body=''
   if ! "$comment"; then
@@ -1068,11 +1072,51 @@ editor-title-body() {
     fi
   fi
   local count=0
-  while read line; do
+  while read -r line; do
     ! $comment && [[ $((count++)) < 2 ]] && continue
     [[ "$line" =~ ^\# ]] && break
     body+="$line"$'\n'
   done < "$msg_file"
+}
+
+editor-comment-state() {
+  local msg_file=.git/GIT_HUB_EDIT_MSG
+
+  rm -f "$msg_file"
+
+  comment= title= state= assignee= milestone=
+
+  echo "$1" > "$msg_file"
+
+  $GIT_HUB_EDITOR "$msg_file"
+  local line started=false
+
+  while read -r line; do
+    [[ "$line" =~ ^\# ]] && break
+    if $started; then
+      if [[ "$line" =~ ^title:\ +(.*) ]]; then
+        title="${BASH_REMATCH[1]}"
+      elif [[ "$line" =~ ^state:\ +(.*) ]]; then
+        state="${BASH_REMATCH[1]}"
+      elif [[ "$line" =~ ^assignee:\ +(.*) ]]; then
+        assignee="${BASH_REMATCH[1]}"
+      elif [[ "$line" =~ ^milestone:\ +(.*) ]]; then
+        milestone="${BASH_REMATCH[1]}"
+      fi
+    else
+      if [[ "$line" == '---' ]]; then
+        started=true
+      elif [ -n "$comment" ] || [[ "$line" =~ [^[:space:]] ]]; then
+        comment+="$line"$'\n'
+      fi
+    fi
+  done < "$msg_file"
+
+  if [[ ! "$title" =~ [^[:space:]] ]]; then
+    msg_fail="No title provided. Aborting. See '$msg_file'."
+    die "$msg_fail"
+    return 1
+  fi
 }
 
 #------------------------------------------------------------------------------
