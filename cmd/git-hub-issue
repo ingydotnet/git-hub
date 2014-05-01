@@ -129,6 +129,7 @@ milestone: $old_milestone
 #   assignee -- GitHub login of a user with push access
 #   milestone -- The id # of the milestone
 #
+# ----------------------------------------------------------------------------
 $issue_report"
 
   msg_ok=0

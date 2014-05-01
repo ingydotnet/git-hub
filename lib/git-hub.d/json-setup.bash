@@ -90,7 +90,7 @@ json-var-list() {
       value="${value%\"}"
       key="${BASH_REMATCH[2]}_${BASH_REMATCH[1]}"
       key="${key//\//__}"
-      printf -v "$key" "$value"
+      printf -v "$key" "%s" "$value"
     else
       die "Unexpected line '$line'"
     fi
