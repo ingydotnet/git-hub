@@ -81,6 +81,7 @@ command:repo-delete() {
   get-args '?owner:get-user/repo:get-repo'
   api-delete "/repos/$owner/$repo"
   msg_ok="Repository '$owner/$repo' deleted"
+  msg_404="Repository '$owner/$repo' not found"
 }
 
 # vim: set lisp:

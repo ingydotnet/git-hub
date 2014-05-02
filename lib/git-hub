@@ -563,6 +563,14 @@ get-hub-config() {
 # List processing functions:
 #------------------------------------------------------------------------------
 report-list() {
+  if interactive && $do_all; then
+    report-list-process "$@" | less -FRX
+  else
+    report-list-process "$@"
+  fi
+}
+
+report-list-process() {
   msg_ok=0
   local url="$1" fields=($2) ii
   local list_max=${list_size:-$(($terminal_lines - 2))}
@@ -606,7 +614,7 @@ report-list() {
     if interactive; then
       if [ $list_counter -gt $list_max ]; then
         if [ -n "$url" -o $ii -lt $page_size ]; then
-          local prompt_msg=--More--
+          local prompt_msg='--More-- (press Enter or CTRL-C)'
           prompt
         fi
       fi
