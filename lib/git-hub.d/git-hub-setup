@@ -144,7 +144,7 @@ The password will not be stored after the commands finish running.
   token_id="$(git hub token-new -qr "$desc")" || rc=$?
   if [ "$rc" -eq 2 ]; then
     export GIT_HUB_2FA_OTP="$(
-      prompt "Enter your 2 Factor Auth Code (2FA password): "
+      prompt "Enter your 2 Factor Auth Code: "
     )"
     token_id="$(git hub token-new -qr "$desc")" || true
   fi
