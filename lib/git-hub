@@ -328,7 +328,9 @@ check-api-call-status() {
       if [[ "$ERROR" =~ rate\ limit\ exceeded ]]; then
         ERROR="$ERROR Try the --use-auth option."
       fi
-      ERROR="$(echo "$ERROR" | fmt -w 81)"
+      local width=81
+      osx && width=78
+      ERROR="$(echo "$ERROR" | fmt -w $width)"
       ;;
     *)
       OK=1
@@ -648,7 +650,9 @@ normalize-multiline-text-output() {
             output+="$indent$line"$'\n'
             code=true para=false
           else
-            output+="$( echo "$indent$line" | fmt -w 81 )"$'\n'
+            local width=81
+            osx && width=78
+            output+="$( echo "$indent$line" | fmt -w $width )"$'\n'
             para=true code=false
           fi
           start=true blank=false
@@ -917,6 +921,15 @@ interactive() {
   else
     return 1
   fi
+}
+
+osx() {
+  if [ "$(uname)" == Darwin ]; then
+    return 0
+  else
+    return 1
+  fi
+
 }
 
 pipeline() {

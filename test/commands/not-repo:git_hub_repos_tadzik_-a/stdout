@@ -19,7 +19,7 @@
 19) (2013-09-08)  tadzik/Perlcasts               good stuff
 20) (2013-09-01)  tadzik/asteroids               as boring as it sounds
 21) (2013-08-03)  tadzik/JSON-Unmarshal          
-22) (2013-07-13)  tadzik/perl6-File-Tools        File::Tools – common shell co
+22) (2013-07-13)  tadzik/perl6-File-Tools        File::Tools - common shell comm
 23) (2013-07-13)  tadzik/perl6-Acme-Meow         It's the Perl 6 kitty you've al
 24) (2013-06-26)  tadzik/psi-password-decoder    Something I found on the intern
 25) (2013-06-25)  tadzik/MinimalneAutogramyLiterowe bla bla ple ple
@@ -60,7 +60,7 @@
 60) (2012-08-15)  tadzik/gorduino                Go to C compiler
 61) (2012-08-04)  tadzik/yapsi                   A Perl 6 compiler-and-runtime w
 62) (2012-07-02)  tadzik/Typed-Subroutines       Better type checking for first-
-63) (2012-06-22)  tadzik/zblog                   źblog: example blog-ish applic
+63) (2012-06-22)  tadzik/zblog                   zblog: example blog-ish applica
 64) (2012-06-10)  tadzik/a8bot                   Extensible irc bot
 65) (2012-06-09)  tadzik/Test-Junkie             Continuous test runner for Perl
 66) (2012-06-08)  tadzik/TIN                     University assigment (boring cr
