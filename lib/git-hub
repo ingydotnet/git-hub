@@ -777,6 +777,12 @@ init-env() {
     GIT_HUB_EDITOR+=' +1'
   fi
 
+  if [ -z "$GIT_HUB_MSG_FILE" ]; then
+    GIT_HUB_MSG_FILE="$(git rev-parse --git-dir 2>/dev/null || true)"
+    [ -z "$GIT_HUB_MSG_FILE" ] && GIT_HUB_MSG_FILE=/tmp
+    GIT_HUB_MSG_FILE+=/GIT_HUB_EDIT_MSG
+  fi
+
   [ -d "$GIT_HUB_EXT_PATH" ] ||
     die "Hmm... git-hub does not seem to be properly installed\n"
   true
@@ -1064,9 +1070,7 @@ prompt-to-run-setup() {
 # Reusable helper functions:
 #------------------------------------------------------------------------------
 editor-title-body() {
-  local msg_file=.git/GIT_HUB_EDIT_MSG
-
-  rm -f "$msg_file"
+  rm -f "$GIT_HUB_MSG_FILE"
 
   local comment=false
   if [ $# -eq 2 -a "$1" == comment ]; then
@@ -1074,21 +1078,21 @@ editor-title-body() {
     shift
   fi
 
-  echo "$1" > "$msg_file"
+  echo "$1" > "$GIT_HUB_MSG_FILE"
 
-  $GIT_HUB_EDITOR "$msg_file"
+  $GIT_HUB_EDITOR "$GIT_HUB_MSG_FILE"
   local line
   body=''
   if ! "$comment"; then
-    title="$(head -n1 "$msg_file")"
+    title="$(head -n1 "$GIT_HUB_MSG_FILE")"
     if [[ ! "$title" =~ [^[:space:]] ]]; then
-      msg_fail="No title provided. Aborting. See '$msg_file'."
+      msg_fail="No title provided. Aborting. See '$GIT_HUB_MSG_FILE'."
       die "$msg_fail"
       return 1
     fi
-    line="$(head -n2 "$msg_file" | tail -n1)"
+    line="$(head -n2 "$GIT_HUB_MSG_FILE" | tail -n1)"
     if [[ ! "$line" =~ ^\s*$ ]] && [[ ! "$line" =~ ^\# ]]; then
-      msg_fail="Malformed message in '$msg_file'"
+      msg_fail="Malformed message in '$GIT_HUB_MSG_FILE'"
       die "$msg_fail"
       return 1
     fi
@@ -1098,19 +1102,17 @@ editor-title-body() {
     ! $comment && [[ $((count++)) < 2 ]] && continue
     [[ "$line" =~ ^\# ]] && break
     body+="$line"$'\n'
-  done < "$msg_file"
+  done < "$GIT_HUB_MSG_FILE"
 }
 
 editor-comment-state() {
-  local msg_file=.git/GIT_HUB_EDIT_MSG
-
-  rm -f "$msg_file"
+  rm -f "$GIT_HUB_MSG_FILE"
 
   comment= title= state= assignee= milestone=
 
-  echo "$1" > "$msg_file"
+  echo "$1" > "$GIT_HUB_MSG_FILE"
 
-  $GIT_HUB_EDITOR "$msg_file"
+  $GIT_HUB_EDITOR "$GIT_HUB_MSG_FILE"
   local line started=false
 
   while read -r line; do
@@ -1132,10 +1134,10 @@ editor-comment-state() {
         comment+="$line"$'\n'
       fi
     fi
-  done < "$msg_file"
+  done < "$GIT_HUB_MSG_FILE"
 
   if [[ ! "$title" =~ [^[:space:]] ]]; then
-    msg_fail="No title provided. Aborting. See '$msg_file'."
+    msg_fail="No title provided. Aborting. See '$GIT_HUB_MSG_FILE'."
     die "$msg_fail"
     return 1
   fi
