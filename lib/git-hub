@@ -565,6 +565,7 @@ get-hub-config() {
 report-list() {
   if interactive && $do_all; then
     report-list-process "$@" | less -FRX
+    msg_ok=0
   else
     report-list-process "$@"
   fi
