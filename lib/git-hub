@@ -61,10 +61,9 @@ R           Debug - Repeat last command without contacting server
 x           Debug - Turn on Bash trace (set -x) output
 "
 
-SELF_PATH=$(readlink -e "$BASH_SOURCE") || SELF_PATH=$BASH_SOURCE
-
 # source bash+ :std
-source "${SELF_PATH%/*}/git-hub.d/bash+.bash"
+SELFDIR="$(cd -P `dirname $BASH_SOURCE` && pwd -P)"
+source "$SELFDIR/git-hub.d/bash+.bash"
 bash+:import :std can
 
 #------------------------------------------------------------------------------
@@ -763,7 +762,7 @@ init-env() {
 
   : "${GIT_HUB_API_URI:=https://api.github.com}"
 
-  : "${GIT_HUB_EXEC_PATH:="$(dirname "${SELF_PATH[0]}")"}"
+  : "${GIT_HUB_EXEC_PATH:=$SELFDIR}"
   : "${GIT_HUB_EXT_PATH:=$GIT_HUB_EXEC_PATH/git-hub.d}"
 
   : "${GIT_HUB_USER_DIR:=$HOME/.git-hub}"
