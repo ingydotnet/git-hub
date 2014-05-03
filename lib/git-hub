@@ -61,7 +61,7 @@ R           Debug - Repeat last command without contacting server
 x           Debug - Turn on Bash trace (set -x) output
 "
 
-SELF_PATH=$(readlink -e "$BASH_SOURCE") || SELF_PATH=$BASH_SOURCE
+SELF_PATH=$(readlink -e "$BASH_SOURCE" 2>&1) || SELF_PATH=$BASH_SOURCE
 
 # source bash+ :std
 source "${SELF_PATH%/*}/git-hub.d/bash+.bash"
