@@ -42,7 +42,7 @@ command:team-new() {
   require-auth
   get-args org name perm
   [[ "$perm" =~ ^(pull|push|admin)$ ]] ||
-    die "3rd param (perm) must be pull, push or admin"
+    error "3rd param (perm) must be pull, push or admin"
   api-post "/orgs/$org/teams" "$(
     json-dump-object name "$name" permission "$perm"
   )"

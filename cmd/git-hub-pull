@@ -11,7 +11,7 @@ command:pull-request() {
   get-remote-name
   assert-git-head-is-pushed
   git fetch "git@github.com:$owner/$repo" "$branch" &> /dev/null ||
-    die "Cannot fetch repo='git@github.com:$owner/$repo' branch='$branch'."
+    error "can't fetch repo='git@github.com:$owner/$repo' branch='$branch'."
 
   local diff="$(git diff FETCH_HEAD)"
   if [ -z "$diff" ]; then

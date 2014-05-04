@@ -31,7 +31,7 @@ command:token-new() {
 
 ok:token-new() {
   local token="$(JSON.get -s "/token" -)"
-  [ -n "$token" ] || die "Can't figure out token value"
+  [ -n "$token" ] || error "can't figure out token value"
   local id="$(JSON.get -n "/id" -)"
   local note="$(JSON.get -s "/note" -)"
   local name="$(JSON.get "/app/name" -)"

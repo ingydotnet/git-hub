@@ -158,7 +158,7 @@ $issue_report"
     [ "$assignee" != "$old_assignee" ] ||
     [ "$milestone" != "$old_milestone" ]
   then
-    [ -z "$title" ] && die "Title can't be empty"
+    [ -z "$title" ] && abort "title can't be empty"
     (
       [ -z "$state" ] && state=open
       [ -z "$assignee" ] && assignee=null

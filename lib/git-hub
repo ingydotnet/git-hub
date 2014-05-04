@@ -97,7 +97,7 @@ run-command() {
   assert-env
 
   callable-or-source "$command" ||
-    die "Unknown 'git hub' command: '$command'\n"
+    error "unknown 'git hub' command '$command'"
   "command:$command" "$@"
 
   if OK; then
@@ -204,7 +204,7 @@ api-call() {
   elif "$repeat_command"; then
     # Use the cache
     [ -e "$command_header_file" ] ||
-      die "-R flag not valid. Command not previously run.\n"
+      error "-R flag not valid. Command not previously run."
     rc=0
   else
     local cache_dir="$GIT_HUB_CACHE/$command_sha1"
@@ -240,7 +240,7 @@ format-curl-command() {
   local data="$3"
 
   [[ "$url" =~ [a-zA-Z0-9]/(/|$) ]] &&
-    die "API url '$url' looks suspiciously wrong"
+    error "API url '$url' looks suspiciously wrong"
 
   "$use_auth" && require-auth
 
@@ -382,7 +382,7 @@ get-args() {
     specs=("${specs[@]:1}")
   done
   if [ ${#args[@]} -gt 0 ]; then
-    die "Unknown argument(s): '${args[*]}'"
+    error "unknown argument(s) '${args[*]}'"
   fi
 }
 
@@ -432,7 +432,7 @@ spec-assign() {
   if [ -n "$arg" ]; then
     printf -v "$var" "$arg"
   else
-    die "Can't find a value for '$var'\n"
+    error "can't find a value for '$var'"
   fi
 }
 
@@ -447,7 +447,7 @@ slash-assign() {
     local arg1=''
     local arg2="$arg"
   else
-    die "Invalid value '$arg' for '$spec'"
+    error "invalid value '$arg' for '$spec'"
   fi
   local spec="$spec1"
   local arg="$arg1"
@@ -459,7 +459,7 @@ slash-assign() {
 
 hash-assign() {
   if [ $(( ${#args[@]} % 2)) -eq 1 ]; then
-    die "Odd number of items for key/value pairs"
+    error "odd number of items for key/value pairs"
   fi
   local spec="${spec#%}"
   eval $spec=\(\"\${args[@]}\"\)
@@ -524,9 +524,9 @@ get-remote-name() {
     remote_name="${remote_name#remote.}"
     remote_name="${remote_name%.fetch}"
   elif [ $num -eq 0 ]; then
-    die "This command requires a remote name, but the current repo has no remotes. Add a remote or use the --remote= option."
+    error "This command requires a remote name, but the current repo has no remotes. Add a remote or use the --remote= option."
   else
-    die "This command requires a remote name, but the current repo has more than one remote. Use the --remote= option to specify which one."
+    error "This command requires a remote name, but the current repo has more than one remote. Use the --remote= option to specify which one."
   fi
 }
 
@@ -543,10 +543,10 @@ basic-auth() {
 check-token-id() {
   local id="$1"
   [ ${#id} -eq 40 ] &&
-    die "'$command' requires a *token-id*, not a *token-value*."
+    error "'$command' requires a *token-id*, not a *token-value*."
   local regex='^[0-9]+$'
   [[ "$id" =~ $regex ]] ||
-    die "'$id' is invalid token-id. Must be an integer value."
+    error "'$id' is invalid token-id. Must be an integer value."
   true
 }
 
@@ -783,7 +783,7 @@ init-env() {
   fi
 
   [ -d "$GIT_HUB_EXT_PATH" ] ||
-    die "Hmm... git-hub does not seem to be properly installed\n"
+    die "Hmm... git-hub does not seem to be properly installed"
   true
 }
 
@@ -844,7 +844,7 @@ assert-env-var() {
   for var in $@; do
     var="GIT_HUB_$var"
     [ -n "${!var}" ] ||
-      die "'$var' is not set"
+      error "'$var' is not set"
   done
 }
 
@@ -911,7 +911,7 @@ get-opts() {
       -x) set -x ;;
       -R) repeat_command=true ;;
 
-      *) die "Unexpected option: $option" ;;
+      *) error "unexpected option '$option'" ;;
     esac
   done
 
@@ -1085,11 +1085,11 @@ editor-title-body() {
   if ! "$comment"; then
     title="$(head -n1 "$GIT_HUB_MSG_FILE")"
     if [[ ! "$title" =~ [^[:space:]] ]]; then
-      abort "No title provided"
+      abort "no title provided"
     fi
     line="$(head -n2 "$GIT_HUB_MSG_FILE" | tail -n1)"
     if [[ ! "$line" =~ ^\s*$ ]] && [[ ! "$line" =~ ^\# ]]; then
-      error "Malformed message in '$GIT_HUB_MSG_FILE'"
+      error "malformed message in '$GIT_HUB_MSG_FILE'"
     fi
   fi
   local count=0
@@ -1132,9 +1132,7 @@ editor-comment-state() {
   done < "$GIT_HUB_MSG_FILE"
 
   if [[ ! "$title" =~ [^[:space:]] ]]; then
-    msg_fail="No title provided. Aborting. See '$GIT_HUB_MSG_FILE'."
-    die "$msg_fail"
-    return 1
+    abort "no title provided."
   fi
 }
 
@@ -1220,29 +1218,29 @@ callable-or-source() {
 
 assert-inside-git-repo() {
   inside-git-repo ||
-    die "Not inside a git repo"
+    error "not inside a git repo"
 }
 
 assert-repo-top-level() {
   [ "$(git rev-parse --git-dir)" == '.git' ] ||
-    die "Not at top level directory of repo"
+    error "not at top level directory of repo"
 }
 
 assert-git-repo-is-clean() {
   # Repo is in a clean state:
   git update-index -q --ignore-submodules --refresh
   git diff-files --quiet --ignore-submodules ||
-    die "Unstaged changes."
+    error "unstaged changes."
   git diff-index --quiet --ignore-submodules HEAD ||
-    die "Working tree has changes."
+    error "working tree has changes."
   git diff-index --quiet --cached --ignore-submodules HEAD ||
-    die "Index has changes."
+    error "index has changes."
 }
 
 assert-git-on-branch() {
   local branch="$(git rev-parse --abbrev-ref HEAD)"
   [ -n "$branch" -a "$branch" != "HEAD" ] ||
-    die "Repo HEAD is not currently on a branch"
+    error "repo HEAD is not currently on a branch"
 }
 
 assert-git-head-is-pushed() {
@@ -1253,7 +1251,7 @@ assert-git-head-is-pushed() {
       grep "$remote_name/$branch"
   )"
   [ -n "$text" ] ||
-    die "Current HEAD is not pushed to remote '$remote_name'"
+    error "current HEAD is not pushed to remote '$remote_name'"
 }
 
 inside-git-repo() {

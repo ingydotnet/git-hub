@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 command:comment() {
-  [ $# -ge 1 ] || die "Comment requires at least an issue #"
+  [ $# -ge 1 ] || error "comment requires at least an issue #"
 
   get-args '?owner:get-user/repo:get-repo' number
 
