@@ -1085,15 +1085,11 @@ editor-title-body() {
   if ! "$comment"; then
     title="$(head -n1 "$GIT_HUB_MSG_FILE")"
     if [[ ! "$title" =~ [^[:space:]] ]]; then
-      msg_fail="No title provided. Aborting. See '$GIT_HUB_MSG_FILE'."
-      die "$msg_fail"
-      return 1
+      abort "No title provided"
     fi
     line="$(head -n2 "$GIT_HUB_MSG_FILE" | tail -n1)"
     if [[ ! "$line" =~ ^\s*$ ]] && [[ ! "$line" =~ ^\# ]]; then
-      msg_fail="Malformed message in '$GIT_HUB_MSG_FILE'"
-      die "$msg_fail"
-      return 1
+      error "Malformed message in '$GIT_HUB_MSG_FILE'"
     fi
   fi
   local count=0
@@ -1155,6 +1151,9 @@ out() { echo -e "$@" >&1; }
 out-() { echo -en "$@" >&1; }
 err() { echo -e "$@" >&2; }
 err-() { echo -en "$@" >&2; }
+
+error() { echo "Error: $1" >&2; return 1; }
+abort() { echo "Abort: $1" >&2; return 1; }
 
 prompt() {
   local msg answer default yn=false password=false

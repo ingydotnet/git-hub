@@ -74,6 +74,8 @@ ok:issue() {
     comments
   )
   local skip_field_comments=true
+  interactive ||
+    echo -------------------------------------------------------------------------------
   report-data
 
   local comments="$(JSON.get -n /comments -)"
