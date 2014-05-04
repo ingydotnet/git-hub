@@ -71,7 +71,8 @@ main() {
   local OK=0 split_words=false
   init-env
   if run-for-each "$@"; then
-    run-each "$@"
+    pager_in_use=true
+    run-each "$@" | $GIT_HUB_PAGER
   else
     run-command "$@"
   fi
@@ -148,7 +149,7 @@ run-each() {
   done
   while read -r line; do
     local lines=("$line")
-    "$split_words" && lines=("$line")
+    "$split_words" && lines=($line)
     local arg
     for arg in "${lines[@]}"; do
       options=()
@@ -562,9 +563,10 @@ get-hub-config() {
 # List processing functions:
 #------------------------------------------------------------------------------
 report-list() {
-  if interactive && $do_all; then
-    report-list-process "$@" | less -FRX
+  if interactive && $do_all && ! $pager_in_use; then
+    pager_in_use=true
     msg_ok=0
+    report-list-process "$@" | $GIT_HUB_PAGER
   else
     report-list-process "$@"
   fi
@@ -756,6 +758,7 @@ label_number='ID #'
 init-env() {
   [ -z "$HOME" ] && die "Cannot determine HOME directory"
 
+  pager_in_use=false
   sha1sum=sha1sum
   [[ "$OSTYPE" =~ ^darwin ]] && sha1sum=shasum
   check-system-commands curl cut git grep head ln mv readlink "$sha1sum" tr
@@ -770,11 +773,10 @@ init-env() {
   : "${GIT_HUB_CACHE:=$GIT_HUB_USER_DIR/cache}"
 
   : "${GIT_HUB_EDITOR:=${EDITOR:-vim}}"
-  : "${GIT_HUB_PAGER:=${PAGER:-less}}"
+  [[ $GIT_HUB_EDITOR =~ ^g?vim?$ ]] && GIT_HUB_EDITOR+=' +1'
 
-  if [[ $GIT_HUB_EDITOR =~ ^g?vim?$ ]]; then
-    GIT_HUB_EDITOR+=' +1'
-  fi
+  : "${GIT_HUB_PAGER:=${PAGER:-less}}"
+  [ "$GIT_HUB_PAGER" == less ] && GIT_HUB_PAGER='less -FRX'
 
   if [ -z "$GIT_HUB_MSG_FILE" ]; then
     GIT_HUB_MSG_FILE="$(git rev-parse --git-dir 2>/dev/null || true)"

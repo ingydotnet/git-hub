@@ -36,6 +36,8 @@ command:issues() {
   state=open
   "$do_all" && state=all
 
+  title="Issues for '$owner/$repo' (state=$state):"
+
   report-list \
     "/repos/$owner/$repo/issues?state=$state;sort=updated;per_page=PER_PAGE" \
     'number updated_at state user/login title'

@@ -4,6 +4,7 @@ set -e
 
 command:repos() {
   get-args owner:get-user
+  title="Repos for '$owner':"
   report-list \
     "/users/$owner/repos?sort=pushed;per_page=PER_PAGE" \
     'pushed_at full_name description'
