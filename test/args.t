@@ -67,12 +67,12 @@ run-test \
   # none
 
 run-test-error \
-  "Can't find a value for 'user'" \
+  "can't find a value for 'user'" \
   "?user:get-owner" \
   # none
 
 run-test-error \
-  "Unknown argument(s): 'xxx yyy'" \
+  "unknown argument(s) 'xxx yyy'" \
   "?user:get-login" \
   fred xxx yyy
 
@@ -82,12 +82,12 @@ run-test \
   billy
 
 run-test-error \
-  "Can't find a value for 'user'" \
+  "can't find a value for 'user'" \
   "user" \
   # none
 
 run-test-error \
-  "Can't find a value for 'user'" \
+  "can't find a value for 'user'" \
   "user:get-owner" \
   # none
 
@@ -103,7 +103,7 @@ run-test \
   type
 
 run-test-error \
-  "Invalid value 'jimmy' for 'user/repo'" \
+  "invalid value 'jimmy' for 'user/repo'" \
   "user/repo key" \
   jimmy type
 
@@ -118,7 +118,7 @@ run-test \
   jimmy/juju name Jimmy game "Ju Ju"
 
 run-test-error \
-  "Odd number of items for key/value pairs" \
+  "odd number of items for key/value pairs" \
   "user/repo %pairs" \
   jimmy/juju name Jimmy game "Ju Ju" no-no
 
