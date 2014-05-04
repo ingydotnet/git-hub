@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+
+set -e
+
+command:irc-enable() {
+  assert-inside-git-repo
+  require-auth
+  get-args room '?server'
+  [ -n "$server" ] || server="irc.freenode.net"
+  owner="$(get-owner)"
+  repo="$(get-repo)"
+  events='["push","issues","pull_request","issue_comment"]'
+  config="$(json-dump-object room "$room" server "$server")"
+  json="$(json-dump-object name irc active true events "$events" config "$config")"
+  api-post "/repos/$owner/$repo/hooks" "$json"
+  msg_ok="Enabled IRC for '$owner/$repo' in #$room on $server."
+}
+
+command:irc-disable() {
+  assert-inside-git-repo
+  require-auth
+  owner="$(get-owner)"
+  repo="$(get-repo)"
+  msg_ok=0
+  cat <<...
+Note: 'git hub irc-disable' not yet implemented.
+
+You can do it yourself here:
+
+    https://github.com/$owner/$repo/settings/hooks
+
+...
+}
+
+# vim: set lisp:
