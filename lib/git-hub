@@ -1158,7 +1158,7 @@ abort() { echo "Abort: $1" >&2; return 1; }
 prompt() {
   local msg answer default yn=false password=false
   case $# in
-    0) msg="${prompt_msg:-'Press <ENTER> to continue, or <CTL>-C to exit.'}" ;;
+    0) msg="${prompt_msg:-Press <ENTER> to continue, or <CTL>-C to exit.}" ;;
     1)
       msg="$1"
       if [[ "$msg" =~ \[yN\] ]]; then
