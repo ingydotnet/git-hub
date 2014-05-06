@@ -1034,14 +1034,14 @@ config-not-setup() {
 
 Greetings!!!
 
-You seem to be a a brand new 'git hub' user, since your config is not setup.
+You seem to be a brand new 'git hub' user, since your config is not set up.
 
 The 'git-hub' should soon be your new best friend. Configuration is really
 easy. Just run the following command and answer a few simple questions:
 
   git hub setup
 
-which will guide you through the setup process. Press <ENTER> to run it now.
+This will guide you through the setup process. Press <ENTER> to run it now.
 
 NOTE: You can also do the setup process by hand using the 'config', 'token'
       and 'scope' commands. See the 'git help hub' documentation for more
@@ -1054,7 +1054,7 @@ NOTE: You can also do the setup process by hand using the 'config', 'token'
           json-lib = json-perl.bash
           use-auth = 1
 
-Would you like start the automated 'setup' process right now? (Do it!)
+Would you like to start the automated 'setup' process right now? (Do it!)
 
 ...
   prompt-to-run-setup
