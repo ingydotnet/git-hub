@@ -177,7 +177,7 @@ are a couple reasons why you might want to send it anyway.
    authenticated requests.
 
 2) GitHub only allows 60 unauthenticated calls per hour, as opposed to 5000
-   for authenticated calls. For this reason is is preferable to always
+   for authenticated calls. For this reason it is preferable to always
    authenticate.
 
 There is a config option called 'use-auth' that you can set to always send the
