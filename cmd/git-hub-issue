@@ -76,7 +76,7 @@ ok:issue() {
     comments
   )
   local skip_field_comments=true
-  interactive ||
+  $pager_in_use &&
     echo -------------------------------------------------------------------------------
   report-data
 
@@ -133,7 +133,7 @@ milestone: $old_milestone
 #   assignee -- GitHub login of a user with push access
 #   milestone -- The id # of the milestone
 #
-# ----------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 $issue_report"
 
   msg_ok=0
