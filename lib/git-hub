@@ -483,6 +483,11 @@ get-login() {
 }
 
 get-owner() {
+  local owner="$(git config git-hub.owner)"
+  if [ -n "$owner" ]; then
+    echo "$owner"
+    return 0
+  fi
   get-repo-config owner
 }
 
