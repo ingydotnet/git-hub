@@ -1073,33 +1073,45 @@ prompt-to-run-setup() {
 editor-title-body() {
   rm -f "$GIT_HUB_MSG_FILE"
 
-  local comment=false
-  if [ $# -eq 2 -a "$1" == comment ]; then
-    comment=true
-    shift
+  echo "$1" > "$GIT_HUB_MSG_FILE"
+
+  $GIT_HUB_EDITOR "$GIT_HUB_MSG_FILE"
+  local line
+  body=''
+  title="$(head -n1 "$GIT_HUB_MSG_FILE")"
+  if [[ ! "$title" =~ [^[:space:]] ]]; then
+    abort "no title provided"
   fi
+  line="$(head -n2 "$GIT_HUB_MSG_FILE" | tail -n1)"
+  if [[ ! "$line" =~ ^\s*$ ]] && [[ ! "$line" =~ ^\# ]]; then
+    error "malformed message in '$GIT_HUB_MSG_FILE'"
+  fi
+  local count=0
+  local ifs="$IFS"
+  IFS=''
+  while read -r line; do
+    [[ $((count++)) -lt 2 ]] && continue
+    [[ "$line" =~ ^\# ]] && break
+    body+="$line"$'\n'
+  done < "$GIT_HUB_MSG_FILE"
+  IFS="$ifs"
+}
+
+editor-comment() {
+  rm -f "$GIT_HUB_MSG_FILE"
 
   echo "$1" > "$GIT_HUB_MSG_FILE"
 
   $GIT_HUB_EDITOR "$GIT_HUB_MSG_FILE"
   local line
   body=''
-  if ! "$comment"; then
-    title="$(head -n1 "$GIT_HUB_MSG_FILE")"
-    if [[ ! "$title" =~ [^[:space:]] ]]; then
-      abort "no title provided"
-    fi
-    line="$(head -n2 "$GIT_HUB_MSG_FILE" | tail -n1)"
-    if [[ ! "$line" =~ ^\s*$ ]] && [[ ! "$line" =~ ^\# ]]; then
-      error "malformed message in '$GIT_HUB_MSG_FILE'"
-    fi
-  fi
-  local count=0
+  local ifs="$IFS"
+  IFS=''
   while read -r line; do
-    ! $comment && [[ $((count++)) < 2 ]] && continue
     [[ "$line" =~ ^\# ]] && break
     body+="$line"$'\n'
   done < "$GIT_HUB_MSG_FILE"
+  IFS="$ifs"
 }
 
 editor-comment-state() {
@@ -1112,6 +1124,8 @@ editor-comment-state() {
   $GIT_HUB_EDITOR "$GIT_HUB_MSG_FILE"
   local line started=false
 
+  local ifs="$IFS"
+  IFS=''
   while read -r line; do
     [[ "$line" =~ ^\# ]] && break
     if $started; then
@@ -1132,6 +1146,7 @@ editor-comment-state() {
       fi
     fi
   done < "$GIT_HUB_MSG_FILE"
+  IFS="$ifs"
 
   if [[ ! "$title" =~ [^[:space:]] ]]; then
     abort "no title provided."

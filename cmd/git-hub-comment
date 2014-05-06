@@ -9,7 +9,7 @@ command:comment() {
 
   local issue_report="$(git hub issue "$owner/$repo" "$number" | sed 's/^/# /')"
 
-  editor-title-body comment "
+  editor-comment "
 # Add a comment for the issue above this line.
 #
 $issue_report"

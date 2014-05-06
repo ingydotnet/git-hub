@@ -27,7 +27,7 @@ json-dump-object() {
     fi
   done
   json="$json}"
-  echo $json
+  echo "$json"
 }
 
 json-dump-array() {
