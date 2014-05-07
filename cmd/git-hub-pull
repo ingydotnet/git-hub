@@ -27,7 +27,12 @@ command:pull-request() {
   local url="/repos/$owner/$repo/pulls"
 
   editor-title-body "
-# New GitHub Pull Request for
+# New GitHub Pull Request
+#
+# Requesting that...
+#   repo: $(git config --get "remote.${remote_name}.url")
+#   branch: $branch_name
+# ...be pulled into...
 #   repo: git@github.com:$owner/$repo
 #   branch: $branch
 #
