@@ -59,6 +59,8 @@ command:pulls() {
   state=open
   "$do_all" && state=all
 
+  title="Pull requests for '$owner/$repo' (state=$state):"
+
   report-list \
     "/repos/$owner/$repo/pulls?state=$state;sort=updated;per_page=PER_PAGE" \
     'number updated_at state user/login head/label base/label title'

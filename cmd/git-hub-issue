@@ -76,8 +76,18 @@ ok:issue() {
     comments
   )
   local skip_field_comments=true
-  $pager_in_use &&
+  if $pager_in_use; then
     echo -------------------------------------------------------------------------------
+    write-issue
+  elif interactive; then
+    pager_in_use=true
+    write-issue | $GIT_HUB_PAGER
+  else
+    write-issue
+  fi
+}
+
+write-issue() {
   report-data
 
   local comments="$(JSON.get -n /comments -)"

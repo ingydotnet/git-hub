@@ -692,6 +692,16 @@ normalize-multiline-text-output() {
 # Report formatting functions:
 #------------------------------------------------------------------------------
 report-data() {
+  if interactive && ! $pager_in_use; then
+    pager_in_use=true
+    msg_ok=0
+    report-data-process "$@" | $GIT_HUB_PAGER
+  else
+    report-data-process "$@"
+  fi
+}
+
+report-data-process() {
   if "$json_output"; then
     pretty-json-object "${fields[@]}"
   else
