@@ -1184,8 +1184,8 @@ out-() { echo -en "$@" >&1; }
 err() { echo -e "$@" >&2; }
 err-() { echo -en "$@" >&2; }
 
-error() { echo "Error: $1" >&2; return 1; }
-abort() { echo "Abort: $1" >&2; return 1; }
+error() { echo "Error: $1" >&2; exit 1; }
+abort() { echo "Abort: $1" >&2; exit 1; }
 
 prompt() {
   local msg answer default yn=false password=false
