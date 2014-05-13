@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+
+set -e
+
+command:search() {
+  get-args query
+  query="${query// /%20}"
+  local key_prefix=/items
+  report-list \
+    "/search/repositories?q=$query;sort=stars;per_page=PER_PAGE" \
+    'full_name stargazers_count'
+}
+
+format-entry:search() {
+  if "$raw_output"; then
+    echo "$2"
+  else
+    printf "%d) %-40s (%d stars)\n" "$1" "$2" "$3"
+  fi
+}
+
+# vim: set lisp:
+

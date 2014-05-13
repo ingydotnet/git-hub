@@ -593,7 +593,11 @@ report-list-process() {
     api-get "$url"
     OK || return 0
     json-var-list "${fields[@]}"
-    local page_size="$(JSON.cache | tail -n1 | cut -d '/' -f2)"
+    if [ -n "$key_prefix" ]; then
+      local page_size="$(JSON.cache | grep "^$key_prefix" | tail -n1 | cut -d '/' -f3)"
+    else
+      local page_size="$(JSON.cache | tail -n1 | cut -d '/' -f2)"
+    fi
     [ -z "$page_size" ] && say '--None--' && break
     local counter=0
     for ((ii = 0; ii <= page_size && counter < list_max; ii++)); do

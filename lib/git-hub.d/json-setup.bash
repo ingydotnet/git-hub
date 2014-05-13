@@ -84,7 +84,7 @@ json-var-list() {
   local fields="$@"
   while IFS='\n' read -r line; do
     [[ -z "$line" ]] && break
-    if [[ "$line" =~ ^/([0-9]+)/([^\	]+)\	(.*) ]]; then
+    if [[ "$line" =~ ^$key_prefix/([0-9]+)/([^\	]+)\	(.*) ]]; then
       local value="${BASH_REMATCH[3]}"
       [ "$value" == null ] && value=''
       value="${value#\"}"
@@ -97,7 +97,7 @@ json-var-list() {
     fi
   done < <(
     echo "$JSON__cache" |
-      grep -E "^/[0-9]+/(${fields// /|})\b" || echo ''
+      grep -E "^$key_prefix/[0-9]+/(${fields// /|})\b" || echo ''
   )
 }
 
