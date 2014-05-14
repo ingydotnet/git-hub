@@ -1,3 +1,5 @@
+export PATH := ../kwim-pm/bin:$(PATH)
+
 CMD := git-hub
 
 LOCAL_LIB := $(shell pwd)/lib/$(CMD)
@@ -74,21 +76,17 @@ $(INSTALL_EXT):
 ##
 # Build rules:
 .PHONY: doc
-doc: $(LOCAL_MAN1)/$(CMD).1
+doc: $(LOCAL_MAN1)/$(CMD).1 doc/$(CMD).kwim
 
-$(CMD).txt: ReadMe.asc
-	cp $< $@
-
-%.xml: %.txt
-	asciidoc -b docbook -d manpage -f doc/asciidoc.conf \
-		-agit_version=$(GITVER) $^
-	rm $<
-
-%.1: %.xml
-	xmlto -m doc/manpage-normal.xsl man $^
-
-$(LOCAL_MAN1)/%.1: %.1
+$(LOCAL_MAN1)/$(CMD).1: $(CMD).1
 	mv $< $@
+
+%.1: %.pod
+	pod2man --utf8 $< > $@
+
+%.pod: doc/%.kwim
+	kwim --para-wrap=1 --render-complete=1 --to=pod $< > $@
+	cp $@ ReadMe.pod
 
 #------------------------------------------------------------------------------
 # BPAN Rules
