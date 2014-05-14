@@ -318,7 +318,7 @@ interactions from the command line. They are installed by default.
   List the people who are followers of a user.
 
 - `follows <user> [<target-user>]`
-  Check if <user> follows <target-user>. The default target user is you.
+  Check if `<user>` follows `<target-user>`. The default target user is you.
 
 - `following [<user>]`
   List the people that a user is following.
@@ -477,7 +477,7 @@ GitHub authentication tokens.
   <token-value>` command. Use the `--raw` option to just print the new
   token id.
 
-- `token-get <api-token-id> <data-key>
+- `token-get <api-token-id> <data-key>`
   Get a specific data value for a particular token.
 
 - `token-delete <api-token-id>`
@@ -626,7 +626,7 @@ Do everything from the command line:
       homepage     http://example.com
   $ git hub repo
 
-Note that on the last two commands you don't need to set the <repo> because it
+Note that on the last two commands you don't need to set the `<repo>` because it
 can be gleaned from the remote. Also on the `edit` command notice how you can
 specify multiple key/value pairs.
 
@@ -656,10 +656,10 @@ Assume your current working directory is not a GitHub repo:
   $ git hub star
   $ # etc...
 
-The `git hub` command tries to be environmentally aware. If you are in a
-GitHub cloned repo directory, and you don't specify <user> or <owner> or
-<repo> for a command that needs them, then they will be pulled from the remote
-url.  Otherwise, if you don't specify a <user> it will use the one (presumably
+The `git hub` command tries to be environmentally aware. If you are in a GitHub
+cloned repo directory, and you don't specify `<user>` or `<owner>` or `<repo>`
+for a command that needs them, then they will be pulled from the remote url.
+Otherwise, if you don't specify a `<user>` it will use the one (presumably
 yours) that you set with the `git hub config login ...` command.
 
 == Example 3. Building Complex Commands
