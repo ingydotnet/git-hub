@@ -13,6 +13,7 @@ git-hub - The Git command for GitHub
 =for comment
 <badge-travis ingydotnet/git-hub>
 
+=for html
 <a href="https://travis-ci.org/ingydotnet/git-hub"><img src="https://travis-ci.org/ingydotnet/git-hub.png" alt="git-hub"></a>
 
 =head1 Synopsis
