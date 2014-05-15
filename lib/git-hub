@@ -27,14 +27,14 @@ The most commonly used commands:
   user, orgs, org, teams, members, followers, following, follow, stars, star,
   clone, repos, repo, repo-new, repo-delete, forks, fork, collabs, trust,
   issues, issue, issue-update, issue-close, comment,
-  pull-request, pulls, pull-diff, pull-merge
+  pull-request, pulls, pull-diff, pull-merge, search
 
-See 'git help hub' for complete documentation of *all* the commands.
+See 'git hub help' for more help.
 
 Options:
 --
 h           Show the command summary
-help        Show the complete documentation
+help        Browse the complete 'git-hub' documentation
  
 remote=     Remote name (like 'origin')
 branch=     Branch name (like 'master')
@@ -166,7 +166,45 @@ run-each() {
 # `git hub` command functions:
 #------------------------------------------------------------------------------
 command:help() {
-  exec git help hub
+  source-ext help-functions.bash
+  local cmd="${command_arguments[0]}"
+  if [ -n "$cmd" ]; then
+    if can "help:$cmd"; then
+      echo
+      "help:$cmd"
+      echo
+    else
+      err "No help found for '$cmd'"
+    fi
+  elif $do_all; then
+    help:all
+  else
+    cat <<'...'
+git-hub -- The GitHub Subcommand for Git
+
+Try the following commands to get more help:
+
+  git hub help --all        # Show all commands
+  git hub help <command>    # Get help for a specific command
+  git help hub              # Browse the complete 'git-hub' documentation
+  git hub --help            # Browse the complete 'git-hub' documentation
+  git hub -h                # Show the short documentation
+
+Or read the documentation online:
+
+  https://github.com/ingydotnet/git-hub#readme
+
+If you find bugs, or missing features, just run:
+
+  git hub issue-new ingydotnet/git-hub
+
+Enjoy GitHubbing in the comfort of your terminal.
+
+  -- Ingy döt Net
+
+...
+  fi
+  msg_ok=0
 }
 
 # NOTE: All the commands used to be defined here but now they have been moved
@@ -1188,7 +1226,16 @@ out-() { echo -en "$@" >&1; }
 err() { echo -e "$@" >&2; }
 err-() { echo -en "$@" >&2; }
 
-error() { echo "Error: $1" >&2; exit 1; }
+error() {
+  local msg="Error: $1" usage=
+  source-ext help-functions.bash
+  if can "help:$command"; then
+    msg="$msg"$'\n'$'\n'"$("help:$command")"$'\n'
+  fi
+  echo "$msg" >&2
+  exit 1
+}
+
 abort() { echo "Abort: $1" >&2; exit 1; }
 
 prompt() {

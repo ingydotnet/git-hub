@@ -355,7 +355,7 @@ interactions from the command line. They are installed by default.
 - `repo-new [<org>/]<repo>`
   Create a new GitHub repository.
 
-- `repo-init [<directory>]
+- `repo-init [<directory>]`
   This command is useful for setting up new repos. Just mkdir a new dir, cd
   into it and issue the command. It will 'git init', make the GitHub repo
   and add it as the origin remote. It will only do the things that have not
@@ -388,10 +388,10 @@ interactions from the command line. They are installed by default.
 - `unwatch [<owner>/<repo>]`
   Stop watching a repo.
 
-- `watching [<user>]:
+- `watching [<user>]`
   Show which repos a user is watching.
 
-- `watchers [<owner>/<repo>]:
+- `watchers [<owner>/<repo>]`
   Show the users who are watching a repo.
 
 - `collabs [<owner>/<repo>]`

@@ -489,8 +489,9 @@ You can edit the following repo keys: \f(CW\*(C`description\*(C'\fR, \f(CW\*(C`h
 .el .IP "\f(CWrepo\-new [<org>/]<repo>\fR" 4
 .IX Item "repo-new [<org>/]<repo>"
 Create a new GitHub repository.
-.IP "`repo\-init <directory>" 4
-.IX Item "`repo-init <directory>"
+.ie n .IP """repo\-init [<directory>]""" 4
+.el .IP "\f(CWrepo\-init [<directory>]\fR" 4
+.IX Item "repo-init [<directory>]"
 This command is useful for setting up new repos. Just mkdir a new dir, cd into
 it and issue the command. It will 'git init', make the GitHub repo and add it
 as the origin remote. It will only do the things that have not yet been done.
@@ -530,12 +531,13 @@ Start watching a repo.
 .el .IP "\f(CWunwatch [<owner>/<repo>]\fR" 4
 .IX Item "unwatch [<owner>/<repo>]"
 Stop watching a repo.
-.IP "`watching <user>:" 4
-.IX Item "`watching <user>:"
+.ie n .IP """watching [<user>]""" 4
+.el .IP "\f(CWwatching [<user>]\fR" 4
+.IX Item "watching [<user>]"
 Show which repos a user is watching.
-.ie n .IP "`watchers ""<repo>"" in <owner>:" 4
-.el .IP "`watchers ``<repo>'' in <owner>:" 4
-.IX Item "`watchers <repo> in <owner>:"
+.ie n .IP """watchers [<owner>/<repo>]""" 4
+.el .IP "\f(CWwatchers [<owner>/<repo>]\fR" 4
+.IX Item "watchers [<owner>/<repo>]"
 Show the users who are watching a repo.
 .ie n .IP """collabs [<owner>/<repo>]""" 4
 .el .IP "\f(CWcollabs [<owner>/<repo>]\fR" 4

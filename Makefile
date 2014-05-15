@@ -77,6 +77,8 @@ $(INSTALL_EXT):
 # Build rules:
 .PHONY: doc
 doc: $(LOCAL_MAN1)/$(CMD).1 doc/$(CMD).kwim
+	perl tool/generate-help-functions.pl doc/$(CMD).kwim > \
+	    $(LOCAL_EXT)/help-functions.bash
 
 $(LOCAL_MAN1)/$(CMD).1: $(CMD).1
 	mv $< $@
@@ -85,7 +87,7 @@ $(LOCAL_MAN1)/$(CMD).1: $(CMD).1
 	pod2man --utf8 $< > $@
 
 %.pod: doc/%.kwim
-	kwim --para-wrap=1 --render-complete=1 --to=pod $< > $@
+	kwim --to=pod --wrap=1 --complete=1 $< > $@
 	cp $@ ReadMe.pod
 
 #------------------------------------------------------------------------------

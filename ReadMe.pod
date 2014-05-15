@@ -441,7 +441,7 @@ You can edit the following repo keys: C<description>, C<homepage>.
 
 Create a new GitHub repository.
 
-=item `repo-init L<< <directory> >>
+=item C<< repo-init [<directory>] >>
 
 This command is useful for setting up new repos. Just mkdir a new dir, cd into
 it and issue the command. It will 'git init', make the GitHub repo and add it
@@ -483,11 +483,11 @@ Start watching a repo.
 
 Stop watching a repo.
 
-=item `watching L<< <user> >>:
+=item C<< watching [<user>] >>
 
 Show which repos a user is watching.
 
-=item `watchers L<< <owner>/<repo> >>:
+=item C<< watchers [<owner>/<repo>] >>
 
 Show the users who are watching a repo.
 
