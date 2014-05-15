@@ -59,7 +59,8 @@ sub write_usage_function {
 
 help:$name() {
     cat <<'...'
-Usage: git hub $usage
+
+  Usage: git hub $usage
 
 $desc
 ...

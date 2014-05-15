@@ -170,7 +170,6 @@ command:help() {
   local cmd="${command_arguments[0]}"
   if [ -n "$cmd" ]; then
     if can "help:$cmd"; then
-      echo
       "help:$cmd"
       echo
     else
@@ -1230,7 +1229,7 @@ error() {
   local msg="Error: $1" usage=
   source-ext help-functions.bash
   if can "help:$command"; then
-    msg="$msg"$'\n'$'\n'"$("help:$command")"$'\n'
+    msg=$'\n'"$msg"$'\n'"$("help:$command")"$'\n'
   fi
   echo "$msg" >&2
   exit 1

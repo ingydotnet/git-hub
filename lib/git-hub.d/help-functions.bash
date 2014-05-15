@@ -79,7 +79,8 @@ watching             watching [<user>]
 
 help:cache-clear() {
     cat <<'...'
-Usage: git hub cache-clear
+
+  Usage: git hub cache-clear
 
   Clear your API response cache.
 ...
@@ -87,7 +88,8 @@ Usage: git hub cache-clear
 
 help:clone() {
     cat <<'...'
-Usage: git hub clone ([<owner>/]<repo> [<directory>])...
+
+  Usage: git hub clone ([<owner>/]<repo> [<directory>])...
 
   Clone a GitHub repo. Always uses `--recursive` so you get submodules too.
   You can specifiy a list of repos. If you specify a directory for a repo, it
@@ -98,7 +100,8 @@ Usage: git hub clone ([<owner>/]<repo> [<directory>])...
 
 help:collabs() {
     cat <<'...'
-Usage: git hub collabs [<owner>/<repo>]
+
+  Usage: git hub collabs [<owner>/<repo>]
 
   List current collaborators for a repository.
 ...
@@ -106,7 +109,8 @@ Usage: git hub collabs [<owner>/<repo>]
 
 help:comment() {
     cat <<'...'
-Usage: git hub comment [<owner>/<repo>] <issue-id-number>
+
+  Usage: git hub comment [<owner>/<repo>] <issue-id-number>
 
   Add a comment to an issue. You can also use `issue-edit` to just add a
   comment.
@@ -115,7 +119,8 @@ Usage: git hub comment [<owner>/<repo>] <issue-id-number>
 
 help:config() {
     cat <<'...'
-Usage: git hub config [<config-key> [<config-value>]]
+
+  Usage: git hub config [<config-key> [<config-value>]]
 
   With no args, this command will print the contents of `~/.githubconfig`.
   With one argument (a key), print the current value of the config key.
@@ -126,7 +131,8 @@ Usage: git hub config [<config-key> [<config-value>]]
 
 help:config-unset() {
     cat <<'...'
-Usage: git hub config-unset <config-key>
+
+  Usage: git hub config-unset <config-key>
 
   Unset a config key. Removes the key from the `~/.githubconfig` file.
 ...
@@ -134,7 +140,8 @@ Usage: git hub config-unset <config-key>
 
 help:follow() {
     cat <<'...'
-Usage: git hub follow <user>...
+
+  Usage: git hub follow <user>...
 
   Follow one or more users.
 ...
@@ -142,7 +149,8 @@ Usage: git hub follow <user>...
 
 help:followers() {
     cat <<'...'
-Usage: git hub followers [<user>]
+
+  Usage: git hub followers [<user>]
 
   List the people who are followers of a user.
 ...
@@ -150,7 +158,8 @@ Usage: git hub followers [<user>]
 
 help:following() {
     cat <<'...'
-Usage: git hub following [<user>]
+
+  Usage: git hub following [<user>]
 
   List the people that a user is following.
 ...
@@ -158,7 +167,8 @@ Usage: git hub following [<user>]
 
 help:follows() {
     cat <<'...'
-Usage: git hub follows <user> [<target-user>]
+
+  Usage: git hub follows <user> [<target-user>]
 
   Check if `<user>` follows `<target-user>`. The default target user is you.
 ...
@@ -166,7 +176,8 @@ Usage: git hub follows <user> [<target-user>]
 
 help:fork() {
     cat <<'...'
-Usage: git hub fork <owner>/<repo> [<org>]
+
+  Usage: git hub fork <owner>/<repo> [<org>]
 
   Fork a repository to your account or to an organization.
 ...
@@ -174,7 +185,8 @@ Usage: git hub fork <owner>/<repo> [<org>]
 
 help:forks() {
     cat <<'...'
-Usage: git hub forks [<owner>/<repo>]
+
+  Usage: git hub forks [<owner>/<repo>]
 
   List the forks of a repository.
 ...
@@ -182,7 +194,8 @@ Usage: git hub forks [<owner>/<repo>]
 
 help:help() {
     cat <<'...'
-Usage: git hub help
+
+  Usage: git hub help
 
   Show this manpage.
 ...
@@ -190,7 +203,8 @@ Usage: git hub help
 
 help:issue() {
     cat <<'...'
-Usage: git hub issue [<owner>/<repo>] <issue-id-number>
+
+  Usage: git hub issue [<owner>/<repo>] <issue-id-number>
 
   Show info (including any comments) for a specific issue. If no issue number
   is given, this command will call `issue-new` instead.
@@ -199,7 +213,8 @@ Usage: git hub issue [<owner>/<repo>] <issue-id-number>
 
 help:issue-close() {
     cat <<'...'
-Usage: git hub issue-close [<owner>/<repo>] <issue-id-number>
+
+  Usage: git hub issue-close [<owner>/<repo>] <issue-id-number>
 
   Close an issue. You can also use `issue-edit` to close an issue.
 ...
@@ -207,7 +222,8 @@ Usage: git hub issue-close [<owner>/<repo>] <issue-id-number>
 
 help:issue-edit() {
     cat <<'...'
-Usage: git hub issue-edit [<owner>/<repo>] <issue-id-number>
+
+  Usage: git hub issue-edit [<owner>/<repo>] <issue-id-number>
 
   Add a comment. Change values of 'title', 'state', 'assignee' and
   'milestone'.  Changing state to 'closed' will close the issue.
@@ -216,7 +232,8 @@ Usage: git hub issue-edit [<owner>/<repo>] <issue-id-number>
 
 help:issue-new() {
     cat <<'...'
-Usage: git hub issue-new [<owner>/<repo>]
+
+  Usage: git hub issue-new [<owner>/<repo>]
 
   Create a new issue for a repository.
 ...
@@ -224,7 +241,8 @@ Usage: git hub issue-new [<owner>/<repo>]
 
 help:issues() {
     cat <<'...'
-Usage: git hub issues [<owner>/<repo>] [--all]
+
+  Usage: git hub issues [<owner>/<repo>] [--all]
 
   List the open issues for a repo. Use the `--all` flag to see both open and
   closed issues.
@@ -233,7 +251,8 @@ Usage: git hub issues [<owner>/<repo>] [--all]
 
 help:keys() {
     cat <<'...'
-Usage: git hub keys [<user>]
+
+  Usage: git hub keys [<user>]
 
   List public SSH keys for a user.
 ...
@@ -241,7 +260,8 @@ Usage: git hub keys [<user>]
 
 help:keys-add() {
     cat <<'...'
-Usage: git hub keys-add <title> <key>
+
+  Usage: git hub keys-add <title> <key>
 
   Add a public ssh key for your user.
 ...
@@ -249,7 +269,8 @@ Usage: git hub keys-add <title> <key>
 
 help:member-add() {
     cat <<'...'
-Usage: git hub member-add <team_id> <user>
+
+  Usage: git hub member-add <team_id> <user>
 
   Add a user to a team.
 ...
@@ -257,7 +278,8 @@ Usage: git hub member-add <team_id> <user>
 
 help:member-remove() {
     cat <<'...'
-Usage: git hub member-remove <team_id> <user>
+
+  Usage: git hub member-remove <team_id> <user>
 
   Remove a user from a team.
 ...
@@ -265,7 +287,8 @@ Usage: git hub member-remove <team_id> <user>
 
 help:members() {
     cat <<'...'
-Usage: git hub members <org>
+
+  Usage: git hub members <org>
 
   List the members of an organization.
 ...
@@ -273,7 +296,8 @@ Usage: git hub members <org>
 
 help:open() {
     cat <<'...'
-Usage: git hub open [<owner>/<repo>] [<file-path>]
+
+  Usage: git hub open [<owner>/<repo>] [<file-path>]
 
   Open a browser window to a repo or a file in a repo.
 ...
@@ -281,7 +305,8 @@ Usage: git hub open [<owner>/<repo>] [<file-path>]
 
 help:org() {
     cat <<'...'
-Usage: git hub org <org>
+
+  Usage: git hub org <org>
 
   Show basic information about a GitHub organization. The `--raw` and
   `--json` options show the data in different formats than normal output.
@@ -290,7 +315,8 @@ Usage: git hub org <org>
 
 help:org-edit() {
     cat <<'...'
-Usage: git hub org-edit <org> <key-value-pairs>...
+
+  Usage: git hub org-edit <org> <key-value-pairs>...
 
   Set specific meta-data fields of an organization to new values. You list
   the parameters as key/value pairs.
@@ -302,7 +328,8 @@ Usage: git hub org-edit <org> <key-value-pairs>...
 
 help:org-get() {
     cat <<'...'
-Usage: git hub org-get <org> <data-key>
+
+  Usage: git hub org-get <org> <data-key>
 
   Get a specific data value for a particular organization.
 ...
@@ -310,7 +337,8 @@ Usage: git hub org-get <org> <data-key>
 
 help:orgs() {
     cat <<'...'
-Usage: git hub orgs [<user>]
+
+  Usage: git hub orgs [<user>]
 
   List the organizations that a user is a member of.
 ...
@@ -318,7 +346,8 @@ Usage: git hub orgs [<user>]
 
 help:pull-diff() {
     cat <<'...'
-Usage: git hub pull-diff [<owner>/<repo>] <issue-id-number>
+
+  Usage: git hub pull-diff [<owner>/<repo>] <issue-id-number>
 
   Show the diff for a pull request.
 ...
@@ -326,7 +355,8 @@ Usage: git hub pull-diff [<owner>/<repo>] <issue-id-number>
 
 help:pull-merge() {
     cat <<'...'
-Usage: git hub pull-merge [<owner>/<repo>] <issue-id-number>
+
+  Usage: git hub pull-merge [<owner>/<repo>] <issue-id-number>
 
   Merge and close a pull request.
 ...
@@ -334,7 +364,8 @@ Usage: git hub pull-merge [<owner>/<repo>] <issue-id-number>
 
 help:pull-request() {
     cat <<'...'
-Usage: git hub pull-request [<owner>/<repo>]
+
+  Usage: git hub pull-request [<owner>/<repo>]
 
   Create a new pull request for a repository.
 ...
@@ -342,7 +373,8 @@ Usage: git hub pull-request [<owner>/<repo>]
 
 help:pulls() {
     cat <<'...'
-Usage: git hub pulls [<owner>/<repo>]
+
+  Usage: git hub pulls [<owner>/<repo>]
 
   List the pull requests for a repo.
 ...
@@ -350,7 +382,8 @@ Usage: git hub pulls [<owner>/<repo>]
 
 help:repo() {
     cat <<'...'
-Usage: git hub repo [<repo>]
+
+  Usage: git hub repo [<repo>]
 
   Show basic information about a specific repository. The `--raw` and
   `--json` options show the data in different formats than normal output.
@@ -359,7 +392,8 @@ Usage: git hub repo [<repo>]
 
 help:repo-delete() {
     cat <<'...'
-Usage: git hub repo-delete <owner>/<repo>
+
+  Usage: git hub repo-delete <owner>/<repo>
 
   Delete a GitHub repository.
 ...
@@ -367,7 +401,8 @@ Usage: git hub repo-delete <owner>/<repo>
 
 help:repo-edit() {
     cat <<'...'
-Usage: git hub repo-edit [<owner>/]<repo> <key-value-pair>...
+
+  Usage: git hub repo-edit [<owner>/]<repo> <key-value-pair>...
 
   Set specific meta-data fields of a repository to new values. You list the
   parameters as key/value pairs.
@@ -378,7 +413,8 @@ Usage: git hub repo-edit [<owner>/]<repo> <key-value-pair>...
 
 help:repo-get() {
     cat <<'...'
-Usage: git hub repo-get <owner>/<repo> <data-key>
+
+  Usage: git hub repo-get <owner>/<repo> <data-key>
 
   Get a specific data value for a particular repository.
 ...
@@ -386,7 +422,8 @@ Usage: git hub repo-get <owner>/<repo> <data-key>
 
 help:repo-init() {
     cat <<'...'
-Usage: git hub repo-init [<directory>]
+
+  Usage: git hub repo-init [<directory>]
 
   This command is useful for setting up new repos. Just mkdir a new dir, cd
   into it and issue the command. It will 'git init', make the GitHub repo
@@ -397,7 +434,8 @@ Usage: git hub repo-init [<directory>]
 
 help:repo-new() {
     cat <<'...'
-Usage: git hub repo-new [<org>/]<repo>
+
+  Usage: git hub repo-new [<org>/]<repo>
 
   Create a new GitHub repository.
 ...
@@ -405,7 +443,8 @@ Usage: git hub repo-new [<org>/]<repo>
 
 help:repos() {
     cat <<'...'
-Usage: git hub repos [<user>]
+
+  Usage: git hub repos [<user>]
 
   List the repos for a user or organization. List is returned in order of
   recent activity.
@@ -414,7 +453,8 @@ Usage: git hub repos [<user>]
 
 help:scope-add() {
     cat <<'...'
-Usage: git hub scope-add <api-token-id> <scope-name>...
+
+  Usage: git hub scope-add <api-token-id> <scope-name>...
 
   Add one or more scopes to your API token. You can use the `--all` option
   to add all possible scopes at once.
@@ -423,7 +463,8 @@ Usage: git hub scope-add <api-token-id> <scope-name>...
 
 help:scope-remove() {
     cat <<'...'
-Usage: git hub scope-remove <api-token-id> <scope-name>...
+
+  Usage: git hub scope-remove <api-token-id> <scope-name>...
 
   Remove one or more scopes from your API token. You can use the `--all`
   option to remove all possible scopes at once.
@@ -432,7 +473,8 @@ Usage: git hub scope-remove <api-token-id> <scope-name>...
 
 help:scopes() {
     cat <<'...'
-Usage: git hub scopes <api-token-id>
+
+  Usage: git hub scopes <api-token-id>
 
   List the scopes assigned to your API token, and also list all the possible
   scope values that you can assign. Use the `--raw` option to just list the
@@ -442,7 +484,8 @@ Usage: git hub scopes <api-token-id>
 
 help:setup() {
     cat <<'...'
-Usage: git hub setup
+
+  Usage: git hub setup
 
   Before you can use the commands described below, you need to perform some
   setup/configuration steps.
@@ -459,7 +502,8 @@ Usage: git hub setup
 
 help:star() {
     cat <<'...'
-Usage: git hub star [<owner>/<repo>]
+
+  Usage: git hub star [<owner>/<repo>]
 
   Add your *star* to a repository.
 ...
@@ -467,7 +511,8 @@ Usage: git hub star [<owner>/<repo>]
 
 help:starred() {
     cat <<'...'
-Usage: git hub starred [<user>]
+
+  Usage: git hub starred [<user>]
 
   List repositories that a user has starred.
 ...
@@ -475,7 +520,8 @@ Usage: git hub starred [<user>]
 
 help:stars() {
     cat <<'...'
-Usage: git hub stars [<owner>/<repo>]
+
+  Usage: git hub stars [<owner>/<repo>]
 
   Show what users have starred a repository.
 ...
@@ -483,7 +529,8 @@ Usage: git hub stars [<owner>/<repo>]
 
 help:team() {
     cat <<'...'
-Usage: git hub team <team_id>
+
+  Usage: git hub team <team_id>
 
   Get information about a team.
 ...
@@ -491,7 +538,8 @@ Usage: git hub team <team_id>
 
 help:team-delete() {
     cat <<'...'
-Usage: git hub team-delete <team_id>
+
+  Usage: git hub team-delete <team_id>
 
   Delete a team.
 ...
@@ -499,7 +547,8 @@ Usage: git hub team-delete <team_id>
 
 help:team-new() {
     cat <<'...'
-Usage: git hub team-new <org> <name> <perm>
+
+  Usage: git hub team-new <org> <name> <perm>
 
   Add a new team (name) to an organization. The 'perm' arg must be pull, push
   or admin.
@@ -508,7 +557,8 @@ Usage: git hub team-new <org> <name> <perm>
 
 help:team-repos() {
     cat <<'...'
-Usage: git hub team-repos <team_id>
+
+  Usage: git hub team-repos <team_id>
 
   List repos of a team.
 ...
@@ -516,7 +566,8 @@ Usage: git hub team-repos <team_id>
 
 help:teams() {
     cat <<'...'
-Usage: git hub teams <org>
+
+  Usage: git hub teams <org>
 
   List the teams in an organization.
 ...
@@ -524,7 +575,8 @@ Usage: git hub teams <org>
 
 help:token-delete() {
     cat <<'...'
-Usage: git hub token-delete <api-token-id>
+
+  Usage: git hub token-delete <api-token-id>
 
   Delete one of your API tokens for your GitHub login id. Note: You need to
   delete tokens by *id* (listed by the `tokens` command), not by token value.
@@ -533,7 +585,8 @@ Usage: git hub token-delete <api-token-id>
 
 help:token-get() {
     cat <<'...'
-Usage: git hub token-get <api-token-id> <data-key>
+
+  Usage: git hub token-get <api-token-id> <data-key>
 
   Get a specific data value for a particular token.
 ...
@@ -541,7 +594,8 @@ Usage: git hub token-get <api-token-id> <data-key>
 
 help:token-new() {
     cat <<'...'
-Usage: git hub token-new [<description-string>]
+
+  Usage: git hub token-new [<description-string>]
 
   Create a new API token for your GitHub login id. Note: Creating a new
   token will not automatically add it to your `~/.githubconfig` file; you
@@ -553,7 +607,8 @@ Usage: git hub token-new [<description-string>]
 
 help:tokens() {
     cat <<'...'
-Usage: git hub tokens
+
+  Usage: git hub tokens
 
   List all the API tokens for your GitHub account. Use the `--raw` option
   to print the token IDs and descriptions, but not the actual token values.
@@ -562,7 +617,8 @@ Usage: git hub tokens
 
 help:trust() {
     cat <<'...'
-Usage: git hub trust [<owner>/<repo>] <user>...
+
+  Usage: git hub trust [<owner>/<repo>] <user>...
 
   Add one or more collaborators to a repository.
 ...
@@ -570,7 +626,8 @@ Usage: git hub trust [<owner>/<repo>] <user>...
 
 help:unfollow() {
     cat <<'...'
-Usage: git hub unfollow <user>...
+
+  Usage: git hub unfollow <user>...
 
   Stop following one or more users.
 ...
@@ -578,7 +635,8 @@ Usage: git hub unfollow <user>...
 
 help:unstar() {
     cat <<'...'
-Usage: git hub unstar [<owner>/<repo>]
+
+  Usage: git hub unstar [<owner>/<repo>]
 
   Add your *star* to a repository.
 ...
@@ -586,7 +644,8 @@ Usage: git hub unstar [<owner>/<repo>]
 
 help:untrust() {
     cat <<'...'
-Usage: git hub untrust [<owner>/<repo>] <user>...
+
+  Usage: git hub untrust [<owner>/<repo>] <user>...
 
   Remove one or more collaborators from a repository.
 ...
@@ -594,7 +653,8 @@ Usage: git hub untrust [<owner>/<repo>] <user>...
 
 help:unwatch() {
     cat <<'...'
-Usage: git hub unwatch [<owner>/<repo>]
+
+  Usage: git hub unwatch [<owner>/<repo>]
 
   Stop watching a repo.
 ...
@@ -602,7 +662,8 @@ Usage: git hub unwatch [<owner>/<repo>]
 
 help:upgrade() {
     cat <<'...'
-Usage: git hub upgrade
+
+  Usage: git hub upgrade
 
   Upgrade the `git-hub` installation to the latest version.
 ...
@@ -610,7 +671,8 @@ Usage: git hub upgrade
 
 help:url() {
     cat <<'...'
-Usage: git hub url [<owner>/<repo>] [<file-path>]
+
+  Usage: git hub url [<owner>/<repo>] [<file-path>]
 
   Print the URL of a repo or a file in a repo.
 ...
@@ -618,7 +680,8 @@ Usage: git hub url [<owner>/<repo>] [<file-path>]
 
 help:user() {
     cat <<'...'
-Usage: git hub user [<user>]
+
+  Usage: git hub user [<user>]
 
   Show basic information about a specific user. User defaults to the owner
   of the current repo, or your login if you are not inside a repo directory.
@@ -629,7 +692,8 @@ Usage: git hub user [<user>]
 
 help:user-edit() {
     cat <<'...'
-Usage: git hub user-edit <key-value-pair>...
+
+  Usage: git hub user-edit <key-value-pair>...
 
   Set specific fields of your user info to new values. You list the
   parameters as key/value pairs.
@@ -641,7 +705,8 @@ Usage: git hub user-edit <key-value-pair>...
 
 help:user-get() {
     cat <<'...'
-Usage: git hub user-get <user> <data-key>
+
+  Usage: git hub user-get <user> <data-key>
 
   Get a specific data value for a particular user.
 ...
@@ -649,7 +714,8 @@ Usage: git hub user-get <user> <data-key>
 
 help:watch() {
     cat <<'...'
-Usage: git hub watch [<owner>/<repo>]
+
+  Usage: git hub watch [<owner>/<repo>]
 
   Start watching a repo.
 ...
@@ -657,7 +723,8 @@ Usage: git hub watch [<owner>/<repo>]
 
 help:watchers() {
     cat <<'...'
-Usage: git hub watchers [<owner>/<repo>]
+
+  Usage: git hub watchers [<owner>/<repo>]
 
   Show the users who are watching a repo.
 ...
@@ -665,7 +732,8 @@ Usage: git hub watchers [<owner>/<repo>]
 
 help:watching() {
     cat <<'...'
-Usage: git hub watching [<user>]
+
+  Usage: git hub watching [<user>]
 
   Show which repos a user is watching.
 ...
