@@ -2,6 +2,18 @@
 
 set -e
 
+# Freenode command to allow message without join:
+#     /msg chanserv set #channel mlock -n
+
+command:irc() {
+  assert-inside-git-repo
+  require-auth
+  owner="$(get-owner)"
+  repo="$(get-repo)"
+  msg_ok=0
+  echo "https://github.com/$owner/$repo/settings/hooks"
+}
+
 command:irc-enable() {
   assert-inside-git-repo
   require-auth
