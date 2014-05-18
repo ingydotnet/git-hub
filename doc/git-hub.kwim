@@ -452,6 +452,28 @@ interactions from the command line. They are installed by default.
 - `url [<owner>/<repo>] [<file-path>]`
   Print the URL of a repo or a file in a repo.
 
+== Plugin Commands
+
+There are external plugins like "this
+one"[http://github.com/carloslima/git-hub-travis].
+
+This section is about the "plugin" commands that currently come with
+`git-hub`.
+
+- `irc-enable <room> [<server>]`
+
+  This command must be run inside a cloned repo. It enables GitHub activities
+  for a repo to be reported to an IRC channel.
+
+- `irc-enable`
+
+  This command must be run inside a cloned repo. It disables the GitHub IRC
+  webhook for a repo.
+
+- `irc-url`
+
+  Show the GitHub URL for setting webhooks on the current repo.
+
 == Configuration Commands
 
 These commands are for editing your `git-hub` config file and managing your

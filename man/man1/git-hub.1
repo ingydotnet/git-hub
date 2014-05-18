@@ -71,7 +71,7 @@
 .\" ========================================================================
 .\"
 .IX Title "GIT-HUB 1"
-.TH GIT-HUB 1 "2014-05-14" "perl v5.18.1" "User Contributed Perl Documentation"
+.TH GIT-HUB 1 "2014-05-18" "perl v5.18.1" "User Contributed Perl Documentation"
 .\" For nroff, turn off justification.  Always turn off hyphenation; it makes
 .\" way too many mistakes in technical documents.
 .if n .ad l
@@ -615,6 +615,26 @@ Open a browser window to a repo or a file in a repo.
 .el .IP "\f(CWurl [<owner>/<repo>] [<file\-path>]\fR" 4
 .IX Item "url [<owner>/<repo>] [<file-path>]"
 Print the \s-1URL\s0 of a repo or a file in a repo.
+.SS "Plugin Commands"
+.IX Subsection "Plugin Commands"
+There are external plugins like this one.
+.PP
+This section is about the \*(L"plugin\*(R" commands that currently come with
+\&\f(CW\*(C`git\-hub\*(C'\fR.
+.ie n .IP """irc\-enable <room> [<server>]""" 4
+.el .IP "\f(CWirc\-enable <room> [<server>]\fR" 4
+.IX Item "irc-enable <room> [<server>]"
+This command must be run inside a cloned repo. It enables GitHub activities
+for a repo to be reported to an \s-1IRC\s0 channel.
+.ie n .IP """irc\-enable""" 4
+.el .IP "\f(CWirc\-enable\fR" 4
+.IX Item "irc-enable"
+This command must be run inside a cloned repo. It disables the GitHub \s-1IRC\s0
+webhook for a repo.
+.ie n .IP """irc\-url""" 4
+.el .IP "\f(CWirc\-url\fR" 4
+.IX Item "irc-url"
+Show the GitHub \s-1URL\s0 for setting webhooks on the current repo.
 .SS "Configuration Commands"
 .IX Subsection "Configuration Commands"
 These commands are for editing your \f(CW\*(C`git\-hub\*(C'\fR config file and managing your

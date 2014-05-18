@@ -569,6 +569,32 @@ Print the URL of a repo or a file in a repo.
 
 =back
 
+=head2 Plugin Commands
+
+There are external plugins like L<this one|http://github.com/carloslima/git-hub-
+travis>.
+
+This section is about the "plugin" commands that currently come with
+C<git-hub>.
+
+=over
+
+=item C<< irc-enable <room> [<server>] >>
+
+This command must be run inside a cloned repo. It enables GitHub activities
+for a repo to be reported to an IRC channel.
+
+=item C<irc-enable>
+
+This command must be run inside a cloned repo. It disables the GitHub IRC
+webhook for a repo.
+
+=item C<irc-url>
+
+Show the GitHub URL for setting webhooks on the current repo.
+
+=back
+
 =head2 Configuration Commands
 
 These commands are for editing your C<git-hub> config file and managing your

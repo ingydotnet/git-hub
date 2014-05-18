@@ -19,6 +19,9 @@ follows              follows <user> [<target-user>]
 fork                 fork <owner>/<repo> [<org>]
 forks                forks [<owner>/<repo>]
 help                 help
+irc-enable           irc-enable <room> [<server>]
+irc-enable           irc-enable
+irc-url              irc-url
 issue                issue [<owner>/<repo>] <issue-id-number>
 issue-close          issue-close [<owner>/<repo>] <issue-id-number>
 issue-edit           issue-edit [<owner>/<repo>] <issue-id-number>
@@ -198,6 +201,38 @@ help:help() {
   Usage: git hub help
 
   Show this manpage.
+...
+}
+
+help:irc-enable() {
+    cat <<'...'
+
+  Usage: git hub irc-enable <room> [<server>]
+
+
+  This command must be run inside a cloned repo. It enables GitHub activities
+  for a repo to be reported to an IRC channel.
+...
+}
+
+help:irc-enable() {
+    cat <<'...'
+
+  Usage: git hub irc-enable
+
+
+  This command must be run inside a cloned repo. It disables the GitHub IRC
+  webhook for a repo.
+...
+}
+
+help:irc-url() {
+    cat <<'...'
+
+  Usage: git hub irc-url
+
+
+  Show the GitHub URL for setting webhooks on the current repo.
 ...
 }
 
