@@ -818,7 +818,7 @@ init-env() {
 
   pager_in_use=false
   sha1sum=sha1sum
-  [[ "$OSTYPE" =~ ^darwin ]] && sha1sum=shasum
+  [[ "$OSTYPE" =~ ^darwin|^freebsd ]] && sha1sum=shasum
   check-system-commands curl cut git grep head ln mv readlink "$sha1sum" tr
 
   : "${GIT_HUB_API_URI:=https://api.github.com}"
