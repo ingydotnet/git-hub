@@ -285,6 +285,7 @@ plugin commands. The ones I know about are list here:
 =item C<git-hub-travis>
 
 Enable and/or disable travis-ci testing from the command line.
+
 L<https://github.com/carloslima/git-hub-travis>
 
 =back
@@ -307,10 +308,12 @@ Show this manpage.
 
 Before you can use the commands described below, you need to perform some
 setup/configuration steps.
+
 This "wizard" style dialog, will walk you through the configuration process
 quickly and painlessly, with lots of explanation. You should run this command
 right away. You can also re-run it, and it will allow you to change your
 config, while defaulting to your existing settings.
+
 If you would rather do the steps by hand, see L<#Configuration-
 Commands> below.
 
@@ -333,6 +336,7 @@ Get a specific data value for a particular user.
 
 Set specific fields of your user info to new values. You list the parameters
 as key/value pairs.
+
 You can edit the following user keys: C<name>, C<email>, C<blog>, C<location>,
 C<company>, C<bio>.
 
@@ -353,6 +357,7 @@ Get a specific data value for a particular organization.
 
 Set specific meta-data fields of an organization to new values. You list the
 parameters as key/value pairs.
+
 You can edit the following organization keys: C<name>, C<email>,
 C<billing_email>, C<blog>, C<location>, C<company>.
 
@@ -435,6 +440,7 @@ Get a specific data value for a particular repository.
 
 Set specific meta-data fields of a repository to new values. You list the
 parameters as key/value pairs.
+
 You can edit the following repo keys: C<description>, C<homepage>.
 
 =item C<< repo-new [<org>/]<repo> >>

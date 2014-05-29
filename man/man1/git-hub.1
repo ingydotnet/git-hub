@@ -71,7 +71,7 @@
 .\" ========================================================================
 .\"
 .IX Title "GIT-HUB 1"
-.TH GIT-HUB 1 "2014-05-18" "perl v5.18.1" "User Contributed Perl Documentation"
+.TH GIT-HUB 1 "2014-05-29" "perl v5.18.1" "User Contributed Perl Documentation"
 .\" For nroff, turn off justification.  Always turn off hyphenation; it makes
 .\" way too many mistakes in technical documents.
 .if n .ad l
@@ -339,6 +339,7 @@ plugin commands. The ones I know about are list here:
 .el .IP "\f(CWgit\-hub\-travis\fR" 4
 .IX Item "git-hub-travis"
 Enable and/or disable travis-ci testing from the command line.
+.Sp
 <https://github.com/carloslima/git\-hub\-travis>
 .PP
 Well \s-1OK, I\s0 only know about this one, and yes, I helped Carlos write it. But
@@ -356,10 +357,12 @@ Show this manpage.
 .IX Item "setup"
 Before you can use the commands described below, you need to perform some
 setup/configuration steps.
+.Sp
 This \*(L"wizard\*(R" style dialog, will walk you through the configuration process
 quickly and painlessly, with lots of explanation. You should run this command
 right away. You can also re-run it, and it will allow you to change your
 config, while defaulting to your existing settings.
+.Sp
 If you would rather do the steps by hand, see #Configuration\-
 Commands below.
 .ie n .IP """upgrade""" 4
@@ -382,6 +385,7 @@ Get a specific data value for a particular user.
 .IX Item "user-edit <key-value-pair>..."
 Set specific fields of your user info to new values. You list the parameters
 as key/value pairs.
+.Sp
 You can edit the following user keys: \f(CW\*(C`name\*(C'\fR, \f(CW\*(C`email\*(C'\fR, \f(CW\*(C`blog\*(C'\fR, \f(CW\*(C`location\*(C'\fR,
 \&\f(CW\*(C`company\*(C'\fR, \f(CW\*(C`bio\*(C'\fR.
 .ie n .IP """orgs [<user>]""" 4
@@ -402,6 +406,7 @@ Get a specific data value for a particular organization.
 .IX Item "org-edit <org> <key-value-pairs>..."
 Set specific meta-data fields of an organization to new values. You list the
 parameters as key/value pairs.
+.Sp
 You can edit the following organization keys: \f(CW\*(C`name\*(C'\fR, \f(CW\*(C`email\*(C'\fR,
 \&\f(CW\*(C`billing_email\*(C'\fR, \f(CW\*(C`blog\*(C'\fR, \f(CW\*(C`location\*(C'\fR, \f(CW\*(C`company\*(C'\fR.
 .ie n .IP """teams <org>""" 4
@@ -484,6 +489,7 @@ Get a specific data value for a particular repository.
 .IX Item "repo-edit [<owner>/]<repo> <key-value-pair>..."
 Set specific meta-data fields of a repository to new values. You list the
 parameters as key/value pairs.
+.Sp
 You can edit the following repo keys: \f(CW\*(C`description\*(C'\fR, \f(CW\*(C`homepage\*(C'\fR.
 .ie n .IP """repo\-new [<org>/]<repo>""" 4
 .el .IP "\f(CWrepo\-new [<org>/]<repo>\fR" 4
