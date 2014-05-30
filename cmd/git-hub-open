@@ -24,6 +24,8 @@ get-browser() {
   browser="$(get-hub-config browser)"
   [ -n "$browser" ] && return
 
+  [ "$(uname)" == "Darwin" ] && browser="open" && return
+
   for browser in firefox chromium-browser; do
     [ -n "$(type $browser)" ] && return
   done
