@@ -94,6 +94,13 @@ ok:pull-diff() {
   git diff "$base_sha" "$head_sha"
 }
 
+command:pull-fetch() {
+  get-args '?owner:get-owner/repo:get-repo' number
+  assert-inside-git-repo
+  git fetch -f "git@github.com:$owner/$repo" "refs/pull/$number/head:review/$number" ||
+    error "can't fetch PR $number"
+}
+
 command:pull-merge() {
   get-args '?owner:get-owner/repo:get-repo' number '?message'
   # TODO Support merge message
