@@ -67,8 +67,8 @@ command:pulls() {
 }
 
 format-entry:pulls() {
-  printf "#%-3d (%s) %-6s @%-15s %s → %s\n" \
-    "$2" "${3/T*/}" "$4" "$5" "$6" "$7"
+  printf "#%-3d (%s) %-6s @%-12s %s\n     %s\n" \
+    "$2" "${3/T*/}" "$4" "$5" "$6 → $7" "$8"
 }
 
 command:pull-diff() {
