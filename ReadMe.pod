@@ -20,7 +20,7 @@ Here are just a few of the things you can do on GitHub with a simple command:
     git hub                             # Show the `git hub` cheat sheet
     git hub help                        # Show this awesome documentation
     git hub setup                       # Config dialog. Do this first!
-    
+
     git hub user <user>                 # Get info about a user
     git hub repos <owner>               # List recent repositories
     git hub repo-new <repo>             # Create a new repository
@@ -461,9 +461,10 @@ Delete a GitHub repository.
 
 List the forks of a repository.
 
-=item C<< fork <owner>/<repo> [<org>] >>
+=item C<< fork <owner>/<repo> [<org>] [--remote=<name>] >>
 
-Fork a repository to your account or to an organization.
+Fork a repository to your account or to an organization. Optionally, you can
+specify the name of a remote to add, pointing to your fork.
 
 =item C<< stars [<owner>/<repo>] >>
 

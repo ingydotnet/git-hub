@@ -367,8 +367,9 @@ interactions from the command line. They are installed by default.
 - `forks [<owner>/<repo>]`
   List the forks of a repository.
 
-- `fork <owner>/<repo> [<org>]`
-  Fork a repository to your account or to an organization.
+- `fork <owner>/<repo> [<org>] [--remote=<name>]`
+  Fork a repository to your account or to an organization. Optionally, you can
+  specify the name of a remote to add, pointing to your fork.
 
 - `stars [<owner>/<repo>]`
   Show what users have starred a repository.
