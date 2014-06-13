@@ -1,4 +1,10 @@
-export PATH := ../kwim-pm/bin:$(PATH)
+# Make sure we have 'git' and it works OK:
+ifeq ($(shell which git),)
+    $(error 'git' is not installed on this system)
+endif
+
+
+# export PATH := ../kwim-pm/bin:$(PATH)
 
 CMD := git-hub
 
