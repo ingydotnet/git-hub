@@ -534,8 +534,11 @@ get-repo() {
 
 get-repo-config() {
   local login="$(get-login)"
+  local remote="$remote_name"
+  [ -n "$remote" ] && remote="^$remote"$'\t'
   urls=($(
     git remote -v 2> /dev/null |
+    grep "$remote" |
     grep 'github\.com' |
     grep -v '^subrepo/'
   ))
