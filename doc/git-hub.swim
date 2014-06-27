@@ -3,7 +3,7 @@ git-hub
 
 The Git command for GitHub
 
-<badge-travis ingydotnet/git-hub>
+<badge travis coveralls ingydotnet/git-hub>
 
 = Synopsis
 
@@ -734,7 +734,7 @@ Written by Ingy döt Net <ingy@ingy.net>
 
 = Status
 
-This command is about a year old. It does a ton of stuff well, but still has a
+This command is over a year old. It does a ton of stuff well, but still has a
 lot to do to be complete.
 
 The plan is to support as much of the API as possible. Patches / Pull Requests
@@ -746,3 +746,9 @@ you submit.
 
 Find 'ingy' on #git-commands in irc.freenode.net if you have questions or
 ideas.
+
+= Copyright & License
+
+The MIT License (MIT)
+
+Copyright 2013-2014. Ingy döt Net.

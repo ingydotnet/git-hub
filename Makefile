@@ -4,7 +4,7 @@ ifeq ($(shell which git),)
 endif
 
 
-# export PATH := ../kwim-pm/bin:$(PATH)
+# export PATH := ../swim-pm/bin:$(PATH)
 
 CMD := git-hub
 
@@ -82,8 +82,8 @@ $(INSTALL_EXT):
 ##
 # Build rules:
 .PHONY: doc
-doc: $(LOCAL_MAN1)/$(CMD).1 doc/$(CMD).kwim
-	perl tool/generate-help-functions.pl doc/$(CMD).kwim > \
+doc: $(LOCAL_MAN1)/$(CMD).1 doc/$(CMD).swim
+	perl tool/generate-help-functions.pl doc/$(CMD).swim > \
 	    $(LOCAL_EXT)/help-functions.bash
 
 $(LOCAL_MAN1)/$(CMD).1: $(CMD).1
@@ -92,8 +92,8 @@ $(LOCAL_MAN1)/$(CMD).1: $(CMD).1
 %.1: %.pod
 	pod2man --utf8 $< > $@
 
-%.pod: doc/%.kwim
-	kwim --to=pod --wrap=1 --complete=1 $< > $@
+%.pod: doc/%.swim
+	swim --to=pod --wrap=1 --complete=1 $< > $@
 	cp $@ ReadMe.pod
 
 #------------------------------------------------------------------------------
