@@ -29,6 +29,7 @@ ok:repo() {
     html_url ssh_url
     forks parent__full_name source__full_name
     watchers open_issues pushed_at created_at
+    privatex
   )
   report-data
 }

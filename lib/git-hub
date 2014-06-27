@@ -280,7 +280,7 @@ format-curl-command() {
   [[ "$url" =~ [a-zA-Z0-9]/(/|$) ]] &&
     error "API url '$url' looks suspiciously wrong"
 
-  "$use_auth" && require-auth
+  "$use_auth" && require-auth 1
 
   local user_agent="git-hub-$GIT_HUB_VERSION"
   # Cheap trick to make github pretty-print the JSON output.
@@ -580,6 +580,12 @@ get-remote-name() {
 
 require-auth() {
   [ -z "$api_token" ] && get-var api-token
+  if [ "$api_token" == XXX ]; then
+    api_token=
+    [ -n "$1" ] && return
+    echo "This command requires an API token in your config, but you have that disabled."
+    exit 0
+  fi
   [ -z "$api_token" ] && need-api-token
   true
 }
