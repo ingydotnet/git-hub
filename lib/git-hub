@@ -353,8 +353,12 @@ check-api-call-status() {
     fi
     return
   fi
-  status_code="$(head -n1 $command_header_file | cut -d ' ' -f2)"
-  [[ "$status_code" =~ ^[0-9]{3}$ ]] || return
+  status_code="$(
+    grep -E 'HTTP/1.1 [2-9]' $command_header_file |
+    head -n1 | cut -d ' ' -f2
+  )"
+  [[ "$status_code" =~ ^[0-9]{3}$ ]] ||
+    die "Can't get the status code from $command_header_file"
   case "$status_code" in
     200|201|202|204)
       OK=0
