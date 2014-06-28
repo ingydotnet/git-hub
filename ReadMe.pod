@@ -555,6 +555,16 @@ Show the diff for a pull request.
 
 Merge and close a pull request.
 
+=item C<< pull-queue [<user>] [--count=#] [--all] >>
+
+Show a user's Pull Request queue, for all repos. Shows the open PRs for any
+repo that has them. The C<--count> option tells how many repos to check. The
+C<--all> option says to show closed as well as open PRs.
+
+Note: this command makes more API calls than most other commands and thus runs
+      slower. You might want to tee the output to a file, if you need to get
+      back to this data a lot.
+
 =item C<< keys [<user>] >>
 
 List public SSH keys for a user.

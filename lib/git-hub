@@ -86,7 +86,7 @@ run-command() {
   local command_header_file command_output_file command_error_file
   local user org owner repo pairs fields title list_size remote_name
   local msg_ok msg_fail status_code ERROR
-  local do_all=false use_auth no_cache
+  local count_option do_all=false use_auth no_cache
   local quiet_output verbose_output
   local raw_output=false json_output=false
   local show_output=false show_headers=false show_json=false
@@ -931,6 +931,7 @@ get-opts() {
     case "$option" in
       -c)
         list_size="$1"
+        count_option="$1"
         shift
         ;;
       -a)

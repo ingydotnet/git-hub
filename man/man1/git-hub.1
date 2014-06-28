@@ -602,6 +602,16 @@ Show the diff for a pull request.
 .el .IP "\f(CWpull\-merge [<owner>/<repo>] <issue\-id\-number>\fR" 4
 .IX Item "pull-merge [<owner>/<repo>] <issue-id-number>"
 Merge and close a pull request.
+.ie n .IP """pull\-queue [<user>] [\-\-count=#] [\-\-all]""" 4
+.el .IP "\f(CWpull\-queue [<user>] [\-\-count=#] [\-\-all]\fR" 4
+.IX Item "pull-queue [<user>] [--count=#] [--all]"
+Show a user's Pull Request queue, for all repos. Shows the open PRs for any
+repo that has them. The \f(CW\*(C`\-\-count\*(C'\fR option tells how many repos to check. The
+\&\f(CW\*(C`\-\-all\*(C'\fR option says to show closed as well as open PRs.
+.Sp
+Note: this command makes more \s-1API\s0 calls than most other commands and thus runs
+      slower. You might want to tee the output to a file, if you need to get
+      back to this data a lot.
 .ie n .IP """keys [<user>]""" 4
 .el .IP "\f(CWkeys [<user>]\fR" 4
 .IX Item "keys [<user>]"

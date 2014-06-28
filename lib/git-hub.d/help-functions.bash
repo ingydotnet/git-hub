@@ -39,6 +39,7 @@ org-get              org-get <org> <data-key>
 orgs                 orgs [<user>]
 pull-diff            pull-diff [<owner>/<repo>] <issue-id-number>
 pull-merge           pull-merge [<owner>/<repo>] <issue-id-number>
+pull-queue           pull-queue [<user>] [--count=#] [--all]
 pull-request         pull-request [<owner>/<repo>]
 pulls                pulls [<owner>/<repo>]
 repo                 repo [<repo>]
@@ -395,6 +396,21 @@ help:pull-merge() {
   Usage: git hub pull-merge [<owner>/<repo>] <issue-id-number>
 
   Merge and close a pull request.
+...
+}
+
+help:pull-queue() {
+    cat <<'...'
+
+  Usage: git hub pull-queue [<user>] [--count=#] [--all]
+
+  Show a user's Pull Request queue, for all repos. Shows the open PRs for any
+  repo that has them. The `--count` option tells how many repos to check. The
+  `--all` option says to show closed as well as open PRs.
+
+  Note: this command makes more API calls than most other commands and thus
+  runs slower. You might want to tee the output to a file, if you need to get
+  back to this data a lot.
 ...
 }
 
