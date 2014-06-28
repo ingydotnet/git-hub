@@ -102,7 +102,7 @@ command:pull-merge() {
 }
 
 command:pull-queue() {
-  get-args '?user:get-owner'
+  get-args '?user:get-user'
   local option1= option2=
   [ -n "$count_option" ] && option1=" --count=$count_option"
   $do_all && option2=" --all"
