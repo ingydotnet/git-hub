@@ -63,15 +63,15 @@ command:pulls() {
 
   report-list \
     "/repos/$owner/$repo/pulls?state=$state;sort=updated;per_page=PER_PAGE" \
-    'number updated_at state user/login head/label base/label title'
+    'number state title user/login created_at updated_at head/label base/label'
 }
 
 format-entry:pulls() {
   if "$raw_output"; then
     echo "$2"
   else
-    printf "#%-3d (%s) %-6s @%-12s %s\n     %s\n" \
-      "$2" "${3/T*/}" "$4" "$5" "$6 → $7" "$8"
+    printf "#%-3d %-8s %s\n     @%-12s Created: %s  Updated: %s\n     %s\n" \
+      "$2" "($3)" "$4" "$5" "${6/T*/}" "${7/T*/}" "$8 → $9"
   fi
 }
 
