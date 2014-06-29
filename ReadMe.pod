@@ -545,9 +545,13 @@ Add a comment to an issue and then close it.
 
 List the pull requests for a repo.
 
-=item C<< pull-request [<owner>/<repo>] >>
+=item C<pull-request>
 
-Create a new pull request for a repository.
+Create a new pull request for a repository based on the current branch. The
+target is the repository parent (and its default branch) if the repo is a fork
+or the repo itself otherwise. Use C<--remote>, C<--branch>, C<--parent>, and
+C<--base> to change the default source remote, source branch, target remote
+and target branch (respectively).
 
 =item C<< pull-diff [<owner>/<repo>] <issue-id-number> >>
 

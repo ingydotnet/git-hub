@@ -42,7 +42,7 @@ pull-diff            pull-diff [<owner>/<repo>] <issue-id-number>
 pull-fetch           pull-fetch [<owner>/<repo>] <issue-id-number>
 pull-merge           pull-merge [<owner>/<repo>] <issue-id-number>
 pull-queue           pull-queue [<user>] [--count=#] [--all]
-pull-request         pull-request [<owner>/<repo>]
+pull-request         pull-request
 pulls                pulls [<owner>/<repo>]
 repo                 repo [<repo>]
 repo-delete          repo-delete <owner>/<repo>
@@ -437,9 +437,13 @@ help:pull-queue() {
 help:pull-request() {
     cat <<'...'
 
-  Usage: git hub pull-request [<owner>/<repo>]
+  Usage: git hub pull-request
 
-  Create a new pull request for a repository.
+  Create a new pull request for a repository based on the current branch.  The
+  target is the repository parent (and its default branch) if the repo is a
+  fork or the repo itself otherwise. Use `--remote`, `--branch`, `--parent`,
+  and `--base` to change the default source remote, source branch, target
+  remote and target branch (respectively).
 ...
 }
 

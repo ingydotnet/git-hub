@@ -596,10 +596,14 @@ Add a comment to an issue and then close it.
 .el .IP "\f(CWpulls [<owner>/<repo>]\fR" 4
 .IX Item "pulls [<owner>/<repo>]"
 List the pull requests for a repo.
-.ie n .IP """pull\-request [<owner>/<repo>]""" 4
-.el .IP "\f(CWpull\-request [<owner>/<repo>]\fR" 4
-.IX Item "pull-request [<owner>/<repo>]"
-Create a new pull request for a repository.
+.ie n .IP """pull\-request""" 4
+.el .IP "\f(CWpull\-request\fR" 4
+.IX Item "pull-request"
+Create a new pull request for a repository based on the current branch. The
+target is the repository parent (and its default branch) if the repo is a fork
+or the repo itself otherwise. Use \f(CW\*(C`\-\-remote\*(C'\fR, \f(CW\*(C`\-\-branch\*(C'\fR, \f(CW\*(C`\-\-parent\*(C'\fR, and
+\&\f(CW\*(C`\-\-base\*(C'\fR to change the default source remote, source branch, target remote
+and target branch (respectively).
 .ie n .IP """pull\-diff [<owner>/<repo>] <issue\-id\-number>""" 4
 .el .IP "\f(CWpull\-diff [<owner>/<repo>] <issue\-id\-number>\fR" 4
 .IX Item "pull-diff [<owner>/<repo>] <issue-id-number>"
