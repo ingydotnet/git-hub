@@ -97,8 +97,13 @@ ok:pull-diff() {
 command:pull-fetch() {
   get-args '?owner:get-owner/repo:get-repo' number
   assert-inside-git-repo
-  git fetch -f "git@github.com:$owner/$repo" "refs/pull/$number/head:review/$number" ||
-    error "can't fetch PR $number"
+  if [ -n "$(git branch | grep review/$number)" ]; then
+    echo "Branch review/$number already exists"
+  else
+    git fetch -f "git@github.com:$owner/$repo" "refs/pull/$number/head:review/$number" ||
+        error "can't fetch PR $number"
+  fi
+  msg_ok=0
 }
 
 command:pull-merge() {
