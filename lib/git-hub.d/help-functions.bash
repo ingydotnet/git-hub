@@ -38,6 +38,7 @@ org-edit             org-edit <org> <key-value-pairs>...
 org-get              org-get <org> <data-key>
 orgs                 orgs [<user>]
 pull-diff            pull-diff [<owner>/<repo>] <issue-id-number>
+pull-fetch           pull-fetch [<owner>/<repo>] <issue-id-number>
 pull-merge           pull-merge [<owner>/<repo>] <issue-id-number>
 pull-queue           pull-queue [<user>] [--count=#] [--all]
 pull-request         pull-request [<owner>/<repo>]
@@ -387,6 +388,15 @@ help:pull-diff() {
   Usage: git hub pull-diff [<owner>/<repo>] <issue-id-number>
 
   Show the diff for a pull request.
+...
+}
+
+help:pull-fetch() {
+    cat <<'...'
+
+  Usage: git hub pull-fetch [<owner>/<repo>] <issue-id-number>
+
+  Fetches a pull request to a local `review/$number` branch
 ...
 }
 

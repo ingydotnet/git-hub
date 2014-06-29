@@ -10,9 +10,7 @@ See http://github.com/ingydotnet/swim-pm#readme
 
 git-hub - The Git command for GitHub
 
-=for html
-<a href="https://travis-ci.org/ingydotnet/git-hub"><img src="https://travis-ci.org/ingydotnet/git-hub.png" alt="git-hub"></a>
-<a href="https://coveralls.io/r/ingydotnet/git-hub?branch=master"><img src="https://coveralls.io/repos/ingydotnet/git-hub/badge.png" alt="git-hub"></a>
+<badge travis coveralls ingydotnet/git-hub>
 
 =head1 Synopsis
 
@@ -550,6 +548,10 @@ Create a new pull request for a repository.
 =item C<< pull-diff [<owner>/<repo>] <issue-id-number> >>
 
 Show the diff for a pull request.
+
+=item C<< pull-fetch [<owner>/<repo>] <issue-id-number> >>
+
+Fetches a pull request to a local C<review/$number> branch
 
 =item C<< pull-merge [<owner>/<repo>] <issue-id-number> >>
 
