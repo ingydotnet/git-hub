@@ -429,8 +429,12 @@ interactions from the command line. They are installed by default.
 - `pulls [<owner>/<repo>]`
   List the pull requests for a repo.
 
-- `pull-request [<owner>/<repo>]`
-  Create a new pull request for a repository.
+- `pull-request`
+  Create a new pull request for a repository based on the current branch.  The
+  target is the repository parent (and its default branch) if the repo is a
+  fork or the repo itself otherwise. Use `--remote`, `--branch`, `--parent`,
+  and `--base` to change the default source remote, source branch, target
+  remote and target branch (respectively).
 
 - `pull-diff [<owner>/<repo>] <issue-id-number>`
   Show the diff for a pull request.
