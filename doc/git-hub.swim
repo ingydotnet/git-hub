@@ -435,6 +435,9 @@ interactions from the command line. They are installed by default.
 - `pull-diff [<owner>/<repo>] <issue-id-number>`
   Show the diff for a pull request.
 
+- `pull-fetch [<owner>/<repo>] <issue-id-number>`
+  Fetches a pull request to a local `review/$number` branch
+
 - `pull-merge [<owner>/<repo>] <issue-id-number>`
   Merge and close a pull request.
 
