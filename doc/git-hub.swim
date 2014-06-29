@@ -426,6 +426,9 @@ interactions from the command line. They are installed by default.
 - `issue-close [<owner>/<repo>] <issue-id-number>`
   Close an issue. You can also use `issue-edit` to close an issue.
 
+- `issue-resolve [<owner>/<repo>] <issue-id-number>`
+  Add a comment to an issue and then close it.
+
 - `pulls [<owner>/<repo>]`
   List the pull requests for a repo.
 

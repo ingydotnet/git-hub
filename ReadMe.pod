@@ -10,9 +10,7 @@ See http://github.com/ingydotnet/swim-pm#readme
 
 git-hub - The Git command for GitHub
 
-=for html
-<a href="https://travis-ci.org/ingydotnet/git-hub"><img src="https://travis-ci.org/ingydotnet/git-hub.png" alt="git-hub"></a>
-<a href="https://coveralls.io/r/ingydotnet/git-hub?branch=master"><img src="https://coveralls.io/repos/ingydotnet/git-hub/badge.png" alt="git-hub"></a>
+<badge travis coveralls ingydotnet/git-hub>
 
 =head1 Synopsis
 
@@ -538,6 +536,10 @@ comment.
 =item C<< issue-close [<owner>/<repo>] <issue-id-number> >>
 
 Close an issue. You can also use C<issue-edit> to close an issue.
+
+=item C<< issue-resolve [<owner>/<repo>] <issue-id-number> >>
+
+Add a comment to an issue and then close it.
 
 =item C<< pulls [<owner>/<repo>] >>
 

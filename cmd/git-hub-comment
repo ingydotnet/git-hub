@@ -14,6 +14,10 @@ command:comment() {
 #
 $issue_report"
 
+  if [[ ! "$body" =~ [^[:space:]] ]]; then
+    abort "no comment body provided."
+  fi
+
   api-post "$url" "$(
     json-dump-object body "$body"
   )"
