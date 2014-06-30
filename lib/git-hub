@@ -917,7 +917,7 @@ assert-env-var() {
   for var in $@; do
     var="GIT_HUB_$var"
     [ -n "${!var}" ] ||
-      error "'$var' is not set"
+      abort "'$var' is not set"
   done
 }
 
@@ -1316,29 +1316,29 @@ callable-or-source() {
 
 assert-inside-git-repo() {
   inside-git-repo ||
-    error "not inside a git repo"
+    abort "not inside a git repo"
 }
 
 assert-repo-top-level() {
   [ "$(git rev-parse --git-dir)" == '.git' ] ||
-    error "not at top level directory of repo"
+    abort "not at top level directory of repo"
 }
 
 assert-git-repo-is-clean() {
   # Repo is in a clean state:
   git update-index -q --ignore-submodules --refresh
   git diff-files --quiet --ignore-submodules ||
-    error "unstaged changes."
+    abort "unstaged changes."
   git diff-index --quiet --ignore-submodules HEAD ||
-    error "working tree has changes."
+    abort "working tree has changes."
   git diff-index --quiet --cached --ignore-submodules HEAD ||
-    error "index has changes."
+    abort "index has changes."
 }
 
 assert-git-on-branch() {
   local branch="$(git rev-parse --abbrev-ref HEAD)"
   [ -n "$branch" -a "$branch" != "HEAD" ] ||
-    error "repo HEAD is not currently on a branch"
+    abort "repo HEAD is not currently on a branch"
 }
 
 assert-git-head-is-pushed() {
@@ -1349,7 +1349,7 @@ assert-git-head-is-pushed() {
       grep "$remote_name/$branch"
   )"
   [ -n "$text" ] ||
-    error "current HEAD is not pushed to remote '$remote_name'"
+    abort "current HEAD is not pushed to remote '$remote_name'"
 }
 
 inside-git-repo() {
