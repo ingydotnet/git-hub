@@ -2,6 +2,7 @@
 
 command:pull-request() {
   require-auth
+  get-args "?number:'none'"
 
   local owner="$(get-owner)"
   local repo="$(get-repo)"
@@ -35,7 +36,19 @@ command:pull-request() {
   local base="$parent_base"
   local url="/repos/$parent_owner_repo/pulls"
 
-  editor-title-body "
+  if [[ "$number" =~ ^[0-9]+$ ]]; then
+    local prompt_msg="Attach pull-request $owner/$repo:$branch_name -> $parent_owner_repo:$parent_base to issue #$number? [yN]"
+    local doit=$(prompt "$prompt_msg")
+    if [[ "$doit" =~ ^[yY] ]]; then
+      api-post "$url" "$(
+        json-dump-object head "$head" base "$base" issue "$number"
+      )"
+      msg_ok="Attached pull-request to issue: $(JSON.get -s /html_url -)"
+    else 
+      msg_ok=0
+    fi
+  else
+    editor-title-body "
 # New GitHub Pull Request
 #
 # Requesting that...
@@ -57,11 +70,12 @@ command:pull-request() {
 #
 $diff"
 
-  api-post "$url" "$(
-    json-dump-object head "$head" base "$base" title "$title" body "$body"
-  )"
+    api-post "$url" "$(
+        json-dump-object head "$head" base "$base" title "$title" body "$body"
+    )"
+    msg_ok="New pull-request created: $(JSON.get -s /html_url -)"
+  fi
 
-  msg_ok="New pull-request created: $(JSON.get -s /html_url -)"
 
 }
 
