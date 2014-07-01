@@ -48,7 +48,7 @@ GitHub user or organization, with one command. See PIPE AND EACH below.
 
 Get the source code from GitHub:
 
-  git clone git@github.com:ingydotnet/git-hub
+  git clone git://github.com/ingydotnet/git-hub.git
 
 Then simply add the `lib` and `man` directories to your PATH and MANPATH:
 
