@@ -52,8 +52,8 @@ Get the source code from GitHub:
 
 Then simply add the `lib` and `man` directories to your PATH and MANPATH:
 
-  export PATH=/path/to/git-hub/lib:$PATH
-  export MANPATH=/path/to/git-hub/man:$MANPATH
+  export PATH=/path/to/git-hub/lib:"$PATH"
+  export MANPATH=/path/to/git-hub/man:"$MANPATH"
 
 To do a proper system install, which puts `git-hub` next to your other git
 commands, do this instead:
