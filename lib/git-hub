@@ -1003,30 +1003,21 @@ get-opts() {
   true
 }
 
-interactive() {
-  if [ -t 0 -a -t 1 ]; then
-    return 0
-  else
-    return 1
-  fi
-}
 
-osx() {
-  if [ "$(uname)" == Darwin ]; then
-    return 0
-  else
-    return 1
-  fi
+if [ -t 0 -a -t 1 ]; then
+  interactive() { return 0; }
+  pipeline()    { return 1; }
+else
+  interactive() { return 1; }
+  pipeline()    { return 0; }
+fi
 
-}
+if [[ "x$(uname)" = xDarwin ]]; then
+  osx() { return 1; }
+else
+  osx() { return 0; }
+fi
 
-pipeline() {
-  if [ -t 0 -a -t 1 ]; then
-    return 1
-  else
-    return 0
-  fi
-}
 
 set-var() {
   local name="$1"
