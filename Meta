@@ -20,10 +20,12 @@ requires:
   git: 1.7.0
   bashplus: 0.0.1
   json: 0.0.1
+
 test:
   cmd: make test
   requires:
     test-more: 0.0.1
+
 install: make bpan-install
 
 devel:
