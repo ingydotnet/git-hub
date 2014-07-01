@@ -38,6 +38,8 @@ help        Browse the complete 'git-hub' documentation
  
 remote=     Remote name (like 'origin')
 branch=     Branch name (like 'master')
+parent=     Parent remote name (like 'upstream')
+base=       Parent pull-request base (like 'devel')
 org=        GitHub organization name
  
 c,count=    Number of list items to show
@@ -582,6 +584,51 @@ get-remote-name() {
   fi
 }
 
+get-default-remote-name() {
+  [ -n "$remote_name" ] && return
+  local owner="$(get-repo-config owner)"
+  local repo="$(get-repo-config repo)"
+  remote_name="$(git remote -v | grep "$owner/$repo" | grep "(fetch)" | cut -f 1)"
+}
+
+get-branch-name() {
+  [ -n "$branch_name" ] && return
+  branch_name="$(git rev-parse --abbrev-ref HEAD)"
+}
+
+get-parent-owner-repo() {
+  [ -n "$parent_owner_repo" ] && return
+  get-parent-remote-name
+  local remote_name="$parent_remote_name"
+  local parent_owner="$(get-repo-config owner)"
+  local parent_repo="$(get-repo-config repo)"
+  parent_owner_repo="$parent_owner/$parent_repo"
+}
+
+get-parent-remote-name() {
+  [ -n "$parent_remote_name" ] && return
+  local owner="$(get-owner)"
+  local repo="$(get-repo)"
+  api-get "/repos/$owner/$repo"
+  OK || {
+    abort "Repo '$owner/$repo' not found"
+  }
+  local value="$(JSON.get -a "/parent/full_name" -)"
+  if [ -z "$value" ]; then
+    # parent for pull requests is self
+    get-default-remote-name
+    parent_remote_name="$remote_name"
+  else
+    parent_remote_name="$(git remote -v | grep "$value" | grep "(fetch)" | cut -f 1)"
+  fi
+}
+
+get-parent-base() {
+  [ -n "$parent_base" ] && return
+  get-parent-owner-repo
+  parent_base="$(git hub repo-get $parent_owner_repo default_branch)"
+}
+
 require-auth() {
   [ -z "$api_token" ] && get-var api-token
   if [ "$api_token" == XXX ]; then
@@ -970,8 +1017,16 @@ get-opts() {
         set-var remote_name "$1"
         shift
         ;;
+      --parent)
+        set-var parent_remote "$1"
+        shift
+        ;;
       --branch)
         set-var branch_name "$1"
+        shift
+        ;;
+      --base)
+        set-var parent_base "$1"
         shift
         ;;
 
