@@ -116,6 +116,12 @@ command:issue-close() {
   )"
 }
 
+command:issue-resolve() {
+  get-args '?owner:get-user/repo:get-repo' number
+  git hub comment $owner/$repo $number && git hub issue-close $owner/$repo $number
+  msg_ok=0
+}
+
 command:issue-edit() {
   get-args '?owner:get-user/repo:get-repo' number
   api-get "/repos/$owner/$repo/issues/$number"

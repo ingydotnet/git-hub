@@ -26,6 +26,7 @@ issue                issue [<owner>/<repo>] <issue-id-number>
 issue-close          issue-close [<owner>/<repo>] <issue-id-number>
 issue-edit           issue-edit [<owner>/<repo>] <issue-id-number>
 issue-new            issue-new [<owner>/<repo>]
+issue-resolve        issue-resolve [<owner>/<repo>] <issue-id-number>
 issues               issues [<owner>/<repo>] [--all]
 keys                 keys [<user>]
 keys-add             keys-add <title> <key>
@@ -273,6 +274,15 @@ help:issue-new() {
   Usage: git hub issue-new [<owner>/<repo>]
 
   Create a new issue for a repository.
+...
+}
+
+help:issue-resolve() {
+    cat <<'...'
+
+  Usage: git hub issue-resolve [<owner>/<repo>] <issue-id-number>
+
+  Add a comment to an issue and then close it.
 ...
 }
 
