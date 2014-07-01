@@ -10,7 +10,9 @@ See http://github.com/ingydotnet/swim-pm#readme
 
 git-hub - The Git command for GitHub
 
-<badge travis coveralls ingydotnet/git-hub>
+=for html
+<a href="https://travis-ci.org/ingydotnet/git-hub"><img src="https://travis-ci.org/ingydotnet/git-hub.png" alt="git-hub"></a>
+<a href="https://coveralls.io/r/ingydotnet/git-hub?branch=master"><img src="https://coveralls.io/repos/ingydotnet/git-hub/badge.png" alt="git-hub"></a>
 
 =head1 Synopsis
 
@@ -545,7 +547,7 @@ Add a comment to an issue and then close it.
 
 List the pull requests for a repo.
 
-=item C<pull-request [issue-id-number]>
+=item C<< pull-request [<issue-id-number>] [<options>] >>
 
 Create a new pull request for a repository based on the current branch. If an
 issue ID number is given, this command will attach the pull request to the
@@ -554,8 +556,8 @@ issue instead of creating a new one.
 If the default remote is a fork, the pull request will target the default
 branch of the parent repository. Otherwise the pull request will target the
 default branch of the default remote itself. Use C<--remote>, C<--branch>, C<--
-parent>, and C<--base> to change the default source remote, source branch,
-target remote and target branch (respectively).
+parent>, and C<--base> options to change the default source remote, source
+branch, target remote and target branch (respectively).
 
 =item C<< pull-diff [<owner>/<repo>] <issue-id-number> >>
 

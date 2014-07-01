@@ -42,7 +42,7 @@ pull-diff            pull-diff [<owner>/<repo>] <issue-id-number>
 pull-fetch           pull-fetch [<owner>/<repo>] <issue-id-number>
 pull-merge           pull-merge [<owner>/<repo>] <issue-id-number>
 pull-queue           pull-queue [<user>] [--count=#] [--all]
-pull-request         pull-request [issue-id-number]
+pull-request         pull-request [<issue-id-number>] [<options>]
 pulls                pulls [<owner>/<repo>]
 repo                 repo [<repo>]
 repo-delete          repo-delete <owner>/<repo>
@@ -437,7 +437,7 @@ help:pull-queue() {
 help:pull-request() {
     cat <<'...'
 
-  Usage: git hub pull-request [issue-id-number]
+  Usage: git hub pull-request [<issue-id-number>] [<options>]
 
   Create a new pull request for a repository based on the current branch.  If
   an issue ID number is given, this command will attach the pull request to the
@@ -446,8 +446,8 @@ help:pull-request() {
   If the default remote is a fork, the pull request will target the default
   branch of the parent repository.  Otherwise the pull request will target the
   default branch of the default remote itself. Use `--remote`, `--branch`,
-  `--parent`, and `--base` to change the default source remote, source branch,
-  target remote and target branch (respectively).
+  `--parent`, and `--base` options to change the default source remote, source
+  branch, target remote and target branch (respectively).
 ...
 }
 

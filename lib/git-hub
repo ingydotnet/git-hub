@@ -38,8 +38,6 @@ help        Browse the complete 'git-hub' documentation
  
 remote=     Remote name (like 'origin')
 branch=     Branch name (like 'master')
-parent=     Parent remote name (like 'upstream')
-base=       Parent pull-request base (like 'devel')
 org=        GitHub organization name
  
 c,count=    Number of list items to show
@@ -1017,16 +1015,8 @@ get-opts() {
         set-var remote_name "$1"
         shift
         ;;
-      --parent)
-        set-var parent_remote "$1"
-        shift
-        ;;
       --branch)
         set-var branch_name "$1"
-        shift
-        ;;
-      --base)
-        set-var parent_base "$1"
         shift
         ;;
 
