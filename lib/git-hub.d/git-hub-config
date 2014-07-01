@@ -1,1 +1,30 @@
-../../cmd/git-hub-config
+#!/usr/bin/env bash
+
+set -e
+
+command:config() {
+  get-args config_key:empty config_value:empty
+  msg_ok=0
+  if [ -z "$config_key" ]; then
+    [ ! -e "$GIT_HUB_CONFIG" ] && config-not-setup
+    say "Your git-hub config file (at $GIT_HUB_CONFIG):\n"
+    cat "$GIT_HUB_CONFIG"
+  elif [ -z "$config_value" ]; then
+    local value="$(git config -f $GIT_HUB_CONFIG github.$config_key)" ||
+      return $?
+    msg_ok="$config_key=$value"
+  else
+    git config -f "$GIT_HUB_CONFIG" "github.$config_key" "$config_value"
+    msg_ok="$config_key=$config_value"
+  fi
+  OK=$?
+}
+
+command:config-unset() {
+  get-args config_key
+  git config -f "$GIT_HUB_CONFIG" --unset "github.$config_key"
+  OK=$?
+  msg_ok="Config key '$config_key' has been unset."
+}
+
+# vim: set lisp:

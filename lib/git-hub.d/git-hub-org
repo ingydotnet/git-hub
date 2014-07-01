@@ -1,1 +1,49 @@
-../../cmd/git-hub-org
+#!/usr/bin/env bash
+
+set -e
+
+command:orgs() {
+  get-args user:get-user
+  local title="Organizations for User '$user':"
+  msg_fail="Can't find Organizations for User '$user'"
+  report-list \
+    "/users/$user/orgs?per_page=PER_PAGE" \
+    login
+}
+
+command:org() {
+  get-args org
+  api-get "/orgs/$org"
+}
+
+ok:org() {
+  fields=(
+    login type name billing_email email blog location company
+    html_url public_repos public created_at
+  )
+  report-data
+}
+
+command:org-get() {
+  get-args org key
+  api-get "/orgs/$org"
+  OK || {
+    msg_fail="Organization '$org' not found"
+    return
+  }
+  local value="$(JSON.get -a "/$key" -)"
+  if [ -n "$value" ]; then
+    msg_ok="$value"
+  else
+    msg_fail="Couldn't get value for '$key'"
+    OK=1
+  fi
+}
+
+command:org-edit() {
+  require-auth
+  get-args org %pairs
+  api-patch "/orgs/$org" "$(json-dump-object-pairs)"
+}
+
+# vim: set lisp:

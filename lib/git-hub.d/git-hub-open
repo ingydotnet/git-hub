@@ -1,1 +1,42 @@
-../../cmd/git-hub-open
+#!/usr/bin/env bash
+
+# Try this vim command:
+#
+# map \gho :let $l=line(".")<cr>:let $p=@%<cr>:!git hub open $p $l<cr><cr>
+
+set -e
+
+command:open() {
+  local options=()
+  "$raw_output" && options+=(--raw)
+  [ -n "$remote_name" ] && options+=(--remote "$remote_name")
+
+  set -- "${command_arguments[@]}"
+
+  url="$(git hub url $@ ${options[@]})"
+
+  get-browser
+
+  "$browser" "$url" &
+  msg_ok="$browser $url"
+}
+
+get-browser() {
+  browser="$(get-hub-config browser)"
+  [ -n "$browser" ] && return
+
+  [ "$(uname)" == "Darwin" ] && browser="open" && return
+
+  for browser in firefox chromium-browser; do
+    [ -n "$(type $browser)" ] && return
+  done
+
+  die <<...
+Can't determine your web browser. Try something like:
+
+    git hub config browser chromium
+
+...
+}
+
+# vim: set lisp:
