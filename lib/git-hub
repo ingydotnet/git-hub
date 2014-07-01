@@ -924,6 +924,26 @@ assert-env-var() {
 get-opts() {
   [ $# -eq 0 ] && set -- --help
 
+  # TODO This is a hack for per-command args. We need to make this be closer
+  # to the commands that need them.
+  local args=() need_var=
+  for arg; do
+    if [ -n "$need_var" ]; then
+      printf -v "$need_var" "$arg"
+      need_var=
+    elif [[ "$arg" =~ ^--parent(=.*)?$ ]]; then
+      set-var parent_remote "${BASH_REMATCH[1]#=}"
+      [ -n "${BASH_REMATCH[1]#=}" ] || need_var=parent_remote
+    elif [[ "$arg" =~ ^--base(=.*)?$ ]]; then
+      set-var parent_base "${BASH_REMATCH[1]#=}"
+      [ -n "${BASH_REMATCH[1]#=}" ] || need_var=parent_base
+    else
+      args+=("$arg")
+    fi
+  done
+
+  set -- "${args[@]}"
+
   eval "$(
     echo "$OPTIONS_SPEC" |
       git rev-parse --parseopt -- "$@" ||
