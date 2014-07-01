@@ -479,7 +479,7 @@ interactions from the command line. They are installed by default.
 == Plugin Commands
 
 There are external plugins like "this
-one"[http://github.com/carloslima/git-hub-travis].
+one"[https://github.com/carloslima/git-hub-travis].
 
 This section is about the "plugin" commands that currently come with
 `git-hub`.
