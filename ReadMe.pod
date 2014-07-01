@@ -553,6 +553,10 @@ Create a new pull request for a repository.
 
 Show the diff for a pull request.
 
+=item C<< pull-fetch [<owner>/<repo>] <issue-id-number> >>
+
+Fetches a pull request to a local C<review/$number> branch
+
 =item C<< pull-merge [<owner>/<repo>] <issue-id-number> >>
 
 Merge and close a pull request.
