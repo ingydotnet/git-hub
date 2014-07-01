@@ -9,6 +9,9 @@ set -e
 command:open() {
   local options=()
   "$raw_output" && options+=(--raw)
+  if [ -n "$remote_name" ]; then
+      options+=("--remote" "$remote_name")
+  fi
 
   set -- "${command_arguments[@]}"
 
