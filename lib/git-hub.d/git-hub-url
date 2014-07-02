@@ -19,7 +19,7 @@ command:url() {
 
   get-args '?owner:get-user/repo:get-repo'
 
-  url="http://github.com/$owner/$repo"
+  url="https://github.com/$owner/$repo"
 
   if [ -n "$path" ]; then
     branch="$(git rev-parse --abbrev-ref HEAD)"
