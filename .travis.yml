@@ -3,3 +3,11 @@ language: c
 
 script:
 - PROVEOPT=-v make test
+
+notifications:
+  irc:
+    channels:
+    - irc.freenode.net#git-commands
+    on_success: change
+    on_failure: always
+
