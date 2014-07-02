@@ -48,12 +48,12 @@ GitHub user or organization, with one command. See PIPE AND EACH below.
 
 Get the source code from GitHub:
 
-  git clone git@github.com:ingydotnet/git-hub
+  git clone git://github.com/ingydotnet/git-hub.git
 
 Then simply add the `lib` and `man` directories to your PATH and MANPATH:
 
-  export PATH=/path/to/git-hub/lib:$PATH
-  export MANPATH=/path/to/git-hub/man:$MANPATH
+  export PATH=/path/to/git-hub/lib:"$PATH"
+  export MANPATH=/path/to/git-hub/man:"$MANPATH"
 
 To do a proper system install, which puts `git-hub` next to your other git
 commands, do this instead:
@@ -479,7 +479,7 @@ interactions from the command line. They are installed by default.
 == Plugin Commands
 
 There are external plugins like "this
-one"[http://github.com/carloslima/git-hub-travis].
+one"[https://github.com/carloslima/git-hub-travis].
 
 This section is about the "plugin" commands that currently come with
 `git-hub`.
