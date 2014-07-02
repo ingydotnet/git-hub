@@ -680,12 +680,18 @@ report-list-process() {
   local list_max=${list_size:-$(($terminal_lines - 2))}
   local line_max=$terminal_cols
   local per_page=100
-  [ $per_page -gt $list_max ] && per_page=$list_max
+  if ! $json_output; then
+    [ $per_page -gt $list_max ] && per_page=$list_max
+  fi
   url="${url/PER_PAGE/$per_page}"
   [ -n "$title" ] && say "$title"
   local list_counter=1
   while true; do
     api-get "$url"
+    if $json_output; then
+      pretty-json-list "${fields[@]}"
+      return 0
+    fi
     OK || return 0
     json-var-list "${fields[@]}"
     if [ -n "$key_prefix" ]; then
