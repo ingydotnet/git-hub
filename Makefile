@@ -79,6 +79,9 @@ uninstall-doc:
 $(INSTALL_EXT):
 	mkdir -p $@
 
+clean purge:
+	git clean -fxd
+
 ##
 # Build rules:
 .PHONY: doc
