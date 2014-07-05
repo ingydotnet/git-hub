@@ -123,10 +123,10 @@ ok:pull-diff() {
 command:pull-fetch() {
   get-args '?owner:get-owner/repo:get-repo' number
   assert-inside-git-repo
-  if [ -n "$(git branch | grep review/$number)" ]; then
-    echo "Branch review/$number already exists"
+  if [ -n "$(git branch | grep PR/$number)" ]; then
+    echo "Branch PR/$number already exists"
   else
-    git fetch -f "git@github.com:$owner/$repo" "refs/pull/$number/head:review/$number" ||
+    git fetch -f "git@github.com:$owner/$repo" "refs/pull/$number/head:PR/$number" ||
         error "can't fetch PR $number"
   fi
   msg_ok=0
