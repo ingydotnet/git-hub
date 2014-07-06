@@ -2,39 +2,31 @@
 ifeq ($(shell which git),)
     $(error 'git' is not installed on this system)
 endif
+GITVER ?= $(word 3,$(shell git --version))
 
-NAME := git-hub
-
-LOCAL_LIB := $(shell pwd)/lib/$(NAME)
-LOCAL_MAN := $(shell pwd)/man
-LOCAL_MAN1 := $(LOCAL_MAN)/man1
-LOCAL_EXT = $(LOCAL_LIB).d
-LOCAL_EXTS = $(shell find $(LOCAL_EXT) -type f) \
-	    $(shell find $(LOCAL_EXT) -type l)
+NAME = git-hub
+LIB = lib
+LIBS = $(shell find $(LIB) -type f) \
+	$(shell find $(LIB) -type l)
+DOC = doc/$(NAME).swim
+MAN = $(MAN1)/$(NAME).1
+MAN1 = man/man1
+EXT = $(LIB)/$(NAME).d
+EXTS = $(shell find $(EXT) -type f) \
+	$(shell find $(EXT) -type l)
 
 # XXX Make these vars look like git.git/Makefile style
 PREFIX ?= /usr/local
-
 # XXX Using sed for now. Would like to use bash or make syntax.
 # If GIT_EXEC_PATH is set, `git --exec-path` will contain that appended to the
 # front. We just want the path where git is actually installed:
 INSTALL_LIB ?= $(shell git --exec-path | sed 's/.*://')
 INSTALL_CMD ?= $(INSTALL_LIB)/$(NAME)
 INSTALL_EXT ?= $(INSTALL_LIB)/$(NAME).d
-INSTALL_MAN ?= $(PREFIX)/share/man/man1
-
-## XXX assert good bash
-
-##
-# Make sure we have 'git' and it works OK.
-ifeq ($(shell which git),)
-    $(error 'git' is not installed on this system)
-endif
-GITVER ?= $(word 3,$(shell git --version))
+INSTALL_MAN1 ?= $(PREFIX)/share/man/man1
 
 ##
 # User targets:
-.PHONY: default help test
 default: help
 
 help:
@@ -44,6 +36,7 @@ help:
 	@echo 'install    Install $(NAME)'
 	@echo 'uninstall  Uninstall $(NAME)'
 
+.PHONY: test
 test:
 ifeq ($(shell which prove),)
 	@echo '`make test` requires the `prove` utility'
@@ -51,19 +44,17 @@ ifeq ($(shell which prove),)
 endif
 	prove $(PROVEOPT:%=% )test/
 
-.PHONY: install install-lib install-doc
 install: install-lib install-doc
 
 install-lib: $(INSTALL_EXT)
-	install -C -m 0755 $(LOCAL_LIB) $(INSTALL_LIB)/
+	install -C -m 0755 $(LIBS) $(INSTALL_LIB)/
 	install -C -d -m 0755 $(INSTALL_EXT)/
-	install -C -m 0755 $(LOCAL_EXTS) $(INSTALL_EXT)/
+	install -C -m 0755 $(EXTS) $(INSTALL_EXT)/
 
 install-doc:
-	install -C -d -m 0755 $(INSTALL_MAN)
-	install -C -m 0644 $(LOCAL_MAN1)/$(NAME).1 $(INSTALL_MAN)
+	install -C -d -m 0755 $(INSTALL_MAN1)
+	install -C -m 0644 $(MAN) $(INSTALL_MAN1)
 
-.PHONY: uninstall uninstall-lib uninstall-doc
 uninstall: uninstall-lib uninstall-doc
 
 uninstall-lib:
@@ -71,7 +62,7 @@ uninstall-lib:
 	rm -fr $(INSTALL_EXT)
 
 uninstall-doc:
-	rm -f $(INSTALL_MAN)/$(NAME).1
+	rm -f $(INSTALL_MAN1)/$(NAME).1
 
 $(INSTALL_EXT):
 	mkdir -p $@
@@ -81,20 +72,18 @@ clean purge:
 
 ##
 # Build rules:
-.PHONY: doc
-doc: $(LOCAL_MAN1)/$(NAME).1 doc/$(NAME).swim
-	perl tool/generate-help-functions.pl doc/$(NAME).swim > \
-	    $(LOCAL_EXT)/help-functions.bash
+doc: $(MAN) ReadMe.pod
+	perl tool/generate-help-functions.pl $(DOC) > \
+	    $(EXT)/help-functions.bash
 
-$(LOCAL_MAN1)/$(NAME).1: $(NAME).1
-	mv $< $@
+$(MAN1)/%.1: doc/%.swim swim-check
+	swim --to=man $< > $@
 
-%.1: %.pod
-	pod2man --utf8 $< > $@
+ReadMe.pod: $(DOC) swim-check
+	swim --to=pod --complete=1 --wrap=1 $< > $@
 
-%.pod: doc/%.swim
-	swim --to=pod --wrap=1 --complete=1 $< > $@
-	cp $@ ReadMe.pod
+swim-check:
+	@# Need to assert Swim and Swim::Plugin::badge are installed
 
 #------------------------------------------------------------------------------
 # BPAN Rules
@@ -104,8 +93,8 @@ BPAN_INSTALL_EXT ?= $(BPAN_INSTALL_LIB)/$(NAME).d
 BPAN_INSTALL_MAN1=$(shell bpan env BPAN_MAN1)
 
 bpan-install:
-	install -C -m 0755 $(LOCAL_LIB) $(BPAN_INSTALL_LIB)/
+	install -C -m 0755 $(LIB) $(BPAN_INSTALL_LIB)/
 	install -C -d -m 0755 $(BPAN_INSTALL_EXT)/
-	install -C -m 0755 $(LOCAL_EXTS) $(BPAN_INSTALL_EXT)/
+	install -C -m 0755 $(EXTS) $(BPAN_INSTALL_EXT)/
 	install -C -d -m 0755 $(BPAN_INSTALL_MAN1)
-	install -C -m 0644 $(LOCAL_MAN1)/$(NAME).1 $(BPAN_INSTALL_MAN1)
+	install -C -m 0644 $(MAN) $(BPAN_INSTALL_MAN1)
