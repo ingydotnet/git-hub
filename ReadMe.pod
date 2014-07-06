@@ -57,12 +57,12 @@ GitHub user or organization, with one command. See PIPE AND EACH below.
 
 Get the source code from GitHub:
 
-    git clone git@github.com:ingydotnet/git-hub
+    git clone git://github.com/ingydotnet/git-hub.git
 
 Then simply add the C<lib> and C<man> directories to your PATH and MANPATH:
 
-    export PATH=/path/to/git-hub/lib:$PATH
-    export MANPATH=/path/to/git-hub/man:$MANPATH
+    export PATH=/path/to/git-hub/lib:"$PATH"
+    export MANPATH=/path/to/git-hub/man:"$MANPATH"
 
 To do a proper system install, which puts C<git-hub> next to your other git
 commands, do this instead:
@@ -605,7 +605,7 @@ Print the URL of a repo or a file in a repo.
 
 =head2 Plugin Commands
 
-There are external plugins like L<this one|http://github.com/carloslima/git-hub-
+There are external plugins like L<this one|https://github.com/carloslima/git-hub-
 travis>.
 
 This section is about the "plugin" commands that currently come with

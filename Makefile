@@ -3,12 +3,9 @@ ifeq ($(shell which git),)
     $(error 'git' is not installed on this system)
 endif
 
+NAME := git-hub
 
-# export PATH := ../swim-pm/bin:$(PATH)
-
-CMD := git-hub
-
-LOCAL_LIB := $(shell pwd)/lib/$(CMD)
+LOCAL_LIB := $(shell pwd)/lib/$(NAME)
 LOCAL_MAN := $(shell pwd)/man
 LOCAL_MAN1 := $(LOCAL_MAN)/man1
 LOCAL_EXT = $(LOCAL_LIB).d
@@ -22,8 +19,8 @@ PREFIX ?= /usr/local
 # If GIT_EXEC_PATH is set, `git --exec-path` will contain that appended to the
 # front. We just want the path where git is actually installed:
 INSTALL_LIB ?= $(shell git --exec-path | sed 's/.*://')
-INSTALL_CMD ?= $(INSTALL_LIB)/$(CMD)
-INSTALL_EXT ?= $(INSTALL_LIB)/$(CMD).d
+INSTALL_CMD ?= $(INSTALL_LIB)/$(NAME)
+INSTALL_EXT ?= $(INSTALL_LIB)/$(NAME).d
 INSTALL_MAN ?= $(PREFIX)/share/man/man1
 
 ## XXX assert good bash
@@ -44,8 +41,8 @@ help:
 	@echo 'Makefile rules:'
 	@echo ''
 	@echo 'test       Run all tests'
-	@echo 'install    Install $(CMD)'
-	@echo 'uninstall  Uninstall $(CMD)'
+	@echo 'install    Install $(NAME)'
+	@echo 'uninstall  Uninstall $(NAME)'
 
 test:
 ifeq ($(shell which prove),)
@@ -64,7 +61,7 @@ install-lib: $(INSTALL_EXT)
 
 install-doc:
 	install -C -d -m 0755 $(INSTALL_MAN)
-	install -C -m 0644 $(LOCAL_MAN1)/$(CMD).1 $(INSTALL_MAN)
+	install -C -m 0644 $(LOCAL_MAN1)/$(NAME).1 $(INSTALL_MAN)
 
 .PHONY: uninstall uninstall-lib uninstall-doc
 uninstall: uninstall-lib uninstall-doc
@@ -74,7 +71,7 @@ uninstall-lib:
 	rm -fr $(INSTALL_EXT)
 
 uninstall-doc:
-	rm -f $(INSTALL_MAN)/$(CMD).1
+	rm -f $(INSTALL_MAN)/$(NAME).1
 
 $(INSTALL_EXT):
 	mkdir -p $@
@@ -85,11 +82,11 @@ clean purge:
 ##
 # Build rules:
 .PHONY: doc
-doc: $(LOCAL_MAN1)/$(CMD).1 doc/$(CMD).swim
-	perl tool/generate-help-functions.pl doc/$(CMD).swim > \
+doc: $(LOCAL_MAN1)/$(NAME).1 doc/$(NAME).swim
+	perl tool/generate-help-functions.pl doc/$(NAME).swim > \
 	    $(LOCAL_EXT)/help-functions.bash
 
-$(LOCAL_MAN1)/$(CMD).1: $(CMD).1
+$(LOCAL_MAN1)/$(NAME).1: $(NAME).1
 	mv $< $@
 
 %.1: %.pod
@@ -103,7 +100,7 @@ $(LOCAL_MAN1)/$(CMD).1: $(CMD).1
 # BPAN Rules
 #------------------------------------------------------------------------------
 BPAN_INSTALL_LIB=$(shell bpan env BPAN_LIB)
-BPAN_INSTALL_EXT ?= $(BPAN_INSTALL_LIB)/$(CMD).d
+BPAN_INSTALL_EXT ?= $(BPAN_INSTALL_LIB)/$(NAME).d
 BPAN_INSTALL_MAN1=$(shell bpan env BPAN_MAN1)
 
 bpan-install:
@@ -111,4 +108,4 @@ bpan-install:
 	install -C -d -m 0755 $(BPAN_INSTALL_EXT)/
 	install -C -m 0755 $(LOCAL_EXTS) $(BPAN_INSTALL_EXT)/
 	install -C -d -m 0755 $(BPAN_INSTALL_MAN1)
-	install -C -m 0644 $(LOCAL_MAN1)/$(CMD).1 $(BPAN_INSTALL_MAN1)
+	install -C -m 0644 $(LOCAL_MAN1)/$(NAME).1 $(BPAN_INSTALL_MAN1)

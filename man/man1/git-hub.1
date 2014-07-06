@@ -71,7 +71,7 @@
 .\" ========================================================================
 .\"
 .IX Title "GIT-HUB 1"
-.TH GIT-HUB 1 "2014-07-01" "perl v5.18.1" "User Contributed Perl Documentation"
+.TH GIT-HUB 1 "2014-07-05" "perl v5.18.1" "User Contributed Perl Documentation"
 .\" For nroff, turn off justification.  Always turn off hyphenation; it makes
 .\" way too many mistakes in technical documents.
 .if n .ad l
@@ -123,14 +123,14 @@ GitHub user or organization, with one command. See \s-1PIPE AND EACH\s0 below.
 Get the source code from GitHub:
 .PP
 .Vb 1
-\&    git clone git@github.com:ingydotnet/git\-hub
+\&    git clone git://github.com/ingydotnet/git\-hub.git
 .Ve
 .PP
 Then simply add the \f(CW\*(C`lib\*(C'\fR and \f(CW\*(C`man\*(C'\fR directories to your \s-1PATH\s0 and \s-1MANPATH:\s0
 .PP
 .Vb 2
-\&    export PATH=/path/to/git\-hub/lib:$PATH
-\&    export MANPATH=/path/to/git\-hub/man:$MANPATH
+\&    export PATH=/path/to/git\-hub/lib:"$PATH"
+\&    export MANPATH=/path/to/git\-hub/man:"$MANPATH"
 .Ve
 .PP
 To do a proper system install, which puts \f(CW\*(C`git\-hub\*(C'\fR next to your other git
