@@ -1,0 +1,11 @@
+; DO NOT EDIT (unless you know what you are doing)
+;
+; This subdirectory is a git "subrepo", and this file is maintained by the
+; git-subrepo command. See https://github.com/git-commands/git-subrepo#readme
+;
+[subrepo]
+	remote = git@github.com:ingydotnet/git-hub-travis
+	branch = master
+	commit = e7b5788d80772bf7c06533254acb3ab36c9e2e4e
+	parent = 961dfe1c69c488fd37002af0a1909d6ffc2d6469
+	cmdver = 0.1.0

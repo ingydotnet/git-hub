@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+
+set -e
+
+command:travis-enable() {
+  get-args ?owner:get-user/repo:get-repo
+  require-auth
+
+  local user="$(get-login)"
+  user="${user:?No login set in git-hub config}"
+
+  local token=
+  travis:get-token
+
+  config="$(json-dump-object user "$user" token "$token")"
+
+  json="$(json-dump-object name travis active true events '[ "push" ]' config "$config")"
+
+  api-post "/repos/$owner/$repo/hooks" "$json"
+}
+
+travis:get-token() {
+  if [ -n "$GIT_HUB_TRAVIS_API_TOKEN" ]; then
+    token="$GIT_HUB_TRAVIS_API_TOKEN"
+  else
+    token="$(get-hub-config travis-api-token)"
+    [ -n "$token" ] && return
+    token="$(get-hub-config api-token)"
+    [ -n "$token" ] || die "Can't find a Travis API Token"
+  fi
+}

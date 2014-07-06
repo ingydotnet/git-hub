@@ -1,0 +1,5 @@
+- Makefile should make sure git-hub is installed
+
+== Bugs
+
+- enable not working against repos in an organization or other user

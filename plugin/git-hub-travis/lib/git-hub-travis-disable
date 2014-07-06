@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+
+command:travis-disable() {
+    get-args ?owner:get-user/repo:get-repo
+    require-auth
+
+    api-get "/repos/$owner/$repo/hooks"
+    id="$(JSON.get -n /0/id - 2>/dev/null)" || {
+        msg_fail="Travis was not enabled"
+        OK=1
+        return
+    }
+    api-delete "/repos/$owner/$repo/hooks/$id"
+}

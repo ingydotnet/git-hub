@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+
+BASHLIB="$(
+  shopt -s nullglob globstar
+  set -- $PWD/**/{bin,lib}
+  IFS=':'; echo "$*"
+)"
+PATH="$BASHLIB:$PATH"
+
+source bash+ :std
