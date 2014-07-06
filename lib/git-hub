@@ -889,6 +889,15 @@ init-env() {
 
   : "${GIT_HUB_EXEC_PATH:=$SELFDIR}"
   : "${GIT_HUB_EXT_PATH:=$GIT_HUB_EXEC_PATH/git-hub.d}"
+  : "${GIT_HUB_PLUGIN_PATH:=${GIT_HUB_EXEC_PATH%lib}plugin}"
+
+  if [ -z "$GIT_HUB_PLUGIN_LIBS" ]; then
+    GIT_HUB_PLUGIN_LIBS="$(
+      shopt -s nullglob globstar
+      set -- $GIT_HUB_PLUGIN_PATH/*/lib
+      IFS=':'; echo "$*"
+    )"
+  fi
 
   : "${GIT_HUB_USER_DIR:=$HOME/.git-hub}"
   : "${GIT_HUB_CONFIG:=$GIT_HUB_USER_DIR/config}"
@@ -952,12 +961,12 @@ check-system-commands() {
 }
 
 source-ext() {
-  PATH="$GIT_HUB_EXT_PATH:$PATH" source "$1"
+  PATH="$GIT_HUB_EXT_PATH:$GIT_HUB_PLUGIN_LIBS:$PATH" source "$1"
 }
 
 source-ext-maybe() {
   set +e
-  PATH="$GIT_HUB_EXT_PATH:$PATH" source "$1" 2> /dev/null
+  PATH="$GIT_HUB_EXT_PATH:$GIT_HUB_PLUGIN_LIBS:$PATH" source "$1" 2> /dev/null
   local rc=$?
   set -e
   return $rc

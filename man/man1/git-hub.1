@@ -70,8 +70,8 @@
 .rr rF
 .\" ========================================================================
 .\"
-.IX Title "IO::FILE=IO(0X25F2F00) 1"
-.TH IO::FILE=IO(0X25F2F00) 1 "2014-07-05" "perl v5.18.1" "User Contributed Perl Documentation"
+.IX Title "IO::FILE=IO(0X11FEF00) 1"
+.TH IO::FILE=IO(0X11FEF00) 1 "2014-07-05" "perl v5.18.1" "User Contributed Perl Documentation"
 .\" For nroff, turn off justification.  Always turn off hyphenation; it makes
 .\" way too many mistakes in technical documents.
 .if n .ad l
@@ -155,6 +155,12 @@ If you used \f(CW\*(C`make install\*(C'\fR method, then:
 \&    git pull
 \&    make install
 .Ve
+.SH "Plugins"
+.IX Header "Plugins"
+The \f(CW\*(C`git\-hub\*(C'\fR command supports plugins. All you need to do to install a
+plugin, is to clone the plugin repo into the \f(CW\*(C`plugin/\*(C'\fR subdirectory of the
+\&\f(CW\*(C`git\-hub\*(C'\fR repository. There are example plugins already installed. If you do
+a system-style install, then just \f(CW\*(C`make install\*(C'\fR the plugins too.
 .SH "Options"
 .IX Header "Options"
 Commandline options start with a dash and can appear in any order in the

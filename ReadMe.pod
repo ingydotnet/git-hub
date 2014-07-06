@@ -82,6 +82,13 @@ If you used C<make install> method, then:
     git pull
     make install
 
+=head1 Plugins
+
+The C<git-hub> command supports plugins. All you need to do to install a
+plugin, is to clone the plugin repo into the C<plugin/> subdirectory of the
+C<git-hub> repository. There are example plugins already installed. If you do
+a system-style install, then just C<make install> the plugins too.
+
 =head1 Options
 
 Commandline options start with a dash and can appear in any order in the

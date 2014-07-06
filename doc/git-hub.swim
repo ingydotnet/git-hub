@@ -73,6 +73,13 @@ If you used `make install` method, then:
   git pull
   make install
 
+= Plugins
+
+The `git-hub` command supports plugins. All you need to do to install a plugin,
+is to clone the plugin repo into the `plugin/` subdirectory of the `git-hub`
+repository. There are example plugins already installed. If you do a
+system-style install, then just `make install` the plugins too.
+
 = Options
 
 Commandline options start with a dash and can appear in any order in the
