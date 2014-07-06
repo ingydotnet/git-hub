@@ -60,7 +60,7 @@ bash+:fcopy() {
 
 # Find the path of a library
 bash+:findlib() {
-  local library_name="$(tr [A-Z] [a-z] <<< "${1//:://}").bash"
+  local library_name="$(tr '[A-Z]' '[a-z]' <<< "${1//:://}").bash"
   local lib="${BASHPLUSLIB:-${BASHLIB:-$PATH}}"
   find ${lib//:/ } -name ${library_name##*/} 2>/dev/null |
     grep -E "$library_name\$" |
