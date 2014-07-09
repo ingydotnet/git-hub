@@ -129,7 +129,7 @@ command:issue-edit() {
   old_title="$(JSON.get -s /title -)"
   old_state="$(JSON.get -s /state -)"
   old_assignee="$(JSON.get -a /assignee/login -)"
-  old_milestone="$(JSON.get -n /milestone -)"
+  old_milestone="$(JSON.get -a /milestone/number -)"
 
   local issue_report="$(git hub issue "$owner/$repo" "$number" | sed 's/^/# /')"
 
