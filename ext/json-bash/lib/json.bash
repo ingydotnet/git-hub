@@ -197,7 +197,7 @@ JSON.parse-error() {
 }
 
 JSON.apply-get-flag() {
-  local value
+  local value back='\'
   read -r value
   # For now assume null can show up instead of string or number
   if [ "$value" == "null" ]; then
@@ -208,6 +208,10 @@ JSON.apply-get-flag() {
     a)
       [[ $value =~ ^$JSON_STR$ ]] && {
         value="${value:1:$((${#value}-2))}"
+        value="${value//\\n/$'\n'}"
+        value="${value//\\t/$'\t'}"
+        value="${value//\\\"/\"}"
+        value="${value//\\\\/$back}"
       }
       ;;
     s)

@@ -13,13 +13,13 @@ fi
 #------------------------------------------------------------------------------
 # Format a JSON object from an input list of key/value pairs.
 json-dump-object() {
-  local json='{' value=
+  local json='{' key= value=
   while [ $# -gt 0 ]; do
     if [[ "$2" =~ (^[\[\{]|^(null|true|false)$|^[0-9]+$) ]]; then
       json="$json\"$1\":$2"
     else
-      value="${2//\"/\\\"}"
-      json="$json\"$1\":\"${value//$'\n'/\\n}\""
+      json-escape "$2" value
+      json="$json\"$1\":\"$value\""
     fi
     shift; shift || true
     if [ $# -gt 0 ]; then
@@ -28,6 +28,15 @@ json-dump-object() {
   done
   json="$json}"
   echo "$json"
+}
+
+json-escape() {
+  local escaped= back='\'
+  escaped="${1//\\/$back$back}"
+  escaped="${escaped//\"/$back\"}"
+  escaped="${escaped//$'\t'/${back}t}"
+  escaped="${escaped//$'\n'/${back}n}"
+  printf -v "$2" "%s" "$escaped"
 }
 
 json-dump-array() {
