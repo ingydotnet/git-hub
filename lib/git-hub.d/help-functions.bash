@@ -73,7 +73,7 @@ unstar               unstar [<owner>/<repo>]
 untrust              untrust [<owner>/<repo>] <user>...
 unwatch              unwatch [<owner>/<repo>]
 upgrade              upgrade
-url                  url [<owner>/<repo>] [<file-path>]
+url                  url [<owner>/<repo>] [<file-path> [<line-number>]]
 user                 user [<user>]
 user-edit            user-edit <key-value-pair>...
 user-get             user-get <user> <data-key>
@@ -752,7 +752,7 @@ help:upgrade() {
 help:url() {
     cat <<'...'
 
-  Usage: git hub url [<owner>/<repo>] [<file-path>]
+  Usage: git hub url [<owner>/<repo>] [<file-path> [<line-number>]]
 
   Print the URL of a repo or a file in a repo.
 ...

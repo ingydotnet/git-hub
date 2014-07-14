@@ -604,7 +604,7 @@ Clear your API response cache.
 
 Open a browser window to a repo or a file in a repo.
 
-=item C<< url [<owner>/<repo>] [<file-path>] >>
+=item C<< url [<owner>/<repo>] [<file-path> [<line-number>]] >>
 
 Print the URL of a repo or a file in a repo.
 

@@ -480,7 +480,7 @@ interactions from the command line. They are installed by default.
 - `open [<owner>/<repo>] [<file-path>]`
   Open a browser window to a repo or a file in a repo.
 
-- `url [<owner>/<repo>] [<file-path>]`
+- `url [<owner>/<repo>] [<file-path> [<line-number>]]`
   Print the URL of a repo or a file in a repo.
 
 == Plugin Commands
