@@ -757,6 +757,7 @@ normalize-multiline-text-output() {
   text="$1"
   local indent="$2"
   text="${text//\\r/}"
+  text="${text//\\n/$'\n'}"
   text="$(
     echo "$text" | (
       local start=false blank=false para=false code=false output=''
