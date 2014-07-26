@@ -318,7 +318,10 @@ format-curl-command() {
   command_output_file="$GIT_HUB_CACHE/$command_sha1/out"
   command_error_file="$GIT_HUB_CACHE/$command_sha1/err"
 
-  if ! "$no_cache" && [ -e "$command_header_file" ]; then
+  if ! "$no_cache" &&
+    [[ ! "$url" =~ hooks$ ]] &&
+    [ -e "$command_header_file" ]
+  then
     etag="$(grep -Em1 '^ETag:' "$command_header_file" | tr -d '\r')"
     if [ -n "$etag" ]; then
       curl_command+=(--header "${etag/ETag/If-None-Match}")
