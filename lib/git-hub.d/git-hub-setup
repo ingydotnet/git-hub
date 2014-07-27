@@ -209,8 +209,9 @@ setup:json-perl() {
   clear
 
   local perl="$(perl -e 'print "OK"' 2> /dev/null)"
+  local perl_json_pp="$(perl -MJSON::PP -e 'print "OK"' 2> /dev/null)"
   local perl_json="$(perl -MJSON -e 'print "OK"' 2> /dev/null)"
-  local perl_json_xs="$(perl -MJSON::XS -e 'print "OK"' 2> /dev/null)"
+  local perl_json_maybexs="$(perl -MJSON::MaybeXS -e 'print "OK"' 2> /dev/null)"
   local set="$(git config -f "$GIT_HUB_CONFIG" github.json-lib)"
   local a=
 
@@ -222,7 +223,7 @@ The 'git-hub' command is written entirely in Bash. The Bash JSON utility it
 uses can be slow.
 
 There is a setting to use Perl to handle the JSON which is much faster. It
-requires Perl and the JSON modules for Perl.
+requires Perl and the JSON::MaybeXS modules for Perl.
 
 ...
   if [ -n "$set" ]; then
@@ -232,7 +233,7 @@ You already have this option set to '$set'.
 ...
     prompt
   elif [ "$perl" == OK ]; then
-    if [ "$perl_json" == OK ]; then
+    if [ "$perl_json_pp" == OK || "$perl_json" == OK|| "$perl_json_maybexs" == OK ]; then
       cat <<...
 You seem to have the prerequisites to speed up your 'git-hub' experience.
 
@@ -242,10 +243,10 @@ You seem to have the prerequisites to speed up your 'git-hub' experience.
         git config -f "$GIT_HUB_CONFIG" github.json-lib json-perl.bash
     else
       cat <<...
-You seem to have Perl, but not the JSON module, so we can't use the setting at
-this time.
+You seem to have Perl, but none of the 'JSON::MaybeXS', 'JSON' or 'JSON::PP'
+modules, so we can't use the setting at this time.
 
-Try installing the JSON module from CPAN and then run 'git hub setup' again.
+Try installing the JSON::MaybeXS module from CPAN and then run 'git hub setup' again.
 
 ...
       prompt
@@ -255,8 +256,8 @@ Try installing the JSON module from CPAN and then run 'git hub setup' again.
 Perl seems to not be installed on your system, so we can't use the setting at
 this time.
 
-If you want to use this speedup in the future, try installing Perl and the JSON
-module from CPAN and then run 'git hub setup' again.
+If you want to use this speedup in the future, try installing Perl and the
+JSON::MaybeXS module from CPAN and then run 'git hub setup' again.
 
 ...
     prompt

@@ -1,20 +1,19 @@
 use strict;
 
 my $JSON;
-for ( qw/JSON JSON::PP/ ) {
+for ( qw/JSON::MaybeXS JSON JSON::PP/ ) {
   last if $JSON = eval "use $_; '$_'";
 }
 
 $JSON or die <<'...';
 
-ERROR: 'JSON.pm' Perl module not installed.
+ERROR: No JSON Perl modules are installed.
 
 This Perl program is being used to speed up the 'git-hub' command. It requires
-the 'JSON' Perl module, but it seems that you don't have it installed.
+one of the 'JSON::MaybeXS', 'JSON' or 'JSON::PP' Perl modules,
+but it seems that you have none of these installed.
 
-Please install the 'JSON' module from CPAN, and try again.
-
-For extra speed, you can also install the 'JSON::XS' module.
+Please install the 'JSON::MaybeXS' module from CPAN, and try again.
 
 ...
 
