@@ -10,8 +10,8 @@ $JSON or die <<'...';
 ERROR: No JSON Perl modules are installed.
 
 This Perl program is being used to speed up the 'git-hub' command. It requires
-one of the 'JSON::MaybeXS', 'JSON' or 'JSON::PP' Perl modules,
-but it seems that you have none of these installed.
+one of the 'JSON::MaybeXS', 'JSON' or 'JSON::PP' Perl modules, but it seems
+that you have none of these installed.
 
 Please install the 'JSON::MaybeXS' module from CPAN, and try again.
 
