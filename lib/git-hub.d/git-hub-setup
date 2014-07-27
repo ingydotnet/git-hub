@@ -211,7 +211,9 @@ setup:json-perl() {
   local perl="$(perl -e 'print "OK"' 2> /dev/null)"
   local perl_json_pp="$(perl -MJSON::PP -e 'print "OK"' 2> /dev/null)"
   local perl_json="$(perl -MJSON -e 'print "OK"' 2> /dev/null)"
-  local perl_json_maybexs="$(perl -MJSON::MaybeXS -e 'print "OK"' 2> /dev/null)"
+  local perl_json_maybexs="$(
+    perl -MJSON::MaybeXS -e 'print "OK"' 2> /dev/null
+  )"
   local set="$(git config -f "$GIT_HUB_CONFIG" github.json-lib)"
   local a=
 
@@ -233,7 +235,10 @@ You already have this option set to '$set'.
 ...
     prompt
   elif [ "$perl" == OK ]; then
-    if [ "$perl_json_pp" == OK || "$perl_json" == OK|| "$perl_json_maybexs" == OK ]; then
+    if [ "$perl_json_pp" == OK ] ||
+       [ "$perl_json" == OK ] ||
+       [ "$perl_json_maybexs" == OK ]
+    then
       cat <<...
 You seem to have the prerequisites to speed up your 'git-hub' experience.
 
@@ -246,7 +251,8 @@ You seem to have the prerequisites to speed up your 'git-hub' experience.
 You seem to have Perl, but none of the 'JSON::MaybeXS', 'JSON' or 'JSON::PP'
 modules, so we can't use the setting at this time.
 
-Try installing the JSON::MaybeXS module from CPAN and then run 'git hub setup' again.
+Try installing the JSON::MaybeXS module from CPAN and then run 'git hub setup'
+again.
 
 ...
       prompt
