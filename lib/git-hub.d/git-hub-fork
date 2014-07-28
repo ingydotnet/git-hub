@@ -32,7 +32,11 @@ command:fork() {
   if [ $# -le 1 ]; then
     remote_name="$login"
   fi
-  if OK && [ -n "$remote_name" ] && inside-git-repo; then
+  if OK &&
+    [ -n "$remote_name" ] &&
+    inside-git-repo &&
+    [ -z "$GIT_HUB_TEST_RUN" ]
+  then
     url="git@github.com:$login/$repo.git"
     git remote add "$remote_name" "$url"
     say "git remote add $remote_name $url"
