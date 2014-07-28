@@ -68,15 +68,20 @@ command:pull-request() {
 #   The body can be as many lines as needed, and is optional. Only the pull
 #   request subject is required.
 #
-$diff"
+#------------------------------------------------------------------------------
+$ git diff $parent_remote_name/$parent_base..$branch_name
+$diff
+
+#------------------------------------------------------------------------------
+$ git log $parent_remote_name/$parent_base..$branch_name
+$(git log $parent_remote_name/$parent_base..$branch_name)
+"
 
     api-post "$url" "$(
         json-dump-object head "$head" base "$base" title "$title" body "$body"
     )"
     msg_ok="New pull-request created: $(JSON.get -s /html_url -)"
   fi
-
-
 }
 
 command:pulls() {
