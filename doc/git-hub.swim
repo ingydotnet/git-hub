@@ -248,6 +248,9 @@ interactions from the command line. They are installed by default.
 - `help`
   Show this manpage.
 
+- `version`
+  Print version info for `git-hub`.
+
 - `setup`
   Before you can use the commands described below, you need to perform some
   setup/configuration steps.

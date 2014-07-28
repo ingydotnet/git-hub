@@ -2,6 +2,17 @@
 
 set -e
 
+command:version() {
+  cat <<...
+git-hub version '$GIT_HUB_VERSION'
+
+  Copyright 2013-2014. Ingy döt Net.
+
+  $0
+
+...
+  msg_ok=0
+}
 command:followers() {
   get-args '?user:get-user'
   report-list \
