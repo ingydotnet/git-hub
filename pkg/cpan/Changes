@@ -1,4 +1,9 @@
 ---
+version: 0.1.1
+date:    Mon Jul 28 08:58:52 PDT 2014
+changes:
+- Add a dummy test
+---
 version: 0.1.0
 date:    Mon Jul 28 08:50:43 PDT 2014
 changes:
