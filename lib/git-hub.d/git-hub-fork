@@ -29,6 +29,9 @@ command:fork() {
   fi
   local login="$(get-login)"
   msg_ok="Repository '$owner/$repo' forked to '$login'"
+  if [ $# -le 1 ]; then
+    remote_name="$login"
+  fi
   if OK && [ -n "$remote_name" ] && inside-git-repo; then
     url="git@github.com:$login/$repo.git"
     git remote add "$remote_name" "$url"
