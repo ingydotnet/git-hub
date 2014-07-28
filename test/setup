@@ -2,7 +2,12 @@
 
 set -e
 
-BASHLIB="`find $PWD -type d | grep -E '/(bin|lib)$' | xargs -n1 printf "%s:"`"
+BASHLIB="$(
+  find $PWD -type d |
+  grep -E '/(bin|lib)$' |
+  grep -v '/pkg/cpan' |
+  xargs -n1 printf "%s:"
+)"
 PATH="$BASHLIB:$PATH"
 
 source bash+ :std
