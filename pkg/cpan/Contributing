@@ -1,0 +1,55 @@
+Contributing
+============
+
+The "App-git-hub" Project needs your help!
+
+Please consider being a contributor. This file contains instructions that will
+help you be an effective contributor to the Project.
+
+GitHub
+------
+
+The code for this Project is hosted at GitHub. The repository is:
+
+  https://github.com/ingydotnet/git-hub
+
+You can get the code with this command:
+
+  git clone https://github.com/ingydotnet/git-hub
+
+If you've found a bug or a missing feature that you would like the author to
+know about, report it here:
+
+  https://github.com/ingydotnet/git-hub/issues
+
+or fix it and submit a pull request here:
+
+  https://github.com/ingydotnet/git-hub/pulls
+
+See these links for help on interacting with GitHub:
+
+* https://help.github.com/
+* https://help.github.com/articles/creating-a-pull-request
+
+Zilla::Dist
+-----------
+
+This Project uses Zilla::Dist to prepare it for publishing to CPAN. Read:
+
+  https://metacpan.org/pod/distribution/Zilla-Dist/lib/Zilla/Dist/Contributing.pod
+
+for up-to-date instructions on what contributors like yourself need to know to
+use it.
+
+IRC
+---
+
+App-git-hub has an IRC channel where you can find real people to help you:
+
+  irc.freenode.net#git-commands
+
+Join the channel. Join the team!
+
+
+    Thanks in advance, Ingy döt Net
+

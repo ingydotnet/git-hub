@@ -1,0 +1,7 @@
+#!/usr/bin/env perl
+
+use File::Share;
+
+my $dir = File::Share::dist_dir('App-git-hub');
+
+exec "$dir/lib/git-hub", @ARGV;

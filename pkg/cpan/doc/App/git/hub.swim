@@ -1,0 +1,37 @@
+App::git::hub
+=============
+
+The git-hub command on CPAN.
+
+= Synopsis
+
+  > cpanm App::git::hub
+  > git hub
+
+= Description
+
+The `git-hub` command allows you to do most of your GitHub interaction from the
+terminal.
+
+The project is here: https://github.com/ingydotnet/git-hub#readme
+
+The command is written in Bash, but some Perl people wanted to be able to
+install it from CPAN. This module is an attempt to do that.
+
+= Experimental!!!
+
+I have no idea how well this will work out, or whether I want to support this
+in the future.
+
+= Author
+
+Ingy döt Net <ingy@cpan.org>
+
+= Copyright
+
+Copyright 2014. Ingy döt Net. All rights reserved.
+
+This program is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.
+
+See http://www.perl.com/perl/misc/Artistic.html

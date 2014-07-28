@@ -1,0 +1,29 @@
+=meta: 0.0.1
+
+name: App-git-hub
+version: 0.1.0
+abstract: The Git command for GitHub
+homepage: https://metacpan.org/release/App-git-hub
+
+license: perl
+copyright: 2014. Ingy döt Net.
+author:
+  name: Ingy döt Net
+  email: ingy@cpan.org
+  github: ingydotnet
+  twitter: ingydotnet
+  freenode: ingy
+  homepage: http://ingy.net
+
+requires:
+  perl: 5.8.1
+  File::Share: 0
+
+devel:
+  git: https://github.com/ingydotnet/git-hub
+  bug: https://github.com/ingydotnet/git-hub/issues
+  irc: irc.freenode.net#git-commands
+
+=travis:
+  type: perl
+  irc: irc.freenode.net#git-commands
