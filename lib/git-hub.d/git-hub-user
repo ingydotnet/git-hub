@@ -10,7 +10,7 @@ command:user() {
 
 ok:user() {
   fields=(
-    login type name email blog location company bio
+    login type name html_url email blog location company bio
     followers following public_repos public_gists created_at
   )
   report-data
