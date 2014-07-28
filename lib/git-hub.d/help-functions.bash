@@ -745,7 +745,9 @@ help:upgrade() {
 
   Usage: git hub upgrade
 
-  Upgrade the `git-hub` installation to the latest version.
+  Upgrade the `git-hub` installation to the latest version. Note: you need to
+  be running 'git-hub' from the source repo, and be on the master branch for
+  this to work.
 ...
 }
 

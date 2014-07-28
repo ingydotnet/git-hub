@@ -261,7 +261,9 @@ interactions from the command line. They are installed by default.
   below.
 
 - `upgrade`
-  Upgrade the `git-hub` installation to the latest version.
+  Upgrade the `git-hub` installation to the latest version. Note: you need to
+  be running 'git-hub' from the source repo, and be on the master branch for
+  this to work.
 
 - `user [<user>]`
   Show basic information about a specific user. User defaults to the owner

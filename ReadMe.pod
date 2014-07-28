@@ -327,7 +327,9 @@ Commands> below.
 
 =item C<upgrade>
 
-Upgrade the C<git-hub> installation to the latest version.
+Upgrade the C<git-hub> installation to the latest version. Note: you need to
+be running 'git-hub' from the source repo, and be on the master branch for
+this to work.
 
 =item C<< user [<user>] >>
 
