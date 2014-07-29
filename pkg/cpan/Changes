@@ -1,4 +1,9 @@
 ---
+version: 0.1.2
+date:    Mon Jul 28 18:31:48 PDT 2014
+changes:
+- Added 'version' subcommand
+---
 version: 0.1.1
 date:    Mon Jul 28 08:58:52 PDT 2014
 changes:
