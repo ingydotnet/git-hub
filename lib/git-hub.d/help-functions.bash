@@ -77,6 +77,7 @@ url                  url [<owner>/<repo>] [<file-path> [<line-number>]]
 user                 user [<user>]
 user-edit            user-edit <key-value-pair>...
 user-get             user-get <user> <data-key>
+version              version
 watch                watch [<owner>/<repo>]
 watchers             watchers [<owner>/<repo>]
 watching             watching [<user>]
@@ -791,6 +792,15 @@ help:user-get() {
   Usage: git hub user-get <user> <data-key>
 
   Get a specific data value for a particular user.
+...
+}
+
+help:version() {
+    cat <<'...'
+
+  Usage: git hub version
+
+  Print version info for `git-hub`.
 ...
 }
 

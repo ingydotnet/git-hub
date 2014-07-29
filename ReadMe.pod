@@ -312,6 +312,10 @@ interactions from the command line. They are installed by default.
 
 Show this manpage.
 
+=item C<version>
+
+Print version info for C<git-hub>.
+
 =item C<setup>
 
 Before you can use the commands described below, you need to perform some
