@@ -44,7 +44,7 @@ command:pull-request() {
         json-dump-object head "$head" base "$base" issue "$number"
       )"
       msg_ok="Attached pull-request to issue: $(JSON.get -s /html_url -)"
-    else 
+    else
       msg_ok=0
     fi
   else
@@ -80,7 +80,11 @@ $(git log $parent_remote_name/$parent_base..$branch_name)
     api-post "$url" "$(
         json-dump-object head "$head" base "$base" title "$title" body "$body"
     )"
-    msg_ok="New pull-request created: $(JSON.get -s /html_url -)"
+    if OK; then
+      msg_ok="New pull-request created: $(JSON.get -a /html_url -)"
+    else
+      msg_fail="New pull-request failed: $(JSON.get -a /errors/0/message -)"
+    fi
   fi
 }
 

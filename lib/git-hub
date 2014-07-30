@@ -131,6 +131,7 @@ run-command() {
         nay "API status code: $status_code\n"
       [ -n "$ERROR" ] &&
         nay "API error output:\n$ERROR\n"
+      nay "See files in: $GIT_HUB_CACHE/$command_sha1/"
     fi
   fi
   true
