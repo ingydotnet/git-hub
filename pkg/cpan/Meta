@@ -1,7 +1,7 @@
 =meta: 0.0.1
 
 name: App-git-hub
-version: 0.1.2
+version: 0.1.3
 abstract: The Git command for GitHub
 homepage: https://metacpan.org/release/App-git-hub
 
