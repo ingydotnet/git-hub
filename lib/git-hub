@@ -342,7 +342,7 @@ cache-response-files() {
   grep -E '^Status: 304' "$GIT_HUB_CACHE/head" &> /dev/null || {
     for f in head out err; do
       [ -e "$GIT_HUB_CACHE/$f" ] &&
-        mv "$GIT_HUB_CACHE/$f" "$cache_dir"
+        cp "$GIT_HUB_CACHE/$f" "$cache_dir"
     done
   }
 }
