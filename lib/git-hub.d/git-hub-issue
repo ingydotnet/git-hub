@@ -27,7 +27,11 @@ command:issue-new() {
     json-dump-object title "$title" body "$body"
   )"
 
-  msg_ok="New issue created: '$(JSON.get -s /html_url -)'"
+  if OK; then
+    msg_ok="New issue created: '$(JSON.get -a /html_url -)'"
+  else
+    msg_fail="New issue failed: $(JSON.get -a /message -)"
+  fi
 }
 
 command:issues() {
