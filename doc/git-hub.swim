@@ -320,6 +320,9 @@ interactions from the command line. They are installed by default.
 - `members <org>`
   List the members of an organization.
 
+- `member-get <team_id> <user>`
+  Authenticated user is a member of the team.
+
 - `member-add <team_id> <user>`
   Add a user to a team.
 
