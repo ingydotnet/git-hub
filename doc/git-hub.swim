@@ -321,7 +321,7 @@ interactions from the command line. They are installed by default.
   List the members of an organization.
 
 - `member-get <team_id> <user>`
-  Authenticated user is a member of the team.
+  Show whether a user is a member of a specified team.
 
 - `member-add <team_id> <user>`
   Add a user to a team.

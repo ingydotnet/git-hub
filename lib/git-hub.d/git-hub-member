@@ -13,8 +13,8 @@ command:member-get() {
   require-auth
   get-args team_id user
   api-get "/teams/$team_id/members/$user"
-  msg_ok="'$user' is on team (id) '$team_id'"
-  msg_404="'$user' is NOT member on team (id) '$team_id'"
+  msg_ok="'$user' is of team (id) '$team_id'"
+  msg_404="'$user' is NOT a member of team (id) '$team_id'"
 }
 
 command:member-add() {

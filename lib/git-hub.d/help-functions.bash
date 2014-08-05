@@ -31,6 +31,7 @@ issues               issues [<owner>/<repo>] [--all]
 keys                 keys [<user>]
 keys-add             keys-add <title> <key>
 member-add           member-add <team_id> <user>
+member-get           member-get <team_id> <user>
 member-remove        member-remove <team_id> <user>
 members              members <org>
 open                 open [<owner>/<repo>] [<file-path>]
@@ -322,6 +323,15 @@ help:member-add() {
   Usage: git hub member-add <team_id> <user>
 
   Add a user to a team.
+...
+}
+
+help:member-get() {
+    cat <<'...'
+
+  Usage: git hub member-get <team_id> <user>
+
+  Show whether a user is a member of a specified team.
 ...
 }
 

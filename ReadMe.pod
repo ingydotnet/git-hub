@@ -400,6 +400,10 @@ Delete a team.
 
 List the members of an organization.
 
+=item C<< member-get <team_id> <user> >>
+
+Show whether a user is a member of a specified team.
+
 =item C<< member-add <team_id> <user> >>
 
 Add a user to a team.
