@@ -12,7 +12,7 @@ command:config() {
   elif [ -z "$config_value" ]; then
     local value="$(git config -f $GIT_HUB_CONFIG github.$config_key)" ||
       return $?
-    msg_ok="$config_key=$value"
+    msg_ok="$value"
   else
     git config -f "$GIT_HUB_CONFIG" "github.$config_key" "$config_value"
     msg_ok="$config_key=$config_value"
