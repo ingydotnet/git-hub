@@ -16,7 +16,7 @@ follow               follow <user>...
 followers            followers [<user>]
 following            following [<user>]
 follows              follows <user> [<target-user>]
-fork                 fork <owner>/<repo> [<org>] [--remote=<name>]
+fork                 fork <owner>/<repo> [--org=<org>] [--remote=<name>]
 forks                forks [<owner>/<repo>]
 help                 help
 irc-enable           irc-enable <room> [<server>]
@@ -185,7 +185,7 @@ help:follows() {
 help:fork() {
     cat <<'...'
 
-  Usage: git hub fork <owner>/<repo> [<org>] [--remote=<name>]
+  Usage: git hub fork <owner>/<repo> [--org=<org>] [--remote=<name>]
 
   Fork a repository to your account or to an organization. Optionally, you can
   specify the name of a remote to add, pointing to your fork.
