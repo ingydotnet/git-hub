@@ -571,21 +571,6 @@ get-repo-config() {
   return 1
 }
 
-get-remote-name() {
-  [ -n "$remote_name" ] && return
-  local remotes=($(git config --get-regex 'remote\..*\.fetch' | cut -d ' ' -f1))
-  local num="${#remotes[@]}"
-  if [ $num -eq 1 ]; then
-    remote_name="${remotes[0]}"
-    remote_name="${remote_name#remote.}"
-    remote_name="${remote_name%.fetch}"
-  elif [ $num -eq 0 ]; then
-    error "This command requires a remote name, but the current repo has no remotes. Add a remote or use the --remote= option."
-  else
-    error "This command requires a remote name, but the current repo has more than one remote. Use the --remote= option to specify which one."
-  fi
-}
-
 get-default-remote-name() {
   [ -n "$remote_name" ] && return
   local owner="$(get-repo-config owner)"
@@ -1420,23 +1405,6 @@ assert-git-repo-is-clean() {
     abort "working tree has changes."
   git diff-index --quiet --cached --ignore-submodules HEAD ||
     abort "index has changes."
-}
-
-assert-git-on-branch() {
-  local branch="$(git rev-parse --abbrev-ref HEAD)"
-  [ -n "$branch" -a "$branch" != "HEAD" ] ||
-    abort "repo HEAD is not currently on a branch"
-}
-
-assert-git-head-is-pushed() {
-  local ref="$(git rev-parse HEAD)"
-  local branch="$(git rev-parse --abbrev-ref HEAD)"
-  local text="$(
-    git branch -r --contains "$ref" 2> /dev/null |
-      grep "$remote_name/$branch"
-  )"
-  [ -n "$text" ] ||
-    abort "current HEAD is not pushed to remote '$remote_name'"
 }
 
 inside-git-repo() {
