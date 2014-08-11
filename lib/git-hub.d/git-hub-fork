@@ -24,11 +24,12 @@ command:fork() {
   if [ -n "$organization" ]; then
     api-post "/repos/$owner/$repo/forks" \
       "$(json-dump-object organization "$organization")"
+    msg_ok="Repository '$owner/$repo' forked to '$organization'"
   else
     api-post "/repos/$owner/$repo/forks" '{}'
+    local login="$(get-login)"
+    msg_ok="Repository '$owner/$repo' forked to '$login'"
   fi
-  local login="$(get-login)"
-  msg_ok="Repository '$owner/$repo' forked to '$login'"
   if [ $# -le 1 ]; then
     remote_name="$login"
   fi
