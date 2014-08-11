@@ -52,7 +52,7 @@ A,use-auth  Force the use of authentication. (Get around rate limits)
 C,no-cache  Don't use cached responses.
 token=      Explicitly specify the GitHub v3 API Authentication Token
 d,dryrun    Check arguments but don't actually run the API command
-T           Show API token in the verbose output
+T           Show (don't hide) API token in the verbose output
  
 O           Debug - Show response output
 H           Debug - Show reponse headers
