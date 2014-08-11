@@ -81,6 +81,9 @@ command:repo-new() {
 command:repo-delete() {
   require-auth
   get-args '?owner:get-user/repo:get-repo'
+  if [ "$owner/$repo" == "ingydotnet/git-hub" ]; then
+    die "Won't delete ingydotnet/git-hub. That's suicide!!"
+  fi
   api-delete "/repos/$owner/$repo"
   msg_ok="Repository '$owner/$repo' deleted"
   msg_404="Repository '$owner/$repo' not found"
