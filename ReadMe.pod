@@ -128,7 +128,7 @@ See PIPE and EACH below.
 
 =item C<=>
 
-Like the '-' command above, but reads each B<word> from stdin.
+Like the '-' command above, but reads each B<word> from stdin.
 
 =item C<-h>
 
@@ -479,7 +479,7 @@ Delete a GitHub repository.
 
 List the forks of a repository.
 
-=item C<< fork <owner>/<repo> [<org>] [--remote=<name>] >>
+=item C<< fork <owner>/<repo> [--org=<org>] [--remote=<name>] >>
 
 Fork a repository to your account or to an organization. Optionally, you can
 specify the name of a remote to add, pointing to your fork.
