@@ -387,6 +387,49 @@ check-api-call-status() {
 OK() { return $OK; }
 
 #------------------------------------------------------------------------------
+# Config management:
+#------------------------------------------------------------------------------
+check-config() {
+  [ -e "$GIT_HUB_CONFIG" ] || config-not-setup
+  read-config-value login && login="$value" || login=
+  if [ -z "$login" ]; then
+    config-not-setup
+  fi
+}
+
+dump-config() {
+  [ ! -e "$GIT_HUB_CONFIG" ] && config-not-setup
+  say "Your git-hub config file (at $GIT_HUB_CONFIG):\n"
+  cat "$GIT_HUB_CONFIG" || return 1
+}
+
+read-config-value() {
+  value=
+  value="$(git config -f $GIT_HUB_CONFIG "git-hub.$1")" || {
+    value="$(git config -f $GIT_HUB_CONFIG "github.$1")" || return 1
+
+    # This auto-migrates github to git-hub. Added 2014/08/11.
+    # TODO Remove after a few months.
+    git config -f $GIT_HUB_CONFIG "git-hub.$1" "$value"
+    git config -f $GIT_HUB_CONFIG --unset "github.$1"
+    if [ -z "$(git config -f $GIT_HUB_CONFIG --get-regex github)" ]; then
+      git config -f $GIT_HUB_CONFIG --remove-section github 2> /dev/null || true
+    fi
+
+  }
+}
+
+write-config-value() {
+  git config -f $GIT_HUB_CONFIG "git-hub.$1" "$2" || return 1
+}
+
+delete-config-value() {
+  git config -f $GIT_HUB_CONFIG --unset "git-hub.$1" || {
+    git config -f $GIT_HUB_CONFIG --unset "github.$1" || return 1
+  }
+}
+
+#------------------------------------------------------------------------------
 # Argument parsing functions:
 #------------------------------------------------------------------------------
 get-args() {
@@ -400,11 +443,16 @@ get-args() {
     if [[ "$spec" =~ ^\? ]]; then
       optional=true
       spec="${spec#\?}"
-      if [[ "$spec" =~ / ]] && [[ ! "$spec" =~ : ]] && [[ ! "$arg" =~ / ]]; then
+      if [[ "$spec" =~ / ]] &&
+        [[ ! "$spec" =~ : ]] &&
+        [[ ! "$arg" =~ / ]]
+      then
         specs=("${specs[@]:1}")
         continue
       fi
-      if [ ${#args[@]} -lt ${#specs[@]} ] && [[ ! "${specs[1]}" =~ ^\? ]]; then
+      if [ ${#args[@]} -lt ${#specs[@]} ] &&
+        [[ ! "${specs[1]}" =~ ^\? ]]
+      then
         if [[ "$spec" =~ : ]]; then
           arg=''
           spec-assign
@@ -524,7 +572,9 @@ get-user() {
 }
 
 get-login() {
-  get-hub-config login
+  if read-config-value login; then
+    echo "$value"
+  fi
 }
 
 get-owner() {
@@ -575,7 +625,12 @@ get-default-remote-name() {
   [ -n "$remote_name" ] && return
   local owner="$(get-repo-config owner)"
   local repo="$(get-repo-config repo)"
-  remote_name="$(git remote -v | grep "$owner/$repo" | grep "(fetch)" | cut -f 1)"
+  remote_name="$(
+    git remote -v |
+    grep "$owner/$repo" |
+    grep "(fetch)" |
+    cut -f 1
+  )"
 }
 
 get-branch-name() {
@@ -640,14 +695,6 @@ check-token-id() {
   [[ "$id" =~ $regex ]] ||
     error "'$id' is invalid token-id. Must be an integer value."
   true
-}
-
-get-hub-config() {
-  local value=
-  if [ -e "$GIT_HUB_CONFIG" ]; then
-    value="$(git config -f "$GIT_HUB_CONFIG" github."$1" 2>/dev/null)"
-  fi
-  echo "${value:-$2}"
 }
 
 #------------------------------------------------------------------------------
@@ -1110,24 +1157,14 @@ set-var() {
   printf -v "$name" "$value"
 }
 
-check-config() {
-  [ -e "$GIT_HUB_CONFIG" ] || config-not-setup
-  local user_name="$(
-    git config -f "$GIT_HUB_CONFIG" github.user-name || echo ''
-  )"
-  login="$(git config -f "$GIT_HUB_CONFIG" github.login || echo '')"
-  if [[ -n "$user_name" ]] || [[ -z "$login" ]]; then
-    config-not-setup
-  fi
-}
-
 get-var() {
   local var="${1//-/_}"
   [ -n "${!var}" ] && return
   local env="GIT_HUB_$(echo "$var" | tr 'a-z' 'A-Z')"
   printf -v "$var" "${!env}"
   [ -n "${!var}" ] && return
-  printf -v "$var" "$(get-hub-config "$1")"
+  read-config-value "$1" || true
+  printf -v "$var" "$value"
   true
 }
 

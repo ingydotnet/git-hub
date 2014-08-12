@@ -22,10 +22,15 @@ command:open() {
 }
 
 get-browser() {
-  browser="$(get-hub-config browser)"
-  [ -n "$browser" ] && return
+  if read-config-value browser; then
+    browser="$value"
+    return
+  fi
 
-  [ "$(uname)" == "Darwin" ] && browser="open" && return
+  if [ "$(uname)" == "Darwin" ]; then
+    browser="open"
+    return
+  fi
 
   for browser in firefox chromium-browser; do
     [ -n "$(type $browser)" ] && return

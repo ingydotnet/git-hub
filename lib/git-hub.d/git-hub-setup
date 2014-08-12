@@ -4,7 +4,6 @@ set -e
 
 command:setup() {
   setup:intro
-  setup:check-old-config
   setup:login
   setup:api-token
   setup:use-auth
@@ -30,34 +29,6 @@ Your config will be stored here: '$GIT_HUB_CONFIG'.
   mkdir -p "$GIT_HUB_USER_DIR"
 }
 
-setup:check-old-config() {
-  local a
-  local old_config_dir="$(dirname $(dirname "$GIT_HUB_CONFIG"))"
-  [ -d "$old_config_dir" ] || return 0
-  local old_config="$old_config_dir/.githubconfig"
-  [ -f "$old_config" ] || return 0
-  cat <<...
-
-You have an outdated config file: '$old_config'.
-
-I can move this file to: '$GIT_HUB_CONFIG'.
-
-...
-  a="$(prompt "Would you like to use this as your new config file? [Yn] ")"
-  if [ "$a" == y ]; then
-    mv "$old_config" "$GIT_HUB_CONFIG"
-    cat <<...
-
-File moved. You can exit now or continue changing your setup.
-
-...
-    prompt
-  else
-    echo
-    a="$(prompt "Would you like to delete the old config file? [Yn] ")"
-  fi
-}
-
 setup:login() {
   clear
   cat <<...
@@ -67,16 +38,7 @@ setup:login() {
 The 'git hub' command needs to know your GitHub login id.
 
 ...
-  local user_name="$(
-    git config -f "$GIT_HUB_CONFIG" github.user-name || echo ''
-  )"
-  if [ -n "$user_name" ]; then
-    git config -f "$GIT_HUB_CONFIG" --unset github.user-name
-    git config -f "$GIT_HUB_CONFIG" github.login "$user_name"
-  fi
-  login=$(
-    git config -f "$GIT_HUB_CONFIG" github.login || echo ''
-  )
+  read-config-value login && login="$value" || login=
   if [ -n "$login" ]; then
     echo "Your login is currently set to '$login'".
     echo
@@ -91,7 +53,8 @@ The 'git hub' command needs to know your GitHub login id.
     echo "Invalid login value '$login'"
   done
 
-  git config -f "$GIT_HUB_CONFIG" github.login "$login"
+  write-config-value login "$login" ||
+    die "Can't write-config-value login $login"
 
   cat <<...
 
@@ -110,7 +73,7 @@ setup:api-token() {
 More advanced commands require an authentication token (with the appropriate
 scopes added).
 ...
-  local token=$(git config -f "$GIT_HUB_CONFIG" github.api-token)
+  read-config-value api-token && token="$value" || token=
   if [ -n "$token" ]; then
     cat <<...
 
@@ -157,7 +120,8 @@ The password will not be stored after the commands finish running.
   echo
   echo "Adding the new token to your config file..."
   local token_value="$(git hub token-get $token_id token)" || exit $?
-  git config -f "$GIT_HUB_CONFIG" github.api-token $token_value
+  write-config-value api-token $token_value ||
+    die "Can't write-config-value api-token $token_value"
   echo "Token successfully added to config file."
   echo
   prompt
@@ -184,7 +148,7 @@ There is a config option called 'use-auth' that you can set to always send the
 authentication token.
 
 ...
-  local auth="$(git config -f "$GIT_HUB_CONFIG" github.use-auth)"
+  read-config-value use-auth && auth="$value" || auth=
   if [ -z "$auth" ]; then
     a="$(prompt "Would you like to turn this option on? [Yn]")"
     [ "$a" == n ] && return
@@ -193,15 +157,18 @@ authentication token.
     echo
     a="$(prompt "Would you like to turn this option on? [yN]")"
   else
-    git config -f "$GIT_HUB_CONFIG" github.use-auth true
+    write-config-value use-auth true ||
+      die "Can't write-config-value use-auth true"
     echo 'You already have this option turned on.'
     echo
     a="$(prompt "Would you like to keep this option on? [Yn]")"
   fi
   if [ "$a" == y ]; then
-    git config -f "$GIT_HUB_CONFIG" github.use-auth true
+    write-config-value use-auth true ||
+      die "Can't write-config-value use-auth true"
   else
-    git config -f "$GIT_HUB_CONFIG" github.use-auth false
+    write-config-value use-auth false ||
+      die "Can't write-config-value use-auth false"
   fi
 }
 
@@ -214,7 +181,7 @@ setup:json-perl() {
   local perl_json_maybexs="$(
     perl -MJSON::MaybeXS -e 'print "OK"' 2> /dev/null
   )"
-  local set="$(git config -f "$GIT_HUB_CONFIG" github.json-lib)"
+  read-config-value json-lib && set="$value" || set=
   local a=
 
   cat <<...
@@ -244,8 +211,8 @@ You seem to have the prerequisites to speed up your 'git-hub' experience.
 
 ...
       a="$(prompt "Would you like to turn this setting on? [Yn]")"
-      [ "$a" == y ] &&
-        git config -f "$GIT_HUB_CONFIG" github.json-lib json-perl.bash
+      [ "$a" == y ] && write-config-value json-lib json-perl.bash ||
+        die "Can't write-config-value use-auth false"
     else
       cat <<...
 You seem to have Perl, but none of the 'JSON::MaybeXS', 'JSON' or 'JSON::PP'

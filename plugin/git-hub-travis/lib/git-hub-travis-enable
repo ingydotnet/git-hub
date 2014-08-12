@@ -23,9 +23,12 @@ travis:get-token() {
   if [ -n "$GIT_HUB_TRAVIS_API_TOKEN" ]; then
     token="$GIT_HUB_TRAVIS_API_TOKEN"
   else
-    token="$(get-hub-config travis-api-token)"
-    [ -n "$token" ] && return
-    token="$(get-hub-config api-token)"
-    [ -n "$token" ] || die "Can't find a Travis API Token"
+    if read-config-value travis-api-token; then
+      token="$value"
+    elif read-config-value api-token
+      token="$value"
+    else
+      die "Can't find a Travis API Token"
+    fi
   fi
 }

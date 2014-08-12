@@ -15,22 +15,15 @@ prompt() {
   exit 0
 }
 
-get-hub-config() {
+read-config-value() {
   if [ -n "$GIT_HUB_TEST_MAKE" ]; then
-    if [ "$1" == "login" ]; then
-      echo "aocole"
+    if [ "$1" == login ]; then
+      value=aocole
       return
     fi
-    if [ "$1" == "use-auth" ]; then
-      echo ""
-      return
+    if [ "$1" == use-auth ]; then
+      value=
     fi
   fi
-  local value=
-  if [ -e "$GIT_HUB_CONFIG" ]; then
-    value="$(git config -f "$GIT_HUB_CONFIG" github."$1" 2>/dev/null)"
-  fi
-  echo "${value:-$2}"
+  value="$(git config -f $GIT_HUB_CONFIG "git-hub.$1")" || value="$2"
 }
-
-
