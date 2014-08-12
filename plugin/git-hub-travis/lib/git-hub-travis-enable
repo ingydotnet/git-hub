@@ -25,7 +25,7 @@ travis:get-token() {
   else
     if read-config-value travis-api-token; then
       token="$value"
-    elif read-config-value api-token
+    elif read-config-value api-token; then
       token="$value"
     else
       die "Can't find a Travis API Token"
