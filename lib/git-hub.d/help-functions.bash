@@ -19,6 +19,7 @@ follows              follows <user> [<target-user>]
 fork                 fork <owner>/<repo> [--org=<org>] [--remote=<name>]
 forks                forks [<owner>/<repo>]
 help                 help
+info                 info
 irc-enable           irc-enable <room> [<server>]
 irc-enable           irc-enable
 irc-url              irc-url
@@ -207,6 +208,17 @@ help:help() {
   Usage: git hub help
 
   Show this manpage.
+...
+}
+
+help:info() {
+    cat <<'...'
+
+  Usage: git hub info
+
+  Show detailed version and environment info about your `git-hub` installation.
+  This can be useful for figuring out things about how `git-hub` is operating
+  in a given situation. Also good for reporting bugs / issues in `git-hub`.
 ...
 }
 

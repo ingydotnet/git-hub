@@ -316,6 +316,12 @@ Show this manpage.
 
 Print version info for C<git-hub>.
 
+=item C<info>
+
+Show detailed version and environment info about your C<git-hub> installation.
+This can be useful for figuring out things about how C<git-hub> is operating
+in a given situation. Also good for reporting bugs / issues in C<git-hub>.
+
 =item C<setup>
 
 Before you can use the commands described below, you need to perform some

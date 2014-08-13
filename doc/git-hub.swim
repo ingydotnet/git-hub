@@ -251,6 +251,11 @@ interactions from the command line. They are installed by default.
 - `version`
   Print version info for `git-hub`.
 
+- `info`
+  Show detailed version and environment info about your `git-hub` installation.
+  This can be useful for figuring out things about how `git-hub` is operating
+  in a given situation. Also good for reporting bugs / issues in `git-hub`.
+
 - `setup`
   Before you can use the commands described below, you need to perform some
   setup/configuration steps.

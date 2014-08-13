@@ -8,11 +8,79 @@ git-hub version '$GIT_HUB_VERSION'
 
   Copyright 2013-2014. Ingy döt Net.
 
-  $0
-
+Run 'git hub info' for more detailed information.
 ...
   msg_ok=0
 }
+
+command:info() {
+  local sha1= user= owner= repo= remote= branch=
+  get-default-remote-name
+  if [[ "$0" =~ ^(.+)/lib/git-hub$ ]]; then
+    sha1="$(cd ${BASH_REMATCH[1]}; git rev-parse --short HEAD)"
+  else
+    sha1=n/a
+  fi
+  user="$(get-user || true)";   [ -n "$user" ] || user=n/a
+  owner="$(get-owner || true)"; [ -n "$owner" ] || owner=n/a
+  repo="$(get-repo || true)";   [ -n "$repo" ] || repo=n/a
+  get-remote-name && remote="$value" || remote=n/a
+  get-branch-name; [ -n "$branch_name" ] && branch="$branch_name" || branch=n/a
+
+  cat <<...
+Version:  $GIT_HUB_VERSION
+SHA1:     $sha1
+Path:     $0
+Defaults:
+  user:   $user
+  owner:  $owner
+  repo:   $repo
+  remote: $remote
+  branch: $branch
+Environment:
+...
+local env=(
+  2FA_OTP
+  API_TOKEN
+  API_URI
+  CACHE
+  CONFIG
+  EDIT_MSG
+  EDITOR
+  EXEC_PATH
+  EXT_PATH
+  JSON_LIB
+  MSG_FILE
+  NO_CACHE
+  ORG_NAME
+  OWNER_NAME
+  PAGER
+  PASSWORD
+  PLUGIN_LIBS
+  PLUGIN_PATH
+  REPO_NAME
+  TEST_COLS
+  TEST_INTERACTIVE
+  TEST_LINES
+  TEST_MAKE
+  TEST_RUN
+  TRAVIS_API_TOKEN
+  USE_AUTH
+  USER_DIR
+  USER_NAME
+  VARIABLE_NAME
+  VERSION
+)
+for e in ${env[@]}; do
+  var="GIT_HUB_$e"
+  if [ -n "${!var}" ]; then
+    printf "%-25s %s\n" "$var" "${!var}"
+  fi
+done
+
+  msg_ok=0
+}
+
 command:followers() {
   get-args '?user:get-user'
   report-list \

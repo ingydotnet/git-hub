@@ -590,35 +590,11 @@ get-repo() {
   get-repo-config repo
 }
 
-get-repo-config() {
-  local login="$(get-login)"
-  local remote="$remote_name"
-  [ -n "$remote" ] && remote="^$remote"$'\t'
-  urls=($(
-    git remote -v 2> /dev/null |
-    grep "$remote" |
-    grep 'github\.com' |
-    grep -v '^subrepo/'
-  ))
-  for x in "$login" '.*'; do
-    for url in "${urls[@]}"; do
-      url="${url% (fetch)}"
-      url="${url% (push)}"
-      [[ "$url" =~ .*://(.*) ]] &&
-        url="${BASH_REMATCH[1]}"
-      local re1="^[^:/]*[:/]($x)/(.*)\.git$"
-      local re2="^[^:/]*[:/]($x)/(.*)$"
-      if [[ "$url" =~ $re1 ]] || [[ "$url" =~ $re2 ]]; then
-        if [ "$1" == owner ]; then
-          echo "${BASH_REMATCH[1]}"
-        else
-          echo "${BASH_REMATCH[2]}"
-        fi
-        return 0
-      fi
-    done
-  done
-  return 1
+get-remote-name() {
+  value=
+  [ -n "$remote_name" ] && value="$remote_name" && return
+  value="$(get-default-remote-name)"
+  [ -n "$value" ] && return 0 || return 1
 }
 
 get-default-remote-name() {
@@ -629,6 +605,7 @@ get-default-remote-name() {
     git remote -v |
     grep "$owner/$repo" |
     grep "(fetch)" |
+    head -n1 |
     cut -f 1
   )"
 }
@@ -669,6 +646,37 @@ get-parent-base() {
   [ -n "$parent_base" ] && return
   get-parent-owner-repo
   parent_base="$(git hub repo-get $parent_owner_repo default_branch)"
+}
+
+get-repo-config() {
+  local login="$(get-login)"
+  local remote="$remote_name"
+  [ -n "$remote" ] && remote="^$remote"$'\t'
+  urls=($(
+    git remote -v 2> /dev/null |
+    grep "$remote" |
+    grep 'github\.com' |
+    grep -v '^subrepo/'
+  ))
+  for x in "$login" '.*'; do
+    for url in "${urls[@]}"; do
+      url="${url% (fetch)}"
+      url="${url% (push)}"
+      [[ "$url" =~ .*://(.*) ]] &&
+        url="${BASH_REMATCH[1]}"
+      local re1="^[^:/]*[:/]($x)/(.*)\.git$"
+      local re2="^[^:/]*[:/]($x)/(.*)$"
+      if [[ "$url" =~ $re1 ]] || [[ "$url" =~ $re2 ]]; then
+        if [ "$1" == owner ]; then
+          echo "${BASH_REMATCH[1]}"
+        else
+          echo "${BASH_REMATCH[2]}"
+        fi
+        return 0
+      fi
+    done
+  done
+  return 1
 }
 
 require-auth() {
