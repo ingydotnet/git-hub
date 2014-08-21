@@ -296,6 +296,9 @@ interactions from the command line. They are installed by default.
   Show basic information about a GitHub organization. The `--raw` and
   `--json` options show the data in different formats than normal output.
 
+- `org-repos <org>`
+  Show all the repos for an organization, both public and private.
+
 - `org-get <org> <data-key>`
   Get a specific data value for a particular organization.
 

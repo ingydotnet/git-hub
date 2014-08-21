@@ -46,4 +46,20 @@ command:org-edit() {
   api-patch "/orgs/$org" "$(json-dump-object-pairs)"
 }
 
+command:org-repos() {
+  get-args org
+  title="Repos for '$org':"
+  report-list \
+    "/orgs/$org/repos?sort=pushed;per_page=PER_PAGE" \
+    'pushed_at full_name description'
+}
+
+format-entry:org-repos() {
+  if "$raw_output"; then
+    out "$3"
+  else
+    printf -v output_line "%d) (%s)  %-30s %s" "$1" "${2/T*}" "$3" "$4"
+  fi
+}
+
 # vim: set lisp:

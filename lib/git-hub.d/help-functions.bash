@@ -39,6 +39,7 @@ open                 open [<owner>/<repo>] [<file-path>]
 org                  org <org>
 org-edit             org-edit <org> <key-value-pairs>...
 org-get              org-get <org> <data-key>
+org-repos            org-repos <org>
 orgs                 orgs [<user>]
 pull-diff            pull-diff [<owner>/<repo>] <issue-id-number>
 pull-fetch           pull-fetch [<owner>/<repo>] <issue-id-number>
@@ -403,6 +404,15 @@ help:org-get() {
   Usage: git hub org-get <org> <data-key>
 
   Get a specific data value for a particular organization.
+...
+}
+
+help:org-repos() {
+    cat <<'...'
+
+  Usage: git hub org-repos <org>
+
+  Show all the repos for an organization, both public and private.
 ...
 }
 

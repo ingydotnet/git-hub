@@ -369,6 +369,10 @@ List the organizations that a user is a member of.
 Show basic information about a GitHub organization. The C<--raw> and C<--json>
 options show the data in different formats than normal output.
 
+=item C<< org-repos <org> >>
+
+Show all the repos for an organization, both public and private.
+
 =item C<< org-get <org> <data-key> >>
 
 Get a specific data value for a particular organization.
