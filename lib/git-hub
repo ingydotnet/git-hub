@@ -88,7 +88,7 @@ run-command() {
   local msg_ok msg_fail status_code ERROR
   local count_option do_all=false use_auth no_cache
   local quiet_output verbose_output
-  local raw_output=false json_output=false
+  local raw_output=false json_output=false interactive=
   local show_output=false show_headers=false show_json=false
   local dry_run=false show_token repeat_command=false
   local terminal_lines terminal_cols
@@ -1131,6 +1131,13 @@ get-opts() {
 }
 
 interactive() {
+  if [ -n "$interactive" ]; then
+    if $interactive; then
+      return 0
+    else
+      return 1
+    fi
+  fi
   if [ -t 0 -a -t 1 ]; then
     return 0
   else

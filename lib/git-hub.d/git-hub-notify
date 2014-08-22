@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+
+set -e
+
+command:notify-list() {
+  require-auth
+  local all=false
+  "$do_all" && all=true
+
+  title="Notifications for '$login' (all=$all):"
+
+  list_size=$Infinity
+  interactive=false
+  report-list \
+    "/notifications?all=$all" \
+    'subject/title reason updated_at unread subject/type subject/url'
+}
+
+format-entry:notify-list() {
+  if "$raw_output"; then
+    out "$2"
+  else
+    local url="${7/api\./}"
+    url="${url/repos\//}"
+    printf -v output_line "%2d) %s  (%s)\n      %s) unread=%s (%s) %s" \
+      "$1" "$2" "$3" "${4%T*}" "$5" "$6" "$url"
+  fi
+}
