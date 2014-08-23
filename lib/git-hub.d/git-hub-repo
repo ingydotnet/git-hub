@@ -80,7 +80,7 @@ command:repo-new() {
 
 command:repo-delete() {
   require-auth
-  get-args '?owner:get-user/repo:get-repo'
+  get-args 'owner/repo'
   if [ "$owner/$repo" == "ingydotnet/git-hub" ]; then
     die "Won't delete ingydotnet/git-hub. That's suicide!!"
   fi

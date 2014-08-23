@@ -73,6 +73,17 @@ If you used `make install` method, then:
   git pull
   make install
 
+= Command Completion
+
+The `git hub` command supports `<TAB>`-based command completion. You need to
+first turn on Git command completion with something like this:
+
+  source /etc/bash_completion.d/git
+
+Then turn on `git-hub` completion with something like this:
+
+  source /path/to/git-hub/lib/git-hub.d/completion
+
 = Plugins
 
 The `git-hub` command supports plugins. All you need to do to install a plugin,

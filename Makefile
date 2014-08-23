@@ -72,9 +72,16 @@ clean purge:
 
 ##
 # Build rules:
+
+update: doc compgen
+
 doc: $(MAN) ReadMe.pod
 	perl tool/generate-help-functions.pl $(DOC) > \
 	    $(EXT)/help-functions.bash
+
+compgen:
+	perl tool/generate-completion.pl $(DOC) > \
+	    $(EXT)/completion
 
 $(MAN1)/%.1: doc/%.swim swim-check
 	swim --to=man $< > $@

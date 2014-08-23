@@ -70,8 +70,8 @@
 .rr rF
 .\" ========================================================================
 .\"
-.IX Title "IO::FILE=IO(0X1300FA0) 1"
-.TH IO::FILE=IO(0X1300FA0) 1 "2014-08-21" "perl v5.18.1" "User Contributed Perl Documentation"
+.IX Title "IO::FILE=IO(0X16F2FA0) 1"
+.TH IO::FILE=IO(0X16F2FA0) 1 "2014-08-23" "perl v5.18.1" "User Contributed Perl Documentation"
 .\" For nroff, turn off justification.  Always turn off hyphenation; it makes
 .\" way too many mistakes in technical documents.
 .if n .ad l
@@ -154,6 +154,20 @@ If you used \f(CW\*(C`make install\*(C'\fR method, then:
 \&    cd /path/to/git\-hub
 \&    git pull
 \&    make install
+.Ve
+.SH "Command Completion"
+.IX Header "Command Completion"
+The \f(CW\*(C`git hub\*(C'\fR command supports \f(CW\*(C`<TAB>\*(C'\fR\-based command completion. You
+need to first turn on Git command completion with something like this:
+.PP
+.Vb 1
+\&    source /etc/bash_completion.d/git
+.Ve
+.PP
+Then turn on \f(CW\*(C`git\-hub\*(C'\fR completion with something like this:
+.PP
+.Vb 1
+\&    source /path/to/git\-hub/lib/git\-hub.d/completion
 .Ve
 .SH "Plugins"
 .IX Header "Plugins"
