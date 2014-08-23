@@ -6,8 +6,6 @@
 
 set -e
 
-echo foo
-
 {
   Bash:version-check() {
     test "$1" -ge 4 && return
