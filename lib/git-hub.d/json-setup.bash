@@ -122,9 +122,14 @@ json-var-list() {
     [[ -z "$line" ]] && break
     if [[ "$line" =~ ^$key_prefix/([0-9]+)/([^\	]+)\	(.*) ]]; then
       local value="${BASH_REMATCH[3]}"
+      # XXX This should use `JSON.get -a`
       [ "$value" == null ] && value=''
       value="${value#\"}"
       value="${value%\"}"
+      value="${value//\\n/$'\n'}"
+      value="${value//\\t/$'\t'}"
+      value="${value//\\\"/\"}"
+      value="${value//\\\\/$back}"
       key="${BASH_REMATCH[2]}_${BASH_REMATCH[1]}"
       key="${key//\//__}"
       printf -v "$key" "%s" "$value"
