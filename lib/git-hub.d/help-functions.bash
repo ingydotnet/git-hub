@@ -35,6 +35,7 @@ member-add           member-add <team_id> <user>
 member-get           member-get <team_id> <user>
 member-remove        member-remove <team_id> <user>
 members              members <org>
+notify-list          notify-list [--all]
 open                 open [<owner>/<repo>] [<file-path>]
 org                  org <org>
 org-edit             org-edit <org> <key-value-pairs>...
@@ -363,6 +364,16 @@ help:members() {
   Usage: git hub members <org>
 
   List the members of an organization.
+...
+}
+
+help:notify-list() {
+    cat <<'...'
+
+  Usage: git hub notify-list [--all]
+
+  List your recent /unread/ user notifications. To list your /read/
+  notifications as well, use the `--all` option.
 ...
 }
 

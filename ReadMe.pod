@@ -619,6 +619,11 @@ Note: this command makes more API calls than most other commands and thus runs
       slower. You might want to tee the output to a file, if you need to get
       back to this data a lot.
 
+=item C<notify-list [--all]>
+
+List your recent I<unread> user notifications. To list your I<read>
+notifications as well, use the C<--all> option.
+
 =item C<< keys [<user>] >>
 
 List public SSH keys for a user.
