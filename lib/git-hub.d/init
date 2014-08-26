@@ -1,0 +1,12 @@
+#!bash
+
+main() {
+  local root="$BASH_SOURCE"
+  root="$(dirname $root)"
+  root="$(dirname $root)"
+  root="$(dirname $root)"
+  export PATH="$root/lib:$PATH"
+  export MANPATH="$root/man:$MANPATH"
+}
+
+[ "$BASH_SOURCE" == "$0" ] || main "$@"
