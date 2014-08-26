@@ -70,8 +70,8 @@
 .rr rF
 .\" ========================================================================
 .\"
-.IX Title "IO::FILE=IO(0X24B4010) 1"
-.TH IO::FILE=IO(0X24B4010) 1 "2014-08-23" "perl v5.18.1" "User Contributed Perl Documentation"
+.IX Title "IO::FILE=IO(0X9DF160) 1"
+.TH IO::FILE=IO(0X9DF160) 1 "2014-08-25" "perl v5.18.1" "User Contributed Perl Documentation"
 .\" For nroff, turn off justification.  Always turn off hyphenation; it makes
 .\" way too many mistakes in technical documents.
 .if n .ad l
@@ -120,25 +120,41 @@ another. For example you could use this technique to clone all the repos of a
 GitHub user or organization, with one command. See \s-1PIPE AND EACH\s0 below.
 .SH "Installation"
 .IX Header "Installation"
-Get the source code from GitHub:
+There are currently 3 ways to install \f(CW\*(C`git\-hub\*(C'\fR. For all of them you need to
+get the source code from GitHub:
 .PP
 .Vb 1
 \&    git clone git://github.com/ingydotnet/git\-hub.git
 .Ve
 .PP
-Then simply add the \f(CW\*(C`lib\*(C'\fR and \f(CW\*(C`man\*(C'\fR directories to your \s-1PATH\s0 and \s-1MANPATH:\s0
+The first installation method is preferred. Just add a line like this one to
+your shell startup script:
+.PP
+.Vb 1
+\&    source /path/to/git\-hub/lib/git\-hub.d/init
+.Ve
+.PP
+That will modify your \s-1PATH\s0 and \s-1MANPATH,\s0 and also enable command completion.
+.PP
+The second method is to do these things by hand. This might afford you more
+control of your shell environment. Simply add the \f(CW\*(C`lib\*(C'\fR and \f(CW\*(C`man\*(C'\fR
+directories to your \s-1PATH\s0 and \s-1MANPATH:\s0
 .PP
 .Vb 2
 \&    export PATH=/path/to/git\-hub/lib:"$PATH"
 \&    export MANPATH=/path/to/git\-hub/man:"$MANPATH"
 .Ve
 .PP
-To do a proper system install, which puts \f(CW\*(C`git\-hub\*(C'\fR next to your other git
-commands, do this instead:
+See below for infor on how to turn on Command Completion.
+.PP
+The thrid method is a standard system install, which puts \f(CW\*(C`git\-hub\*(C'\fR next to
+your other git commands, do this instead:
 .PP
 .Vb 1
 \&    make install        # Possibly with \*(Aqsudo\*(Aq
 .Ve
+.PP
+This method does not account for upgrading and command completion yet.
 .SH "Upgrading"
 .IX Header "Upgrading"
 If you used the \s-1PATH\s0 method of installation, just run this to upgrade
@@ -164,7 +180,13 @@ need to first turn on Git command completion with something like this:
 \&    source /etc/bash_completion.d/git
 .Ve
 .PP
-Then turn on \f(CW\*(C`git\-hub\*(C'\fR completion with something like this:
+Note: if you don't have this file or can't find it, do this:
+.PP
+.Vb 1
+\&    source /path/to/git\-hub/lib/git\-hub.d/git\-completion
+.Ve
+.PP
+Then turn on \f(CW\*(C`git\-hub\*(C'\fR completion with a command like this:
 .PP
 .Vb 1
 \&    source /path/to/git\-hub/lib/git\-hub.d/completion
