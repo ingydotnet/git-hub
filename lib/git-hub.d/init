@@ -1,7 +1,8 @@
 #!bash
 
 main() {
-  local root="$BASH_SOURCE"
+  local root=
+  [[ -n ${ZSH_VERSION-} ]] && $root="$0" || root="$BASH_SOURCE"
   root="$(dirname $root)"
   root="$(dirname $root)"
   root="$(dirname $root)"
