@@ -7,6 +7,14 @@ main() {
   root="$(dirname $root)"
   export PATH="$root/lib:$PATH"
   export MANPATH="$root/man:$MANPATH"
+#   if [ "$(type -f __gitcomp 2> /dev/null)" != function ]; then
+#     if [ -e /etc/bash_completion.d/git ]; then
+#       source /etc/bash_completion.d/git
+#     else
+#       source "$root/lib/git-hub.d/git-completion"
+#     fi
+#     source "$root/lib/git-hub.d/completion"
+#   fi
 }
 
-[ "$BASH_SOURCE" == "$0" ] || main "$@"
+main "$@"
