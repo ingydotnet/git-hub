@@ -46,19 +46,33 @@ GitHub user or organization, with one command. See PIPE AND EACH below.
 
 = Installation
 
-Get the source code from GitHub:
+There are currently 3 ways to install `git-hub`. For all of them you need to
+get the source code from GitHub:
 
   git clone git://github.com/ingydotnet/git-hub.git
 
-Then simply add the `lib` and `man` directories to your PATH and MANPATH:
+The first installation method is preferred. Just add a line like this one to
+your shell startup script:
+
+  source /path/to/git-hub/lib/git-hub.d/init
+
+That will modify your PATH and MANPATH, and also enable command completion.
+
+The second method is to do these things by hand. This might afford you more
+control of your shell environment.  Simply add the `lib` and `man` directories
+to your PATH and MANPATH:
 
   export PATH=/path/to/git-hub/lib:"$PATH"
   export MANPATH=/path/to/git-hub/man:"$MANPATH"
 
-To do a proper system install, which puts `git-hub` next to your other git
-commands, do this instead:
+See below for infor on how to turn on Command Completion.
+
+The thrid method is a standard system install, which puts `git-hub` next to
+your other git commands, do this instead:
 
   make install        # Possibly with 'sudo'
+
+This method does not account for upgrading and command completion yet.
 
 = Upgrading
 
@@ -80,7 +94,11 @@ first turn on Git command completion with something like this:
 
   source /etc/bash_completion.d/git
 
-Then turn on `git-hub` completion with something like this:
+Note: if you don't have this file or can't find it, do this:
+
+  source /path/to/git-hub/lib/git-hub.d/git-completion
+
+Then turn on `git-hub` completion with a command like this:
 
   source /path/to/git-hub/lib/git-hub.d/completion
 
