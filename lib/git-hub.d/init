@@ -1,21 +1,20 @@
 #!bash
 
-main() {
-  local root=
-  [[ -n ${ZSH_VERSION-} ]] && $root="$0" || root="$BASH_SOURCE"
-  root="$(dirname $root)"
-  root="$(dirname $root)"
-  root="$(dirname $root)"
-  export PATH="$root/lib:$PATH"
-  export MANPATH="$root/man:$MANPATH"
-#   if [ "$(type -f __gitcomp 2> /dev/null)" != function ]; then
-#     if [ -e /etc/bash_completion.d/git ]; then
-#       source /etc/bash_completion.d/git
-#     else
-#       source "$root/lib/git-hub.d/git-completion"
-#     fi
-#     source "$root/lib/git-hub.d/completion"
-#   fi
-}
+[[ -n ${ZSH_VERSION-} ]] &&
+  GIT_HUB_ROOT="$0" ||
+  GIT_HUB_ROOT="$BASH_SOURCE"
+GIT_HUB_ROOT="$(dirname $GIT_HUB_ROOT)"
+GIT_HUB_ROOT="$(dirname $GIT_HUB_ROOT)"
+GIT_HUB_ROOT="$(dirname $GIT_HUB_ROOT)"
+export GIT_HUB_ROOT
 
-main "$@"
+export PATH="$GIT_HUB_ROOT/lib:$PATH"
+export MANPATH="$GIT_HUB_ROOT/man:$MANPATH"
+# if [ "$(type -f __gitcomp 2> /dev/null)" != function ]; then
+#   if [ -e /etc/bash_completion.d/git ]; then
+#     source /etc/bash_completion.d/git
+#   else
+#     source "$GIT_HUB_ROOT/lib/git-hub.d/git-completion"
+#   fi
+#   source "$GIT_HUB_ROOT/lib/git-hub.d/completion"
+# fi
