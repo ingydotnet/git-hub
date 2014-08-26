@@ -48,11 +48,11 @@ install: install-lib install-doc
 
 install-lib: $(INSTALL_EXT)
 	install -C -m 0755 $(LIBS) $(INSTALL_LIB)/
-	install -C -d -m 0755 $(INSTALL_EXT)/
+	install -d -m 0755 $(INSTALL_EXT)/
 	install -C -m 0755 $(EXTS) $(INSTALL_EXT)/
 
 install-doc:
-	install -C -d -m 0755 $(INSTALL_MAN1)
+	install -d -m 0755 $(INSTALL_MAN1)
 	install -C -m 0644 $(MAN) $(INSTALL_MAN1)
 
 uninstall: uninstall-lib uninstall-doc
@@ -101,7 +101,7 @@ BPAN_INSTALL_MAN1=$(shell bpan env BPAN_MAN1)
 
 bpan-install:
 	install -C -m 0755 $(LIB) $(BPAN_INSTALL_LIB)/
-	install -C -d -m 0755 $(BPAN_INSTALL_EXT)/
+	install -d -m 0755 $(BPAN_INSTALL_EXT)/
 	install -C -m 0755 $(EXTS) $(BPAN_INSTALL_EXT)/
-	install -C -d -m 0755 $(BPAN_INSTALL_MAN1)
+	install -d -m 0755 $(BPAN_INSTALL_MAN1)
 	install -C -m 0644 $(MAN) $(BPAN_INSTALL_MAN1)
