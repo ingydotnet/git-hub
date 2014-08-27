@@ -1,0 +1,14 @@
+#compdef git-hub -P git\ ##hub
+#description perform GitHub operations
+
+if [[ -z $GIT_HUB_ROOT ]]; then
+	echo 'GIT_HUB_ROOT is null; has `/path/to/git-hub/lib/git-hub.d/init been sourced?`'
+	return 3
+fi
+
+git-hub-subcommands() {
+	bash_compl="$(<$GIT_HUB_ROOT/lib/git-hub.d/completion)"
+	echo "${${bash_compl#*__gitcomp \"}%%\"*}"
+}
+
+_arguments ':`git-hub` sub-command:('"$(git-hub-subcommands)"')'
