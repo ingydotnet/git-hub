@@ -23,6 +23,13 @@ if [[ "$GIT_HUB_ROOT" =~ ^/ ]]; then
       fi
     fi
     source "$GIT_HUB_ROOT/lib/git-hub.d/completion"
+  elif [[ -n ${ZSH_VERSION-} ]]; then
+    # Zsh
+    #
+    # Prepend to `fpath` the path of the directory containing our zsh
+    # completion script, so that our completion script will be hooked into
+    # the zsh completion system.
+    fpath=($GIT_HUB_ROOT/share/zsh-completion $fpath)
   fi
 
 else
