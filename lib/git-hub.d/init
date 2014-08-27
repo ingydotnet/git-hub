@@ -11,7 +11,7 @@ if [[ "$GIT_HUB_ROOT" =~ ^/ ]]; then
 
   export PATH="$GIT_HUB_ROOT/lib:$PATH"
   export MANPATH="$GIT_HUB_ROOT/man:$MANPATH"
-  if [ "$(type -f __gitcomp 2> /dev/null)" != function ]; then
+  if [ "$(type -t __gitcomp 2> /dev/null)" != function ]; then
     if [ -e /etc/bash_completion.d/git ]; then
       source /etc/bash_completion.d/git
     else
