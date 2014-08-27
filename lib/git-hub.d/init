@@ -11,14 +11,20 @@ if [[ "$GIT_HUB_ROOT" =~ ^/ ]]; then
 
   export PATH="$GIT_HUB_ROOT/lib:$PATH"
   export MANPATH="$GIT_HUB_ROOT/man:$MANPATH"
-  if [ "$(type -t __gitcomp 2> /dev/null)" != function ]; then
-    if [ -e /etc/bash_completion.d/git ]; then
-      source /etc/bash_completion.d/git
-    else
-      source "$GIT_HUB_ROOT/lib/git-hub.d/git-completion"
+
+  # Completion facilities
+  if [[ -n ${BASH_VERSION-} ]]; then
+    # Bash
+    if [ "$(type -t __gitcomp 2> /dev/null)" != function ]; then
+      if [ -e /etc/bash_completion.d/git ]; then
+	source /etc/bash_completion.d/git
+      else
+	source "$GIT_HUB_ROOT/lib/git-hub.d/git-completion"
+      fi
     fi
+    source "$GIT_HUB_ROOT/lib/git-hub.d/completion"
   fi
-  source "$GIT_HUB_ROOT/lib/git-hub.d/completion"
+
 else
   echo "source the absolute path of '$GIT_HUB_ROOT'"
 fi
