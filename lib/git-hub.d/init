@@ -17,8 +17,8 @@ if [[ "$GIT_HUB_ROOT" =~ ^/ ]]; then
     else
       source "$GIT_HUB_ROOT/lib/git-hub.d/git-completion"
     fi
-    source "$GIT_HUB_ROOT/lib/git-hub.d/completion"
   fi
+  source "$GIT_HUB_ROOT/lib/git-hub.d/completion"
 else
   echo "source the absolute path of '$GIT_HUB_ROOT'"
 fi
