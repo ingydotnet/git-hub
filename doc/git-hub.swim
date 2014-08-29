@@ -89,18 +89,42 @@ If you used `make install` method, then:
 
 = Command Completion
 
-The `git hub` command supports `<TAB>`-based command completion. You need to
-first turn on Git command completion with something like this:
+The `git hub` command supports `<TAB>`-based command completion. If you don’t
+use the `init` script (see Installation, above), you’ll need to enable this
+manually to use it.
 
-  source /etc/bash_completion.d/git
+== In Bash
 
-Note: if you don't have this file or can't find it, do this:
+If your Bash setup does not already provide command completion for Git, you’ll
+need to enable that first:
+
+  source <Git completion script>
+
+On your system, the Git completion script might be found at any of the
+following locations (or somewhere else that we don’t know about):
+
+* `/etc/bash_completion.d/git`
+* `/usr/share/bash-completion/git`
+* `/usr/share/bash-completion/completions/git`
+* `/opt/local/share/bash-completion/completions/git`
+
+In case you can’t find any of these, this repository contains a copy of the
+Git completion script:
 
   source /path/to/git-hub/lib/git-hub.d/git-completion
 
-Then turn on `git-hub` completion with a command like this:
+Once Git completion is enabled (whether you needed to do that manually or
+not), you can turn on `git-hub` completion with a command like this:
 
   source /path/to/git-hub/share/completion.bash
+
+== In zsh
+
+In the Z shell (zsh), you can manually enable `git-hub` completion by adding
+the following line to your `~/.zshrc`, *before* the `compinit` function is
+called:
+
+  fpath=('/path/to/git-hub/share/zsh-completion' $fpath)
 
 = Plugins
 
