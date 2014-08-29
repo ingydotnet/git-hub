@@ -49,25 +49,25 @@ GitHub user or organization, with one command. See PIPE AND EACH below.
 There are currently 3 ways to install `git-hub`. For all of them you need to
 get the source code from GitHub:
 
-  git clone git://github.com/ingydotnet/git-hub.git
+  git clone git://github.com/ingydotnet/git-hub /path/to/git-hub
 
-The first installation method is preferred. Just add a line like this one to
-your shell startup script:
+The first installation method is preferred: `source` the `init` file. Just add
+a line like this one to your shell startup script:
 
-  source /path/to/git-hub/lib/git-hub.d/init
+  source /path/to/git-hub/init
 
-That will modify your PATH and MANPATH, and also enable command completion.
+That will modify your `PATH` and `MANPATH`, and also enable command completion.
 
 The second method is to do these things by hand. This might afford you more
 control of your shell environment.  Simply add the `lib` and `man` directories
-to your PATH and MANPATH:
+to your `PATH and `MANPATH`:
 
   export PATH=/path/to/git-hub/lib:"$PATH"
   export MANPATH=/path/to/git-hub/man:"$MANPATH"
 
-See below for infor on how to turn on Command Completion.
+See below for info on how to turn on Command Completion.
 
-The thrid method is a standard system install, which puts `git-hub` next to
+The third method is a standard system install, which puts `git-hub` next to
 your other git commands, do this instead:
 
   make install        # Possibly with 'sudo'
@@ -76,7 +76,7 @@ This method does not account for upgrading and command completion yet.
 
 = Upgrading
 
-If you used the PATH method of installation, just run this to upgrade
+If you used the `PATH` method of installation, just run this to upgrade
 `git-hub`:
 
   git hub upgrade

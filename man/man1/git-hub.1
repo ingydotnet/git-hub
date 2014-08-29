@@ -70,8 +70,8 @@
 .rr rF
 .\" ========================================================================
 .\"
-.IX Title "IO::FILE=IO(0X9DF160) 1"
-.TH IO::FILE=IO(0X9DF160) 1 "2014-08-25" "perl v5.18.1" "User Contributed Perl Documentation"
+.IX Title "IO::FILE=IO(0X1DC0FE0) 1"
+.TH IO::FILE=IO(0X1DC0FE0) 1 "2014-08-28" "perl v5.18.1" "User Contributed Perl Documentation"
 .\" For nroff, turn off justification.  Always turn off hyphenation; it makes
 .\" way too many mistakes in technical documents.
 .if n .ad l
@@ -124,30 +124,31 @@ There are currently 3 ways to install \f(CW\*(C`git\-hub\*(C'\fR. For all of the
 get the source code from GitHub:
 .PP
 .Vb 1
-\&    git clone git://github.com/ingydotnet/git\-hub.git
+\&    git clone git://github.com/ingydotnet/git\-hub /path/to/git\-hub
 .Ve
 .PP
-The first installation method is preferred. Just add a line like this one to
-your shell startup script:
+The first installation method is preferred: \f(CW\*(C`source\*(C'\fR the \f(CW\*(C`init\*(C'\fR file. Just
+add a line like this one to your shell startup script:
 .PP
 .Vb 1
-\&    source /path/to/git\-hub/lib/git\-hub.d/init
+\&    source /path/to/git\-hub/init
 .Ve
 .PP
-That will modify your \s-1PATH\s0 and \s-1MANPATH,\s0 and also enable command completion.
+That will modify your \f(CW\*(C`PATH\*(C'\fR and \f(CW\*(C`MANPATH\*(C'\fR, and also enable command
+completion.
 .PP
 The second method is to do these things by hand. This might afford you more
 control of your shell environment. Simply add the \f(CW\*(C`lib\*(C'\fR and \f(CW\*(C`man\*(C'\fR
-directories to your \s-1PATH\s0 and \s-1MANPATH:\s0
+directories to your \f(CW\*(C`PATH and \*(C'\fRMANPATH`:
 .PP
 .Vb 2
 \&    export PATH=/path/to/git\-hub/lib:"$PATH"
 \&    export MANPATH=/path/to/git\-hub/man:"$MANPATH"
 .Ve
 .PP
-See below for infor on how to turn on Command Completion.
+See below for info on how to turn on Command Completion.
 .PP
-The thrid method is a standard system install, which puts \f(CW\*(C`git\-hub\*(C'\fR next to
+The third method is a standard system install, which puts \f(CW\*(C`git\-hub\*(C'\fR next to
 your other git commands, do this instead:
 .PP
 .Vb 1
@@ -157,7 +158,7 @@ your other git commands, do this instead:
 This method does not account for upgrading and command completion yet.
 .SH "Upgrading"
 .IX Header "Upgrading"
-If you used the \s-1PATH\s0 method of installation, just run this to upgrade
+If you used the \f(CW\*(C`PATH\*(C'\fR method of installation, just run this to upgrade
 \&\f(CW\*(C`git\-hub\*(C'\fR:
 .PP
 .Vb 1
