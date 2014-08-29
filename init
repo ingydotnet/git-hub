@@ -51,7 +51,7 @@ if [[ "$GIT_HUB_ROOT" =~ ^/ ]]; then
       }
     fi
     # Load our Bash completion facilities.
-    source "$GIT_HUB_ROOT/lib/git-hub.d/completion"
+    source "$GIT_HUB_ROOT/share/completion.bash"
   elif [[ -n ${ZSH_VERSION-} ]]; then
     # Zsh
     #

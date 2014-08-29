@@ -100,7 +100,7 @@ Note: if you don't have this file or can't find it, do this:
 
 Then turn on `git-hub` completion with a command like this:
 
-  source /path/to/git-hub/lib/git-hub.d/completion
+  source /path/to/git-hub/share/completion.bash
 
 = Plugins
 

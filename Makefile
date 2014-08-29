@@ -14,6 +14,7 @@ MAN1 = man/man1
 EXT = $(LIB)/$(NAME).d
 EXTS = $(shell find $(EXT) -type f) \
 	$(shell find $(EXT) -type l)
+SHARE = share
 
 # XXX Make these vars look like git.git/Makefile style
 PREFIX ?= /usr/local
@@ -81,7 +82,7 @@ doc: $(MAN) ReadMe.pod
 
 compgen:
 	perl tool/generate-completion.pl $(DOC) > \
-	    $(EXT)/completion
+	    $(SHARE)/completion.bash
 
 $(MAN1)/%.1: doc/%.swim swim-check
 	swim --to=man $< > $@

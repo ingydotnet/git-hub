@@ -7,7 +7,7 @@ if [[ -z $GIT_HUB_ROOT ]]; then
 fi
 
 git-hub-subcommands() {
-	bash_compl="$(<$GIT_HUB_ROOT/lib/git-hub.d/completion)"
+	bash_compl="$(<$GIT_HUB_ROOT/share/completion.bash)"
 	echo "${${bash_compl#*__gitcomp \"}%%\"*}"
 }
 
