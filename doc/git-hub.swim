@@ -60,7 +60,7 @@ That will modify your `PATH` and `MANPATH`, and also enable command completion.
 
 The second method is to do these things by hand. This might afford you more
 control of your shell environment.  Simply add the `lib` and `man` directories
-to your `PATH and `MANPATH`:
+to your `PATH` and `MANPATH`:
 
   export PATH=/path/to/git-hub/lib:"$PATH"
   export MANPATH=/path/to/git-hub/man:"$MANPATH"
