@@ -2,7 +2,7 @@
 #description perform GitHub operations
 
 if [[ -z $GIT_HUB_ROOT ]]; then
-	echo 'GIT_HUB_ROOT is null; has `/path/to/git-hub/init been sourced?`'
+	echo 'GIT_HUB_ROOT is null; has `/path/to/git-hub/init` been sourced?'
 	return 3
 fi
 
