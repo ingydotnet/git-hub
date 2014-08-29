@@ -111,7 +111,7 @@ following locations (or somewhere else that we don’t know about):
 In case you can’t find any of these, this repository contains a copy of the
 Git completion script:
 
-  source /path/to/git-hub/lib/git-hub.d/git-completion
+  source /path/to/git-hub/share/git-completion.bash
 
 Once Git completion is enabled (whether you needed to do that manually or
 not), you can turn on `git-hub` completion with a command like this:
