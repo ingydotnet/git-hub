@@ -107,6 +107,8 @@ following locations (or somewhere else that we don’t know about):
 * `/usr/share/bash-completion/git`
 * `/usr/share/bash-completion/completions/git`
 * `/opt/local/share/bash-completion/completions/git`
+* `/usr/local/etc/bash_completion.d/git`
+* `~/.homebrew/etc/bash_completion.d/git`
 
 In case you can’t find any of these, this repository contains a copy of the
 Git completion script:
