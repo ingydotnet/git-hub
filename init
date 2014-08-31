@@ -5,8 +5,6 @@
   GIT_HUB_ROOT="$BASH_SOURCE"
 if [[ "$GIT_HUB_ROOT" =~ ^/ ]]; then
   GIT_HUB_ROOT="$(dirname $GIT_HUB_ROOT)"
-  GIT_HUB_ROOT="$(dirname $GIT_HUB_ROOT)"
-  GIT_HUB_ROOT="$(dirname $GIT_HUB_ROOT)"
   export GIT_HUB_ROOT
 
   export PATH="$GIT_HUB_ROOT/lib:$PATH"
