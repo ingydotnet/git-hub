@@ -20,7 +20,7 @@ if [[ "$GIT_HUB_ROOT" =~ ^/ ]]; then
       {
         # Look for the Git completion script at the file-paths whereat it
         # might be found, according to
-        # <https://github.com/git/git/blob/4109c28e055dba27d73cefb956bea5e611f66ec0/contrib/completion/git-completion.zsh#L34-L36>
+        # <https://github.com/git/git/blob/4109c28/contrib/completion/git-completion.zsh#L34-L36>
         # and experimental and anecdotal evidence.
         for f in \
           /{usr,opt/local}/share/bash-completion/{completions/,}git \
