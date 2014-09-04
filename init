@@ -48,7 +48,7 @@ if [[ "$GIT_HUB_ROOT" =~ ^/ ]]; then
             # `$f` provides a `__gitcomp` function, but that would entail
             # plowing ahead to the next potential Git completion script if
             # this one errors partway through being sourced, possibly
-            # resulting in an inconsistent mis-mash of Git completion scripts.
+            # resulting in an inconsistent mishmash of Git completion scripts.
           fi
         done
       } || {
