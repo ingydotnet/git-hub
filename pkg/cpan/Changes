@@ -1,4 +1,10 @@
 ---
+version: 0.1.4
+date:    Thu Sep  4 16:25:54 MDT 2014
+changes:
+- Lots of improvement
+- pull-* commands are now pr-*
+---
 version: 0.1.3
 date:    Wed Jul 30 14:40:31 PDT 2014
 changes:

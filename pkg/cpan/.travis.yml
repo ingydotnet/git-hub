@@ -8,6 +8,7 @@
 language: perl
 
 perl:
+- '5.20'
 - '5.18'
 - '5.16'
 - '5.14'
@@ -21,9 +22,11 @@ install:
   File::Share
 
 script:
-- PERL5OPT=-MDevel::Cover=-coverage,statement,branch,condition,path,subroutine
+- test -e test &&
+  PERL5OPT=-MDevel::Cover=-coverage,statement,branch,condition,path,subroutine
   prove -lv test/
-- cover
+  || true
+- test -e test && cover || true
 
 after_success:
 - cover -report coveralls
