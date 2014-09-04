@@ -70,8 +70,8 @@
 .rr rF
 .\" ========================================================================
 .\"
-.IX Title "IO::FILE=IO(0X18FA0F0) 1"
-.TH IO::FILE=IO(0X18FA0F0) 1 "2014-09-04" "perl v5.18.1" "User Contributed Perl Documentation"
+.IX Title "IO::FILE=IO(0XF7B0F0) 1"
+.TH IO::FILE=IO(0XF7B0F0) 1 "2014-09-04" "perl v5.18.1" "User Contributed Perl Documentation"
 .\" For nroff, turn off justification.  Always turn off hyphenation; it makes
 .\" way too many mistakes in technical documents.
 .if n .ad l
@@ -684,13 +684,13 @@ Close an issue. You can also use \f(CW\*(C`issue\-edit\*(C'\fR to close an issue
 .el .IP "\f(CWissue\-resolve [<owner>/<repo>] <issue\-id\-number>\fR" 4
 .IX Item "issue-resolve [<owner>/<repo>] <issue-id-number>"
 Add a comment to an issue and then close it.
-.ie n .IP """pulls [<owner>/<repo>]""" 4
-.el .IP "\f(CWpulls [<owner>/<repo>]\fR" 4
-.IX Item "pulls [<owner>/<repo>]"
+.ie n .IP """pr\-list [<owner>/<repo>]""" 4
+.el .IP "\f(CWpr\-list [<owner>/<repo>]\fR" 4
+.IX Item "pr-list [<owner>/<repo>]"
 List the pull requests for a repo.
-.ie n .IP """pull\-request [<issue\-id\-number>] [<options>]""" 4
-.el .IP "\f(CWpull\-request [<issue\-id\-number>] [<options>]\fR" 4
-.IX Item "pull-request [<issue-id-number>] [<options>]"
+.ie n .IP """pr\-new [<issue\-id\-number>] [<options>]""" 4
+.el .IP "\f(CWpr\-new [<issue\-id\-number>] [<options>]\fR" 4
+.IX Item "pr-new [<issue-id-number>] [<options>]"
 Create a new pull request for a repository based on the current branch. If an
 issue \s-1ID\s0 number is given, this command will attach the pull request to the
 issue instead of creating a new one.
@@ -700,21 +700,21 @@ branch of the parent repository. Otherwise the pull request will target the
 default branch of the default remote itself. Use \f(CW\*(C`\-\-remote\*(C'\fR, \f(CW\*(C`\-\-branch\*(C'\fR, \f(CW\*(C`\-\-
 parent\*(C'\fR, and \f(CW\*(C`\-\-base\*(C'\fR options to change the default source remote, source
 branch, target remote and target branch (respectively).
-.ie n .IP """pull\-diff [<owner>/<repo>] <issue\-id\-number>""" 4
-.el .IP "\f(CWpull\-diff [<owner>/<repo>] <issue\-id\-number>\fR" 4
-.IX Item "pull-diff [<owner>/<repo>] <issue-id-number>"
+.ie n .IP """pr\-diff [<owner>/<repo>] <issue\-id\-number>""" 4
+.el .IP "\f(CWpr\-diff [<owner>/<repo>] <issue\-id\-number>\fR" 4
+.IX Item "pr-diff [<owner>/<repo>] <issue-id-number>"
 Show the diff for a pull request.
-.ie n .IP """pull\-fetch [<owner>/<repo>] <issue\-id\-number>""" 4
-.el .IP "\f(CWpull\-fetch [<owner>/<repo>] <issue\-id\-number>\fR" 4
-.IX Item "pull-fetch [<owner>/<repo>] <issue-id-number>"
+.ie n .IP """pr\-fetch [<owner>/<repo>] <issue\-id\-number>""" 4
+.el .IP "\f(CWpr\-fetch [<owner>/<repo>] <issue\-id\-number>\fR" 4
+.IX Item "pr-fetch [<owner>/<repo>] <issue-id-number>"
 Fetches a pull request to a local \f(CW\*(C`review/$number\*(C'\fR branch
-.ie n .IP """pull\-merge [<owner>/<repo>] <issue\-id\-number>""" 4
-.el .IP "\f(CWpull\-merge [<owner>/<repo>] <issue\-id\-number>\fR" 4
-.IX Item "pull-merge [<owner>/<repo>] <issue-id-number>"
+.ie n .IP """pr\-merge [<owner>/<repo>] <issue\-id\-number>""" 4
+.el .IP "\f(CWpr\-merge [<owner>/<repo>] <issue\-id\-number>\fR" 4
+.IX Item "pr-merge [<owner>/<repo>] <issue-id-number>"
 Merge and close a pull request.
-.ie n .IP """pull\-queue [<user>] [\-\-count=#] [\-\-all]""" 4
-.el .IP "\f(CWpull\-queue [<user>] [\-\-count=#] [\-\-all]\fR" 4
-.IX Item "pull-queue [<user>] [--count=#] [--all]"
+.ie n .IP """pr\-queue [<user>] [\-\-count=#] [\-\-all]""" 4
+.el .IP "\f(CWpr\-queue [<user>] [\-\-count=#] [\-\-all]\fR" 4
+.IX Item "pr-queue [<user>] [--count=#] [--all]"
 Show a user's Pull Request queue, for all repos. Shows the open PRs for any
 repo that has them. The \f(CW\*(C`\-\-count\*(C'\fR option tells how many repos to check. The
 \&\f(CW\*(C`\-\-all\*(C'\fR option says to show closed as well as open PRs.

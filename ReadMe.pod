@@ -635,11 +635,11 @@ Close an issue. You can also use C<issue-edit> to close an issue.
 
 Add a comment to an issue and then close it.
 
-=item C<< pulls [<owner>/<repo>] >>
+=item C<< pr-list [<owner>/<repo>] >>
 
 List the pull requests for a repo.
 
-=item C<< pull-request [<issue-id-number>] [<options>] >>
+=item C<< pr-new [<issue-id-number>] [<options>] >>
 
 Create a new pull request for a repository based on the current branch. If an
 issue ID number is given, this command will attach the pull request to the
@@ -651,19 +651,19 @@ default branch of the default remote itself. Use C<--remote>, C<--branch>, C<--
 parent>, and C<--base> options to change the default source remote, source
 branch, target remote and target branch (respectively).
 
-=item C<< pull-diff [<owner>/<repo>] <issue-id-number> >>
+=item C<< pr-diff [<owner>/<repo>] <issue-id-number> >>
 
 Show the diff for a pull request.
 
-=item C<< pull-fetch [<owner>/<repo>] <issue-id-number> >>
+=item C<< pr-fetch [<owner>/<repo>] <issue-id-number> >>
 
 Fetches a pull request to a local C<review/$number> branch
 
-=item C<< pull-merge [<owner>/<repo>] <issue-id-number> >>
+=item C<< pr-merge [<owner>/<repo>] <issue-id-number> >>
 
 Merge and close a pull request.
 
-=item C<< pull-queue [<user>] [--count=#] [--all] >>
+=item C<< pr-queue [<user>] [--count=#] [--all] >>
 
 Show a user's Pull Request queue, for all repos. Shows the open PRs for any
 repo that has them. The C<--count> option tells how many repos to check. The

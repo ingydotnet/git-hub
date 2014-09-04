@@ -14,7 +14,7 @@ How to hack on `git-hub`.
   # … hack hack hack …
   make test
   make dev-test
-  git hub pull-request
+  git hub pr-new
 
 
 = Welcome Young Hacker

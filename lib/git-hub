@@ -27,7 +27,7 @@ The most commonly used commands:
   user, orgs, org, teams, members, followers, following, follow, stars, star,
   clone, repos, repo, repo-new, repo-delete, forks, fork, collabs, trust,
   issues, issue, issue-update, issue-close, comment,
-  pull-request, pulls, pull-diff, pull-merge, search
+  pr-new, pr-list, pr-diff, pr-merge, pr-fetch
 
 See 'git hub help' for more help.
 
@@ -634,7 +634,7 @@ get-parent-remote-name() {
   }
   local value="$(JSON.get -a "/parent/full_name" -)"
   if [ -z "$value" ]; then
-    # parent for pull requests is self
+    # parent for PR is self
     get-default-remote-name
     parent_remote_name="$remote_name"
   else

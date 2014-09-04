@@ -187,6 +187,6 @@ x Chunk list json into an array of texts
 + Support @ as shorthand for login-name
 + Try loading git-hub-foo plugin for git-hub-foo-bar command
 + repo-delete repo (don't require user/repo)
-+ pull-list - list pull requests
-+ pull-request - issue a pull request
-+ pull-merge - merge a pull request
++ pr-list - list pull requests
++ pr-new - issue a pull request
++ pr-merge - merge a pull request

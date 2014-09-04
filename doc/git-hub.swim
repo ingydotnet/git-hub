@@ -507,10 +507,10 @@ interactions from the command line. They are installed by default.
 - `issue-resolve [<owner>/<repo>] <issue-id-number>`
   Add a comment to an issue and then close it.
 
-- `pulls [<owner>/<repo>]`
+- `pr-list [<owner>/<repo>]`
   List the pull requests for a repo.
 
-- `pull-request [<issue-id-number>] [<options>]`
+- `pr-new [<issue-id-number>] [<options>]`
   Create a new pull request for a repository based on the current branch.  If
   an issue ID number is given, this command will attach the pull request to the
   issue instead of creating a new one.
@@ -521,16 +521,16 @@ interactions from the command line. They are installed by default.
   `--parent`, and `--base` options to change the default source remote, source
   branch, target remote and target branch (respectively).
 
-- `pull-diff [<owner>/<repo>] <issue-id-number>`
+- `pr-diff [<owner>/<repo>] <issue-id-number>`
   Show the diff for a pull request.
 
-- `pull-fetch [<owner>/<repo>] <issue-id-number>`
+- `pr-fetch [<owner>/<repo>] <issue-id-number>`
   Fetches a pull request to a local `review/$number` branch
 
-- `pull-merge [<owner>/<repo>] <issue-id-number>`
+- `pr-merge [<owner>/<repo>] <issue-id-number>`
   Merge and close a pull request.
 
-- `pull-queue [<user>] [--count=#] [--all]`
+- `pr-queue [<user>] [--count=#] [--all]`
   Show a user's Pull Request queue, for all repos. Shows the open PRs for any
   repo that has them. The `--count` option tells how many repos to check. The
   `--all` option says to show closed as well as open PRs.

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-command:pull-request() {
+command:pr-new() {
   require-auth
   get-args "?number:'none'"
 
@@ -37,13 +37,13 @@ command:pull-request() {
   local url="/repos/$parent_owner_repo/pulls"
 
   if [[ "$number" =~ ^[0-9]+$ ]]; then
-    local prompt_msg="Attach pull-request $owner/$repo:$branch_name -> $parent_owner_repo:$parent_base to issue #$number? [yN]"
+    local prompt_msg="Attach PR $owner/$repo:$branch_name -> $parent_owner_repo:$parent_base to issue #$number? [yN]"
     local doit=$(prompt "$prompt_msg")
     if [[ "$doit" =~ ^[yY] ]]; then
       api-post "$url" "$(
         json-dump-object head "$head" base "$base" issue "$number"
       )"
-      msg_ok="Attached pull-request to issue: $(JSON.get -s /html_url -)"
+      msg_ok="Attached PR to issue: $(JSON.get -s /html_url -)"
     else
       msg_ok=0
     fi
@@ -81,14 +81,14 @@ $(git log $parent_remote_name/$parent_base..$branch_name)
         json-dump-object head "$head" base "$base" title "$title" body "$body"
     )"
     if OK; then
-      msg_ok="New pull-request created: $(JSON.get -a /html_url -)"
+      msg_ok="New PR created: $(JSON.get -a /html_url -)"
     else
-      msg_fail="New pull-request failed: $(JSON.get -a /errors/0/message -)"
+      msg_fail="New PR failed: $(JSON.get -a /errors/0/message -)"
     fi
   fi
 }
 
-command:pulls() {
+command:pr-list() {
   get-args '?owner:get-owner/repo:get-repo'
 
   state=open
@@ -101,7 +101,7 @@ command:pulls() {
     'number state title user/login created_at updated_at head/label base/label'
 }
 
-format-entry:pulls() {
+format-entry:pr-list() {
   if "$raw_output"; then
     echo "$2"
   else
@@ -110,12 +110,12 @@ format-entry:pulls() {
   fi
 }
 
-command:pull-diff() {
+command:pr-diff() {
   get-args '?owner:get-owner/repo:get-repo' number
   api-get "/repos/$owner/$repo/pulls/$number"
 }
 
-ok:pull-diff() {
+ok:pr-diff() {
   head_url="$(JSON.get -s /head/repo/ssh_url -)"
   head_sha="$(JSON.get -s /head/sha -)"
   head_ref="$(JSON.get -s /head/ref -)"
@@ -129,7 +129,7 @@ ok:pull-diff() {
   git diff "$base_sha" "$head_sha"
 }
 
-command:pull-fetch() {
+command:pr-fetch() {
   get-args '?owner:get-owner/repo:get-repo' number
   assert-inside-git-repo
   if [ -n "$(git branch | grep PR/$number)" ]; then
@@ -141,21 +141,21 @@ command:pull-fetch() {
   msg_ok=0
 }
 
-command:pull-merge() {
+command:pr-merge() {
   get-args '?owner:get-owner/repo:get-repo' number '?message'
   # TODO Support merge message
   local json='{}'
   api-put "/repos/$owner/$repo/pulls/$number/merge" "$json"
 }
 
-command:pull-queue() {
+command:pr-queue() {
   get-args '?user:get-user'
   local option1= option2=
   [ -n "$count_option" ] && option1=" --count=$count_option"
   $do_all && option2=" --all"
 
   for repo in `git hub repos $user -r$option1`; do
-    local pulls="`git hub pulls $repo$option2`"
+    local pulls="`git hub pr-list $repo$option2`"
     if [[ ! "$pulls" =~ --None-- ]]; then
       echo
       echo "$pulls"

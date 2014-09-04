@@ -24,10 +24,10 @@ org
 org-edit
 org-get
 orgs
-pull-diff
-pulls
-pull-merge
-pull-request
+pr-diff
+pr-list
+pr-merge
+pr-request
 repo
 repo-delete
 repo-edit
