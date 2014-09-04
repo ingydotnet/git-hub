@@ -1,5 +1,15 @@
 #!bash
 
+# This is the `git-hub` initialization script.
+#
+# This script turns on `git-hub` and its manpages and tab completion for *Bash*
+# and *zsh* shells.
+#
+# Just add a line like this to your shell startup configuration:
+#
+#   source /path/to/git-hub/init
+#
+
 [[ -n ${ZSH_VERSION-} ]] &&
   GIT_HUB_ROOT="$0" ||
   GIT_HUB_ROOT="$BASH_SOURCE"
