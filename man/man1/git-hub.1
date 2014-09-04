@@ -70,8 +70,8 @@
 .rr rF
 .\" ========================================================================
 .\"
-.IX Title "IO::FILE=IO(0X1DC0FE0) 1"
-.TH IO::FILE=IO(0X1DC0FE0) 1 "2014-08-28" "perl v5.18.1" "User Contributed Perl Documentation"
+.IX Title "IO::FILE=IO(0X18FA0F0) 1"
+.TH IO::FILE=IO(0X18FA0F0) 1 "2014-09-04" "perl v5.18.1" "User Contributed Perl Documentation"
 .\" For nroff, turn off justification.  Always turn off hyphenation; it makes
 .\" way too many mistakes in technical documents.
 .if n .ad l
@@ -139,11 +139,11 @@ completion.
 .PP
 The second method is to do these things by hand. This might afford you more
 control of your shell environment. Simply add the \f(CW\*(C`lib\*(C'\fR and \f(CW\*(C`man\*(C'\fR
-directories to your \f(CW\*(C`PATH and \*(C'\fRMANPATH`:
+directories to your \f(CW\*(C`PATH\*(C'\fR and \f(CW\*(C`MANPATH\*(C'\fR:
 .PP
 .Vb 2
-\&    export PATH=/path/to/git\-hub/lib:"$PATH"
-\&    export MANPATH=/path/to/git\-hub/man:"$MANPATH"
+\&    export PATH="/path/to/git\-hub/lib:$PATH"
+\&    export MANPATH="/path/to/git\-hub/man:$MANPATH"
 .Ve
 .PP
 See below for info on how to turn on Command Completion.
@@ -174,23 +174,54 @@ If you used \f(CW\*(C`make install\*(C'\fR method, then:
 .Ve
 .SH "Command Completion"
 .IX Header "Command Completion"
-The \f(CW\*(C`git hub\*(C'\fR command supports \f(CW\*(C`<TAB>\*(C'\fR\-based command completion. You
-need to first turn on Git command completion with something like this:
+The \f(CW\*(C`git hub\*(C'\fR command supports \f(CW\*(C`<TAB>\*(C'\fR\-based command completion. If you
+donât use the \f(CW\*(C`init\*(C'\fR script (see Installation, above), youâll need to enable
+this manually to use it.
+.SS "In Bash"
+.IX Subsection "In Bash"
+If your Bash setup does not already provide command completion for Git, youâll
+need to enable that first:
 .PP
 .Vb 1
-\&    source /etc/bash_completion.d/git
+\&    source <Git completion script>
 .Ve
 .PP
-Note: if you don't have this file or can't find it, do this:
+On your system, the Git completion script might be found at any of the
+following locations (or somewhere else that we donât know about):
+.IP "\(bu" 4
+\&\f(CW\*(C`/etc/bash_completion.d/git\*(C'\fR
+.IP "\(bu" 4
+\&\f(CW\*(C`/usr/share/bash\-completion/git\*(C'\fR
+.IP "\(bu" 4
+\&\f(CW\*(C`/usr/share/bash\-completion/completions/git\*(C'\fR
+.IP "\(bu" 4
+\&\f(CW\*(C`/opt/local/share/bash\-completion/completions/git\*(C'\fR
+.IP "\(bu" 4
+\&\f(CW\*(C`/usr/local/etc/bash_completion.d/git\*(C'\fR
+.IP "\(bu" 4
+\&\f(CW\*(C`~/.homebrew/etc/bash_completion.d/git\*(C'\fR
+.PP
+In case you canât find any of these, this repository contains a copy of the
+Git completion script:
 .PP
 .Vb 1
-\&    source /path/to/git\-hub/lib/git\-hub.d/git\-completion
+\&    source /path/to/git\-hub/share/git\-completion.bash
 .Ve
 .PP
-Then turn on \f(CW\*(C`git\-hub\*(C'\fR completion with a command like this:
+Once Git completion is enabled (whether you needed to do that manually or
+not), you can turn on \f(CW\*(C`git\-hub\*(C'\fR completion with a command like this:
 .PP
 .Vb 1
-\&    source /path/to/git\-hub/lib/git\-hub.d/completion
+\&    source /path/to/git\-hub/share/completion.bash
+.Ve
+.SS "In zsh"
+.IX Subsection "In zsh"
+In the Z shell (zsh), you can manually enable \f(CW\*(C`git\-hub\*(C'\fR completion by
+adding the following line to your \f(CW\*(C`~/.zshrc\*(C'\fR, \fBbefore\fR the \f(CW\*(C`compinit\*(C'\fR
+function is called:
+.PP
+.Vb 1
+\&    fpath=(\*(Aq/path/to/git\-hub/share/zsh\-completion\*(Aq $fpath)
 .Ve
 .SH "Plugins"
 .IX Header "Plugins"

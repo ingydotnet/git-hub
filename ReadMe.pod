@@ -70,10 +70,10 @@ completion.
 
 The second method is to do these things by hand. This might afford you more
 control of your shell environment. Simply add the C<lib> and C<man>
-directories to your C<PATH and >MANPATH`:
+directories to your C<PATH> and C<MANPATH>:
 
-    export PATH=/path/to/git-hub/lib:"$PATH"
-    export MANPATH=/path/to/git-hub/man:"$MANPATH"
+    export PATH="/path/to/git-hub/lib:$PATH"
+    export MANPATH="/path/to/git-hub/man:$MANPATH"
 
 See below for info on how to turn on Command Completion.
 
@@ -99,18 +99,53 @@ If you used C<make install> method, then:
 
 =head1 Command Completion
 
-The C<git hub> command supports C<< <TAB> >>-based command completion. You
-need to first turn on Git command completion with something like this:
+The C<git hub> command supports C<< <TAB> >>-based command completion. If you
+don’t use the C<init> script (see Installation, above), you’ll need to enable
+this manually to use it.
 
-    source /etc/bash_completion.d/git
+=head2 In Bash
 
-Note: if you don't have this file or can't find it, do this:
+If your Bash setup does not already provide command completion for Git, you’ll
+need to enable that first:
 
-    source /path/to/git-hub/lib/git-hub.d/git-completion
+    source <Git completion script>
 
-Then turn on C<git-hub> completion with a command like this:
+On your system, the Git completion script might be found at any of the
+following locations (or somewhere else that we don’t know about):
 
-    source /path/to/git-hub/lib/git-hub.d/completion
+=over
+
+=item * C</etc/bash_completion.d/git>
+
+=item * C</usr/share/bash-completion/git>
+
+=item * C</usr/share/bash-completion/completions/git>
+
+=item * C</opt/local/share/bash-completion/completions/git>
+
+=item * C</usr/local/etc/bash_completion.d/git>
+
+=item * C<~/.homebrew/etc/bash_completion.d/git>
+
+=back
+
+In case you can’t find any of these, this repository contains a copy of the
+Git completion script:
+
+    source /path/to/git-hub/share/git-completion.bash
+
+Once Git completion is enabled (whether you needed to do that manually or
+not), you can turn on C<git-hub> completion with a command like this:
+
+    source /path/to/git-hub/share/completion.bash
+
+=head2 In zsh
+
+In the Z shell (zsh), you can manually enable C<git-hub> completion by
+adding the following line to your C<~/.zshrc>, B<before> the C<compinit>
+function is called:
+
+    fpath=('/path/to/git-hub/share/zsh-completion' $fpath)
 
 =head1 Plugins
 
