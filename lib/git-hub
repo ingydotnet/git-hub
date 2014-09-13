@@ -869,6 +869,8 @@ report-value() {
   local label="$key"
   if [ "$key" == created_at ]; then
     value="${value%T*}"
+  elif [ "$key" == updated_at ]; then
+    value="${value%T*}"
   elif [ "$key" == pushed_at ]; then
     value="${value/T/ }"
     value="${value/Z/}"
