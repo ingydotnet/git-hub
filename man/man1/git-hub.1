@@ -70,8 +70,8 @@
 .rr rF
 .\" ========================================================================
 .\"
-.IX Title "IO::FILE=IO(0XA82280) 1"
-.TH IO::FILE=IO(0XA82280) 1 "2014-09-13" "perl v5.18.1" "User Contributed Perl Documentation"
+.IX Title "IO::FILE=IO(0X2726280) 1"
+.TH IO::FILE=IO(0X2726280) 1 "2014-09-14" "perl v5.18.1" "User Contributed Perl Documentation"
 .\" For nroff, turn off justification.  Always turn off hyphenation; it makes
 .\" way too many mistakes in technical documents.
 .if n .ad l
@@ -165,12 +165,17 @@ If you used the \f(CW\*(C`PATH\*(C'\fR method of installation, just run this to 
 \&    git hub upgrade
 .Ve
 .PP
-If you used \f(CW\*(C`make install\*(C'\fR method, then:
+Or (same thing):
 .PP
-.Vb 3
+.Vb 2
 \&    cd /path/to/git\-hub
 \&    git pull
-\&    make install
+.Ve
+.PP
+If you used \f(CW\*(C`make install\*(C'\fR method, then run this again (after \f(CW\*(C`git pull\*(C'\fR):
+.PP
+.Vb 1
+\&    make install        # Possibly with \*(Aqsudo\*(Aq
 .Ve
 .SH "Command Completion"
 .IX Header "Command Completion"
