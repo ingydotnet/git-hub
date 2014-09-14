@@ -58,7 +58,7 @@ if [[ "$GIT_HUB_ROOT" =~ ^/ ]]; then
       } || {
         # If no file was found at any of the potential file-paths checked
         # above, source a bundled copy of
-        # <https://github.com/git/git/blob/c285171dacb2e3fbcb644ad16b14b2cb1875947d/contrib/completion/git-completion.bash>.
+        # <https://github.com/git/git/blob/c285171/contrib/completion/git-completion.bash>.
 	source "$GIT_HUB_ROOT/share/git-completion.bash"
       }
     fi
