@@ -66,6 +66,7 @@ team                 team <team_id>
 team-delete          team-delete <team_id>
 team-members         team-members <team_id>
 team-new             team-new <org> <name> <perm>
+team-repo-add        team-repo-add <team_id> <repo>
 team-repos           team-repos <team_id>
 teams                teams <org>
 token-delete         token-delete <api-token-id>
@@ -686,6 +687,15 @@ help:team-new() {
 
   Add a new team (name) to an organization. The 'perm' arg must be pull, push
   or admin.
+...
+}
+
+help:team-repo-add() {
+    cat <<'...'
+
+  Usage: git hub team-repo-add <team_id> <repo>
+
+  Add repo to a team.  Repo name must not include org name.
 ...
 }
 
