@@ -132,7 +132,7 @@ ok:pr-diff() {
 command:pr-fetch() {
   get-args '?owner:get-owner/repo:get-repo' number
   assert-inside-git-repo
-  if [ -n "$(git branch | grep PR/$number)" ]; then
+  if [ -n "$(git branch | grep -E "^PR/$number$")" ]; then
     echo "Branch PR/$number already exists"
   else
     git fetch -f "git@github.com:$owner/$repo" "refs/pull/$number/head:PR/$number" ||
