@@ -373,6 +373,9 @@ interactions from the command line. They are installed by default.
 - `team <team_id>`
   Get information about a team.
 
+- `team-members <team_id>`
+  List members of a team.
+
 - `team-repos <team_id>`
   List repos of a team.
 
