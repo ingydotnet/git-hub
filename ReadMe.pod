@@ -473,6 +473,10 @@ List members of a team.
 
 List repos of a team.
 
+=item C<< team-repo-add <team_id> <repo> >>
+
+Add repo to a team. Repo name must not include org name.
+
 =item C<< team-new <org> <name> <perm> >>
 
 Add a new team (name) to an organization. The 'perm' arg must be pull,

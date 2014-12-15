@@ -382,6 +382,9 @@ interactions from the command line. They are installed by default.
 - `team-repos <team_id>`
   List repos of a team.
 
+- `team-repo-add <team_id> <repo>`
+  Add repo to a team.  Repo name must not include org name.
+
 - `team-new <org> <name> <perm>`
   Add a new team (name) to an organization. The 'perm' arg must be pull, push
   or admin.

@@ -38,6 +38,20 @@ command:team-repos() {
     full_name
 }
 
+command:team-repo-add() {
+  require-auth
+  get-args team_id repo
+  api-get "/teams/$team_id"
+  local org="$(JSON.get -a "/organization/login" -)"
+  if [ -n "$org" ]; then
+    api-put "/teams/$team_id/repos/$org/$repo"
+    msg_ok="'$org/$repo' is added to team (id) '$team_id'"
+  else
+    msg_fail="Couldn't find org for team '$team_id'"
+    OK=1
+  fi
+}
+
 command:team-members() {
   require-auth
   get-args team_id
