@@ -10,7 +10,9 @@ See http://github.com/ingydotnet/swim-pm#readme
 
 git-hub - The Git command for GitHub
 
-<badge travis coveralls ingydotnet/git-hub>
+=for html
+<a href="https://travis-ci.org/ingydotnet/git-hub"><img src="https://travis-ci.org/ingydotnet/git-hub.png" alt="git-hub"></a>
+<a href="https://coveralls.io/r/ingydotnet/git-hub?branch=master"><img src="https://coveralls.io/repos/ingydotnet/git-hub/badge.png" alt="git-hub"></a>
 
 =head1 Synopsis
 
@@ -439,6 +441,10 @@ options show the data in different formats than normal output.
 
 Show all the repos for an organization, both public and private.
 
+=item C<< org-members <org> >>
+
+List members of an organization.
+
 =item C<< org-get <org> <data-key> >>
 
 Get a specific data value for a particular organization.
@@ -476,9 +482,10 @@ push or admin.
 
 Delete a team.
 
-=item C<< members <org> >>
+=item C<< members <org>|<team_id> >>
 
-List the members of an organization.
+List the members of an organization or team. If numeric argument, show team
+members, else organization members.
 
 =item C<< member-get <team_id> <user> >>
 

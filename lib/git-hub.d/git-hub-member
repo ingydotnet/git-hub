@@ -3,10 +3,14 @@
 set -e
 
 command:members() {
-  get-args org
-  report-list \
-    "/orgs/$org/members?per_page=PER_PAGE" \
-    login
+  require-auth
+  get-args team_id
+  if [[ ! "$team_id" =~ ^[0-9]+$ ]]; then
+    git hub org-members "$team_id"
+    return
+  else
+    git hub team-members "$team_id"
+  fi
 }
 
 command:member-get() {

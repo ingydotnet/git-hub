@@ -62,4 +62,11 @@ format-entry:org-repos() {
   fi
 }
 
+command:org-members() {
+  get-args org
+  report-list \
+    "/orgs/$org/members?per_page=PER_PAGE" \
+    login
+}
+
 # vim: set lisp:

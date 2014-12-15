@@ -34,12 +34,13 @@ keys-add             keys-add <title> <key>
 member-add           member-add <team_id> <user>
 member-get           member-get <team_id> <user>
 member-remove        member-remove <team_id> <user>
-members              members <org>
+members              members <org>|<team_id>
 notify-list          notify-list [--all]
 open                 open [<owner>/<repo>] [<file-path>]
 org                  org <org>
 org-edit             org-edit <org> <key-value-pairs>...
 org-get              org-get <org> <data-key>
+org-members          org-members <org>
 org-repos            org-repos <org>
 orgs                 orgs [<user>]
 pr-diff              pr-diff [<owner>/<repo>] <issue-id-number>
@@ -362,9 +363,10 @@ help:member-remove() {
 help:members() {
     cat <<'...'
 
-  Usage: git hub members <org>
+  Usage: git hub members <org>|<team_id>
 
-  List the members of an organization.
+  List the members of an organization or team. If numeric argument, show team
+  members, else organization members.
 ...
 }
 
@@ -416,6 +418,15 @@ help:org-get() {
   Usage: git hub org-get <org> <data-key>
 
   Get a specific data value for a particular organization.
+...
+}
+
+help:org-members() {
+    cat <<'...'
+
+  Usage: git hub org-members <org>
+
+  List members of an organization.
 ...
 }
 

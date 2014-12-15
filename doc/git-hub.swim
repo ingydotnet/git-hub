@@ -357,6 +357,9 @@ interactions from the command line. They are installed by default.
 - `org-repos <org>`
   Show all the repos for an organization, both public and private.
 
+- `org-members <org>`
+  List members of an organization.
+
 - `org-get <org> <data-key>`
   Get a specific data value for a particular organization.
 
@@ -386,8 +389,9 @@ interactions from the command line. They are installed by default.
 - `team-delete <team_id>`
   Delete a team.
 
-- `members <org>`
-  List the members of an organization.
+- `members <org>|<team_id>`
+  List the members of an organization or team. If numeric argument, show team
+  members, else organization members.
 
 - `member-get <team_id> <user>`
   Show whether a user is a member of a specified team.
