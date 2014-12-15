@@ -38,6 +38,14 @@ command:team-repos() {
     full_name
 }
 
+command:team-members() {
+  require-auth
+  get-args team_id
+  report-list \
+    "/teams/$team_id/members?per_page=PER_PAGE" \
+    login
+}
+
 command:team-new() {
   require-auth
   get-args org name perm

@@ -64,6 +64,7 @@ starred              starred [<user>]
 stars                stars [<owner>/<repo>]
 team                 team <team_id>
 team-delete          team-delete <team_id>
+team-members         team-members <team_id>
 team-new             team-new <org> <name> <perm>
 team-repos           team-repos <team_id>
 teams                teams <org>
@@ -666,6 +667,15 @@ help:team-delete() {
   Usage: git hub team-delete <team_id>
 
   Delete a team.
+...
+}
+
+help:team-members() {
+    cat <<'...'
+
+  Usage: git hub team-members <team_id>
+
+  List members of a team.
 ...
 }
 
