@@ -19,11 +19,10 @@ url="$(
     git add foo
     git commit -m ...
     git checkout -b bar
-  ) &>/dev/null
+  ) 2>&1 > /dev/null
   git hub url
 )"
-like "$url" "bar" "'git hub url' repects branches"
-note $url
+like "$url" bar "'git hub url' repects branches"
 
 rm -fr tmp
 
