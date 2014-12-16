@@ -18,17 +18,11 @@ command:url() {
   fi
 
   get-args '?owner:get-user/repo:get-repo'
-
-  url="https://github.com/$owner/$repo"
+  branch="$(git rev-parse --abbrev-ref HEAD)"
+  url="https://github.com/$owner/$repo/tree/$branch"
 
   if [ -n "$path" ]; then
-    branch="$(git rev-parse --abbrev-ref HEAD)"
-    if "$raw_output"; then
-      quiet_output=false
-      url+="/raw/$branch/$path"
-    else
-      url+="/blob/$branch/$path"
-    fi
+    url+="/$path"
     if [ -n "$line" ]; then
       url+="#L$line"
     fi
