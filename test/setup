@@ -11,3 +11,26 @@ BASHLIB="$(
 PATH="$BASHLIB:$PATH"
 
 source bash+ :std
+
+export TEST_DIR="$PWD/test/commands"
+export TEST_BIN="$PWD/test/bin"
+export TEST_LIB="$PWD/test/lib"
+
+# unset most of GIT_HUB_* vars:
+unset `env | cut -f1 -d= | grep '^GIT_HUB' | grep -v 'GIT_HUB_JSON_LIB'`
+
+# Set env vars for testing:
+export GIT_HUB_TEST_RUN=true
+
+export GIT_HUB_USER_DIR=$PWD/test
+export GIT_HUB_EXEC_PATH=$PWD/lib
+export GIT_HUB_EXT_PATH=$GIT_HUB_EXEC_PATH/git-hub.d
+export GIT_HUB_API_URI=https://api.github.com
+export GIT_HUB_CONFIG=$GIT_HUB_USER_DIR/githubconfig
+
+export GIT_DIR=.no-git-repo
+export GIT_EXEC_PATH=$GIT_HUB_EXEC_PATH
+
+export GIT_HUB_TEST_INTERACTIVE=true
+export GIT_HUB_TEST_COLS=80
+export GIT_HUB_TEST_LINES=24
