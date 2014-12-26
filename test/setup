@@ -30,6 +30,10 @@ export GIT_HUB_CONFIG=$GIT_HUB_USER_DIR/githubconfig
 
 export GIT_DIR=.no-git-repo
 export GIT_EXEC_PATH=$GIT_HUB_EXEC_PATH
+export GIT_AUTHOR_NAME=Tester
+export GIT_AUTHOR_EMAIL=test@example.com
+export GIT_COMMITTER_NAME=Tester
+export GIT_COMMITTER_EMAIL=test@example.com
 
 export GIT_HUB_TEST_INTERACTIVE=true
 export GIT_HUB_TEST_COLS=80
