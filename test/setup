@@ -8,7 +8,7 @@ BASHLIB="$(
   grep -v '/pkg/cpan' |
   xargs -n1 printf "%s:"
 )"
-PATH="$BASHLIB:$PATH"
+export PATH="$BASHLIB:$PATH"
 
 source bash+ :std
 
