@@ -709,7 +709,7 @@ check-token-id() {
 # List processing functions:
 #------------------------------------------------------------------------------
 report-list() {
-  if interactive && $do_all && ! $pager_in_use; then
+  if interactive && ! $pager_in_use; then
     pager_in_use=true
     msg_ok=0
     report-list-process "$@" | $GIT_HUB_PAGER
@@ -721,7 +721,7 @@ report-list() {
 report-list-process() {
   msg_ok=0
   local url="$1" fields=($2) ii
-  local list_max=${list_size:-$(($terminal_lines - 2))}
+  local list_max=${list_size:-1000}
   local line_max=$terminal_cols
   local per_page=100
   if ! $json_output; then
@@ -769,12 +769,12 @@ report-list-process() {
       [ -n "$list_size" ] && [ $list_counter -gt $list_size ] && return
     done
     url=$(get-next-page-url)
-    if interactive; then
-      if [ $list_counter -gt $list_max ]; then
-        if [ -n "$url" -o $ii -lt $page_size ]; then
-          local prompt_msg='--More-- (press Enter or CTRL-C)'
-          prompt
-        fi
+    # out "list_counter=$list_counter list_max=$list_max page_size=$page_size ii=$ii url=$url"
+    # list_counter=401 list_max=400 page_size=99 ii=100 url=https
+    if [ $list_counter -gt $list_max ]; then
+      if [ -n "$url" -o $ii -lt $page_size ]; then
+        echo '*** More content available: Use --all or --count='
+        break
       fi
     fi
     [ -n "$url" ] || break
