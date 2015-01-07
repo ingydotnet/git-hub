@@ -18,6 +18,7 @@ following            following [<user>]
 follows              follows <user> [<target-user>]
 fork                 fork <owner>/<repo> [--org=<org>] [--remote=<name>]
 forks                forks [<owner>/<repo>]
+git-hub-travis       git-hub-travis
 help                 help
 info                 info
 irc-enable           irc-enable <room> [<server>]
@@ -204,6 +205,15 @@ help:forks() {
   Usage: git hub forks [<owner>/<repo>]
 
   List the forks of a repository.
+...
+}
+
+help:git-hub-travis() {
+    cat <<'...'
+
+  Usage: git hub git-hub-travis
+
+  Enable and/or disable travis-ci testing from the command line.
 ...
 }
 

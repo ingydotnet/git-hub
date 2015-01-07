@@ -70,8 +70,8 @@
 .rr rF
 .\" ========================================================================
 .\"
-.IX Title "IO::FILE=IO(0X21B9240) 1"
-.TH IO::FILE=IO(0X21B9240) 1 "2015-01-07" "perl v5.18.1" "User Contributed Perl Documentation"
+.IX Title "IO::FILE=IO(0X19CE240) 1"
+.TH IO::FILE=IO(0X19CE240) 1 "2015-01-07" "perl v5.18.1" "User Contributed Perl Documentation"
 .\" For nroff, turn off justification.  Always turn off hyphenation; it makes
 .\" way too many mistakes in technical documents.
 .if n .ad l
@@ -143,74 +143,10 @@ The third method is a standard system install, which puts \f(CW\*(C`git\-hub\*(C
 .Ve
 .PP
 This method does not account for upgrading and command completion yet.
-.SH "Upgrading"
-.IX Header "Upgrading"
-If you used the \f(CW\*(C`PATH\*(C'\fR method of installation, just run this to upgrade \f(CW\*(C`git\-hub\*(C'\fR:
 .PP
-.Vb 1
-\&    git hub upgrade
-.Ve
-.PP
-Or (same thing):
-.PP
-.Vb 2
-\&    cd /path/to/git\-hub
-\&    git pull
-.Ve
-.PP
-If you used \f(CW\*(C`make install\*(C'\fR method, then run this again (after \f(CW\*(C`git pull\*(C'\fR):
-.PP
-.Vb 1
-\&    make install        # Possibly with \*(Aqsudo\*(Aq
-.Ve
-.SH "Command Completion"
-.IX Header "Command Completion"
-The \f(CW\*(C`git hub\*(C'\fR command supports \f(CW\*(C`<TAB>\*(C'\fR\-based command completion. If you don't use the \f(CW\*(C`init\*(C'\fR script (see Installation, above), you'll need to enable this manually to use it.
-.SS "In Bash"
-.IX Subsection "In Bash"
-If your Bash setup does not already provide command completion for Git, you'll need to enable that first:
-.PP
-.Vb 1
-\&    source <Git completion script>
-.Ve
-.PP
-On your system, the Git completion script might be found at any of the following locations (or somewhere else that we don't know about):
-.IP "\(bu" 4
-\&\f(CW\*(C`/etc/bash_completion.d/git\*(C'\fR
-.IP "\(bu" 4
-\&\f(CW\*(C`/usr/share/bash\-completion/git\*(C'\fR
-.IP "\(bu" 4
-\&\f(CW\*(C`/usr/share/bash\-completion/completions/git\*(C'\fR
-.IP "\(bu" 4
-\&\f(CW\*(C`/opt/local/share/bash\-completion/completions/git\*(C'\fR
-.IP "\(bu" 4
-\&\f(CW\*(C`/usr/local/etc/bash_completion.d/git\*(C'\fR
-.IP "\(bu" 4
-\&\f(CW\*(C`~/.homebrew/etc/bash_completion.d/git\*(C'\fR
-.PP
-In case you can't find any of these, this repository contains a copy of the Git completion script:
-.PP
-.Vb 1
-\&    source /path/to/git\-hub/share/git\-completion.bash
-.Ve
-.PP
-Once Git completion is enabled (whether you needed to do that manually or not), you can turn on \f(CW\*(C`git\-hub\*(C'\fR completion with a command like this:
-.PP
-.Vb 1
-\&    source /path/to/git\-hub/share/completion.bash
-.Ve
-.SS "In zsh"
-.IX Subsection "In zsh"
-In the Z shell (zsh), you can manually enable \f(CW\*(C`git\-hub\*(C'\fR completion by adding the following line to your \f(CW\*(C`~/.zshrc\*(C'\fR, \fBbefore\fR the \f(CW\*(C`compinit\*(C'\fR function is called:
-.PP
-.Vb 1
-\&    fpath=(\*(Aq/path/to/git\-hub/share/zsh\-completion\*(Aq $fpath)
-.Ve
-.SH "Plugins"
-.IX Header "Plugins"
-The \f(CW\*(C`git\-hub\*(C'\fR command supports plugins. All you need to do to install a plugin, is to clone the plugin repo into the \f(CW\*(C`plugin/\*(C'\fR subdirectory of the \f(CW\*(C`git\-hub\*(C'\fR repository. There are example plugins already installed. If you do a system-style install, then just \f(CW\*(C`make install\*(C'\fR the plugins too.
-.SH "Options"
-.IX Header "Options"
+See \*(L"Upgrading\*(R" and \*(L"Command Completion\*(R" below.
+.SH "Command Options"
+.IX Header "Command Options"
 Commandline options start with a dash and can appear in any order in the command. Long form commands that require an argument can use '=' or not:
 .PP
 .Vb 2
@@ -347,17 +283,6 @@ The integer number \fBid\fR of a token (not the 40 hex-character value).
 .el .IP "\f(CW<scope\-name>\fR" 4
 .IX Item "<scope-name>"
 One of the GitHub scopes that you can apply to a token. The \f(CW\*(C`git hub scopes\*(C'\fR command will tell you all of these, and what they mean.
-.SH "Plugins"
-.IX Header "Plugins"
-You get tons of useful commands by default, and they are all listed and documented in the next section below. But \f(CW\*(C`git\-hub\*(C'\fR also supports third party plugin commands. The ones I know about are list here:
-.ie n .IP """git\-hub\-travis""" 4
-.el .IP "\f(CWgit\-hub\-travis\fR" 4
-.IX Item "git-hub-travis"
-Enable and/or disable travis-ci testing from the command line.
-.Sp
-<https://github.com/carloslima/git\-hub\-travis>
-.PP
-Well \s-1OK, I\s0 only know about this one, and yes, I helped Carlos write it. But trust me, it's easy. What are you waiting for?
 .SH "Commands"
 .IX Header "Commands"
 These are the commands you can use to perform most of your daily GitHub interactions from the command line. They are installed by default.
@@ -655,10 +580,13 @@ Open a browser window to a repo or a file in a repo.
 .el .IP "\f(CWurl [<owner>/<repo>] [<file\-path> [<line\-number>]]\fR" 4
 .IX Item "url [<owner>/<repo>] [<file-path> [<line-number>]]"
 Print the \s-1URL\s0 of a repo or a file in a repo.
+.ie n .IP """git\-hub\-travis""" 4
+.el .IP "\f(CWgit\-hub\-travis\fR" 4
+.IX Item "git-hub-travis"
+Enable and/or disable travis-ci testing from the command line.
 .SS "Plugin Commands"
 .IX Subsection "Plugin Commands"
-There are external plugins like this
-one <https://github.com/carloslima/git-hub-travis>.
+You get tons of useful commands by default, and they are all listed and documented in the next section below. But \f(CW\*(C`git\-hub\*(C'\fR also supports third party plugin commands.
 .PP
 This section is about the \*(L"plugin\*(R" commands that currently come with \f(CW\*(C`git\-hub\*(C'\fR.
 .ie n .IP """irc\-enable <room> [<server>]""" 4
@@ -712,6 +640,72 @@ Add one or more scopes to your \s-1API\s0 token. You can use the \f(CW\*(C`\-\-a
 .el .IP "\f(CWscope\-remove <api\-token\-id> <scope\-name>...\fR" 4
 .IX Item "scope-remove <api-token-id> <scope-name>..."
 Remove one or more scopes from your \s-1API\s0 token. You can use the \f(CW\*(C`\-\-all\*(C'\fR option to remove all possible scopes at once.
+.SH "Upgrading git-hub"
+.IX Header "Upgrading git-hub"
+If you used the \f(CW\*(C`PATH\*(C'\fR method of installation, just run this to upgrade \f(CW\*(C`git\-hub\*(C'\fR:
+.PP
+.Vb 1
+\&    git hub upgrade
+.Ve
+.PP
+Or (same thing):
+.PP
+.Vb 2
+\&    cd /path/to/git\-hub
+\&    git pull
+.Ve
+.PP
+If you used \f(CW\*(C`make install\*(C'\fR method, then run this again (after \f(CW\*(C`git pull\*(C'\fR):
+.PP
+.Vb 1
+\&    make install        # Possibly with \*(Aqsudo\*(Aq
+.Ve
+.SH "Command Completion"
+.IX Header "Command Completion"
+The \f(CW\*(C`git hub\*(C'\fR command supports \f(CW\*(C`<TAB>\*(C'\fR\-based command completion. If you don't use the \f(CW\*(C`init\*(C'\fR script (see Installation, above), you'll need to enable this manually to use it.
+.SS "In Bash"
+.IX Subsection "In Bash"
+If your Bash setup does not already provide command completion for Git, you'll need to enable that first:
+.PP
+.Vb 1
+\&    source <Git completion script>
+.Ve
+.PP
+On your system, the Git completion script might be found at any of the following locations (or somewhere else that we don't know about):
+.IP "\(bu" 4
+\&\f(CW\*(C`/etc/bash_completion.d/git\*(C'\fR
+.IP "\(bu" 4
+\&\f(CW\*(C`/usr/share/bash\-completion/git\*(C'\fR
+.IP "\(bu" 4
+\&\f(CW\*(C`/usr/share/bash\-completion/completions/git\*(C'\fR
+.IP "\(bu" 4
+\&\f(CW\*(C`/opt/local/share/bash\-completion/completions/git\*(C'\fR
+.IP "\(bu" 4
+\&\f(CW\*(C`/usr/local/etc/bash_completion.d/git\*(C'\fR
+.IP "\(bu" 4
+\&\f(CW\*(C`~/.homebrew/etc/bash_completion.d/git\*(C'\fR
+.PP
+In case you can't find any of these, this repository contains a copy of the Git completion script:
+.PP
+.Vb 1
+\&    source /path/to/git\-hub/share/git\-completion.bash
+.Ve
+.PP
+Once Git completion is enabled (whether you needed to do that manually or not), you can turn on \f(CW\*(C`git\-hub\*(C'\fR completion with a command like this:
+.PP
+.Vb 1
+\&    source /path/to/git\-hub/share/completion.bash
+.Ve
+.SS "In zsh"
+.IX Subsection "In zsh"
+In the Z shell (zsh), you can manually enable \f(CW\*(C`git\-hub\*(C'\fR completion by adding the following line to your \f(CW\*(C`~/.zshrc\*(C'\fR, \fBbefore\fR the \f(CW\*(C`compinit\*(C'\fR function is called:
+.PP
+.Vb 1
+\&    fpath=(\*(Aq/path/to/git\-hub/share/zsh\-completion\*(Aq $fpath)
+.Ve
+.SH "Plugins"
+.IX Header "Plugins"
+The \f(CW\*(C`git\-hub\*(C'\fR command supports plugins. All you need to do to install a plugin, is to clone the plugin repo into the \f(CW\*(C`plugin/\*(C'\fR subdirectory of the \f(CW\*(C`git\-hub\*(C'\fR repository. There are example plugins already installed. If you do a system-style install, then just \f(CW\*(C`make install\*(C'\fR the plugins too.
 .SH "Faster"
 .IX Header "Faster"
 The \f(CW\*(C`git\-hub\*(C'\fR command is written in pure Bash, including a complete \s-1JSON\s0 parser written in Bash. Unfortunately, this parser is a bit slow. It is \fBreally\fR slow for large \s-1API\s0 payloads.
@@ -795,9 +789,7 @@ Another option is to set the \s-1GIT_HUB_USE_AUTH\s0 environment variable:
 .IX Header "ETAG Caching"
 GitHub provides ETag headers in the \s-1API\s0 responses, and \f(CW\*(C`git\-hub\*(C'\fR uses them to cache responses, by default. When you use this feature, your rate-limit usage is not affected for cached responses.
 .PP
-Unfortunately, there is currently a bug in GitHub's \s-1API\s0 implementation: ETag values are not always updated for changed response content. This means that your cache may get stale.
-.PP
-There are a few things you can do, if you suspect the cache is stale:
+GitHub has had caching bugs in their \s-1API\s0 in the past. If you suspect the cache is stale, you may want to try these options:
 .IP "\(bu" 4
 Use the \f(CW\*(C`\-C\*(C'\fR (\f(CW\*(C`\-\-no\-cache\*(C'\fR) flag on a request to bypass the cache.
 .IP "\(bu" 4

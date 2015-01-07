@@ -84,80 +84,9 @@ your other git commands, do this instead:
 
 This method does not account for upgrading and command completion yet.
 
-=head1 Upgrading
+See "Upgrading" and "Command Completion" below.
 
-If you used the C<PATH> method of installation, just run this to upgrade
-C<git-hub>:
-
-    git hub upgrade
-
-Or (same thing):
-
-    cd /path/to/git-hub
-    git pull
-
-If you used C<make install> method, then run this again (after C<git pull>):
-
-    make install        # Possibly with 'sudo'
-
-=head1 Command Completion
-
-The C<git hub> command supports C<< <TAB> >>-based command completion. If you
-don't use the C<init> script (see Installation, above), you'll need to enable
-this manually to use it.
-
-=head2 In Bash
-
-If your Bash setup does not already provide command completion for Git, you'll
-need to enable that first:
-
-    source <Git completion script>
-
-On your system, the Git completion script might be found at any of the
-following locations (or somewhere else that we don't know about):
-
-=over
-
-=item * C</etc/bash_completion.d/git>
-
-=item * C</usr/share/bash-completion/git>
-
-=item * C</usr/share/bash-completion/completions/git>
-
-=item * C</opt/local/share/bash-completion/completions/git>
-
-=item * C</usr/local/etc/bash_completion.d/git>
-
-=item * C<~/.homebrew/etc/bash_completion.d/git>
-
-=back
-
-In case you can't find any of these, this repository contains a copy of the
-Git completion script:
-
-    source /path/to/git-hub/share/git-completion.bash
-
-Once Git completion is enabled (whether you needed to do that manually or
-not), you can turn on C<git-hub> completion with a command like this:
-
-    source /path/to/git-hub/share/completion.bash
-
-=head2 In zsh
-
-In the Z shell (zsh), you can manually enable C<git-hub> completion by
-adding the following line to your C<~/.zshrc>, B<before> the C<compinit>
-function is called:
-
-    fpath=('/path/to/git-hub/share/zsh-completion' $fpath)
-
-=head1 Plugins
-
-The C<git-hub> command supports plugins. All you need to do to install a
-plugin, is to clone the plugin repo into the C<plugin/> subdirectory of the
-C<git-hub> repository. There are example plugins already installed. If you do
-a system-style install, then just C<make install> the plugins too.
-
-=head1 Options
+=head1 Command Options
 
 Commandline options start with a dash and can appear in any order in the
 command. Long form commands that require an argument can use '=' or not:
@@ -349,25 +278,6 @@ One of the GitHub scopes that you can apply to a token. The C<git hub scopes>
 command will tell you all of these, and what they mean.
 
 =back
-
-=head1 Plugins
-
-You get tons of useful commands by default, and they are all listed and
-documented in the next section below. But C<git-hub> also supports third party
-plugin commands. The ones I know about are list here:
-
-=over
-
-=item C<git-hub-travis>
-
-Enable and/or disable travis-ci testing from the command line.
-
-L<https://github.com/carloslima/git-hub-travis>
-
-=back
-
-Well OK, I only know about this one, and yes, I helped Carlos write it. But
-trust me, it's easy. What are you waiting for?
 
 =head1 Commands
 
@@ -714,12 +624,17 @@ Open a browser window to a repo or a file in a repo.
 
 Print the URL of a repo or a file in a repo.
 
+=item C<git-hub-travis>
+
+Enable and/or disable travis-ci testing from the command line.
+
 =back
 
 =head2 Plugin Commands
 
-There are external plugins like L<this one|https://github.com/carloslima/git-hub-
-travis>.
+You get tons of useful commands by default, and they are all listed and
+documented in the next section below. But C<git-hub> also supports third party
+plugin commands.
 
 This section is about the "plugin" commands that currently come with
 C<git-hub>.
@@ -798,6 +713,79 @@ Remove one or more scopes from your API token. You can use the C<--all> option
 to remove all possible scopes at once.
 
 =back
+
+=head1 Upgrading git-hub
+
+If you used the C<PATH> method of installation, just run this to upgrade
+C<git-hub>:
+
+    git hub upgrade
+
+Or (same thing):
+
+    cd /path/to/git-hub
+    git pull
+
+If you used C<make install> method, then run this again (after C<git pull>):
+
+    make install        # Possibly with 'sudo'
+
+=head1 Command Completion
+
+The C<git hub> command supports C<< <TAB> >>-based command completion. If you
+don't use the C<init> script (see Installation, above), you'll need to enable
+this manually to use it.
+
+=head2 In Bash
+
+If your Bash setup does not already provide command completion for Git, you'll
+need to enable that first:
+
+    source <Git completion script>
+
+On your system, the Git completion script might be found at any of the
+following locations (or somewhere else that we don't know about):
+
+=over
+
+=item * C</etc/bash_completion.d/git>
+
+=item * C</usr/share/bash-completion/git>
+
+=item * C</usr/share/bash-completion/completions/git>
+
+=item * C</opt/local/share/bash-completion/completions/git>
+
+=item * C</usr/local/etc/bash_completion.d/git>
+
+=item * C<~/.homebrew/etc/bash_completion.d/git>
+
+=back
+
+In case you can't find any of these, this repository contains a copy of the
+Git completion script:
+
+    source /path/to/git-hub/share/git-completion.bash
+
+Once Git completion is enabled (whether you needed to do that manually or
+not), you can turn on C<git-hub> completion with a command like this:
+
+    source /path/to/git-hub/share/completion.bash
+
+=head2 In zsh
+
+In the Z shell (zsh), you can manually enable C<git-hub> completion by
+adding the following line to your C<~/.zshrc>, B<before> the C<compinit>
+function is called:
+
+    fpath=('/path/to/git-hub/share/zsh-completion' $fpath)
+
+=head1 Plugins
+
+The C<git-hub> command supports plugins. All you need to do to install a
+plugin, is to clone the plugin repo into the C<plugin/> subdirectory of the
+C<git-hub> repository. There are example plugins already installed. If you do
+a system-style install, then just C<make install> the plugins too.
 
 =head1 Faster
 
@@ -893,11 +881,8 @@ GitHub provides ETag headers in the API responses, and C<git-hub> uses them to
 cache responses, by default. When you use this feature, your rate-limit usage
 is not affected for cached responses.
 
-Unfortunately, there is currently a bug in GitHub's API implementation: ETag
-values are not always updated for changed response content. This means that
-your cache may get stale.
-
-There are a few things you can do, if you suspect the cache is stale:
+GitHub has had caching bugs in their API in the past. If you suspect the cache
+is stale, you may want to try these options:
 
 =over
 
