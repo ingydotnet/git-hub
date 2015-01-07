@@ -1,2 +1,2 @@
 package App::git::hub;
-our $VERSION = '0.1.4';
+our $VERSION = '0.1.5';

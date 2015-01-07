@@ -1,4 +1,9 @@
 ---
+version: 0.1.5
+date:    Wed Jan  7 12:10:30 PST 2015
+changes:
+- New CPAN release for 2015
+---
 version: 0.1.4
 date:    Thu Sep  4 16:25:54 MDT 2014
 changes:
