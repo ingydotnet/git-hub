@@ -6,7 +6,7 @@ command:version() {
   cat <<...
 git-hub version '$GIT_HUB_VERSION'
 
-  Copyright 2013-2014. Ingy döt Net.
+  Copyright 2013-2015. Ingy döt Net.
 
 Run 'git hub info' for more detailed information.
 ...

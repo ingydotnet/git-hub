@@ -70,13 +70,8 @@
 .rr rF
 .\" ========================================================================
 .\"
-<<<<<<< HEAD
-.IX Title "IO::FILE=IO(0X23542C0) 1"
-.TH IO::FILE=IO(0X23542C0) 1 "2014-12-14" "perl v5.18.1" "User Contributed Perl Documentation"
-=======
-.IX Title "IO::FILE=IO(0X7F8AE3029530) 1"
-.TH IO::FILE=IO(0X7F8AE3029530) 1 "2014-12-14" "perl v5.20.0" "User Contributed Perl Documentation"
->>>>>>> 116daed... add team-repo-add command
+.IX Title "IO::FILE=IO(0X1BC2240) 1"
+.TH IO::FILE=IO(0X1BC2240) 1 "2015-01-07" "perl v5.18.1" "User Contributed Perl Documentation"
 .\" For nroff, turn off justification.  Always turn off hyphenation; it makes
 .\" way too many mistakes in technical documents.
 .if n .ad l
@@ -111,40 +106,28 @@ Here are just a few of the things you can do on GitHub with a simple command:
 .Ve
 .SH "Description"
 .IX Header "Description"
-The \fBhub\fR subcommand for git, allows you to perform many of the operations
-made available by GitHub's v3 \s-1REST API,\s0 from the \f(CW\*(C`git\*(C'\fR commandline command.
+The \fBhub\fR subcommand for git, allows you to perform many of the operations made available by GitHub's v3 \s-1REST API,\s0 from the \f(CW\*(C`git\*(C'\fR commandline command.
 .PP
-You can fork, create, delete and modify repositories. You can get information
-about users, repositories and issues. You can \fBstar\fR, \fBwatch\fR and \fBfollow\fR
-things, and find out who else is doing the same. The \s-1API\s0 is quite extensive.
-With this command you can do many of your day to day GitHub actions without
-needing a web browser.
+You can fork, create, delete and modify repositories. You can get information about users, repositories and issues. You can \fBstar\fR, \fBwatch\fR and \fBfollow\fR things, and find out who else is doing the same. The \s-1API\s0 is quite extensive. With this command you can do many of your day to day GitHub actions without needing a web browser.
 .PP
-You can also chain commands together using the output of one as the input of
-another. For example you could use this technique to clone all the repos of a
-GitHub user or organization, with one command. See \s-1PIPE AND EACH\s0 below.
+You can also chain commands together using the output of one as the input of another. For example you could use this technique to clone all the repos of a GitHub user or organization, with one command. See \s-1PIPE AND EACH\s0 below.
 .SH "Installation"
 .IX Header "Installation"
-There are currently 3 ways to install \f(CW\*(C`git\-hub\*(C'\fR. For all of them you need to
-get the source code from GitHub:
+There are currently 3 ways to install \f(CW\*(C`git\-hub\*(C'\fR. For all of them you need to get the source code from GitHub:
 .PP
 .Vb 1
 \&    git clone https://github.com/ingydotnet/git\-hub /path/to/git\-hub
 .Ve
 .PP
-The first installation method is preferred: \f(CW\*(C`source\*(C'\fR the \f(CW\*(C`init\*(C'\fR file. Just
-add a line like this one to your shell startup script:
+The first installation method is preferred: \f(CW\*(C`source\*(C'\fR the \f(CW\*(C`init\*(C'\fR file. Just add a line like this one to your shell startup script:
 .PP
 .Vb 1
 \&    source /path/to/git\-hub/init
 .Ve
 .PP
-That will modify your \f(CW\*(C`PATH\*(C'\fR and \f(CW\*(C`MANPATH\*(C'\fR, and also enable command
-completion.
+That will modify your \f(CW\*(C`PATH\*(C'\fR and \f(CW\*(C`MANPATH\*(C'\fR, and also enable command completion.
 .PP
-The second method is to do these things by hand. This might afford you more
-control of your shell environment. Simply add the \f(CW\*(C`lib\*(C'\fR and \f(CW\*(C`man\*(C'\fR
-directories to your \f(CW\*(C`PATH\*(C'\fR and \f(CW\*(C`MANPATH\*(C'\fR:
+The second method is to do these things by hand. This might afford you more control of your shell environment.  Simply add the \f(CW\*(C`lib\*(C'\fR and \f(CW\*(C`man\*(C'\fR directories to your \f(CW\*(C`PATH\*(C'\fR and \f(CW\*(C`MANPATH\*(C'\fR:
 .PP
 .Vb 2
 \&    export PATH="/path/to/git\-hub/lib:$PATH"
@@ -153,8 +136,7 @@ directories to your \f(CW\*(C`PATH\*(C'\fR and \f(CW\*(C`MANPATH\*(C'\fR:
 .PP
 See below for info on how to turn on Command Completion.
 .PP
-The third method is a standard system install, which puts \f(CW\*(C`git\-hub\*(C'\fR next to
-your other git commands, do this instead:
+The third method is a standard system install, which puts \f(CW\*(C`git\-hub\*(C'\fR next to your other git commands, do this instead:
 .PP
 .Vb 1
 \&    make install        # Possibly with \*(Aqsudo\*(Aq
@@ -163,8 +145,7 @@ your other git commands, do this instead:
 This method does not account for upgrading and command completion yet.
 .SH "Upgrading"
 .IX Header "Upgrading"
-If you used the \f(CW\*(C`PATH\*(C'\fR method of installation, just run this to upgrade
-\&\f(CW\*(C`git\-hub\*(C'\fR:
+If you used the \f(CW\*(C`PATH\*(C'\fR method of installation, just run this to upgrade \f(CW\*(C`git\-hub\*(C'\fR:
 .PP
 .Vb 1
 \&    git hub upgrade
@@ -184,20 +165,16 @@ If you used \f(CW\*(C`make install\*(C'\fR method, then run this again (after \f
 .Ve
 .SH "Command Completion"
 .IX Header "Command Completion"
-The \f(CW\*(C`git hub\*(C'\fR command supports \f(CW\*(C`<TAB>\*(C'\fR\-based command completion. If you
-donât use the \f(CW\*(C`init\*(C'\fR script (see Installation, above), youâll need to enable
-this manually to use it.
+The \f(CW\*(C`git hub\*(C'\fR command supports \f(CW\*(C`<TAB>\*(C'\fR\-based command completion. If you donât use the \f(CW\*(C`init\*(C'\fR script (see Installation, above), youâll need to enable this manually to use it.
 .SS "In Bash"
 .IX Subsection "In Bash"
-If your Bash setup does not already provide command completion for Git, youâll
-need to enable that first:
+If your Bash setup does not already provide command completion for Git, youâll need to enable that first:
 .PP
 .Vb 1
 \&    source <Git completion script>
 .Ve
 .PP
-On your system, the Git completion script might be found at any of the
-following locations (or somewhere else that we donât know about):
+On your system, the Git completion script might be found at any of the following locations (or somewhere else that we donât know about):
 .IP "\(bu" 4
 \&\f(CW\*(C`/etc/bash_completion.d/git\*(C'\fR
 .IP "\(bu" 4
@@ -211,38 +188,30 @@ following locations (or somewhere else that we donât know about):
 .IP "\(bu" 4
 \&\f(CW\*(C`~/.homebrew/etc/bash_completion.d/git\*(C'\fR
 .PP
-In case you canât find any of these, this repository contains a copy of the
-Git completion script:
+In case you canât find any of these, this repository contains a copy of the Git completion script:
 .PP
 .Vb 1
 \&    source /path/to/git\-hub/share/git\-completion.bash
 .Ve
 .PP
-Once Git completion is enabled (whether you needed to do that manually or
-not), you can turn on \f(CW\*(C`git\-hub\*(C'\fR completion with a command like this:
+Once Git completion is enabled (whether you needed to do that manually or not), you can turn on \f(CW\*(C`git\-hub\*(C'\fR completion with a command like this:
 .PP
 .Vb 1
 \&    source /path/to/git\-hub/share/completion.bash
 .Ve
 .SS "In zsh"
 .IX Subsection "In zsh"
-In the Z shell (zsh), you can manually enable \f(CW\*(C`git\-hub\*(C'\fR completion by
-adding the following line to your \f(CW\*(C`~/.zshrc\*(C'\fR, \fBbefore\fR the \f(CW\*(C`compinit\*(C'\fR
-function is called:
+In the Z shell (zsh), you can manually enable \f(CW\*(C`git\-hub\*(C'\fR completion by adding the following line to your \f(CW\*(C`~/.zshrc\*(C'\fR, \fBbefore\fR the \f(CW\*(C`compinit\*(C'\fR function is called:
 .PP
 .Vb 1
 \&    fpath=(\*(Aq/path/to/git\-hub/share/zsh\-completion\*(Aq $fpath)
 .Ve
 .SH "Plugins"
 .IX Header "Plugins"
-The \f(CW\*(C`git\-hub\*(C'\fR command supports plugins. All you need to do to install a
-plugin, is to clone the plugin repo into the \f(CW\*(C`plugin/\*(C'\fR subdirectory of the
-\&\f(CW\*(C`git\-hub\*(C'\fR repository. There are example plugins already installed. If you do
-a system-style install, then just \f(CW\*(C`make install\*(C'\fR the plugins too.
+The \f(CW\*(C`git\-hub\*(C'\fR command supports plugins. All you need to do to install a plugin, is to clone the plugin repo into the \f(CW\*(C`plugin/\*(C'\fR subdirectory of the \f(CW\*(C`git\-hub\*(C'\fR repository. There are example plugins already installed. If you do a system-style install, then just \f(CW\*(C`make install\*(C'\fR the plugins too.
 .SH "Options"
 .IX Header "Options"
-Commandline options start with a dash and can appear in any order in the
-command. Long form commands that require an argument can use '=' or not:
+Commandline options start with a dash and can appear in any order in the command. Long form commands that require an argument can use '=' or not:
 .PP
 .Vb 2
 \&    \-\-count=5
@@ -251,20 +220,15 @@ command. Long form commands that require an argument can use '=' or not:
 .ie n .IP """\-c <number>"", ""count=<number>""" 4
 .el .IP "\f(CW\-c <number>\fR, \f(CWcount=<number>\fR" 4
 .IX Item "-c <number>, count=<number>"
-This option is for commands that return a list of things. Specify the number
-of items you want the command to return. Each list command has a reasonable
-default value.
+This option is for commands that return a list of things.  Specify the number of items you want the command to return. Each list command has a reasonable default value.
 .ie n .IP """\-a"", ""\-\-all""" 4
 .el .IP "\f(CW\-a\fR, \f(CW\-\-all\fR" 4
 .IX Item "-a, --all"
-Show all elements for list commands. Also applies to a few other commands as
-documented.
+Show all elements for list commands. Also applies to a few other commands as documented.
 .ie n .IP """\-r"", ""\-\-raw""" 4
 .el .IP "\f(CW\-r\fR, \f(CW\-\-raw\fR" 4
 .IX Item "-r, --raw"
-For commands the produce lists, just list the raw data. For commands that
-produce reports, show the raw storage keys, rather than the human friendly
-ones. You will need the raw keys to edit/change values.
+For commands the produce lists, just list the raw data. For commands that produce reports, show the raw storage keys, rather than the human friendly ones. You will need the raw keys to edit/change values.
 .ie n .IP """\-j"", ""\-\-json""" 4
 .el .IP "\f(CW\-j\fR, \f(CW\-\-json\fR" 4
 .IX Item "-j, --json"
@@ -272,13 +236,11 @@ For some commands, you can get the raw data in \s-1JSON.\s0
 .ie n .IP """\-""" 4
 .el .IP "\f(CW\-\fR" 4
 .IX Item "-"
-This option, just a single '\-', is small but very powerful. It means to read
-the next line from stdin, and put the content into the command at that point.
-See \s-1PIPE\s0 and \s-1EACH\s0 below.
+This option, just a single '\-', is small but very powerful. It means to read the next line from stdin, and put the content into the command at that point. See \s-1PIPE\s0 and \s-1EACH\s0 below.
 .ie n .IP """=""" 4
 .el .IP "\f(CW=\fR" 4
 .IX Item "="
-Like the '\-' command above, but reads each \fBword\fR from stdin.
+Like the '\-'Â command above, but reads each \fBword\fR from stdin.
 .ie n .IP """\-h""" 4
 .el .IP "\f(CW\-h\fR" 4
 .IX Item "-h"
@@ -294,14 +256,11 @@ Show minimal output.
 .ie n .IP """\-v"", ""\-\-verbose""" 4
 .el .IP "\f(CW\-v\fR, \f(CW\-\-verbose\fR" 4
 .IX Item "-v, --verbose"
-Show detailed output. Notably, show the raw command that is used for the
-GitHub \s-1API\s0 calls.
+Show detailed output. Notably, show the raw command that is used for the GitHub \s-1API\s0 calls.
 .ie n .IP """\-\-token=<api\-token>""" 4
 .el .IP "\f(CW\-\-token=<api\-token>\fR" 4
 .IX Item "--token=<api-token>"
-Set or override the api-token required by the command. This value can also
-come from the \f(CW\*(C`GIT_HUB_API_TOKEN\*(C'\fR environment variable. Usually this value
-comes from your \f(CW\*(C`~/.git\-hub/config\*(C'\fR file.
+Set or override the api-token required by the command. This value can also come from the \f(CW\*(C`GIT_HUB_API_TOKEN\*(C'\fR environment variable. Usually this value comes from your \f(CW\*(C`~/.git\-hub/config\*(C'\fR file.
 .ie n .IP """\-d"" ""\-\-dryrun""" 4
 .el .IP "\f(CW\-d\fR \f(CW\-\-dryrun\fR" 4
 .IX Item "-d --dryrun"
@@ -309,23 +268,18 @@ Don't actually make the \s-1API\s0 call. This option turns on verbose mode.
 .ie n .IP """\-T""" 4
 .el .IP "\f(CW\-T\fR" 4
 .IX Item "-T"
-Show the \s-1API\s0 token in the verbose output. Hidden by default. This option turns
-on verbose mode.
+Show the \s-1API\s0 token in the verbose output. Hidden by default. This option turns on verbose mode.
 .ie n .IP """\-A"", ""\-\-use\-auth""" 4
 .el .IP "\f(CW\-A\fR, \f(CW\-\-use\-auth\fR" 4
 .IX Item "-A, --use-auth"
-Use authentication whether or not it is needed for a certain command. This is
-useful if you have exceeded your hourly GitHub \s-1API\s0 rate limit, which is 60
-calls unauthenticated, and 5000 calls authenticated.
+Use authentication whether or not it is needed for a certain command.  This is useful if you have exceeded your hourly GitHub \s-1API\s0 rate limit, which is 60 calls unauthenticated, and 5000 calls authenticated.
 .ie n .IP """\-C"" ""\-\-no\-cache""" 4
 .el .IP "\f(CW\-C\fR \f(CW\-\-no\-cache\fR" 4
 .IX Item "-C --no-cache"
-There are currently known bugs in GitHub's cache headers. If the content seems
-stale, use this option.
+There are currently known bugs in GitHub's cache headers. If the content seems stale, use this option.
 .SS "Debug Options"
 .IX Subsection "Debug Options"
-There are a number of debug options that will give you lots of extra
-information (albeit in a less pretty format).
+There are a number of debug options that will give you lots of extra information (albeit in a less pretty format).
 .ie n .IP """\-O""" 4
 .el .IP "\f(CW\-O\fR" 4
 .IX Item "-O"
@@ -341,18 +295,14 @@ Show the \s-1API\s0 response \s-1JSON,\s0 in decoded form.
 .ie n .IP """\-R""" 4
 .el .IP "\f(CW\-R\fR" 4
 .IX Item "-R"
-Repeat the last command, using the previous \s-1API\s0 server response. Useful for
-development and debugging. (Beware, only caches the most recent \s-1API\s0 call, so
-not really good for commands that make multiple calls).
+Repeat the last command, using the previous \s-1API\s0 server response. Useful for development and debugging. (Beware, only caches the most recent \s-1API\s0 call, so not really good for commands that make multiple calls).
 .ie n .IP """\-x""" 4
 .el .IP "\f(CW\-x\fR" 4
 .IX Item "-x"
-Turn on Bash \f(CW\*(C`\-x\*(C'\fR debugging. This will show every bash command executed in
-the program. This is extremely useful to track down nasty bugs.
+Turn on Bash \f(CW\*(C`\-x\*(C'\fR debugging. This will show every bash command executed in the program. This is extremely useful to track down nasty bugs.
 .SH "Arguments"
 .IX Header "Arguments"
-The \f(CW\*(C`git hub\*(C'\fR command gets its input values from these sources (in
-this order):
+The \f(CW\*(C`git hub\*(C'\fR command gets its input values from these sources (in this order):
 .IP "\(bu" 4
 Commandline \fBarguments\fR (see specific command, below).
 .IP "\(bu" 4
@@ -362,49 +312,33 @@ The \f(CW\*(C`./.git/config\*(C'\fR file. (The repo you are issuing commands fro
 .IP "\(bu" 4
 The \f(CW\*(C`~/.githubconfig\*(C'\fR file.
 .PP
-Most of the commands described below have arguments. This section defines each
-of the argument types. Note that argument values that are strings containing
-whitespace need to be quoted.
+Most of the commands described below have arguments. This section defines each of the argument types. Note that argument values that are strings containing whitespace need to be quoted.
 .PP
-Argument variable names are always indicated by angle brackets, like: \f(CW\*(C`<variable>\*(C'\fR. Arguments listed in square brackets are optional and arguments
-followed by \f(CW\*(C`...\*(C'\fR indicate that more than one is allowed.
+Argument variable names are always indicated by angle brackets, like: \f(CW\*(C`<variable>\*(C'\fR. Arguments listed in square brackets are optional and arguments followed by \f(CW\*(C`...\*(C'\fR indicate that more than one is allowed.
 .ie n .IP """<user>""" 4
 .el .IP "\f(CW<user>\fR" 4
 .IX Item "<user>"
-A GitHub user name. Sometimes an organization name can be used instead. If
-this argument is optional, it defaults to the GitHub owner of the repo you are
-currently in. If you are not in a GitHub repo, it defaults to your login.
-\&\fBOverride\fR: \f(CW\*(C`GIT_HUB_USER_NAME\*(C'\fR environment variable.
+A GitHub user name. Sometimes an organization name can be used instead.  If this argument is optional, it defaults to the GitHub owner of the repo you are currently in. If you are not in a GitHub repo, it defaults to your login. \fBOverride\fR: \f(CW\*(C`GIT_HUB_USER_NAME\*(C'\fR environment variable.
 .ie n .IP """<owner>""" 4
 .el .IP "\f(CW<owner>\fR" 4
 .IX Item "<owner>"
-A GitHub user or organization that owns the repository being specified. This
-value defaults much like the \f(CW\*(C`<user>\*(C'\fR argument (above). \fBOverride\fR:
-\&\f(CW\*(C`GIT_HUB_OWNER_NAME\*(C'\fR environment variable.
+A GitHub user or organization that owns the repository being specified. This value defaults much like the \f(CW\*(C`<user>\*(C'\fR argument (above). \fBOverride\fR: \f(CW\*(C`GIT_HUB_OWNER_NAME\*(C'\fR environment variable.
 .ie n .IP """<org>""" 4
 .el .IP "\f(CW<org>\fR" 4
 .IX Item "<org>"
-A GitHub organization name. \fBOverride\fR: \f(CW\*(C`GIT_HUB_ORG_NAME\*(C'\fR
-environment variable.
+A GitHub organization name. \fBOverride\fR: \f(CW\*(C`GIT_HUB_ORG_NAME\*(C'\fR environment variable.
 .ie n .IP """<repo>""" 4
 .el .IP "\f(CW<repo>\fR" 4
 .IX Item "<repo>"
-A GitHub repository name. If this argument is optional, it defaults to the
-GitHub repo name of the repo you are currently in. \fBOverride\fR:
-\&\f(CW\*(C`GIT_HUB_REPO_NAME\*(C'\fR environment variable.
+A GitHub repository name. If this argument is optional, it defaults to the GitHub repo name of the repo you are currently in. \fBOverride\fR: \f(CW\*(C`GIT_HUB_REPO_NAME\*(C'\fR environment variable.
 .ie n .IP """<owner>/<repo>""" 4
 .el .IP "\f(CW<owner>/<repo>\fR" 4
 .IX Item "<owner>/<repo>"
-Many commands need both an owner and repo separated by a slash. If the owner
-is you (your GitHub login) you can omit it (but you still need the leading
-slash). Like \f(CW\*(C`/myrepo\*(C'\fR, instead of \f(CW\*(C`me/myrepo\*(C'\fR. If this argument is
-optional, it defaults the the owner and repo of the GitHub repo you are in.
+Many commands need both an owner and repo separated by a slash. If the owner is you (your GitHub login) you can omit it (but you still need the leading slash). Like \f(CW\*(C`/myrepo\*(C'\fR, instead of \f(CW\*(C`me/myrepo\*(C'\fR. If this argument is optional, it defaults the the owner and repo of the GitHub repo you are in.
 .ie n .IP """<key\-value\-pair>""" 4
 .el .IP "\f(CW<key\-value\-pair>\fR" 4
 .IX Item "<key-value-pair>"
-Two strings separated by whitespace. Values with embedded whitespace should be
-quoted. The documentation of each command that needs these pairs, will list
-the valid keys.
+Two strings separated by whitespace. Values with embedded whitespace should be quoted. The documentation of each command that needs these pairs, will list the valid keys.
 .ie n .IP """<api\-token\-id>""" 4
 .el .IP "\f(CW<api\-token\-id>\fR" 4
 .IX Item "<api-token-id>"
@@ -412,13 +346,10 @@ The integer number \fBid\fR of a token (not the 40 hex-character value).
 .ie n .IP """<scope\-name>""" 4
 .el .IP "\f(CW<scope\-name>\fR" 4
 .IX Item "<scope-name>"
-One of the GitHub scopes that you can apply to a token. The \f(CW\*(C`git hub scopes\*(C'\fR
-command will tell you all of these, and what they mean.
+One of the GitHub scopes that you can apply to a token. The \f(CW\*(C`git hub scopes\*(C'\fR command will tell you all of these, and what they mean.
 .SH "Plugins"
 .IX Header "Plugins"
-You get tons of useful commands by default, and they are all listed and
-documented in the next section below. But \f(CW\*(C`git\-hub\*(C'\fR also supports third party
-plugin commands. The ones I know about are list here:
+You get tons of useful commands by default, and they are all listed and documented in the next section below. But \f(CW\*(C`git\-hub\*(C'\fR also supports third party plugin commands. The ones I know about are list here:
 .ie n .IP """git\-hub\-travis""" 4
 .el .IP "\f(CWgit\-hub\-travis\fR" 4
 .IX Item "git-hub-travis"
@@ -426,12 +357,10 @@ Enable and/or disable travis-ci testing from the command line.
 .Sp
 <https://github.com/carloslima/git\-hub\-travis>
 .PP
-Well \s-1OK, I\s0 only know about this one, and yes, I helped Carlos write it. But
-trust me, it's easy. What are you waiting for?
+Well \s-1OK, I\s0 only know about this one, and yes, I helped Carlos write it. But trust me, it's easy. What are you waiting for?
 .SH "Commands"
 .IX Header "Commands"
-These are the commands you can use to perform most of your daily GitHub
-interactions from the command line. They are installed by default.
+These are the commands you can use to perform most of your daily GitHub interactions from the command line. They are installed by default.
 .ie n .IP """help""" 4
 .el .IP "\f(CWhelp\fR" 4
 .IX Item "help"
@@ -443,35 +372,23 @@ Print version info for \f(CW\*(C`git\-hub\*(C'\fR.
 .ie n .IP """info""" 4
 .el .IP "\f(CWinfo\fR" 4
 .IX Item "info"
-Show detailed version and environment info about your \f(CW\*(C`git\-hub\*(C'\fR installation.
-This can be useful for figuring out things about how \f(CW\*(C`git\-hub\*(C'\fR is operating
-in a given situation. Also good for reporting bugs / issues in \f(CW\*(C`git\-hub\*(C'\fR.
+Show detailed version and environment info about your \f(CW\*(C`git\-hub\*(C'\fR installation. This can be useful for figuring out things about how \f(CW\*(C`git\-hub\*(C'\fR is operating in a given situation. Also good for reporting bugs / issues in \f(CW\*(C`git\-hub\*(C'\fR.
 .ie n .IP """setup""" 4
 .el .IP "\f(CWsetup\fR" 4
 .IX Item "setup"
-Before you can use the commands described below, you need to perform some
-setup/configuration steps.
+Before you can use the commands described below, you need to perform some setup/configuration steps.
 .Sp
-This \*(L"wizard\*(R" style dialog, will walk you through the configuration process
-quickly and painlessly, with lots of explanation. You should run this command
-right away. You can also re-run it, and it will allow you to change your
-config, while defaulting to your existing settings.
+This \*(L"wizard\*(R" style dialog, will walk you through the configuration process quickly and painlessly, with lots of explanation. You should run this command right away. You can also re-run it, and it will allow you to change your config, while defaulting to your existing settings.
 .Sp
-If you would rather do the steps by hand, see #Configuration\-
-Commands below.
+If you would rather do the steps by hand, see #Configuration\-Commands below.
 .ie n .IP """upgrade""" 4
 .el .IP "\f(CWupgrade\fR" 4
 .IX Item "upgrade"
-Upgrade the \f(CW\*(C`git\-hub\*(C'\fR installation to the latest version. Note: you need to
-be running 'git\-hub' from the source repo, and be on the master branch for
-this to work.
+Upgrade the \f(CW\*(C`git\-hub\*(C'\fR installation to the latest version. Note: you need to be running 'git\-hub' from the source repo, and be on the master branch for this to work.
 .ie n .IP """user [<user>]""" 4
 .el .IP "\f(CWuser [<user>]\fR" 4
 .IX Item "user [<user>]"
-Show basic information about a specific user. User defaults to the owner of
-the current repo, or your login if you are not inside a repo directory. The
-\&\f(CW\*(C`\-\-raw\*(C'\fR and \f(CW\*(C`\-\-json\*(C'\fR options show the data in different formats than
-normal output.
+Show basic information about a specific user. User defaults to the owner of the current repo, or your login if you are not inside a repo directory. The \f(CW\*(C`\-\-raw\*(C'\fR and \f(CW\*(C`\-\-json\*(C'\fR options show the data in different formats than normal output.
 .ie n .IP """user\-get <user> <data\-key>""" 4
 .el .IP "\f(CWuser\-get <user> <data\-key>\fR" 4
 .IX Item "user-get <user> <data-key>"
@@ -479,11 +396,9 @@ Get a specific data value for a particular user.
 .ie n .IP """user\-edit <key\-value\-pair>...""" 4
 .el .IP "\f(CWuser\-edit <key\-value\-pair>...\fR" 4
 .IX Item "user-edit <key-value-pair>..."
-Set specific fields of your user info to new values. You list the parameters
-as key/value pairs.
+Set specific fields of your user info to new values. You list the parameters as key/value pairs.
 .Sp
-You can edit the following user keys: \f(CW\*(C`name\*(C'\fR, \f(CW\*(C`email\*(C'\fR, \f(CW\*(C`blog\*(C'\fR, \f(CW\*(C`location\*(C'\fR,
-\&\f(CW\*(C`company\*(C'\fR, \f(CW\*(C`bio\*(C'\fR.
+You can edit the following user keys: \f(CW\*(C`name\*(C'\fR, \f(CW\*(C`email\*(C'\fR, \f(CW\*(C`blog\*(C'\fR, \f(CW\*(C`location\*(C'\fR, \f(CW\*(C`company\*(C'\fR, \f(CW\*(C`bio\*(C'\fR.
 .ie n .IP """orgs [<user>]""" 4
 .el .IP "\f(CWorgs [<user>]\fR" 4
 .IX Item "orgs [<user>]"
@@ -491,8 +406,7 @@ List the organizations that a user is a member of.
 .ie n .IP """org <org>""" 4
 .el .IP "\f(CWorg <org>\fR" 4
 .IX Item "org <org>"
-Show basic information about a GitHub organization. The \f(CW\*(C`\-\-raw\*(C'\fR and \f(CW\*(C`\-\-json\*(C'\fR
-options show the data in different formats than normal output.
+Show basic information about a GitHub organization. The \f(CW\*(C`\-\-raw\*(C'\fR and \f(CW\*(C`\-\-json\*(C'\fR options show the data in different formats than normal output.
 .ie n .IP """org\-repos <org>""" 4
 .el .IP "\f(CWorg\-repos <org>\fR" 4
 .IX Item "org-repos <org>"
@@ -508,11 +422,9 @@ Get a specific data value for a particular organization.
 .ie n .IP """org\-edit <org> <key\-value\-pairs>...""" 4
 .el .IP "\f(CWorg\-edit <org> <key\-value\-pairs>...\fR" 4
 .IX Item "org-edit <org> <key-value-pairs>..."
-Set specific meta-data fields of an organization to new values. You list the
-parameters as key/value pairs.
+Set specific meta-data fields of an organization to new values. You list the parameters as key/value pairs.
 .Sp
-You can edit the following organization keys: \f(CW\*(C`name\*(C'\fR, \f(CW\*(C`email\*(C'\fR,
-\&\f(CW\*(C`billing_email\*(C'\fR, \f(CW\*(C`blog\*(C'\fR, \f(CW\*(C`location\*(C'\fR, \f(CW\*(C`company\*(C'\fR.
+You can edit the following organization keys: \f(CW\*(C`name\*(C'\fR, \f(CW\*(C`email\*(C'\fR, \f(CW\*(C`billing_email\*(C'\fR, \f(CW\*(C`blog\*(C'\fR, \f(CW\*(C`location\*(C'\fR, \f(CW\*(C`company\*(C'\fR.
 .ie n .IP """teams <org>""" 4
 .el .IP "\f(CWteams <org>\fR" 4
 .IX Item "teams <org>"
@@ -532,12 +444,11 @@ List repos of a team.
 .ie n .IP """team\-repo\-add <team_id> <repo>""" 4
 .el .IP "\f(CWteam\-repo\-add <team_id> <repo>\fR" 4
 .IX Item "team-repo-add <team_id> <repo>"
-Add repo to a team. Repo name must not include org name.
+Add repo to a team.  Repo name must not include org name.
 .ie n .IP """team\-new <org> <name> <perm>""" 4
 .el .IP "\f(CWteam\-new <org> <name> <perm>\fR" 4
 .IX Item "team-new <org> <name> <perm>"
-Add a new team (name) to an organization. The 'perm' arg must be pull,
-push or admin.
+Add a new team (name) to an organization. The 'perm' arg must be pull, push or admin.
 .ie n .IP """team\-delete <team_id>""" 4
 .el .IP "\f(CWteam\-delete <team_id>\fR" 4
 .IX Item "team-delete <team_id>"
@@ -545,8 +456,7 @@ Delete a team.
 .ie n .IP """members <org>|<team_id>""" 4
 .el .IP "\f(CWmembers <org>|<team_id>\fR" 4
 .IX Item "members <org>|<team_id>"
-List the members of an organization or team. If numeric argument, show team
-members, else organization members.
+List the members of an organization or team. If numeric argument, show team members, else organization members.
 .ie n .IP """member\-get <team_id> <user>""" 4
 .el .IP "\f(CWmember\-get <team_id> <user>\fR" 4
 .IX Item "member-get <team_id> <user>"
@@ -566,8 +476,7 @@ List the people who are followers of a user.
 .ie n .IP """follows <user> [<target\-user>]""" 4
 .el .IP "\f(CWfollows <user> [<target\-user>]\fR" 4
 .IX Item "follows <user> [<target-user>]"
-Check if \f(CW\*(C`<user>\*(C'\fR follows \f(CW\*(C`<target\-user>\*(C'\fR. The default target
-user is you.
+Check if \f(CW\*(C`<user>\*(C'\fR follows \f(CW\*(C`<target\-user>\*(C'\fR. The default target user is you.
 .ie n .IP """following [<user>]""" 4
 .el .IP "\f(CWfollowing [<user>]\fR" 4
 .IX Item "following [<user>]"
@@ -583,20 +492,15 @@ Stop following one or more users.
 .ie n .IP """clone ([<owner>/]<repo> [<directory>])...""" 4
 .el .IP "\f(CWclone ([<owner>/]<repo> [<directory>])...\fR" 4
 .IX Item "clone ([<owner>/]<repo> [<directory>])..."
-Clone a GitHub repo. Always uses \f(CW\*(C`\-\-recursive\*(C'\fR so you get submodules too. You
-can specifiy a list of repos. If you specify a directory for a repo, it should
-be an absolute path name or else begin with '.\fI' or '..\fR' so that it can be
-distinguished from another repo name.
+Clone a GitHub repo. Always uses \f(CW\*(C`\-\-recursive\*(C'\fR so you get submodules too. You can specifiy a list of repos. If you specify a directory for a repo, it should be an absolute path name or else begin with '.\fI' or '..\fR' so that it can be distinguished from another repo name.
 .ie n .IP """repos [<user>]""" 4
 .el .IP "\f(CWrepos [<user>]\fR" 4
 .IX Item "repos [<user>]"
-List the repos for a user or organization. List is returned in order of
-recent activity.
+List the repos for a user or organization. List is returned in order of recent activity.
 .ie n .IP """repo [<repo>]""" 4
 .el .IP "\f(CWrepo [<repo>]\fR" 4
 .IX Item "repo [<repo>]"
-Show basic information about a specific repository. The \f(CW\*(C`\-\-raw\*(C'\fR and \f(CW\*(C`\-\-json\*(C'\fR
-options show the data in different formats than normal output.
+Show basic information about a specific repository. The \f(CW\*(C`\-\-raw\*(C'\fR and \f(CW\*(C`\-\-json\*(C'\fR options show the data in different formats than normal output.
 .ie n .IP """repo\-get <owner>/<repo> <data\-key>""" 4
 .el .IP "\f(CWrepo\-get <owner>/<repo> <data\-key>\fR" 4
 .IX Item "repo-get <owner>/<repo> <data-key>"
@@ -604,8 +508,7 @@ Get a specific data value for a particular repository.
 .ie n .IP """repo\-edit [<owner>/]<repo> <key\-value\-pair>...""" 4
 .el .IP "\f(CWrepo\-edit [<owner>/]<repo> <key\-value\-pair>...\fR" 4
 .IX Item "repo-edit [<owner>/]<repo> <key-value-pair>..."
-Set specific meta-data fields of a repository to new values. You list the
-parameters as key/value pairs.
+Set specific meta-data fields of a repository to new values. You list the parameters as key/value pairs.
 .Sp
 You can edit the following repo keys: \f(CW\*(C`description\*(C'\fR, \f(CW\*(C`homepage\*(C'\fR.
 .ie n .IP """repo\-new [<org>/]<repo>""" 4
@@ -615,9 +518,7 @@ Create a new GitHub repository.
 .ie n .IP """repo\-init [<directory>]""" 4
 .el .IP "\f(CWrepo\-init [<directory>]\fR" 4
 .IX Item "repo-init [<directory>]"
-This command is useful for setting up new repos. Just mkdir a new dir, cd into
-it and issue the command. It will 'git init', make the GitHub repo and add it
-as the origin remote. It will only do the things that have not yet been done.
+This command is useful for setting up new repos. Just mkdir a new dir, cd into it and issue the command. It will 'git init', make the GitHub repo and add it as the origin remote. It will only do the things that have not yet been done.
 .ie n .IP """repo\-delete <owner>/<repo>""" 4
 .el .IP "\f(CWrepo\-delete <owner>/<repo>\fR" 4
 .IX Item "repo-delete <owner>/<repo>"
@@ -629,8 +530,7 @@ List the forks of a repository.
 .ie n .IP """fork <owner>/<repo> [\-\-org=<org>] [\-\-remote=<name>]""" 4
 .el .IP "\f(CWfork <owner>/<repo> [\-\-org=<org>] [\-\-remote=<name>]\fR" 4
 .IX Item "fork <owner>/<repo> [--org=<org>] [--remote=<name>]"
-Fork a repository to your account or to an organization. Optionally, you can
-specify the name of a remote to add, pointing to your fork.
+Fork a repository to your account or to an organization. Optionally, you can specify the name of a remote to add, pointing to your fork.
 .ie n .IP """stars [<owner>/<repo>]""" 4
 .el .IP "\f(CWstars [<owner>/<repo>]\fR" 4
 .IX Item "stars [<owner>/<repo>]"
@@ -678,13 +578,11 @@ Remove one or more collaborators from a repository.
 .ie n .IP """issues [<owner>/<repo>] [\-\-all]""" 4
 .el .IP "\f(CWissues [<owner>/<repo>] [\-\-all]\fR" 4
 .IX Item "issues [<owner>/<repo>] [--all]"
-List the open issues for a repo. Use the \f(CW\*(C`\-\-all\*(C'\fR flag to see both open and
-closed issues.
+List the open issues for a repo. Use the \f(CW\*(C`\-\-all\*(C'\fR flag to see both open and closed issues.
 .ie n .IP """issue [<owner>/<repo>] <issue\-id\-number>""" 4
 .el .IP "\f(CWissue [<owner>/<repo>] <issue\-id\-number>\fR" 4
 .IX Item "issue [<owner>/<repo>] <issue-id-number>"
-Show info (including any comments) for a specific issue. If no issue number is
-given, this command will call \f(CW\*(C`issue\-new\*(C'\fR instead.
+Show info (including any comments) for a specific issue. If no issue number is given, this command will call \f(CW\*(C`issue\-new\*(C'\fR instead.
 .ie n .IP """issue\-new [<owner>/<repo>]""" 4
 .el .IP "\f(CWissue\-new [<owner>/<repo>]\fR" 4
 .IX Item "issue-new [<owner>/<repo>]"
@@ -692,13 +590,11 @@ Create a new issue for a repository.
 .ie n .IP """issue\-edit [<owner>/<repo>] <issue\-id\-number>""" 4
 .el .IP "\f(CWissue\-edit [<owner>/<repo>] <issue\-id\-number>\fR" 4
 .IX Item "issue-edit [<owner>/<repo>] <issue-id-number>"
-Add a comment. Change values of 'title', 'state', 'assignee' and 'milestone'.
-Changing state to 'closed' will close the issue.
+Add a comment. Change values of 'title', 'state', 'assignee' and 'milestone'.  Changing state to 'closed' will close the issue.
 .ie n .IP """comment [<owner>/<repo>] <issue\-id\-number>""" 4
 .el .IP "\f(CWcomment [<owner>/<repo>] <issue\-id\-number>\fR" 4
 .IX Item "comment [<owner>/<repo>] <issue-id-number>"
-Add a comment to an issue. You can also use \f(CW\*(C`issue\-edit\*(C'\fR to just add a
-comment.
+Add a comment to an issue. You can also use \f(CW\*(C`issue\-edit\*(C'\fR to just add a comment.
 .ie n .IP """issue\-close [<owner>/<repo>] <issue\-id\-number>""" 4
 .el .IP "\f(CWissue\-close [<owner>/<repo>] <issue\-id\-number>\fR" 4
 .IX Item "issue-close [<owner>/<repo>] <issue-id-number>"
@@ -714,15 +610,9 @@ List the pull requests for a repo.
 .ie n .IP """pr\-new [<issue\-id\-number>] [<options>]""" 4
 .el .IP "\f(CWpr\-new [<issue\-id\-number>] [<options>]\fR" 4
 .IX Item "pr-new [<issue-id-number>] [<options>]"
-Create a new pull request for a repository based on the current branch. If an
-issue \s-1ID\s0 number is given, this command will attach the pull request to the
-issue instead of creating a new one.
+Create a new pull request for a repository based on the current branch.  If an issue \s-1ID\s0 number is given, this command will attach the pull request to the issue instead of creating a new one.
 .Sp
-If the default remote is a fork, the pull request will target the default
-branch of the parent repository. Otherwise the pull request will target the
-default branch of the default remote itself. Use \f(CW\*(C`\-\-remote\*(C'\fR, \f(CW\*(C`\-\-branch\*(C'\fR, \f(CW\*(C`\-\-
-parent\*(C'\fR, and \f(CW\*(C`\-\-base\*(C'\fR options to change the default source remote, source
-branch, target remote and target branch (respectively).
+If the default remote is a fork, the pull request will target the default branch of the parent repository.  Otherwise the pull request will target the default branch of the default remote itself. Use \f(CW\*(C`\-\-remote\*(C'\fR, \f(CW\*(C`\-\-branch\*(C'\fR, \f(CW\*(C`\-\-parent\*(C'\fR, and \f(CW\*(C`\-\-base\*(C'\fR options to change the default source remote, source branch, target remote and target branch (respectively).
 .ie n .IP """pr\-diff [<owner>/<repo>] <issue\-id\-number>""" 4
 .el .IP "\f(CWpr\-diff [<owner>/<repo>] <issue\-id\-number>\fR" 4
 .IX Item "pr-diff [<owner>/<repo>] <issue-id-number>"
@@ -738,18 +628,13 @@ Merge and close a pull request.
 .ie n .IP """pr\-queue [<user>] [\-\-count=#] [\-\-all]""" 4
 .el .IP "\f(CWpr\-queue [<user>] [\-\-count=#] [\-\-all]\fR" 4
 .IX Item "pr-queue [<user>] [--count=#] [--all]"
-Show a user's Pull Request queue, for all repos. Shows the open PRs for any
-repo that has them. The \f(CW\*(C`\-\-count\*(C'\fR option tells how many repos to check. The
-\&\f(CW\*(C`\-\-all\*(C'\fR option says to show closed as well as open PRs.
+Show a user's Pull Request queue, for all repos. Shows the open PRs for any repo that has them. The \f(CW\*(C`\-\-count\*(C'\fR option tells how many repos to check. The \f(CW\*(C`\-\-all\*(C'\fR option says to show closed as well as open PRs.
 .Sp
-Note: this command makes more \s-1API\s0 calls than most other commands and thus runs
-      slower. You might want to tee the output to a file, if you need to get
-      back to this data a lot.
+Note: this command makes more \s-1API\s0 calls than most other commands and thus runs slower. You might want to tee the output to a file, if you need to get back to this data a lot.
 .ie n .IP """notify\-list [\-\-all]""" 4
 .el .IP "\f(CWnotify\-list [\-\-all]\fR" 4
 .IX Item "notify-list [--all]"
-List your recent \fIunread\fR user notifications. To list your \fIread\fR
-notifications as well, use the \f(CW\*(C`\-\-all\*(C'\fR option.
+List your recent \fIunread\fR user notifications. To list your \fIread\fR notifications as well, use the \f(CW\*(C`\-\-all\*(C'\fR option.
 .ie n .IP """keys [<user>]""" 4
 .el .IP "\f(CWkeys [<user>]\fR" 4
 .IX Item "keys [<user>]"
@@ -772,35 +657,29 @@ Open a browser window to a repo or a file in a repo.
 Print the \s-1URL\s0 of a repo or a file in a repo.
 .SS "Plugin Commands"
 .IX Subsection "Plugin Commands"
-There are external plugins like this one.
+There are external plugins like this
+one <https://github.com/carloslima/git-hub-travis>.
 .PP
-This section is about the \*(L"plugin\*(R" commands that currently come with
-\&\f(CW\*(C`git\-hub\*(C'\fR.
+This section is about the \*(L"plugin\*(R" commands that currently come with \f(CW\*(C`git\-hub\*(C'\fR.
 .ie n .IP """irc\-enable <room> [<server>]""" 4
 .el .IP "\f(CWirc\-enable <room> [<server>]\fR" 4
 .IX Item "irc-enable <room> [<server>]"
-This command must be run inside a cloned repo. It enables GitHub activities
-for a repo to be reported to an \s-1IRC\s0 channel.
+This command must be run inside a cloned repo. It enables GitHub activities for a repo to be reported to an \s-1IRC\s0 channel.
 .ie n .IP """irc\-enable""" 4
 .el .IP "\f(CWirc\-enable\fR" 4
 .IX Item "irc-enable"
-This command must be run inside a cloned repo. It disables the GitHub \s-1IRC\s0
-webhook for a repo.
+This command must be run inside a cloned repo. It disables the GitHub \s-1IRC\s0 webhook for a repo.
 .ie n .IP """irc\-url""" 4
 .el .IP "\f(CWirc\-url\fR" 4
 .IX Item "irc-url"
 Show the GitHub \s-1URL\s0 for setting webhooks on the current repo.
 .SS "Configuration Commands"
 .IX Subsection "Configuration Commands"
-These commands are for editing your \f(CW\*(C`git\-hub\*(C'\fR config file and managing your
-GitHub authentication tokens.
+These commands are for editing your \f(CW\*(C`git\-hub\*(C'\fR config file and managing your GitHub authentication tokens.
 .ie n .IP """config [<config\-key> [<config\-value>]]""" 4
 .el .IP "\f(CWconfig [<config\-key> [<config\-value>]]\fR" 4
 .IX Item "config [<config-key> [<config-value>]]"
-With no args, this command will print the contents of \f(CW\*(C`~/.githubconfig\*(C'\fR. With
-one argument (a key), print the current value of the config key. With two
-arguments (key value), set the value of the config key. 4 keys are currently
-supported: \f(CW\*(C`login\*(C'\fR, \f(CW\*(C`api\-token\*(C'\fR, \f(CW\*(C`use\-auth\*(C'\fR, and \f(CW\*(C`json\-lib\*(C'\fR.
+With no args, this command will print the contents of \f(CW\*(C`~/.githubconfig\*(C'\fR. With one argument (a key), print the current value of the config key. With two arguments (key value), set the value of the config key. 4 keys are currently supported: \f(CW\*(C`login\*(C'\fR, \f(CW\*(C`api\-token\*(C'\fR, \f(CW\*(C`use\-auth\*(C'\fR, and \f(CW\*(C`json\-lib\*(C'\fR.
 .ie n .IP """config\-unset <config\-key>""" 4
 .el .IP "\f(CWconfig\-unset <config\-key>\fR" 4
 .IX Item "config-unset <config-key>"
@@ -808,15 +687,11 @@ Unset a config key. Removes the key from the \f(CW\*(C`~/.githubconfig\*(C'\fR f
 .ie n .IP """tokens""" 4
 .el .IP "\f(CWtokens\fR" 4
 .IX Item "tokens"
-List all the \s-1API\s0 tokens for your GitHub account. Use the \f(CW\*(C`\-\-raw\*(C'\fR option to
-print the token IDs and descriptions, but not the actual token values.
+List all the \s-1API\s0 tokens for your GitHub account. Use the \f(CW\*(C`\-\-raw\*(C'\fR option to print the token IDs and descriptions, but not the actual token values.
 .ie n .IP """token\-new [<description\-string>]""" 4
 .el .IP "\f(CWtoken\-new [<description\-string>]\fR" 4
 .IX Item "token-new [<description-string>]"
-Create a new \s-1API\s0 token for your GitHub login id. Note: Creating a new token
-will not automatically add it to your \f(CW\*(C`~/.githubconfig\*(C'\fR file; you need to do
-that yourself with the \f(CW\*(C`git hub config api\-token <token\-value>\*(C'\fR command.
-Use the \f(CW\*(C`\-\-raw\*(C'\fR option to just print the new token id.
+Create a new \s-1API\s0 token for your GitHub login id. Note: Creating a new token will not automatically add it to your \f(CW\*(C`~/.githubconfig\*(C'\fR file; you need to do that yourself with the \f(CW\*(C`git hub config api\-token <token\-value>\*(C'\fR command. Use the \f(CW\*(C`\-\-raw\*(C'\fR option to just print the new token id.
 .ie n .IP """token\-get <api\-token\-id> <data\-key>""" 4
 .el .IP "\f(CWtoken\-get <api\-token\-id> <data\-key>\fR" 4
 .IX Item "token-get <api-token-id> <data-key>"
@@ -824,29 +699,22 @@ Get a specific data value for a particular token.
 .ie n .IP """token\-delete <api\-token\-id>""" 4
 .el .IP "\f(CWtoken\-delete <api\-token\-id>\fR" 4
 .IX Item "token-delete <api-token-id>"
-Delete one of your \s-1API\s0 tokens for your GitHub login id. Note: You need to
-delete tokens by \fBid\fR (listed by the \f(CW\*(C`tokens\*(C'\fR command), not by token value.
+Delete one of your \s-1API\s0 tokens for your GitHub login id. Note: You need to delete tokens by \fBid\fR (listed by the \f(CW\*(C`tokens\*(C'\fR command), not by token value.
 .ie n .IP """scopes <api\-token\-id>""" 4
 .el .IP "\f(CWscopes <api\-token\-id>\fR" 4
 .IX Item "scopes <api-token-id>"
-List the scopes assigned to your \s-1API\s0 token, and also list all the
-possible scope values that you can assign. Use the \f(CW\*(C`\-\-raw\*(C'\fR option to
-just list the scopes.
+List the scopes assigned to your \s-1API\s0 token, and also list all the possible scope values that you can assign. Use the \f(CW\*(C`\-\-raw\*(C'\fR option to just list the scopes.
 .ie n .IP """scope\-add <api\-token\-id> <scope\-name>...""" 4
 .el .IP "\f(CWscope\-add <api\-token\-id> <scope\-name>...\fR" 4
 .IX Item "scope-add <api-token-id> <scope-name>..."
-Add one or more scopes to your \s-1API\s0 token. You can use the \f(CW\*(C`\-\-all\*(C'\fR option to
-add all possible scopes at once.
+Add one or more scopes to your \s-1API\s0 token. You can use the \f(CW\*(C`\-\-all\*(C'\fR option to add all possible scopes at once.
 .ie n .IP """scope\-remove <api\-token\-id> <scope\-name>...""" 4
 .el .IP "\f(CWscope\-remove <api\-token\-id> <scope\-name>...\fR" 4
 .IX Item "scope-remove <api-token-id> <scope-name>..."
-Remove one or more scopes from your \s-1API\s0 token. You can use the \f(CW\*(C`\-\-all\*(C'\fR option
-to remove all possible scopes at once.
+Remove one or more scopes from your \s-1API\s0 token. You can use the \f(CW\*(C`\-\-all\*(C'\fR option to remove all possible scopes at once.
 .SH "Faster"
 .IX Header "Faster"
-The \f(CW\*(C`git\-hub\*(C'\fR command is written in pure Bash, including a complete \s-1JSON\s0
-parser written in Bash. Unfortunately, this parser is a bit slow. It is
-\&\fBreally\fR slow for large \s-1API\s0 payloads.
+The \f(CW\*(C`git\-hub\*(C'\fR command is written in pure Bash, including a complete \s-1JSON\s0 parser written in Bash. Unfortunately, this parser is a bit slow. It is \fBreally\fR slow for large \s-1API\s0 payloads.
 .PP
 To make the \f(CW\*(C`git\-hub\*(C'\fR command perform much faster, just run this command:
 .PP
@@ -854,16 +722,10 @@ To make the \f(CW\*(C`git\-hub\*(C'\fR command perform much faster, just run thi
 \&    git hub config json\-lib json\-perl.bash
 .Ve
 .PP
-That will enable a Perl replacement, which requires Perl (of course) and the
-\&\s-1JSON\s0.pm Perl module. If the \s-1JSON::XS\s0 Perl module is also installed, it will be
-even faster.
+That will enable a Perl replacement, which requires Perl (of course) and the \s-1JSON\s0.pm Perl module. If the \s-1JSON::XS\s0 Perl module is also installed, it will be even faster.
 .SH "Pipe and Each"
 .IX Header "Pipe and Each"
-You can pipe the output of one \f(CW\*(C`git hub\*(C'\fR into another and multiply your
-power. The command being piped into should use the \s-1EACH\s0 option which is a
-single dash ('\-'). It will cause the command to be run once for each line of
-input, inserting the line into the command, in place of the '\-'. If you use a
-\&'=' it will do the same thing except for each \*(L"word\*(R" of input.
+You can pipe the output of one \f(CW\*(C`git hub\*(C'\fR into another and multiply your power. The command being piped into should use the \s-1EACH\s0 option which is a single dash ('\-'). It will cause the command to be run once for each line of input, inserting the line into the command, in place of the '\-'. If you use a '=' it will do the same thing except for each \*(L"word\*(R" of input.
 .PP
 This command:
 .PP
@@ -871,8 +733,7 @@ This command:
 \&    git hub followers \-\-raw
 .Ve
 .PP
-will list lines containing only user ids. You can pipe it into commands
-needing a user id, like:
+will list lines containing only user ids. You can pipe it into commands needing a user id, like:
 .PP
 .Vb 1
 \&    git hub followers \-\-raw | git hub user \- \-\-json
@@ -895,15 +756,13 @@ For '=' you can do things like:
 to trust a list of users in one go.
 .SH "Token Authentication and Scopes"
 .IX Header "Token Authentication and Scopes"
-Many endpoints of the GitHub v3 \s-1API\s0 require a Personal \s-1API\s0 Access Token. You
-can list your current tokens with this command:
+Many endpoints of the GitHub v3 \s-1API\s0 require a Personal \s-1API\s0 Access Token. You can list your current tokens with this command:
 .PP
 .Vb 1
 \&    git hub tokens
 .Ve
 .PP
-If you don't have any tokens or want a new one for the \f(CW\*(C`git\-hub\*(C'\fR command, run
-these commands (the \f(CW\*(C`git hub setup\*(C'\fR command automates this):
+If you don't have any tokens or want a new one for the \f(CW\*(C`git\-hub\*(C'\fR command, run these commands (the \f(CW\*(C`git hub setup\*(C'\fR command automates this):
 .PP
 .Vb 4
 \&    git hub token\-new "my git\-hub command token"
@@ -912,28 +771,16 @@ these commands (the \f(CW\*(C`git hub setup\*(C'\fR command automates this):
 \&    git hub config api\-token <token\-value>
 .Ve
 .PP
-You can also see all your tokens on the web at this
-page <https://github.com/settings/applications>.
+You can also see all your tokens on the web at this page <https://github.com/settings/applications>.
 .PP
-You can specify your \s-1API\s0 token to \f(CW\*(C`git hub\*(C'\fR on the commandline with \f(CW\*(C`\-\-
-token=...\*(C'\fR or in the \f(CW\*(C`GIT_HUB_API_TOKEN\*(C'\fR environment variable, but the
-easiest thing to do is just set it in the git-hub config.
+You can specify your \s-1API\s0 token to \f(CW\*(C`git hub\*(C'\fR on the commandline with \f(CW\*(C`\-\-token=...\*(C'\fR or in the \f(CW\*(C`GIT_HUB_API_TOKEN\*(C'\fR environment variable, but the easiest thing to do is just set it in the git-hub config.
 .PP
-Certain token \fBscopes\fR are required for various GitHub \s-1API\s0 operations. Make
-sure your token has the scopes turned on for the things you want to do. See
-the \f(CW\*(C`scopes\*(C'\fR, \f(CW\*(C`scope\-add\*(C'\fR and \f(CW\*(C`scope\-remove\*(C'\fR \f(CW\*(C`git hub\*(C'\fR subcommands.
+Certain token \fBscopes\fR are required for various GitHub \s-1API\s0 operations. Make sure your token has the scopes turned on for the things you want to do. See the \f(CW\*(C`scopes\*(C'\fR, \f(CW\*(C`scope\-add\*(C'\fR and \f(CW\*(C`scope\-remove\*(C'\fR \f(CW\*(C`git hub\*(C'\fR subcommands.
 .PP
-\&\s-1NOTE:\s0 All the \f(CW\*(C`git hub\*(C'\fR commands dealing with tokens and scopes require you
-      to enter your GitHub password. If you need to issue a bunch of these
-      commands and you don't want to retype your password each time, you can
-      put your password in the \f(CW\*(C`GIT_HUB_PASSWORD\*(C'\fR environment variable.
+\&\s-1NOTE:\s0 All the \f(CW\*(C`git hub\*(C'\fR commands dealing with tokens and scopes require you to enter your GitHub password. If you need to issue a bunch of these commands and you don't want to retype your password each time, you can put your password in the \f(CW\*(C`GIT_HUB_PASSWORD\*(C'\fR environment variable.
 .SH "Rate Limits"
 .IX Header "Rate Limits"
-GitHub limits unauthenticated \s-1API\s0 calls to 60 per hour, and authenticated \s-1API\s0
-calls to 5000 per hour. For this reason you may wish to use authentication
-even for calls that don't need it. You can use the \f(CW\*(C`\-A/\-\-use\-auth\*(C'\fR option to
-make sure a command uses authentication. You can also set the config file to
-always use authentication, with this command:
+GitHub limits unauthenticated \s-1API\s0 calls to 60 per hour, and authenticated \s-1API\s0 calls to 5000 per hour. For this reason you may wish to use authentication even for calls that don't need it. You can use the \f(CW\*(C`\-A/\-\-use\-auth\*(C'\fR option to make sure a command uses authentication. You can also set the config file to always use authentication, with this command:
 .PP
 .Vb 1
 \&    git hub config use\-auth true
@@ -946,13 +793,9 @@ Another option is to set the \s-1GIT_HUB_USE_AUTH\s0 environment variable:
 .Ve
 .SH "ETAG Caching"
 .IX Header "ETAG Caching"
-GitHub provides ETag headers in the \s-1API\s0 responses, and \f(CW\*(C`git\-hub\*(C'\fR uses them to
-cache responses, by default. When you use this feature, your rate-limit usage
-is not affected for cached responses.
+GitHub provides ETag headers in the \s-1API\s0 responses, and \f(CW\*(C`git\-hub\*(C'\fR uses them to cache responses, by default. When you use this feature, your rate-limit usage is not affected for cached responses.
 .PP
-Unfortunately, there is currently a bug in GitHub's \s-1API\s0 implementation: ETag
-values are not always updated for changed response content. This means that
-your cache may get stale.
+Unfortunately, there is currently a bug in GitHub's \s-1API\s0 implementation: ETag values are not always updated for changed response content. This means that your cache may get stale.
 .PP
 There are a few things you can do, if you suspect the cache is stale:
 .IP "\(bu" 4
@@ -965,8 +808,7 @@ Run \f(CW\*(C`git hub config no\-cache true\*(C'\fR to never use the cache.
 Run \f(CW\*(C`git hub cache\-clear\*(C'\fR to erase all the cached values.
 .SH "Examples"
 .IX Header "Examples"
-The following sections show lots of interesting ways to use \f(CW\*(C`git hub\*(C'\fR. Let
-your imagination be your guide.
+The following sections show lots of interesting ways to use \f(CW\*(C`git hub\*(C'\fR. Let your imagination be your guide.
 .SS "Example 1. Create a new repo and GitHub origin"
 .IX Subsection "Example 1. Create a new repo and GitHub origin"
 Do everything from the command line:
@@ -988,9 +830,7 @@ Do everything from the command line:
 \&    $ git hub repo
 .Ve
 .PP
-Note that on the last two commands you don't need to set the \f(CW\*(C`<repo>\*(C'\fR
-because it can be gleaned from the remote. Also on the \f(CW\*(C`edit\*(C'\fR command notice
-how you can specify multiple key/value pairs.
+Note that on the last two commands you don't need to set the \f(CW\*(C`<repo>\*(C'\fR because it can be gleaned from the remote. Also on the \f(CW\*(C`edit\*(C'\fR command notice how you can specify multiple key/value pairs.
 .SS "Example 2. Commands from within a repo"
 .IX Subsection "Example 2. Commands from within a repo"
 Assume your current working directory is not a GitHub repo:
@@ -1019,18 +859,10 @@ Assume your current working directory is not a GitHub repo:
 \&    $ # etc...
 .Ve
 .PP
-The \f(CW\*(C`git hub\*(C'\fR command tries to be environmentally aware. If you are in a
-GitHub cloned repo directory, and you don't specify \f(CW\*(C`<user>\*(C'\fR or \f(CW\*(C`<owner>\*(C'\fR or \f(CW\*(C`<repo>\*(C'\fR for a command that needs them, then they will be
-pulled from the remote url. Otherwise, if you don't specify a \f(CW\*(C`<user>\*(C'\fR it
-will use the one (presumably yours) that you set with the \f(CW\*(C`git hub config
-login ...\*(C'\fR command.
+The \f(CW\*(C`git hub\*(C'\fR command tries to be environmentally aware. If you are in a GitHub cloned repo directory, and you don't specify \f(CW\*(C`<user>\*(C'\fR or \f(CW\*(C`<owner>\*(C'\fR or \f(CW\*(C`<repo>\*(C'\fR for a command that needs them, then they will be pulled from the remote url. Otherwise, if you don't specify a \f(CW\*(C`<user>\*(C'\fR it will use the one (presumably yours) that you set with the \f(CW\*(C`git hub config login ...\*(C'\fR command.
 .SS "Example 3. Building Complex Commands"
 .IX Subsection "Example 3. Building Complex Commands"
-The \f(CW\*(C`git hub\*(C'\fR command can be used to output raw data, which can be fed into
-other commands; even other \f(CW\*(C`git hub\*(C'\fR commands. This lets you do some powerful
-automation with very little code. The \f(CW\*(C`\-\-raw\*(C'\fR (\f(CW\*(C`\-r\*(C'\fR) flag will make the
-output of many commands be usable as data, and the \f(CW\*(C`\-\*(C'\fR (\s-1EACH\s0) option makes
-commands read data from stdin.
+The \f(CW\*(C`git hub\*(C'\fR command can be used to output raw data, which can be fed into other commands; even other \f(CW\*(C`git hub\*(C'\fR commands. This lets you do some powerful automation with very little code. The \f(CW\*(C`\-\-raw\*(C'\fR (\f(CW\*(C`\-r\*(C'\fR) flag will make the output of many commands be usable as data, and the \f(CW\*(C`\-\*(C'\fR (\s-1EACH\s0) option makes commands read data from stdin.
 .PP
 Get information about all your followers:
 .PP
@@ -1070,8 +902,7 @@ Clone all the repos in an organization:
 \&    git hub repos <org> \-r | git hub clone \-
 .Ve
 .PP
-Star the latest 5 repos from all the people you are following that have more
-than 50 repos:
+Star the latest 5 repos from all the people you are following that have more than 50 repos:
 .PP
 .Vb 5
 \&    git hub following <your\-login> \-r |
@@ -1082,24 +913,18 @@ than 50 repos:
 .Ve
 .SH "Author"
 .IX Header "Author"
-Written by Ingy dÃ¶t Net <ingy@ingy.net>
+Written by Ingy dÃ¶t Net
 .SH "Status"
 .IX Header "Status"
-This command is over a year old. It does a ton of stuff well, but still has a
-lot to do to be complete.
+This command is over a year old. It does a ton of stuff well, but still has a lot to do to be complete.
 .PP
-The plan is to support as much of the \s-1API\s0 as possible. Patches / Pull
-Requests welcome. See the file \f(CW\*(C`notes/todo\*(C'\fR in the \f(CW\*(C`git\-hub\*(C'\fR repo for
-upcoming changes.
+The plan is to support as much of the \s-1API\s0 as possible. Patches / Pull Requests welcome. See the file \f(CW\*(C`notes/todo\*(C'\fR in the \f(CW\*(C`git\-hub\*(C'\fR repo for upcoming changes.
 .PP
-Try \f(CW\*(C`make test\*(C'\fR. There are tests in place but testing is not yet extensive.
-Expect more testing soon. Also please include tests-in-kind for any patches
-you submit.
+Try \f(CW\*(C`make test\*(C'\fR. There are tests in place but testing is not yet extensive. Expect more testing soon. Also please include tests-in-kind for any patches you submit.
 .PP
-Find 'ingy' on #git\-commands in irc.freenode.net if you have questions or
-ideas.
+Find 'ingy' on #git\-commands in irc.freenode.net if you have questions or ideas.
 .SH "Copyright & License"
 .IX Header "Copyright & License"
 The \s-1MIT\s0 License (\s-1MIT\s0)
 .PP
-Copyright 2013\-2014. Ingy dÃ¶t Net.
+Copyright 2013\-2015. Ingy dÃ¶t Net.

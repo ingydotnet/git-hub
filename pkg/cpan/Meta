@@ -4,9 +4,9 @@ name: App-git-hub
 version: 0.1.4
 abstract: The Git command for GitHub
 homepage: https://metacpan.org/release/App-git-hub
-
 license: perl
-copyright: 2014. Ingy döt Net.
+copyright: 2014-2015
+
 author:
   name: Ingy döt Net
   email: ingy@cpan.org
