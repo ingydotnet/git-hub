@@ -294,7 +294,7 @@ help:issue-edit() {
   Usage: git hub issue-edit [<owner>/<repo>] <issue-id-number>
 
   Add a comment. Change values of 'title', 'state', 'assignee' and
-  'milestone'.  Changing state to 'closed' will close the issue.
+  'milestone'. Changing state to 'closed' will close the issue.
 ...
 }
 
@@ -500,12 +500,12 @@ help:pr-new() {
 
   Usage: git hub pr-new [<issue-id-number>] [<options>]
 
-  Create a new pull request for a repository based on the current branch.  If
+  Create a new pull request for a repository based on the current branch. If
   an issue ID number is given, this command will attach the pull request to the
   issue instead of creating a new one.
 
   If the default remote is a fork, the pull request will target the default
-  branch of the parent repository.  Otherwise the pull request will target the
+  branch of the parent repository. Otherwise the pull request will target the
   default branch of the default remote itself. Use `--remote`, `--branch`,
   `--parent`, and `--base` options to change the default source remote, source
   branch, target remote and target branch (respectively).
@@ -716,7 +716,7 @@ help:team-repo-add() {
 
   Usage: git hub team-repo-add <team_id> <repo>
 
-  Add repo to a team.  Repo name must not include org name.
+  Add repo to a team. Repo name must not include org name.
 ...
 }
 

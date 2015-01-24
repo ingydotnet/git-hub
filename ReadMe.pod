@@ -1022,8 +1022,8 @@ ideas.
 
 =head1 Copyright & License
 
-The MIT License (MIT)
-
 Copyright 2013-2015. Ingy döt Net.
+
+The MIT License (MIT)
 
 =cut

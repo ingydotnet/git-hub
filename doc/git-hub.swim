@@ -59,7 +59,7 @@ a line like this one to your shell startup script:
 That will modify your `PATH` and `MANPATH`, and also enable command completion.
 
 The second method is to do these things by hand. This might afford you more
-control of your shell environment.  Simply add the `lib` and `man` directories
+control of your shell environment. Simply add the `lib` and `man` directories
 to your `PATH` and `MANPATH`:
 
   export PATH="/path/to/git-hub/lib:$PATH"
@@ -85,7 +85,7 @@ command. Long form commands that require an argument can use '=' or not:
   --count 5
 
 - `-c <number>`, `count=<number>`
-  This option is for commands that return a list of things.  Specify the
+  This option is for commands that return a list of things. Specify the
   number of items you want the command to return. Each list command has a
   reasonable default value.
 
@@ -135,7 +135,7 @@ command. Long form commands that require an argument can use '=' or not:
   turns on verbose mode.
 
 - `-A`, `--use-auth`
-  Use authentication whether or not it is needed for a certain command.  This
+  Use authentication whether or not it is needed for a certain command. This
   is useful if you have exceeded your hourly GitHub API rate limit, which is
   60 calls unauthenticated, and 5000 calls authenticated.
 
@@ -185,7 +185,7 @@ Argument variable names are always indicated by angle brackets, like:
 followed by `...` indicate that more than one is allowed.
 
 - `<user>`
-  A GitHub user name. Sometimes an organization name can be used instead.  If
+  A GitHub user name. Sometimes an organization name can be used instead. If
   this argument is optional, it defaults to the GitHub owner of the repo you
   are currently in. If you are not in a GitHub repo, it defaults to your
   login. *Override*: `GIT_HUB_USER_NAME` environment variable.
@@ -307,7 +307,7 @@ interactions from the command line. They are installed by default.
   List repos of a team.
 
 - `team-repo-add <team_id> <repo>`
-  Add repo to a team.  Repo name must not include org name.
+  Add repo to a team. Repo name must not include org name.
 
 - `team-new <org> <name> <perm>`
   Add a new team (name) to an organization. The 'perm' arg must be pull, push
@@ -432,7 +432,7 @@ interactions from the command line. They are installed by default.
 
 - `issue-edit [<owner>/<repo>] <issue-id-number>`
   Add a comment. Change values of 'title', 'state', 'assignee' and
-  'milestone'.  Changing state to 'closed' will close the issue.
+  'milestone'. Changing state to 'closed' will close the issue.
 
 - `comment [<owner>/<repo>] <issue-id-number>`
   Add a comment to an issue. You can also use `issue-edit` to just add a
@@ -448,12 +448,12 @@ interactions from the command line. They are installed by default.
   List the pull requests for a repo.
 
 - `pr-new [<issue-id-number>] [<options>]`
-  Create a new pull request for a repository based on the current branch.  If
+  Create a new pull request for a repository based on the current branch. If
   an issue ID number is given, this command will attach the pull request to the
   issue instead of creating a new one.
 
   If the default remote is a fork, the pull request will target the default
-  branch of the parent repository.  Otherwise the pull request will target the
+  branch of the parent repository. Otherwise the pull request will target the
   default branch of the default remote itself. Use `--remote`, `--branch`,
   `--parent`, and `--base` options to change the default source remote, source
   branch, target remote and target branch (respectively).
@@ -856,6 +856,6 @@ ideas.
 
 = Copyright & License
 
-The MIT License (MIT)
-
 Copyright 2013-2015. Ingy döt Net.
+
+The MIT License (MIT)
