@@ -44,4 +44,33 @@ command:fork() {
   fi
 }
 
+command:fork-branch() {
+  get-forker-repo
+  msg_ok=0
+  local remote="git@github.com:$forker/$repo"
+  local branch="fork/$forker"
+  git fetch --quiet "$remote"
+  git branch --quiet "$branch" FETCH_HEAD
+  say "Created branch '$branch' from '$remote'"
+}
+
+command:fork-remote() {
+  get-forker-repo
+  msg_ok=0
+  local remote="git@github.com:$forker/$repo"
+  git remote add "fork/$forker" "$remote" &> /dev/null
+  say "Created remote '$forker' -> '$remote'"
+}
+
+get-forker-repo() {
+  get-args "?repo:'.'/forker"
+  if [ "$repo" == '.' ]; then
+    repo="$(get-repo)"
+  else
+    local temp="$forker"
+    forker="$repo"
+    repo="$temp"
+  fi
+}
+
 # vim: set lisp:
