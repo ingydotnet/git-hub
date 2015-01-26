@@ -1,6 +1,6 @@
 # json.bash - JSON Loader/Dumper for Bash
 #
-# Copyright (c) 2013 Ingy döt Net
+# Copyright (c) 2013-2015 Ingy döt Net
 
 JSON_VERSION=0.0.1
 
@@ -42,26 +42,27 @@ JSON.dump() {
 }
 
 JSON.get() {
+  local flag=""
   if [[ $# -gt 0 ]] && [[ "$1" =~ ^-([asnbz])$ ]]; then
-    local flag="${BASH_REMATCH[1]}"
+    flag="${BASH_REMATCH[1]}"
     shift
   fi
   case $# in
     1)
       grep -Em1 "^$1	" | cut -f2 |
-          JSON.apply-get-flag $flag
+          JSON.apply-get-flag "$flag"
       ;;
     2)
       if [ "$2" == '-' ]; then
         echo "$JSON__cache" |
           grep -Em1 "^$1	" |
           cut -f2 |
-          JSON.apply-get-flag $flag
+          JSON.apply-get-flag "$flag"
       else
-        echo "\"${!2}\"" |
+        echo "${!2}" |
           grep -Em1 "^$1	" |
           cut -f2 |
-          JSON.apply-get-flag $flag
+          JSON.apply-get-flag "$flag"
       fi
       ;;
     *) JSON.die 'Usage: JSON.get [-a|-s|-n|-b|-z] <key-path> [<tree-var>]' ;;
@@ -197,7 +198,7 @@ JSON.parse-error() {
 }
 
 JSON.apply-get-flag() {
-  local value back='\'
+  local value
   read -r value
   # For now assume null can show up instead of string or number
   if [ "$value" == "null" ]; then
@@ -208,10 +209,6 @@ JSON.apply-get-flag() {
     a)
       [[ $value =~ ^$JSON_STR$ ]] && {
         value="${value:1:$((${#value}-2))}"
-        value="${value//\\n/$'\n'}"
-        value="${value//\\t/$'\t'}"
-        value="${value//\\\"/\"}"
-        value="${value//\\\\/$back}"
       }
       ;;
     s)

@@ -1,17 +1,11 @@
-.PHONY: default help doc test \
-    install install-lib install-doc \
-    uninstall uninstall-lib uninstall-doc
-
 CMD := json.bash
 
-# XXX This is a very crude default. Be smarter here…
 PREFIX ?= /usr/local
 INSTALL_LIB ?= $(PREFIX)/lib/bash
 INSTALL_MAN ?= $(PREFIX)/share/man/man1
 
 # Submodules
 TEST_MORE := ext/test-more-bash/lib/test/more.bash
-SUBMODULE := $(TEST_MORE)
 
 ##
 # User targets:
@@ -25,44 +19,31 @@ help:
 	@echo 'uninstall  Uninstall $(CMD)'
 	@echo 'clean      Remove build/test files'
 
+.PHONY: test
 test: $(TEST_MORE)
 	prove $(PROVEOPT) test/
 
-install: install-lib install-doc
-
-install-lib: $(INSTALL_LIB)
+install: $(INSTALL_LIB)
 	install -m 0755 lib/$(CMD) $(INSTALL_LIB)/
+	install -c -d -m 0755 $(INSTALL_MAN)/
+	install -c -m 0644 man/man1/$(CMD).1 $(INSTALL_MAN)/
 
-install-doc:
-	install -c -d -m 0755 $(INSTALL_MAN)
-	install -c -m 0644 doc/$(CMD).1 $(INSTALL_MAN)
-
-uninstall: uninstall-lib uninstall-doc
-
-uninstall-lib:
+uninstall:
 	rm -f $(INSTALL_LIB)/$(CMD)
-
-uninstall-doc:
 	rm -f $(INSTALL_MAN)/$(CMD).1
 
 clean purge:
 	true
 
-##
-# Sanity checks:
-$(SUBMODULE):
-	git submodule update --init --recursive
-
-##
 # Builder rules:
 .PHONY: doc
-doc: doc/json.1
+doc: ReadMe.pod man/man1/json.1
 
-%.1: %.md
-	ronn --roff < $< > $@
+ReadMe.pod: doc/json.swim
+	swim --to=pod --wrap --complete $< > $@
 
-doc/%.1: %.1
-	mv $< $@
+man/man1/json.1: doc/json.swim
+	swim --to=man $< > $@
 
 $(INSTALL_LIB):
 	mkdir -p $@
