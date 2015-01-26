@@ -13,7 +13,7 @@ $(MAN3)/%.3: doc/%.swim swim-check
 	swim --to=man $< > $@
 
 ReadMe.pod: $(DOC) swim-check
-	swim --to=pod --complete=1 --wrap=1 $< > $@
+	swim --to=pod --complete --wrap $< > $@
 
 swim-check:
 	@# Need to assert Swim and Swim::Plugin::badge are installed

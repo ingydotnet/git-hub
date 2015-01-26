@@ -70,104 +70,65 @@
 .rr rF
 .\" ========================================================================
 .\"
-.IX Title "IO::FILE=IO(0X257A280) 1"
-.TH IO::FILE=IO(0X257A280) 1 "2015-01-23" "perl v5.18.1" "User Contributed Perl Documentation"
+.IX Title "IO::FILE=IO(0X141F210) 1"
+.TH IO::FILE=IO(0X141F210) 1 "2015-01-23" "perl v5.18.1" "User Contributed Perl Documentation"
 .\" For nroff, turn off justification.  Always turn off hyphenation; it makes
 .\" way too many mistakes in technical documents.
 .if n .ad l
 .nh
 .SH "Name"
 .IX Header "Name"
-Test::More \- \s-1TAP\s0 Testing for Bash
+Bash+(1) \- Modern Bash Programming
 .SH "Synopsis"
 .IX Header "Synopsis"
-Write a test file like this. Maybe call it \f(CW\*(C`test/test.t\*(C'\fR:
-.PP
 .Vb 1
-\&    #!/usr/bin/env bash
+\&    source bash+ :std :array
 \&
-\&    TEST_MORE_PATH="/path/to/test\-more\-bash"
-\&    BASHLIB="\`
-\&        find $TEST_MORE_PATH \-type d |
-\&        grep \-E \*(Aq/(bin|lib)$\*(Aq |
-\&        xargs \-n1 printf "%s:"\`"
-\&    PATH="$BASHLIB$PATH"
+\&    use Foo::Bar this that
 \&
-\&    source bash+ :std
+\&    Array.new args "$@"
 \&
-\&    use Test::More
+\&    if args.empty?; then
+\&      die "I need args!"
+\&    fi
 \&
-\&    plan tests 8
+\&    Foo::Bar.new foo args
 \&
-\&    some\-command
-\&    ok $? \*(Aqsome\-command is ok\*(Aq
-\&
-\&    # or:
-\&    ok "\`some\-command\`" \*(Aqsome\-command is ok\*(Aq
-\&
-\&    pass \*(AqThis will always pass\*(Aq
-\&
-\&    fail \*(AqThis will always fail\*(Aq
-\&
-\&    is \`echo foo\` \*(Aqfoo\*(Aq \*(Aqfoo is foo\*(Aq
-\&
-\&    isnt foo bar "foo isn\*(Aqt bar"
-\&
-\&    like food foo \*(Aqfood is like foo\*(Aq
-\&
-\&    unlike team I "There\*(Aqs no \*(AqI\*(Aq in \*(Aqteam\*(Aq"
-\&
-\&    diag "A message for stderr"
-\&
-\&    note "A message for stdout"
+\&    this is awesome     # <= this is a real command! (You just imported it)
 .Ve
-.PP
-Run the test with \f(CW\*(C`prove\*(C'\fR like this:
-.PP
-.Vb 1
-\&    prove test/test.t
-.Ve
-.PP
-Prove knows it's Bash from the first line (the hashbang), and it just works.
 .SH "Description"
 .IX Header "Description"
-Test::More is the tried and true testing library for Perl. It uses \s-1TAP \s0(the Test Anything Protocol). This is the same thing for Bash.  For the most part it should work exactly the same.
-.SH "Methods"
-.IX Header "Methods"
-This is the basic usage:
-.IP "\(bu" 4
-\&\f(CW\*(C`plan tests $count\*(C'\fR
-.IP "\(bu" 4
-\&\f(CW\*(C`ok $status_code "$label"\*(C'\fR
-.IP "\(bu" 4
-\&\f(CW\*(C`pass "$label"\*(C'\fR
-.IP "\(bu" 4
-\&\f(CW\*(C`fail "$label"\*(C'\fR
-.IP "\(bu" 4
-\&\f(CW\*(C`is "$got" "$want" "label"\*(C'\fR
-.IP "\(bu" 4
-\&\f(CW\*(C`isnt "$got" "$unwanted" "$label"\*(C'\fR
-.IP "\(bu" 4
-\&\f(CW\*(C`like "$got" "$regex" "$label"\*(C'\fR
-.IP "\(bu" 4
-\&\f(CW\*(C`unlike "$got" "$regex" "$label"\*(C'\fR
-.IP "\(bu" 4
-\&\f(CW\*(C`diag "$message"\*(C'\fR
-.IP "\(bu" 4
-\&\f(CW\*(C`note "$message"\*(C'\fR
-.IP "\(bu" 4
-\&\f(CW\*(C`done_testing $count\*(C'\fR
-.IP "\(bu" 4
-\&\f(CW\*(C`plan skip_all "$reason"\*(C'\fR
-.IP "\(bu" 4
-\&\f(CW\*(C`BAIL_OUT "$reason"\*(C'\fR
+Bash+ is just Bash... \fBplus\fR some libraries that can make Bash programming a lot nicer.
 .PP
-More detailed info coming soon.
+Get the source code from GitHub:
+.PP
+.Vb 1
+\&    git clone git@github.com:ingydotnet/bashplus
+.Ve
+.PP
+Then run:
+.PP
+.Vb 2
+\&    make test
+\&    make install        # Possibly with \*(Aqsudo\*(Aq
+.Ve
+.SH "Usage"
+.IX Header "Usage"
+For now look at some libraries the use Bash+:
+.IP "\(bu" 4
+<https://github.com/ingydotnet/git\-hub>
+.IP "\(bu" 4
+<https://github.com/ingydotnet/json\-bash>
+.IP "\(bu" 4
+<https://github.com/ingydotnet/test\-more\-bash>
+.SH "Status"
+.IX Header "Status"
+If you are interested in chatting about this, \f(CW\*(C`/join #bpan\*(C'\fR on irc.freenode.net.
 .SH "Author"
 .IX Header "Author"
-Ingy döt Net <ingy@bpan.org>
+Written by Ingy döt Net <ingy@ingy.net>
 .SH "Copyright & License"
 .IX Header "Copyright & License"
 Copyright 2013\-2015. Ingy döt Net.
 .PP
-The \s-1MIT\s0 License (\s-1MIT\s0)
+The \s-1MIT\s0 License (\s-1MIT\s0).
