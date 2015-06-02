@@ -48,7 +48,6 @@ fi
 
 _git-hub() {
     local curcontext="$curcontext" state line
-    typeset -A opt_args
 
     _arguments \
         '1: :->subcmd'\
