@@ -59,24 +59,28 @@ _git-hub() {
     print <<"...";
         compadd @$list
     ;;
+    repo)
+        case \$words[2] in
 ...
-    print "    ";
+    print " " x 8;
     print join '|', @$repo_cmds;
     print <<'...';
 )
-        re="^(\w+)/(.*)"
-        if [[ $words[3] =~ $re ]];
-        then
-            username="$match[1]"
-            if [[ "$username" != "$lastusername" ]];
+            re="^(\w+)/(.*)"
+            if [[ $words[3] =~ $re ]];
             then
-                lastusername=$username
-                reponames=`git hub repos $username --raw`
+                username="$match[1]"
+                if [[ "$username" != "$lastusername" ]];
+                then
+                    lastusername=$username
+                    reponames=`git hub repos $username --raw`
+                fi
+                _arguments "2:Repos:($reponames)"
+            else
+                _arguments "2:Repos:()"
             fi
-            _arguments "2:Repos:($reponames)"
-        else
-            _arguments "2:Repos:()"
-        fi
+        ;;
+        esac
     ;;
     esac
 
