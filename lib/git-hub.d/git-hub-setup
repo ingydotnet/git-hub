@@ -26,7 +26,7 @@ Your config will be stored here: '$GIT_HUB_CONFIG'.
 
 ...
   prompt
-  mkdir -p "$GIT_HUB_USER_DIR"
+  mkdir -m 700 -p "$GIT_HUB_USER_DIR"
 }
 
 setup:login() {
