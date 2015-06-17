@@ -102,30 +102,19 @@ The password will not be stored after the commands finish running.
   echo
   echo 'Generating a new authentication token...'
 
-  local rc=0 token_id= desc="API Token for git-hub ($(date "+%s"))"
+  local rc=0 token= desc="API Token for git-hub ($(date "+%s"))"
 
-  token_id="$(git hub token-new -qr "$desc")" || rc=$?
-  if [ "$rc" -eq 2 ]; then
-    export GIT_HUB_2FA_OTP="$(
-      prompt "Enter your 2 Factor Auth Code: "
-    )"
-    token_id="$(git hub token-new -qr "$desc")" || true
-  fi
-  [ -n "$token_id" ] || die "Command failed"
-  echo "Token successfully generated (token id: $token_id)."
-  echo
-  echo "Adding the 'user', 'repo' and 'gist' scopes to the token..."
-  $(git hub scope-add $token_id user repo gist &> /dev/null) || exit $?
-  echo "Scopes successfully added."
-  echo
+  token="$(git hub token-new -qr "$desc" | tail -1)" || rc=$?
+  [ -n "$token" ] || die "Command failed"
+  echo "Token successfully generated."
   echo "Adding the new token to your config file..."
-  local token_value="$(git hub token-get $token_id token)" || exit $?
-  write-config-value api-token $token_value ||
-    die "Can't write-config-value api-token $token_value"
+  write-config-value api-token $token ||
+    die "Can't write-config-value api-token $token"
   echo "Token successfully added to config file."
   echo
   prompt
   unset GIT_HUB_PASSWORD
+  unset GIT_HUB_2FA_OTP
 }
 
 setup:use-auth() {
