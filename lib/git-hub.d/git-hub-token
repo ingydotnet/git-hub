@@ -20,35 +20,49 @@ format-entry:tokens() {
 command:token-new() {
   get-args '?note'
   local json
+  local scopes='"scopes":["user","repo","gist"]'
   if [ -n "$note" ]; then
-    json="$(json-dump-object note "$note")"
+    json-escape "$note" escaped_note
+    json="{$scopes,"'"note":"'"$escaped_note"'"}'
   else
-    json='{}'
+    json="{$scopes}"
   fi
+  echo $json
   basic-auth
   api-post '/authorizations' "$json"
 }
 
 ok:token-new() {
+  set -x
   local token="$(JSON.get -s "/token" -)"
   [ -n "$token" ] || error "can't figure out token value"
   local id="$(JSON.get -n "/id" -)"
   local note="$(JSON.get -s "/note" -)"
   local name="$(JSON.get "/app/name" -)"
   if "$raw_output" || "$quiet_output"; then
-    out "$id"
+    out "$token"
   else
-    # TODO out+ instead of printf?
     printf "Token created: %s %-14s  %s\n" \
       "$token" "(id: $id)" "${note:-$name}"
   fi
 }
 
 status-401:token-new() {
-  if [ -n "$(grep "X-GitHub-OTP: required;" "$command_header_file")" ]; then
-    err "2 Factor Auth needed"
-    exit 2
+  if [ -z "$GIT_HUB_2FA_OTP" ]; then
+    if [ -n "$(grep "X-GitHub-OTP: required;" "$command_header_file")" ]; then
+      export GIT_HUB_2FA_OTP="$(
+        prompt "Enter your 2-Factor-Auth code: "
+      )"
+    else
+      echo "Invalid password."
+    fi
+  else
+    echo "Invalid code."
+    export GIT_HUB_2FA_OTP="$(
+      prompt "Enter your 2-Factor-Auth code: "
+    )"
   fi
+  run-command token-new "${command_arguments[@]}"
 }
 
 command:token-get() {

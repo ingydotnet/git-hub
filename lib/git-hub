@@ -68,19 +68,9 @@ bash+:import :std can
 
 #------------------------------------------------------------------------------
 main() {
-  local OK=0 split_words=false
-  init-env
-  if run-for-each "$@"; then
-    pager_in_use=true
-    run-each "$@" | $GIT_HUB_PAGER
-  else
-    run-command "$@"
-  fi
-  exit $OK
-}
-
-run-command() {
   set -e
+  local OK=0 RERUN=false split_words=false
+  init-env
   local Infinity=9999999
   local command command_arguments command_sha1 api_token
   local command_header_file command_output_file command_error_file
@@ -92,6 +82,21 @@ run-command() {
   local show_output=false show_headers=false show_json=false
   local dry_run=false show_token repeat_command=false
   local terminal_lines terminal_cols
+  if run-for-each "$@"; then
+    pager_in_use=true
+    run-each "$@" | $GIT_HUB_PAGER
+  else
+    run-command "$@"
+  fi
+  exit $OK
+}
+
+re-run-command() {
+  local RERUN=true
+  run-command "$@"
+}
+
+run-command() {
   init-vars
 
   get-opts "$@"
@@ -100,6 +105,7 @@ run-command() {
   callable-or-source "$command" ||
     error "unknown 'git hub' command '$command'"
   "command:$command" "$@"
+  $RERUN && return
 
   if OK; then
     if can "ok:$command"; then
