@@ -66,16 +66,15 @@ _git-hub() {
     print join '|', @$repo_cmds;
     print <<'...';
 )
-            re="^(\w+)/(.*)"
-            if [[ $words[3] =~ $re ]];
+            if [[ $words[3] =~ "^(\w+)/(.*)" ]];
             then
-                username="$match[1]"
-                if [[ "$username" != "$lastusername" ]];
+                local username="$match[1]"
+                if [[ "$username" != "$__git_hub_lastusername" ]];
                 then
-                    lastusername=$username
-                    reponames=`git hub repos $username --raw`
+                    __git_hub_lastusername=$username
+                    __git_hub_reponames=`git hub repos $username --raw`
                 fi
-                _arguments "2:Repos:($reponames)"
+                _arguments "2:Repos:($__git_hub_reponames)"
             else
                 _arguments "2:Repos:()"
             fi
