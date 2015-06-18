@@ -22,16 +22,15 @@ _git-hub() {
     repo)
         case $words[2] in
         collabs|comment|fork|forks|issue|issue-close|issue-edit|issue-new|issue-resolve|issues|open|pr-diff|pr-fetch|pr-list|pr-merge|repo|repo-delete|repo-get|star|stars|trust|unstar|untrust|unwatch|url|watch|watchers)
-            re="^(\w+)/(.*)"
-            if [[ $words[3] =~ $re ]];
+            if [[ $words[3] =~ "^(\w+)/(.*)" ]];
             then
-                username="$match[1]"
-                if [[ "$username" != "$lastusername" ]];
+                local username="$match[1]"
+                if [[ "$username" != "$__git_hub_lastusername" ]];
                 then
-                    lastusername=$username
-                    reponames=`git hub repos $username --raw`
+                    __git_hub_lastusername=$username
+                    __git_hub_reponames=`git hub repos $username --raw`
                 fi
-                _arguments "2:Repos:($reponames)"
+                _arguments "2:Repos:($__git_hub_reponames)"
             else
                 _arguments "2:Repos:()"
             fi
