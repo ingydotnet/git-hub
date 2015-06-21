@@ -1053,11 +1053,17 @@ get-opts() {
 
   set -- "${args[@]}"
 
-  eval "$(
+  rc=0
+  parsed="$(
     echo "$OPTIONS_SPEC" |
-      git rev-parse --parseopt -- "$@" ||
-    echo exit $?
-  )"
+    git rev-parse --parseopt -- "$@"
+  )" || rc=$?
+  if [ $rc -eq 0 ]; then
+    eval "$parsed"
+  else
+    eval "$parsed" | $GIT_HUB_PAGER
+    exit $rc
+  fi
 
   while [ $# -gt 0 ]; do
     local option="$1"; shift
