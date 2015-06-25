@@ -64,11 +64,11 @@ sub generate_zsh {
         }
         my @keystrings = map { (length $_ > 1 ? "--" : "-") . $_ } @$keys;
         if (@$keys == 1) {
-            $options_string .= sprintf "'%s[%s]%s' \\\n",
+            $options_string .= sprintf "        '%s[%s]%s' \\\n",
                 $keystrings[0], $desc, $arg;
         }
         elsif (@$keys > 1) {
-            $options_string .= sprintf "'(%s)'{%s}'[%s]%s' \\\n",
+            $options_string .= sprintf "        '(%s)'{%s}'[%s]%s' \\\n",
                 (join ' ', @keystrings), (join ',', @keystrings), $desc, $arg;
         }
     }
