@@ -81,9 +81,9 @@ doc: $(MAN) ReadMe.pod
 	    $(EXT)/help-functions.bash
 
 compgen:
-	perl tool/generate-completion.pl bash $(DOC) > \
+	perl tool/generate-completion.pl bash $(DOC) $(LIB)/git-hub > \
 	    $(SHARE)/completion.bash
-	perl tool/generate-completion.pl zsh $(DOC) > \
+	perl tool/generate-completion.pl zsh $(DOC) $(LIB)/git-hub > \
 	    $(SHARE)/zsh-completion/_git-hub
 
 $(MAN1)/%.1: doc/%.swim swim-check

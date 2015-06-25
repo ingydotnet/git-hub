@@ -5,6 +5,21 @@ use strict;
 sub main {
     my ($cmd) = @_;
     my $input = do { local $/; <> };
+    my $input2 = do { local $/; <> };
+    my ($options_spec) = $input2 =~ m/ ^ OPTIONS_SPEC="\\ $ (.*?) ^ " $/xsm;
+    $options_spec =~ s/.*Options:\n--//s;
+    my @options;
+    for my $line (split m/\n/, $options_spec) {
+        next unless $line =~ m/\S/;
+        my $arg = 0;
+        my ($key, $desc) = split ' ', $line, 2;
+        if ($key =~ s/=$//) {
+            $arg = 1;
+        }
+        my @keys = split m/,/, $key;
+        push @options, { keys => \@keys, arg => $arg, desc => $desc };
+    }
+
     $input =~ s/.*?\n= Commands\n//s;
     $input =~ s/(.*?\n== Configuration Commands\n.*?\n)==? .*/$1/s;
     my @list;
@@ -29,12 +44,34 @@ sub main {
         generate_bash(\@list);
     }
     else {
-        generate_zsh(\@list, \@repo_cmds);
+        generate_zsh(\@list, \@repo_cmds, \@options);
     }
 }
 
 sub generate_zsh {
-    my ($list, $repo_cmds) = @_;
+    my ($list, $repo_cmds, $options) = @_;
+    my $options_string = '';
+    for my $opt (@$options) {
+        my $keys = $opt->{keys};
+        my $desc = $opt->{desc};
+        $desc =~ s/'/'"'"'/g;
+        # examples:
+        #'(-c --count)'{-c,--count}'[Number of list items to show]:count' \
+        #'--remote[Remote name (like "origin")]:remote' \
+        my $arg = '';
+        if ($opt->{arg}) {
+            $arg = ":$keys->[0]";
+        }
+        my @keystrings = map { (length $_ > 1 ? "--" : "-") . $_ } @$keys;
+        if (@$keys == 1) {
+            $options_string .= sprintf "'%s[%s]%s' \\\n",
+                $keystrings[0], $desc, $arg;
+        }
+        elsif (@$keys > 1) {
+            $options_string .= sprintf "'(%s)'{%s}'[%s]%s' \\\n",
+                (join ' ', @keystrings), (join ',', @keystrings), $desc, $arg;
+        }
+    }
     print <<'...';
 #compdef git-hub -P git\ ##hub
 #description perform GitHub operations
@@ -47,11 +84,16 @@ if [[ -z $GIT_HUB_ROOT ]]; then
 fi
 
 _git-hub() {
-    local curcontext="$curcontext" state line
+    typeset -A opt_args
+    local curcontext="$curcontext" state line context
 
-    _arguments \
-        '1: :->subcmd'\
-        '*: :->repo'
+    _arguments -s \
+        '1: :->subcmd' \
+        '2: :->repo' \
+...
+    print $options_string;
+    print <<'...';
+        && ret=0
 
     case $state in
     subcmd)
@@ -60,21 +102,21 @@ _git-hub() {
         compadd @$list
     ;;
     repo)
-        case \$words[2] in
+        case \$line[1] in
 ...
     print " " x 8;
     print join '|', @$repo_cmds;
     print <<'...';
 )
-            if [[ $words[3] =~ "^(\w+)/(.*)" ]];
+            if [[ $line[2] =~ "^(\w+)/(.*)" ]];
             then
                 local username="$match[1]"
                 if [[ "$username" != "$__git_hub_lastusername" ]];
                 then
                     __git_hub_lastusername=$username
-                    __git_hub_reponames=`git hub repos $username --raw`
+                    IFS=$'\n' set -A  __git_hub_reponames `git hub repos $username --raw`
                 fi
-                _arguments "2:Repos:($__git_hub_reponames)"
+                compadd -X "Repos:" $__git_hub_reponames
             else
                 _arguments "2:Repos:()"
             fi
