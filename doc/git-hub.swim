@@ -626,6 +626,12 @@ The `git hub` command supports `<TAB>`-based command completion. If you don't
 use the `init` script (see Installation, above), you'll need to enable this
 manually to use it.
 
+You can complete subcommands, options and repository names:
+
+    git hub <TAB>
+    git hub -<TAB>
+    git hub issues username/<TAB>
+
 == In Bash
 
 If your Bash setup does not already provide command completion for Git, you'll
