@@ -29,7 +29,7 @@ _git_hub() {
 
         local repocommand="$(__git_find_on_cmdline "$repocommands")"
         if [ ! -z "$repocommand" ]; then
-            if [[ $cur =~ ^([a-zA-Z_]+)/(.*) ]];
+            if [[ $cur =~ ^([a-zA-Z0-9_]+)/(.*) ]];
             then
                 local username=${BASH_REMATCH[1]}
                 if [[ "$username" != "$__git_hub_lastusername" ]];
