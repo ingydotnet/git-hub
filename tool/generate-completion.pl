@@ -6,7 +6,7 @@ sub main {
     my ($cmd) = @_;
     my $input = do { local $/; <> };
     my $input2 = do { local $/; <> };
-    my ($options_spec) = $input2 =~ m/ ^ OPTIONS_SPEC="\\ $ (.*?) ^ " $/xsm;
+    my ($options_spec) = $input2 =~ m/ ^ GETOPT_SPEC="\\ $ (.*?) ^ " $/xsm;
     $options_spec =~ s/.*Options:\n--//s;
     my @options;
     for my $line (split m/\n/, $options_spec) {
