@@ -355,7 +355,7 @@ interactions from the command line. They are installed by default.
   List the repos for a user or organization. List is returned in order of
   recent activity.
 
-- `repo [<repo>]`
+- `repo [<owner>/<repo>]`
   Show basic information about a specific repository. The `--raw` and
   `--json` options show the data in different formats than normal output.
 

@@ -423,9 +423,9 @@ Clone a GitHub repo. Always uses \f(CW\*(C`\-\-recursive\*(C'\fR so you get subm
 .el .IP "\f(CWrepos [<user>]\fR" 4
 .IX Item "repos [<user>]"
 List the repos for a user or organization. List is returned in order of recent activity.
-.ie n .IP """repo [<repo>]""" 4
-.el .IP "\f(CWrepo [<repo>]\fR" 4
-.IX Item "repo [<repo>]"
+.ie n .IP """repo [<owner>/<repo>]""" 4
+.el .IP "\f(CWrepo [<owner>/<repo>]\fR" 4
+.IX Item "repo [<owner>/<repo>]"
 Show basic information about a specific repository. The \f(CW\*(C`\-\-raw\*(C'\fR and \f(CW\*(C`\-\-json\*(C'\fR options show the data in different formats than normal output.
 .ie n .IP """repo\-get <owner>/<repo> <data\-key>""" 4
 .el .IP "\f(CWrepo\-get <owner>/<repo> <data\-key>\fR" 4
@@ -710,6 +710,14 @@ If you used \f(CW\*(C`make install\*(C'\fR method, then run this again (after \f
 .SH "Command Completion"
 .IX Header "Command Completion"
 The \f(CW\*(C`git hub\*(C'\fR command supports \f(CW\*(C`<TAB>\*(C'\fR\-based command completion. If you don't use the \f(CW\*(C`init\*(C'\fR script (see Installation, above), you'll need to enable this manually to use it.
+.PP
+You can complete subcommands, options and repository names:
+.PP
+.Vb 3
+\&      git hub <TAB>
+\&      git hub \-<TAB>
+\&      git hub issues username/<TAB>
+.Ve
 .SS "In Bash"
 .IX Subsection "In Bash"
 If your Bash setup does not already provide command completion for Git, you'll need to enable that first:
