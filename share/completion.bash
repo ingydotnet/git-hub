@@ -35,7 +35,7 @@ _git_hub() {
                 if [[ "$username" != "$__git_hub_lastusername" ]];
                 then
                     __git_hub_lastusername=$username
-                    __git_hub_reponames=`git hub repos $username --raw`
+                    __git_hub_reponames=`git hub repos $username --raw --count ${GIT_HUB_COMPLETE_FETCH_LIMIT:=50}`
                 fi
                 __gitcomp "$__git_hub_reponames"
             fi
