@@ -632,6 +632,9 @@ You can complete subcommands, options and repository names:
     git hub -<TAB>
     git hub issues username/<TAB>
 
+The number of repositories to complete is limited to 50 by default. You can
+change that by setting `GIT_HUB_COMPLETE_FETCH_LIMIT`.
+
 == In Bash
 
 If your Bash setup does not already provide command completion for Git, you'll

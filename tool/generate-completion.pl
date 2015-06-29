@@ -20,6 +20,7 @@ sub main {
         push @options, { keys => \@keys, arg => $arg, desc => $desc };
     }
 
+    my ($complete_fetch_limit) = $input =~ m/The number of repositories to complete is limited to (\d+)/;
     $input =~ s/.*?\n= Commands\n//s;
     $input =~ s/(.*?\n== Configuration Commands\n.*?\n)==? .*/$1/s;
     my @list;
@@ -41,15 +42,15 @@ sub main {
     @list = sort @list;
 
     if ($cmd eq "bash") {
-        generate_bash(\@list, \@repo_cmds, \@options);
+        generate_bash(\@list, \@repo_cmds, \@options, $complete_fetch_limit);
     }
     else {
-        generate_zsh(\@list, \@repo_cmds, \@options);
+        generate_zsh(\@list, \@repo_cmds, \@options, $complete_fetch_limit);
     }
 }
 
 sub generate_zsh {
-    my ($list, $repo_cmds, $options) = @_;
+    my ($list, $repo_cmds, $options, $complete_fetch_limit) = @_;
     my $options_string = '';
     for my $opt (@$options) {
         my $keys = $opt->{keys};
@@ -114,7 +115,7 @@ _git-hub() {
                 if [[ "\$username" != "\$__git_hub_lastusername" ]];
                 then
                     __git_hub_lastusername=\$username
-                    IFS=\$'\\n' set -A  __git_hub_reponames `git hub repos \$username --raw`
+                    IFS=\$'\\n' set -A  __git_hub_reponames `git hub repos \$username --raw --count \${GIT_HUB_COMPLETE_FETCH_LIMIT:=$complete_fetch_limit}`
                 fi
                 compadd -X "Repos:" \$__git_hub_reponames
             else
@@ -134,7 +135,7 @@ _git-hub() {
 }
 
 sub generate_bash {
-    my ($list, $repo_cmds, $options) = @_;
+    my ($list, $repo_cmds, $options, $complete_fetch_limit) = @_;
     my $options_string = '';
     for my $opt (@$options) {
         my $keys = $opt->{keys};
@@ -186,7 +187,7 @@ _git_hub() {
                 if [[ "\$username" != "\$__git_hub_lastusername" ]];
                 then
                     __git_hub_lastusername=\$username
-                    __git_hub_reponames=`git hub repos \$username --raw`
+                    __git_hub_reponames=`git hub repos \$username --raw --count \${GIT_HUB_COMPLETE_FETCH_LIMIT:=$complete_fetch_limit}`
                 fi
                 __gitcomp "\$__git_hub_reponames"
             fi

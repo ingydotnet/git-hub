@@ -51,7 +51,7 @@ _git-hub() {
                 if [[ "$username" != "$__git_hub_lastusername" ]];
                 then
                     __git_hub_lastusername=$username
-                    IFS=$'\n' set -A  __git_hub_reponames `git hub repos $username --raw`
+                    IFS=$'\n' set -A  __git_hub_reponames `git hub repos $username --raw --count ${GIT_HUB_COMPLETE_FETCH_LIMIT:=50}`
                 fi
                 compadd -X "Repos:" $__git_hub_reponames
             else
