@@ -5,7 +5,7 @@
 _git_hub() {
     local _opts=" -h --help --remote= --branch= --org= -c= --count= -a --all -q --quiet -v --verbose -r --raw -j --json -A --use-auth -C --no-cache --token= -d --dryrun -T -O -H -J -R -x"
     local subcommands="cache-clear clone collabs comment config config-unset follow followers following follows fork forks git-hub-travis help info irc-enable irc-enable irc-url issue issue-close issue-edit issue-new issue-resolve issues keys keys-add member-add member-get member-remove members notify-list open org org-edit org-get org-members org-repos orgs pr-diff pr-fetch pr-list pr-merge pr-new pr-queue repo repo-delete repo-edit repo-get repo-init repo-new repos scope-add scope-remove scopes setup star starred stars team team-delete team-members team-new team-repo-add team-repos teams token-delete token-get token-new tokens trust unfollow unstar untrust unwatch upgrade url user user-edit user-get version watch watchers watching"
-    local repocommands="collabs comment fork forks issue issue-close issue-edit issue-new issue-resolve issues open pr-diff pr-fetch pr-list pr-merge repo repo-delete repo-get star stars trust unstar untrust unwatch url watch watchers"
+    local repocommands="clone collabs comment fork forks issue issue-close issue-edit issue-new issue-resolve issues open pr-diff pr-fetch pr-list pr-merge repo repo-delete repo-edit repo-get star stars trust unstar untrust unwatch url watch watchers"
     local subcommand="$(__git_find_on_cmdline "$subcommands")"
 
     if [ -z "$subcommand" ]; then
