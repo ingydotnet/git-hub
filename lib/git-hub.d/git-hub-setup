@@ -91,9 +91,11 @@ for you and put it in the config file.
   fi
   cat <<...
 
-To generate a new token, the commands require your GitHub password.
+To generate a new token, the commands require your GitHub password. If 2FA
+(two-factor authentication) is enabled for your Github account, you will also
+be prompted for a 2FA code.
 
-The password will not be stored after the commands finish running.
+The password and token will not be stored after the commands finish running.
 ...
   export GIT_HUB_PASSWORD="$(
     prompt "Enter your GitHub password (for '$login'): "
