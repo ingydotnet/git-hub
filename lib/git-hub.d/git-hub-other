@@ -128,7 +128,22 @@ command:clone() {
   owner_repo="$owner/$repo"
 
   url="git@github.com:$owner_repo"
-  cmd="git clone --recursive $url $dir"
+
+  # configure preferred email/name locally
+  local useremail=""
+  read-config-value "github-email"
+  if [ -n "$value" ]; then
+      useremail='--config user.email="'$value'"'
+  fi
+
+  local username=""
+  read-config-value "github-name"
+  if [ -n "$value" ]; then
+      username='--config user.name="'$value'"'
+  fi
+
+  cmd="git clone --recursive $url $dir $useremail $username"
+
   if [ -n "$branch_name" ]; then
     cmd+=" --branch $branch_name"
   fi
