@@ -137,7 +137,7 @@ help:config() {
 
   Usage: git hub config [<config-key> [<config-value>]]
 
-  With no args, this command will print the contents of `~/.githubconfig`.
+  With no args, this command will print the contents of `~/.git-hub/config`.
   With one argument (a key), print the current value of the config key.
   With two arguments (key value), set the value of the config key. 4 keys
   are currently supported: `login`, `api-token`, `use-auth`, and `json-lib`.
@@ -149,7 +149,7 @@ help:config-unset() {
 
   Usage: git hub config-unset <config-key>
 
-  Unset a config key. Removes the key from the `~/.githubconfig` file.
+  Unset a config key. Removes the key from the `~/.git-hub/config` file.
 ...
 }
 
@@ -763,7 +763,7 @@ help:token-new() {
   Usage: git hub token-new [<description-string>]
 
   Create a new API token for your GitHub login id. Note: Creating a new
-  token will not automatically add it to your `~/.githubconfig` file; you
+  token will not automatically add it to your `~/.git-hub/config` file; you
   need to do that yourself with the `git hub config api-token
   <token-value>` command. Use the `--raw` option to just print the new
   token id.
