@@ -216,7 +216,7 @@ this order):
 
 =item * The C<./.git/config> file. (The repo you are issuing commands from)
 
-=item * The C<~/.githubconfig> file.
+=item * The C<~/.git-hub/config> file.
 
 =back
 
@@ -665,14 +665,14 @@ GitHub authentication tokens.
 
 =item C<< config [<config-key> [<config-value>]] >>
 
-With no args, this command will print the contents of C<~/.githubconfig>. With
+With no args, this command will print the contents of C<~/.git-hub/config>. With
 one argument (a key), print the current value of the config key. With two
 arguments (key value), set the value of the config key. 4 keys are currently
 supported: C<login>, C<api-token>, C<use-auth>, and C<json-lib>.
 
 =item C<< config-unset <config-key> >>
 
-Unset a config key. Removes the key from the C<~/.githubconfig> file.
+Unset a config key. Removes the key from the C<~/.git-hub/config> file.
 
 =item C<tokens>
 
@@ -682,7 +682,7 @@ print the token IDs and descriptions, but not the actual token values.
 =item C<< token-new [<description-string>] >>
 
 Create a new API token for your GitHub login id. Note: Creating a new token
-will not automatically add it to your C<~/.githubconfig> file; you need to do
+will not automatically add it to your C<~/.git-hub/config> file; you need to do
 that yourself with the C<< git hub config api-token <token-value> >> command.
 Use the C<--raw> option to just print the new token id.
 
