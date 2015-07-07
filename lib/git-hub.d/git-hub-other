@@ -131,16 +131,10 @@ command:clone() {
 
   # configure preferred email/name locally
   local useremail=""
-  read-config-value "github-email"
-  if [ -n "$value" ]; then
-      useremail='--config user.email="'$value'"'
-  fi
+  read-config-value "github-email" && useremail='--config user.email="'$value'"'
 
   local username=""
-  read-config-value "github-name"
-  if [ -n "$value" ]; then
-      username='--config user.name="'$value'"'
-  fi
+  read-config-value "github-name" && username='--config user.name="'$value'"'
 
   cmd="git clone --recursive $url $dir $useremail $username"
 
