@@ -138,9 +138,9 @@ help:config() {
   Usage: git hub config [<config-key> [<config-value>]]
 
   With no args, this command will print the contents of `~/.git-hub/config`.
-  With one argument (a key), print the current value of the config key.
-  With two arguments (key value), set the value of the config key. 4 keys
-  are currently supported: `login`, `api-token`, `use-auth`, and `json-lib`.
+  With With one argument (a key), print the current value of the config key.
+  With two arguments (key value), set the value of the config key. 4 keys are
+  currently supported: `login`, `api-token`, `use-auth`, and `json-lib`.
 ...
 }
 

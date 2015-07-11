@@ -174,7 +174,7 @@ order):
 * Commandline *arguments* (see specific command, below).
 * Environment variables of the form `GIT_HUB_VARIABLE_NAME`.
 * The `./.git/config` file. (The repo you are issuing commands from)
-* The `~/.githubconfig` file.
+* The `~/.git-hub/config` file.
 
 Most of the commands described below have arguments. This section defines each
 of the argument types. Note that argument values that are strings containing
@@ -527,13 +527,13 @@ These commands are for editing your `git-hub` config file and managing your
 GitHub authentication tokens.
 
 - `config [<config-key> [<config-value>]]`
-  With no args, this command will print the contents of `~/.githubconfig`.
-  With one argument (a key), print the current value of the config key.
-  With two arguments (key value), set the value of the config key. 4 keys
-  are currently supported: `login`, `api-token`, `use-auth`, and `json-lib`.
+  With no args, this command will print the contents of `~/.git-hub/config`.
+  With With one argument (a key), print the current value of the config key.
+  With two arguments (key value), set the value of the config key. 4 keys are
+  currently supported: `login`, `api-token`, `use-auth`, and `json-lib`.
 
 - `config-unset <config-key>`
-  Unset a config key. Removes the key from the `~/.githubconfig` file.
+  Unset a config key. Removes the key from the `~/.git-hub/config` file.
 
 - `tokens`
   List all the API tokens for your GitHub account. Use the `--raw` option
@@ -541,7 +541,7 @@ GitHub authentication tokens.
 
 - `token-new [<description-string>]`
   Create a new API token for your GitHub login id. Note: Creating a new
-  token will not automatically add it to your `~/.githubconfig` file; you
+  token will not automatically add it to your `~/.git-hub/config` file; you
   need to do that yourself with the `git hub config api-token
   <token-value>` command. Use the `--raw` option to just print the new
   token id.

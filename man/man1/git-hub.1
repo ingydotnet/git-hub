@@ -70,8 +70,8 @@
 .rr rF
 .\" ========================================================================
 .\"
-.IX Title "IO::FILE=IO(0X13148D0) 1"
-.TH IO::FILE=IO(0X13148D0) 1 "2015-02-24" "perl v5.18.1" "User Contributed Perl Documentation"
+.IX Title "IO::FILE=IO(0XAB9180) 1"
+.TH IO::FILE=IO(0XAB9180) 1 "2015-07-10" "perl v5.18.4" "User Contributed Perl Documentation"
 .\" For nroff, turn off justification.  Always turn off hyphenation; it makes
 .\" way too many mistakes in technical documents.
 .if n .ad l
@@ -246,7 +246,7 @@ Environment variables of the form \f(CW\*(C`GIT_HUB_VARIABLE_NAME\*(C'\fR.
 .IP "\(bu" 4
 The \f(CW\*(C`./.git/config\*(C'\fR file. (The repo you are issuing commands from)
 .IP "\(bu" 4
-The \f(CW\*(C`~/.githubconfig\*(C'\fR file.
+The \f(CW\*(C`~/.git\-hub/config\*(C'\fR file.
 .PP
 Most of the commands described below have arguments. This section defines each of the argument types. Note that argument values that are strings containing whitespace need to be quoted.
 .PP
@@ -607,11 +607,11 @@ These commands are for editing your \f(CW\*(C`git\-hub\*(C'\fR config file and m
 .ie n .IP """config [<config\-key> [<config\-value>]]""" 4
 .el .IP "\f(CWconfig [<config\-key> [<config\-value>]]\fR" 4
 .IX Item "config [<config-key> [<config-value>]]"
-With no args, this command will print the contents of \f(CW\*(C`~/.githubconfig\*(C'\fR. With one argument (a key), print the current value of the config key. With two arguments (key value), set the value of the config key. 4 keys are currently supported: \f(CW\*(C`login\*(C'\fR, \f(CW\*(C`api\-token\*(C'\fR, \f(CW\*(C`use\-auth\*(C'\fR, and \f(CW\*(C`json\-lib\*(C'\fR.
+With no args, this command will print the contents of \f(CW\*(C`~/.git\-hub/config\*(C'\fR. With With one argument (a key), print the current value of the config key. With two arguments (key value), set the value of the config key. 4 keys are currently supported: \f(CW\*(C`login\*(C'\fR, \f(CW\*(C`api\-token\*(C'\fR, \f(CW\*(C`use\-auth\*(C'\fR, and \f(CW\*(C`json\-lib\*(C'\fR.
 .ie n .IP """config\-unset <config\-key>""" 4
 .el .IP "\f(CWconfig\-unset <config\-key>\fR" 4
 .IX Item "config-unset <config-key>"
-Unset a config key. Removes the key from the \f(CW\*(C`~/.githubconfig\*(C'\fR file.
+Unset a config key. Removes the key from the \f(CW\*(C`~/.git\-hub/config\*(C'\fR file.
 .ie n .IP """tokens""" 4
 .el .IP "\f(CWtokens\fR" 4
 .IX Item "tokens"
@@ -619,7 +619,7 @@ List all the \s-1API\s0 tokens for your GitHub account. Use the \f(CW\*(C`\-\-ra
 .ie n .IP """token\-new [<description\-string>]""" 4
 .el .IP "\f(CWtoken\-new [<description\-string>]\fR" 4
 .IX Item "token-new [<description-string>]"
-Create a new \s-1API\s0 token for your GitHub login id. Note: Creating a new token will not automatically add it to your \f(CW\*(C`~/.githubconfig\*(C'\fR file; you need to do that yourself with the \f(CW\*(C`git hub config api\-token <token\-value>\*(C'\fR command. Use the \f(CW\*(C`\-\-raw\*(C'\fR option to just print the new token id.
+Create a new \s-1API\s0 token for your GitHub login id. Note: Creating a new token will not automatically add it to your \f(CW\*(C`~/.git\-hub/config\*(C'\fR file; you need to do that yourself with the \f(CW\*(C`git hub config api\-token <token\-value>\*(C'\fR command. Use the \f(CW\*(C`\-\-raw\*(C'\fR option to just print the new token id.
 .ie n .IP """token\-get <api\-token\-id> <data\-key>""" 4
 .el .IP "\f(CWtoken\-get <api\-token\-id> <data\-key>\fR" 4
 .IX Item "token-get <api-token-id> <data-key>"
