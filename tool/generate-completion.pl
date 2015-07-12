@@ -33,7 +33,7 @@ sub main {
             or die "Bad usage: '$text'";
         (my $name = $usage) =~ s/ .*//;
         push @list, $name;
-        if ($usage =~ m#\Q$name\E \[?\(?(<owner>/)?<repo>#) {
+        if ($usage =~ m#\Q$name\E \(?\[?(<owner>/)?\]?<repo>#) {
             push @repo_cmds, $name;
         }
     }

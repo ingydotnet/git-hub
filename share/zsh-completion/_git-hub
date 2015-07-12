@@ -44,7 +44,7 @@ _git-hub() {
     ;;
     repo)
         case $line[1] in
-        collabs|comment|fork|forks|issue|issue-close|issue-edit|issue-new|issue-resolve|issues|open|pr-diff|pr-fetch|pr-list|pr-merge|repo|repo-delete|repo-get|star|stars|trust|unstar|untrust|unwatch|url|watch|watchers)
+        clone|collabs|comment|fork|forks|issue|issue-close|issue-edit|issue-new|issue-resolve|issues|open|pr-diff|pr-fetch|pr-list|pr-merge|repo|repo-delete|repo-edit|repo-get|star|stars|trust|unstar|untrust|unwatch|url|watch|watchers)
             if [[ $line[2] =~ "^(\w+)/(.*)" ]];
             then
                 local username="$match[1]"
