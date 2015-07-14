@@ -393,7 +393,7 @@ interactions from the command line. They are installed by default.
   Add your *star* to a repository.
 
 - `unstar [<owner>/<repo>]`
-  Add your *star* to a repository.
+  Remove your *star* from a repository.
 
 - `starred [<user>]`
   List repositories that a user has starred.

@@ -494,7 +494,7 @@ Add your B<star> to a repository.
 
 =item C<< unstar [<owner>/<repo>] >>
 
-Add your B<star> to a repository.
+Remove your B<star> from a repository.
 
 =item C<< starred [<user>] >>
 

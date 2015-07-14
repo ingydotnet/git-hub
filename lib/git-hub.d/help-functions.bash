@@ -803,7 +803,7 @@ help:unstar() {
 
   Usage: git hub unstar [<owner>/<repo>]
 
-  Add your *star* to a repository.
+  Remove your *star* from a repository.
 ...
 }
 
