@@ -128,56 +128,8 @@ command:clone() {
   owner_repo="$owner/$repo"
 
   url="git@github.com:$owner_repo"
-
-  # configure preferred email/name locally
-  local useremail=
-  if read-config-value github-email; then
-    useremail='--config user.email="'$value'"'
-  fi
-
-  local username=
-  if read-config-value github-name; then
-    username='--config user.name="'$value'"'
-  fi
-
-  cmd="git clone --recursive $url $dir $useremail $username"
-
-  if [ -n "$branch_name" ]; then
-    cmd+=" --branch $branch_name"
-  fi
-
-  # TODO Make this dry_run on non-API command be reusable
-  "$verbose_output" && nay "$cmd"
-  "$dry_run" && {
-    nay '*** NOTE: This is a dry run only. ***'
-    return 0
-  }
-
-  local OK=0
-  (
-    if "$quiet_output"; then
-      $cmd &> /dev/null
-    elif "$verbose_output"; then
-      (
-        set -x
-        $cmd
-      )
-    else
-      $cmd
-    fi
-  ) || OK=1
-  if OK; then
-    if [ -n "$dir" ]; then
-      say "$owner_repo cloned into $dir"
-    else
-      say "$owner_repo cloned"
-    fi
-  else
-    say "Failed: 'git hub $@'"
-    if ! "$verbose_output"; then
-      say "  Try using -v for more info"
-    fi
-  fi
+  local cmd="git clone --recursive $url $dir"
+  execute-clone-cmd "$cmd"
 }
 
 command:stars() {

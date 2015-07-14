@@ -1,0 +1,133 @@
+#!/usr/bin/env bash
+
+set -e
+
+command:gists() {
+  get-args owner:get-user
+  title="Gists for '$owner':"
+  report-list \
+    "/users/$owner/gists?sort=pushed;per_page=PER_PAGE" \
+    'id description'
+}
+
+format-entry:gists() {
+  if "$raw_output"; then
+    out "$2"
+  else
+    printf -v output_line "%d) %s %-20s" "$1" "$2" "$3"
+  fi
+}
+
+command:gist() {
+  get-args 'gist:get-gist'
+  api-get "/gists/$gist"
+}
+
+ok:gist() {
+  fields=(
+      id description html_url public
+      created_at updated_at
+      comments owner__login
+  )
+  report-data
+}
+
+command:gist-get() {
+  get-args 'gist:get-gist' key
+  api-get "/gists/$gist"
+  OK || {
+    msg_fail="Gist '$gist' not found"
+    return
+  }
+  local value="$(JSON.get -a "/$key" -)"
+  if [ -n "$value" ]; then
+    msg_ok="$value"
+  else
+    msg_fail="Couldn't get value for '$key'"
+    OK=1
+  fi
+}
+
+command:gist-edit() {
+  require-auth
+  get-args 'gist:get-gist' %pairs
+  local adds=(name "$repo")
+  for (( i = 0; i < ${#pairs[@]}; i = i + 2 )); do
+    if [ "${pairs[$i]}" == name ]; then
+      adds=()
+      break
+    fi
+  done
+  pairs+=( "${adds[@]}" )
+  api-patch "/gists/$gist" "$(json-dump-object-pairs)"
+}
+
+command:gist-star() {
+  require-auth
+  get-args 'gist:get-gist'
+  api-put "/gists/$gist/star"
+  msg_ok="'$gist' starred"
+}
+
+command:gist-unstar() {
+  require-auth
+  get-args 'gist:get-gist'
+  api-delete "/gists/$gist/star"
+  msg_ok="'$gist' unstarred"
+}
+
+command:gist-delete() {
+  require-auth
+  get-args 'gist:get-gist'
+  api-delete "/gists/$gist"
+  msg_ok="'$gist' deleted"
+}
+
+command:gist-clone() {
+  get-args 'gist:get-gist' '?dir'
+  msg_ok=0
+  url=$(git hub gist-get $gist git_pull_url)
+
+  local cmd="git clone $url $dir"
+  execute-clone-cmd "$cmd"
+}
+
+command:gist-new() {
+  require-auth
+  local args=("${command_arguments[@]}")
+  local description="${args[1]}"
+  local public="false"
+  if [[ "${args[0]}" == "public" ]]; then
+      public="true"
+  fi
+  args=("${args[@]:2}")
+  local files= escaped_filename= escaped_body= escaped_description=
+
+  while [ ${#args[@]} -gt 0 ]; do
+    local body=$(cat "${args[0]}")
+    local filename=$(basename "${args[0]}")
+    json-escape "$filename" escaped_filename
+
+    json-escape "$body" escaped_body
+    files+='"'$escaped_filename'":{"content":"'$escaped_body'"}'
+    args=("${args[@]:1}")
+    if [ ${#args[@]} -gt 0 ]; then
+      files="$files,"
+    fi
+  done
+
+  json-escape "$description" escaped_description
+  local json='{"description":"'$escaped_description'","public":'"$public"',"files":{'"$files"'}}'
+  api-post "/gists" "$json"
+}
+
+ok:gist-new() {
+  fields=(
+      id description html_url public
+      created_at owner__login
+  )
+  report-data
+}
+
+
+# vim: set lisp:

@@ -1367,6 +1367,55 @@ editor-comment-state() {
   fi
 }
 
+execute-clone-cmd() {
+  local cmd="$@"
+  # configure preferred email/name locally
+  if read-config-value github-email; then
+    cmd+=' --config user.email="'$value'"'
+  fi
+
+  if read-config-value github-name; then
+    cmd+=' --config user.name="'$value'"'
+  fi
+
+  if [ -n "$branch_name" ]; then
+    cmd+=" --branch $branch_name"
+  fi
+
+  "$verbose_output" && nay "$cmd"
+  "$dry_run" && {
+    nay '*** NOTE: This is a dry run only. ***'
+    return 0
+  }
+
+  local OK=0
+  (
+    if "$quiet_output"; then
+      $cmd &> /dev/null
+    elif "$verbose_output"; then
+      (
+        set -x
+        $cmd
+      )
+    else
+      $cmd
+    fi
+  ) || OK=1
+  if OK; then
+    if [ -n "$dir" ]; then
+      say "$repo cloned into $dir"
+    else
+      say "$repo cloned"
+    fi
+  else
+    say "Failed: 'git hub $@'"
+    if ! "$verbose_output"; then
+      say "  Try using -v for more info"
+    fi
+  fi
+}
+
+
 #------------------------------------------------------------------------------
 # General purpose functions:
 #------------------------------------------------------------------------------
