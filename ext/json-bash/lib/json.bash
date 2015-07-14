@@ -2,17 +2,16 @@
 #
 # Copyright (c) 2013-2015 Ingy döt Net
 
-JSON_VERSION=0.0.1
+JSON_VERSION=0.0.2
 
 #-----------------------------------------------------------------------------
 # API functions
 #-----------------------------------------------------------------------------
 JSON.load() {
   unset JSON__cache
-  # set -o pipefail
   case $# in
-    0) JSON.lex | JSON.lex | JSON.parse ;;
-    1) JSON__cache="$(echo -E "$1" | JSON.lex | JSON.parse)"
+    0) (set -o pipefail; JSON.lex | JSON.parse) ;;
+    1) JSON__cache="$(set -o pipefail; echo -E "$1" | JSON.lex | JSON.parse)"
       [ -n "$JSON__cache" ] && JSON__cache+=$'\n'
       ;;
     2) printf -v "$2" "%s" "$(echo -E "$1" | JSON.lex | JSON.parse)"
@@ -150,18 +149,18 @@ JSON.parse() {
 
 JSON.parse-object() {
   read -r JSON_token
-  while [ $JSON_token != '}' ]; do
+  while [[ $JSON_token != '}' ]]; do
     [[ $JSON_token =~ ^\" ]] || JSON.parse-error STRING   #"
     local key="${JSON_token:1:$((${#JSON_token}-2))}"
     read -r JSON_token
-    [ $JSON_token == ':' ] || JSON.parse-error "':'"
+    [[ $JSON_token == ':' ]] || JSON.parse-error "':'"
     read -r JSON_token
     JSON.parse-value "$1/$key"
     read -r JSON_token
-    if [ $JSON_token == ',' ]; then
+    if [[ $JSON_token == ',' ]]; then
       read -r JSON_token
     else
-      [ $JSON_token == '}' ] || JSON.parse-error "'}'"
+      [[ $JSON_token == '}' ]] || JSON.parse-error "'}'"
     fi
   done
 }
@@ -169,13 +168,13 @@ JSON.parse-object() {
 JSON.parse-array() {
   local index=0
   read -r JSON_token
-  while [ $JSON_token != ']' ]; do
+  while [[ $JSON_token != ']' ]]; do
     JSON.parse-value "$1/$((index++))"
     read -r JSON_token
-    if [ $JSON_token == ',' ]; then
+    if [[ $JSON_token == ',' ]]; then
       read -r JSON_token
     else
-      [ $JSON_token == ']' ] || JSON.parse-error "']'"
+      [[ $JSON_token == ']' ]] || JSON.parse-error "']'"
     fi
   done
 }
