@@ -36,6 +36,7 @@ Here are just a few of the things you can do on GitHub with a simple command:
     git hub trust ingydotnet            # Add collaborators to repo
                                         # Stalk all your followers
     git hub followers -ra | git hub user -
+    git hub gists <user>                # List gists for a user
 
 =head1 Description
 
@@ -626,6 +627,43 @@ Print the URL of a repo or a file in a repo.
 =item C<git-hub-travis>
 
 Enable and/or disable travis-ci testing from the command line.
+
+=item C<< gists [<user>] >>
+
+List gists for a user.
+
+=item C<< gist <gist-id> >>
+
+Show info about gist.
+
+=item C<< gist-get <gist-id> <data-key> >>
+
+Get a specific data value for a particular gist.
+
+=item C<< gist-edit <gist-id> <key-value-pair...> >>
+
+Set specific meta-data fields of a gist to new values. You list the parameters
+as key/value pairs.
+
+=item C<< gist-star <gist-id> >>`
+
+Add your B<star> to a gist.
+
+=item C<< gist-unstar <gist-id> >>
+
+Remove your B<star> from a gist.
+
+=item C<< gist-delete <gist-id> >>
+
+Delete a gist.
+
+=item C<< gist-clone <gist-id> [<directory>] >>
+
+Clone a gist.
+
+=item C<< gist-new <(public|secret)> <description> <files...> >>
+
+Create a gist
 
 =back
 
