@@ -524,7 +524,7 @@ interactions from the command line. They are installed by default.
 - `gist-clone <gist-id> [<directory>]`
   Clone a gist.
 
-- `gist-new <(public|secret)> <description> <files...>
+- `gist-new <(public|secret)> <description> <files...>`
   Create a gist
 
 == Plugin Commands
