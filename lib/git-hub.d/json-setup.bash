@@ -75,6 +75,9 @@ json-dump-object-pairs() {
 pretty-json-list() {
   local num="$(JSON.cache | tail -n1 | cut -d '/' -f2)"
   declare -a keys=("$@")
+  if [[ -z "$num" ]]; then
+      num=-1
+  fi
 
   echo '['
   for (( i = 0; i <= $num; i++)); do
