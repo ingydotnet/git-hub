@@ -1290,7 +1290,7 @@ editor-title-body() {
   local line
   body=''
   title="$(head -n1 "$GIT_HUB_MSG_FILE")"
-  if [[ ! "$title" =~ [^[:space:]] ]]; then
+  if [[ ! "$title" =~ [^[:space:]] || "$title" =~ ^\# ]]; then
     abort "no title provided"
   fi
   line="$(head -n2 "$GIT_HUB_MSG_FILE" | tail -n1)"
