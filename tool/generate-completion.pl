@@ -106,17 +106,17 @@ _git-hub() {
 ...
     print " " x 8;
     print join '|', @$repo_cmds;
-    print <<'...';
+    print <<"...";
 )
-            if [[ $line[2] =~ "^(\w+)/(.*)" ]];
+            if [[ \$line[2] =~ "^(\\w+)/(.*)" ]];
             then
-                local username="$match[1]"
-                if [[ "$username" != "$__git_hub_lastusername" ]];
+                local username="\$match[1]"
+                if [[ "\$username" != "\$__git_hub_lastusername" ]];
                 then
-                    __git_hub_lastusername=$username
-                    IFS=$'\n' set -A  __git_hub_reponames `git hub repos $username --raw`
+                    __git_hub_lastusername=\$username
+                    IFS=\$'\\n' set -A  __git_hub_reponames `git hub repos \$username --raw`
                 fi
-                compadd -X "Repos:" $__git_hub_reponames
+                compadd -X "Repos:" \$__git_hub_reponames
             else
                 _arguments "2:Repos:()"
             fi
