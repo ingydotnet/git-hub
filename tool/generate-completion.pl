@@ -121,6 +121,9 @@ _git-hub() {
                 _arguments "2:Repos:()"
             fi
         ;;
+        help)
+            compadd @$list
+        ;;
         esac
     ;;
     esac
