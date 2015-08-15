@@ -524,6 +524,9 @@ interactions from the command line. They are installed by default.
 - `gist-clone <gist-id> [<directory>]`
   Clone a gist.
 
+- `gist-fork <gist-id>`
+  Fork a gist.
+
 - `gist-new <(public|secret)> <description> <files...>`
   Create a gist
 

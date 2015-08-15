@@ -28,6 +28,7 @@ ok:gist() {
       id description html_url public
       created_at updated_at
       comments owner__login
+      fork_of__id
   )
   report-data
 }
@@ -80,7 +81,8 @@ command:gist-delete() {
   require-auth
   get-args 'gist:get-gist'
   api-delete "/gists/$gist"
-  msg_ok="'$gist' deleted"
+  msg_ok="Gist '$gist' deleted"
+  msg_404="Gist '$gist' not found"
 }
 
 command:gist-clone() {
@@ -90,6 +92,21 @@ command:gist-clone() {
 
   local cmd="git clone $url $dir"
   execute-clone-cmd "$cmd"
+}
+
+command:gist-fork() {
+  require-auth
+  get-args 'gist:get-gist'
+  api-post "/gists/$gist/forks"
+}
+
+ok:gist-fork() {
+  fields=(
+      id description html_url public
+      created_at owner__login
+
+  )
+  report-data
 }
 
 command:gist-new() {
