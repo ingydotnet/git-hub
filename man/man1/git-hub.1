@@ -70,8 +70,8 @@
 .rr rF
 .\" ========================================================================
 .\"
-.IX Title "IO::FILE=IO(0X1FEC050) 1"
-.TH IO::FILE=IO(0X1FEC050) 1 "2015-08-12" "perl v5.18.2" "User Contributed Perl Documentation"
+.IX Title "IO::FILE=IO(0X23FB070) 1"
+.TH IO::FILE=IO(0X23FB070) 1 "2015-08-16" "perl v5.18.2" "User Contributed Perl Documentation"
 .\" For nroff, turn off justification.  Always turn off hyphenation; it makes
 .\" way too many mistakes in technical documents.
 .if n .ad l
@@ -617,6 +617,10 @@ Delete a gist.
 .el .IP "\f(CWgist\-clone <gist\-id> [<directory>]\fR" 4
 .IX Item "gist-clone <gist-id> [<directory>]"
 Clone a gist.
+.ie n .IP """gist\-fork <gist\-id>""" 4
+.el .IP "\f(CWgist\-fork <gist\-id>\fR" 4
+.IX Item "gist-fork <gist-id>"
+Fork a gist.
 .ie n .IP """gist\-new <(public|secret)> <description> <files...>""" 4
 .el .IP "\f(CWgist\-new <(public|secret)> <description> <files...>\fR" 4
 .IX Item "gist-new <(public|secret)> <description> <files...>"

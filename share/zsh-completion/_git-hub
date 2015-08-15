@@ -40,7 +40,7 @@ _git-hub() {
 
     case $state in
     subcmd)
-        compadd cache-clear clone collabs comment config config-unset follow followers following follows fork forks gist gist-clone gist-delete gist-edit gist-get gist-new gist-star gist-unstar gists git-hub-travis help info irc-enable irc-enable irc-url issue issue-close issue-edit issue-new issue-resolve issues keys keys-add member-add member-get member-remove members notify-list open org org-edit org-get org-members org-repos orgs pr-diff pr-fetch pr-list pr-merge pr-new pr-queue repo repo-delete repo-edit repo-get repo-init repo-new repos scope-add scope-remove scopes setup star starred stars team team-delete team-members team-new team-repo-add team-repos teams token-delete token-get token-new tokens trust unfollow unstar untrust unwatch upgrade url user user-edit user-get version watch watchers watching
+        compadd cache-clear clone collabs comment config config-unset follow followers following follows fork forks gist gist-clone gist-delete gist-edit gist-fork gist-get gist-new gist-star gist-unstar gists git-hub-travis help info irc-enable irc-enable irc-url issue issue-close issue-edit issue-new issue-resolve issues keys keys-add member-add member-get member-remove members notify-list open org org-edit org-get org-members org-repos orgs pr-diff pr-fetch pr-list pr-merge pr-new pr-queue repo repo-delete repo-edit repo-get repo-init repo-new repos scope-add scope-remove scopes setup star starred stars team team-delete team-members team-new team-repo-add team-repos teams token-delete token-get token-new tokens trust unfollow unstar untrust unwatch upgrade url user user-edit user-get version watch watchers watching
     ;;
     repo)
         case $line[1] in

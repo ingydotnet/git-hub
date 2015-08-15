@@ -661,6 +661,10 @@ Delete a gist.
 
 Clone a gist.
 
+=item C<< gist-fork <gist-id> >>
+
+Fork a gist.
+
 =item C<< gist-new <(public|secret)> <description> <files...> >>
 
 Create a gist

@@ -22,6 +22,7 @@ gist                 gist <gist-id>
 gist-clone           gist-clone <gist-id> [<directory>]
 gist-delete          gist-delete <gist-id>
 gist-edit            gist-edit <gist-id> <key-value-pair...>
+gist-fork            gist-fork <gist-id>
 gist-get             gist-get <gist-id> <data-key>
 gist-new             gist-new <(public|secret)> <description> <files...>
 gist-star            gist-star <gist-id>`
@@ -251,6 +252,15 @@ help:gist-edit() {
 
   Set specific meta-data fields of a gist to new values. You list the
   parameters as key/value pairs.
+...
+}
+
+help:gist-fork() {
+    cat <<'...'
+
+  Usage: git hub gist-fork <gist-id>
+
+  Fork a gist.
 ...
 }
 
