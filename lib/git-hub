@@ -596,6 +596,10 @@ get-repo() {
   get-repo-config repo
 }
 
+get-gist() {
+    get-repo-config gist
+}
+
 get-remote-name() {
   value=
   [ -n "$remote_name" ] && value="$remote_name" && return
@@ -670,15 +674,25 @@ get-repo-config() {
       url="${url% (push)}"
       [[ "$url" =~ .*://(.*) ]] &&
         url="${BASH_REMATCH[1]}"
-      local re1="^[^:/]*[:/]($x)/(.*)\.git$"
-      local re2="^[^:/]*[:/]($x)/(.*)$"
-      if [[ "$url" =~ $re1 ]] || [[ "$url" =~ $re2 ]]; then
-        if [ "$1" == owner ]; then
-          echo "${BASH_REMATCH[1]}"
-        else
-          echo "${BASH_REMATCH[2]}"
+      if [[ "$1" == owner ]] || [[ "$1" == "repo" ]]; then
+        local re1="^[^:/]*[:/]($x)/(.*)\.git$"
+        local re2="^[^:/]*[:/]($x)/(.*)$"
+        if [[ "$url" =~ $re1 ]] || [[ "$url" =~ $re2 ]]; then
+          if [ "$1" == owner ]; then
+            echo "${BASH_REMATCH[1]}"
+          else
+            echo "${BASH_REMATCH[2]}"
+          fi
+          return 0
         fi
-        return 0
+      else
+        # gist
+        local re1="^[^:/]*[:/]([0-9a-f]*)\.git$"
+        local re2="^[^:/]*[:/]([0-9a-f]*)$"
+        if [[ "$url" =~ $re1 ]] || [[ "$url" =~ $re2 ]]; then
+          echo "${BASH_REMATCH[1]}"
+          return 0
+        fi
       fi
     done
   done
