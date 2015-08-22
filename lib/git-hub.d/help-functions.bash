@@ -24,7 +24,8 @@ gist-delete          gist-delete <gist-id>
 gist-edit            gist-edit <gist-id> <key-value-pair...>
 gist-fork            gist-fork <gist-id>
 gist-get             gist-get <gist-id> <data-key>
-gist-new             gist-new <(public|secret)> <description> <files...>
+gist-init            gist-init (public|secret) <description>
+gist-new             gist-new (public|secret) <description> <files...>
 gist-star            gist-star <gist-id>`
 gist-unstar          gist-unstar <gist-id>
 gists                gists [<user>]
@@ -273,12 +274,23 @@ help:gist-get() {
 ...
 }
 
+help:gist-init() {
+    cat <<'...'
+
+  Usage: git hub gist-init (public|secret) <description>
+
+  Create an (almost) empty gist and clone it
+
+  This will create a gist with a file '.gitignore'
+...
+}
+
 help:gist-new() {
     cat <<'...'
 
-  Usage: git hub gist-new <(public|secret)> <description> <files...>
+  Usage: git hub gist-new (public|secret) <description> <files...>
 
-  Create a gist
+  Create a gist from existing files
 ...
 }
 
