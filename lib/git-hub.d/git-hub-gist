@@ -146,5 +146,34 @@ ok:gist-new() {
   report-data
 }
 
+command:gist-init() {
+  require-auth
+  local args=("${command_arguments[@]}")
+  local description="${args[1]}"
+  local public="false"
+  if [[ "${args[0]}" == "public" ]]; then
+      public="true"
+  fi
+
+  local files='".gitignore":{"content":"#"}'
+
+  local escaped_description=
+  json-escape "$description" escaped_description
+  local json='{"description":"'$escaped_description'","public":'"$public"',"files":{'"$files"'}}'
+
+  api-post "/gists" "$json"
+
+  local gistid="$(JSON.get -a "/id" -)"
+
+  git hub gist-clone $gistid $gistid
+}
+
+ok:gist-init() {
+  fields=(
+      id description html_url public
+      created_at owner__login
+  )
+  report-data
+}
 
 # vim: set lisp:
