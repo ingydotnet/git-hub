@@ -527,8 +527,14 @@ interactions from the command line. They are installed by default.
 - `gist-fork <gist-id>`
   Fork a gist.
 
-- `gist-new <(public|secret)> <description> <files...>`
-  Create a gist
+- `gist-new (public|secret) <description> <files...>`
+  Create a gist from existing files
+
+- `gist-init (public|secret) <description>`
+  Create an (almost) empty gist and clone it
+
+  This will create a gist with a file '.gitignore'
+
 
 == Plugin Commands
 
