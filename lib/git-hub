@@ -264,6 +264,7 @@ api-call() {
     echo "$cc"$'\n' >&2
   fi
 
+  get-var force-cache
   if "$dry_run"; then
     nay '*** NOTE: This is a dry run only. ***'
     msg_ok=0
@@ -275,6 +276,8 @@ api-call() {
     if "$verbose_output"; then
       echo "Using API Cache: $GIT_HUB_CACHE/$command_sha1"$'\n' >&2
     fi
+    rc=0
+  elif  "$force_cache" && [[ -e "$command_output_file" ]]; then
     rc=0
   else
     local cache_dir="$GIT_HUB_CACHE/$command_sha1"
@@ -1057,6 +1060,7 @@ init-vars() {
   get-var list-size
   get-var-bool use-auth
   get-var-bool no-cache
+  get-var-bool force-cache
   get-var-bool quiet-output
   get-var-bool verbose-output
   get-var-bool show-token
