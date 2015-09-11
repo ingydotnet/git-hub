@@ -173,7 +173,7 @@ command:clone() {
       say "$owner_repo cloned"
     fi
   else
-    say "Failed: 'git hub clone $@'"
+    say "Failed: 'git hub $@'"
     if ! "$verbose_output"; then
       say "  Try using -v for more info"
     fi
