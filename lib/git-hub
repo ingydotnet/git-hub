@@ -250,6 +250,9 @@ api-call() {
     # Use the cache
     [ -e "$command_header_file" ] ||
       error "-R flag not valid. Command not previously run."
+    if "$verbose_output"; then
+      echo "cache dir: $GIT_HUB_CACHE/$command_sha1"$'\n' >&2
+    fi
     rc=0
   else
     local cache_dir="$GIT_HUB_CACHE/$command_sha1"
