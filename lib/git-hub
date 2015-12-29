@@ -596,6 +596,10 @@ get-repo() {
   get-repo-config repo
 }
 
+get-gist() {
+    get-repo-config gist
+}
+
 get-remote-name() {
   value=
   [ -n "$remote_name" ] && value="$remote_name" && return
@@ -670,15 +674,25 @@ get-repo-config() {
       url="${url% (push)}"
       [[ "$url" =~ .*://(.*) ]] &&
         url="${BASH_REMATCH[1]}"
-      local re1="^[^:/]*[:/]($x)/(.*)\.git$"
-      local re2="^[^:/]*[:/]($x)/(.*)$"
-      if [[ "$url" =~ $re1 ]] || [[ "$url" =~ $re2 ]]; then
-        if [ "$1" == owner ]; then
-          echo "${BASH_REMATCH[1]}"
-        else
-          echo "${BASH_REMATCH[2]}"
+      if [[ "$1" == owner ]] || [[ "$1" == "repo" ]]; then
+        local re1="^[^:/]*[:/]($x)/(.*)\.git$"
+        local re2="^[^:/]*[:/]($x)/(.*)$"
+        if [[ "$url" =~ $re1 ]] || [[ "$url" =~ $re2 ]]; then
+          if [ "$1" == owner ]; then
+            echo "${BASH_REMATCH[1]}"
+          else
+            echo "${BASH_REMATCH[2]}"
+          fi
+          return 0
         fi
-        return 0
+      else
+        # gist
+        local re1="^[^:/]*[:/]([0-9a-f]*)\.git$"
+        local re2="^[^:/]*[:/]([0-9a-f]*)$"
+        if [[ "$url" =~ $re1 ]] || [[ "$url" =~ $re2 ]]; then
+          echo "${BASH_REMATCH[1]}"
+          return 0
+        fi
       fi
     done
   done
@@ -1363,6 +1377,55 @@ editor-comment-state() {
     abort "no title provided."
   fi
 }
+
+execute-clone-cmd() {
+  local cmd="$@"
+  # configure preferred email/name locally
+  if read-config-value github-email; then
+    cmd+=' --config user.email="'$value'"'
+  fi
+
+  if read-config-value github-name; then
+    cmd+=' --config user.name="'$value'"'
+  fi
+
+  if [ -n "$branch_name" ]; then
+    cmd+=" --branch $branch_name"
+  fi
+
+  "$verbose_output" && nay "$cmd"
+  "$dry_run" && {
+    nay '*** NOTE: This is a dry run only. ***'
+    return 0
+  }
+
+  local OK=0
+  (
+    if "$quiet_output"; then
+      $cmd &> /dev/null
+    elif "$verbose_output"; then
+      (
+        set -x
+        $cmd
+      )
+    else
+      $cmd
+    fi
+  ) || OK=1
+  if OK; then
+    if [ -n "$dir" ]; then
+      say "$repo cloned into $dir"
+    else
+      say "$repo cloned"
+    fi
+  else
+    say "Failed: 'git hub $@'"
+    if ! "$verbose_output"; then
+      say "  Try using -v for more info"
+    fi
+  fi
+}
+
 
 #------------------------------------------------------------------------------
 # General purpose functions:

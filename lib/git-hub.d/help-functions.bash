@@ -18,6 +18,17 @@ following            following [<user>]
 follows              follows <user> [<target-user>]
 fork                 fork <owner>/<repo> [--org=<org>] [--remote=<name>]
 forks                forks [<owner>/<repo>]
+gist                 gist <gist-id>
+gist-clone           gist-clone <gist-id> [<directory>]
+gist-delete          gist-delete <gist-id>
+gist-edit            gist-edit <gist-id> <key-value-pair...>
+gist-fork            gist-fork <gist-id>
+gist-get             gist-get <gist-id> <data-key>
+gist-init            gist-init (public|secret) <description>
+gist-new             gist-new (public|secret) <description> <files...>
+gist-star            gist-star <gist-id>`
+gist-unstar          gist-unstar <gist-id>
+gists                gists [<user>]
 git-hub-travis       git-hub-travis
 help                 help
 info                 info
@@ -205,6 +216,108 @@ help:forks() {
   Usage: git hub forks [<owner>/<repo>]
 
   List the forks of a repository.
+...
+}
+
+help:gist() {
+    cat <<'...'
+
+  Usage: git hub gist <gist-id>
+
+  Show info about gist.
+...
+}
+
+help:gist-clone() {
+    cat <<'...'
+
+  Usage: git hub gist-clone <gist-id> [<directory>]
+
+  Clone a gist.
+...
+}
+
+help:gist-delete() {
+    cat <<'...'
+
+  Usage: git hub gist-delete <gist-id>
+
+  Delete a gist.
+...
+}
+
+help:gist-edit() {
+    cat <<'...'
+
+  Usage: git hub gist-edit <gist-id> <key-value-pair...>
+
+  Set specific meta-data fields of a gist to new values. You list the
+  parameters as key/value pairs.
+...
+}
+
+help:gist-fork() {
+    cat <<'...'
+
+  Usage: git hub gist-fork <gist-id>
+
+  Fork a gist.
+...
+}
+
+help:gist-get() {
+    cat <<'...'
+
+  Usage: git hub gist-get <gist-id> <data-key>
+
+  Get a specific data value for a particular gist.
+...
+}
+
+help:gist-init() {
+    cat <<'...'
+
+  Usage: git hub gist-init (public|secret) <description>
+
+  Create an (almost) empty gist and clone it
+
+  This will create a gist with a file '.gitignore'
+...
+}
+
+help:gist-new() {
+    cat <<'...'
+
+  Usage: git hub gist-new (public|secret) <description> <files...>
+
+  Create a gist from existing files
+...
+}
+
+help:gist-star() {
+    cat <<'...'
+
+  Usage: git hub gist-star <gist-id>`
+
+  Add your *star* to a gist.
+...
+}
+
+help:gist-unstar() {
+    cat <<'...'
+
+  Usage: git hub gist-unstar <gist-id>
+
+  Remove your *star* from a gist.
+...
+}
+
+help:gists() {
+    cat <<'...'
+
+  Usage: git hub gists [<user>]
+
+  List gists for a user.
 ...
 }
 

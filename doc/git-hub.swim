@@ -28,6 +28,7 @@ Here are just a few of the things you can do on GitHub with a simple command:
   git hub trust ingydotnet            # Add collaborators to repo
                                       # Stalk all your followers
   git hub followers -ra | git hub user -
+  git hub gists <user>                # List gists for a user
 
 = Description
 
@@ -497,6 +498,43 @@ interactions from the command line. They are installed by default.
 
 - `git-hub-travis`
   Enable and/or disable travis-ci testing from the command line.
+
+- `gists [<user>]`
+  List gists for a user.
+
+- `gist <gist-id>`
+  Show info about gist.
+
+- `gist-get <gist-id> <data-key>`
+  Get a specific data value for a particular gist.
+
+- `gist-edit <gist-id> <key-value-pair...>`
+  Set specific meta-data fields of a gist to new values. You list the
+  parameters as key/value pairs.
+
+- `gist-star <gist-id>``
+  Add your *star* to a gist.
+
+- `gist-unstar <gist-id>`
+  Remove your *star* from a gist.
+
+- `gist-delete <gist-id>`
+  Delete a gist.
+
+- `gist-clone <gist-id> [<directory>]`
+  Clone a gist.
+
+- `gist-fork <gist-id>`
+  Fork a gist.
+
+- `gist-new (public|secret) <description> <files...>`
+  Create a gist from existing files
+
+- `gist-init (public|secret) <description>`
+  Create an (almost) empty gist and clone it
+
+  This will create a gist with a file '.gitignore'
+
 
 == Plugin Commands
 
