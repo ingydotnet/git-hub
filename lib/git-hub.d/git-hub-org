@@ -4,11 +4,18 @@ set -e
 
 command:orgs() {
   get-args user:get-user
-  local title="Organizations for User '$user':"
   msg_fail="Can't find Organizations for User '$user'"
-  report-list \
-    "/users/$user/orgs?per_page=PER_PAGE" \
-    login
+  if [[ $user = $(get-login) ]]; then
+    local title="Public and Private Organizations for User '$user':"
+    report-list \
+      "/user/orgs?per_page=PER_PAGE" \
+      login
+  else
+    local title="Organizations for User '$user':"
+    report-list \
+      "/users/$user/orgs?per_page=PER_PAGE" \
+      login
+  fi
 }
 
 command:org() {
