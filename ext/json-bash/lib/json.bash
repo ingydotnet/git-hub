@@ -12,10 +12,10 @@ JSON.load() {
   case $# in
     0) (set -o pipefail; JSON.lex | JSON.parse) ;;
     1) JSON__cache="$(set -o pipefail; echo -E "$1" | JSON.lex | JSON.parse)"
-      [ -n "$JSON__cache" ] && JSON__cache+=$'\n'
+      [[ -n $JSON__cache ]] && JSON__cache+=$'\n'
       ;;
     2) printf -v "$2" "%s" "$(echo -E "$1" | JSON.lex | JSON.parse)"
-      [ -n "${!2}" ] && printf -v "$2" "%s\n" "${!2}"
+      [[ -n ${!2} ]] && printf -v "$2" "%s\n" "${!2}"
       ;;
     *) JSON.die 'Usage: JSON.load [<json-string> [<tree-var>]]' ;;
   esac
@@ -30,7 +30,7 @@ JSON.dump() {
       JSON.normalize | sort | JSON.emit-json
       ;;
     1)
-      if [ "$1" == '-' ]; then
+      if [[ $1 == '-' ]]; then
         echo "$JSON__cache" | JSON.dump-json
       else
         echo ${!1} | JSON.dump-json
@@ -42,7 +42,7 @@ JSON.dump() {
 
 JSON.get() {
   local flag=""
-  if [[ $# -gt 0 ]] && [[ "$1" =~ ^-([asnbz])$ ]]; then
+  if [[ $# -gt 0 && $1 =~ ^-([asnbz])$ ]]; then
     flag="${BASH_REMATCH[1]}"
     shift
   fi
@@ -52,7 +52,7 @@ JSON.get() {
           JSON.apply-get-flag "$flag"
       ;;
     2)
-      if [ "$2" == '-' ]; then
+      if [[ $2 == '-' ]]; then
         echo "$JSON__cache" |
           grep -Em1 "^$1	" |
           cut -f2 |
@@ -70,7 +70,7 @@ JSON.get() {
 
 JSON.put() {
   set -o pipefail
-  if [[ $# -gt 0 ]] && [[ "$1" =~ ^-([snbz])$ ]]; then
+  if [[ $# -gt 0 && $1 =~ ^-([snbz])$ ]]; then
     local flag="${BASH_REMATCH[1]}"
     shift
   fi
@@ -80,7 +80,7 @@ JSON.put() {
       printf "$1\t$2\n"
       ;;
     3)
-      if [ "$1" == '-' ]; then
+      if [[ $1 == '-' ]]; then
         echo "$JSON__cache" | JSON.del "$1"
         printf "$1\t$2\n"
       else
@@ -99,7 +99,7 @@ JSON.del() {
       grep -Ev "$1	"
       ;;
     2)
-      if [ "$1" == '-' ]; then
+      if [[ $1 == '-' ]]; then
         echo "$JSON__cache" | grep -Ev "$1	"
       else
         echo ${!1} | grep -Ev "$1	"
@@ -184,7 +184,7 @@ JSON.parse-value() {
     '[') JSON.parse-array "$1";;
     '{') JSON.parse-object "$1";;
     *)
-      [[ "$JSON_token" =~ $JSON_SCALAR ]] ||
+      [[ $JSON_token =~ $JSON_SCALAR ]] ||
         JSON.parse-error
       printf "%s\t%s\n" "$1" "$JSON_token"
   esac
@@ -192,7 +192,7 @@ JSON.parse-value() {
 
 JSON.parse-error() {
   msg="JSON.parse error. Unexpected token: '$JSON_token'."
-  [ -n "$1" ] && msg+=" Expected: $1."
+  [[ -n $1 ]] && msg+=" Expected: $1."
   JSON.die "$msg"
 }
 
@@ -200,7 +200,7 @@ JSON.apply-get-flag() {
   local value
   read -r value
   # For now assume null can show up instead of string or number
-  if [ "$value" == "null" ]; then
+  if [[ $value == null ]]; then
     echo ''
     return 0
   fi
@@ -244,7 +244,7 @@ JSON.apply-get-flag() {
 }
 
 JSON.assert-cache() {
-  [ -n "$JSON__cache" ] || JSON.die 'JSON.get error: no cached data.'
+  [[ -n $JSON__cache ]] || JSON.die 'JSON.get error: no cached data.'
 }
 
 JSON.die() {
