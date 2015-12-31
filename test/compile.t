@@ -9,19 +9,14 @@ use Test::More
   pass 'git-hub compiles'
 }
 
-{
-  source lib/git-hub.d/git-hub-setup
-  pass 'git-hub-setup compiles'
-}
+for f in lib/git-hub lib/git-hub.d/*; do
+  [[ -f $f ]] || continue
+  if [[ $f =~ \.pl$ ]]; then
+    perl -c $f &>/dev/null
+  else
+    source "$f"
+  fi
+  pass "${f##*/} compiles"
+done
 
-{
-  source lib/git-hub.d/git-hub-setup
-  pass 'git-hub-setup compiles'
-}
-
-{
-  source lib/git-hub.d/git-hub-cache-clear
-  pass 'git-hub-cache-clear compiles'
-}
-
-done_testing 4
+done_testing

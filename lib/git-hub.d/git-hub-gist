@@ -41,7 +41,7 @@ command:gist-get() {
     return
   }
   local value="$(JSON.get -a "/$key" -)"
-  if [ -n "$value" ]; then
+  if [[ -n $value ]]; then
     msg_ok="$value"
   else
     msg_fail="Couldn't get value for '$key'"
@@ -54,7 +54,7 @@ command:gist-edit() {
   get-args 'gist:get-gist' %pairs
   local adds=(name "$repo")
   for (( i = 0; i < ${#pairs[@]}; i = i + 2 )); do
-    if [ "${pairs[$i]}" == name ]; then
+    if [[ ${pairs[$i]} == name ]]; then
       adds=()
       break
     fi
@@ -114,13 +114,13 @@ command:gist-new() {
   local args=("${command_arguments[@]}")
   local description="${args[1]}"
   local public="false"
-  if [[ "${args[0]}" == "public" ]]; then
+  if [[ ${args[0]} == public ]]; then
       public="true"
   fi
   args=("${args[@]:2}")
   local files= escaped_filename= escaped_body= escaped_description=
 
-  while [ ${#args[@]} -gt 0 ]; do
+  while [[ ${#args[@]} -gt 0 ]]; do
     local body=$(cat "${args[0]}")
     local filename=$(basename "${args[0]}")
     json-escape "$filename" escaped_filename
@@ -128,7 +128,7 @@ command:gist-new() {
     json-escape "$body" escaped_body
     files+='"'$escaped_filename'":{"content":"'$escaped_body'"}'
     args=("${args[@]:1}")
-    if [ ${#args[@]} -gt 0 ]; then
+    if [[ ${#args[@]} -gt 0 ]]; then
       files="$files,"
     fi
   done
@@ -151,7 +151,7 @@ command:gist-init() {
   local args=("${command_arguments[@]}")
   local description="${args[1]}"
   local public="false"
-  if [[ "${args[0]}" == "public" ]]; then
+  if [[ ${args[0]} == public ]]; then
       public="true"
   fi
 

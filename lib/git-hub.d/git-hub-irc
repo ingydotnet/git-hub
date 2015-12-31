@@ -31,7 +31,7 @@ command:irc-enable() {
   assert-inside-git-repo
   require-auth
   get-args room '?server'
-  [ -n "$server" ] || server="irc.freenode.net"
+  [[ -n $server ]] || server="irc.freenode.net"
   owner="$(get-owner)"
   repo="$(get-repo)"
   events='["push","issues","pull_request","issue_comment"]'

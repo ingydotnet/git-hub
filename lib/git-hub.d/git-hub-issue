@@ -57,7 +57,7 @@ format-entry:issues() {
 
 command:issue() {
   get-args '?owner:get-user/repo:get-repo' "number:'none'"
-  if [[ ! "$number" =~ ^[0-9]+$ ]]; then
+  if [[ ! $number =~ ^[0-9]+$ ]]; then
     command=issue-new
     command:issue-new
   else
@@ -95,7 +95,7 @@ write-issue() {
   report-data
 
   local comments="$(JSON.get -n /comments -)"
-  if [ "$comments" -gt 0 ]; then
+  if [[ $comments -gt 0 ]]; then
     echo Comments:
     command=comments
     report-list \
@@ -158,33 +158,33 @@ $issue_report"
 
   msg_ok=0
 
-  if [ -z "$comment" ] &&
-    [ "$title" == "$old_title" ] &&
-    [ "$state" == "$old_state" ] &&
-    [ "$assignee" == "$old_assignee" ] &&
-    [ "$milestone" == "$old_milestone" ]
+  if [[ -z $comment ]] &&
+    [[ $title == $old_title ]] &&
+    [[ $state == $old_state ]] &&
+    [[ $assignee == $old_assignee ]] &&
+    [[ $milestone == $old_milestone ]]
   then
     say "No changes made."
     return
   fi
 
-  if [ -n "$comment" ]; then
+  if [[ -n $comment ]]; then
     say "Comment added"
     api-post "/repos/$owner/$repo/issues/$number/comments" "$(
       json-dump-object body "$comment"
     )"
   fi
 
-  if [ "$title" != "$old_title" ] ||
-    [ "$state" != "$old_state" ] ||
-    [ "$assignee" != "$old_assignee" ] ||
-    [ "$milestone" != "$old_milestone" ]
+  if [[ $title != $old_title ]] ||
+    [[ $state != $old_state ]] ||
+    [[ $assignee != $old_assignee ]] ||
+    [[ $milestone != $old_milestone ]]
   then
-    [ -z "$title" ] && abort "title can't be empty"
+    [[ -z $title ]] && abort "title can't be empty"
     (
-      [ -z "$state" ] && state=open
-      [ -z "$assignee" ] && assignee=null
-      [ -z "$milestone" ] && milestone=null
+      [[ -z $state ]] && state=open
+      [[ -z $assignee ]] && assignee=null
+      [[ -z $milestone ]] && milestone=null
 
       api-patch "/repos/$owner/$repo/issues/$number" "$( \
         json-dump-object \
@@ -195,16 +195,16 @@ $issue_report"
       )"
     ) || return 1
 
-    if [[ "$title" != "$old_title" ]]; then
+    if [[ $title != $old_title ]]; then
       say "Changed title to '$title'"
     fi
-    if [[ "$state" != "$old_state" ]]; then
+    if [[ $state != $old_state ]]; then
       say "Changed state to '$state'"
     fi
-    if [[ "$assignee" != "$old_assignee" ]]; then
+    if [[ $assignee != $old_assignee ]]; then
       say "Changed assignee to '$assignee'"
     fi
-    if [[ "$milestone" != "$old_milestone" ]]; then
+    if [[ $milestone != $old_milestone ]]; then
       say "Changed milestone to '$milestone'"
     fi
   fi

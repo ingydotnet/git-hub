@@ -21,7 +21,7 @@ command:fork() {
   require-auth
   get-args '?owner:get-user/repo:get-repo'
   local data='{}'
-  if [ -n "$organization" ]; then
+  if [[ -n $organization ]]; then
     api-post "/repos/$owner/$repo/forks" \
       "$(json-dump-object organization "$organization")"
     msg_ok="Repository '$owner/$repo' forked to '$organization'"
@@ -30,13 +30,13 @@ command:fork() {
     local login="$(get-login)"
     msg_ok="Repository '$owner/$repo' forked to '$login'"
   fi
-  if [ $# -le 1 ]; then
+  if [[ $# -le 1 ]]; then
     remote_name="$login"
   fi
   if OK &&
-    [ -n "$remote_name" ] &&
+    [[ -n $remote_name ]] &&
     inside-git-repo &&
-    [ -z "$GIT_HUB_TEST_RUN" ]
+    [[ -z $GIT_HUB_TEST_RUN ]]
   then
     url="git@github.com:$login/$repo.git"
     git remote add "$remote_name" "$url"
@@ -64,7 +64,7 @@ command:fork-remote() {
 
 get-forker-repo() {
   get-args "?repo:'.'/forker"
-  if [ "$repo" == '.' ]; then
+  if [[ $repo == . ]]; then
     repo="$(get-repo)"
   else
     local temp="$forker"

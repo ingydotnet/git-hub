@@ -39,17 +39,17 @@ The 'git hub' command needs to know your GitHub login id.
 
 ...
   read-config-value login && login="$value" || login=
-  if [ -n "$login" ]; then
+  if [[ -n $login ]]; then
     echo "Your login is currently set to '$login'".
     echo
     a="$(prompt "Do you want to keep this value? [Yn] ")"
-    [ "$a" == y ] && return
+    [[ $a == y ]] && return
   fi
 
   while true; do
     echo
     login="$(prompt "Enter your GitHub login id: ")"
-    [[ "$login" =~ ^[-a-zA-Z0-9]+$ ]] && break
+    [[ $login =~ ^[-a-zA-Z0-9]+$ ]] && break
     echo "Invalid login value '$login'"
   done
 
@@ -74,7 +74,7 @@ More advanced commands require an authentication token (with the appropriate
 scopes added).
 ...
   read-config-value api-token && token="$value" || token=
-  if [ -n "$token" ]; then
+  if [[ -n $token ]]; then
     cat <<...
 
 It seems that you already have a token. To see your token, run these commands:
@@ -87,7 +87,7 @@ for you and put it in the config file.
 
 ...
     a="$(prompt "Is this the correct token? [Yn]")"
-    [ "$a" == y ] && return
+    [[ $a == y ]] && return
   fi
   cat <<...
 
@@ -107,7 +107,7 @@ The password will not be stored after the commands finish running.
   local rc=0 token= desc="API Token for git-hub ($(date "+%s"))"
 
   token="$(git hub token-new -qr "$desc" | tail -1)" || rc=$?
-  [ -n "$token" ] || die "Command failed"
+  [[ -n $token ]] || die "Command failed"
   echo "Token successfully generated."
   echo "Adding the new token to your config file..."
   write-config-value api-token $token ||
@@ -140,10 +140,10 @@ authentication token.
 
 ...
   read-config-value use-auth && auth="$value" || auth=
-  if [ -z "$auth" ]; then
+  if [[ -z $auth ]]; then
     a="$(prompt "Would you like to turn this option on? [Yn]")"
-    [ "$a" == n ] && return
-  elif [ "$auth" == false ]; then
+    [[ $a == n ]] && return
+  elif [[ $auth == false ]]; then
     echo 'You have this option turned off.'
     echo
     a="$(prompt "Would you like to turn this option on? [yN]")"
@@ -154,7 +154,7 @@ authentication token.
     echo
     a="$(prompt "Would you like to keep this option on? [Yn]")"
   fi
-  if [ "$a" == y ]; then
+  if [[ $a == y ]]; then
     write-config-value use-auth true ||
       die "Can't write-config-value use-auth true"
   else
@@ -186,23 +186,23 @@ There is a setting to use Perl to handle the JSON which is much faster. It
 requires Perl and the JSON::MaybeXS modules for Perl.
 
 ...
-  if [ -n "$set" ]; then
+  if [[ -n $set ]]; then
     cat <<...
 You already have this option set to '$set'.
 
 ...
     prompt
-  elif [ "$perl" == OK ]; then
-    if [ "$perl_json_pp" == OK ] ||
-       [ "$perl_json" == OK ] ||
-       [ "$perl_json_maybexs" == OK ]
+  elif [[ $perl == OK ]]; then
+    if [[ $perl_json_pp == OK ]] ||
+       [[ $perl_json == OK ]] ||
+       [[ $perl_json_maybexs == OK ]]
     then
       cat <<...
 You seem to have the prerequisites to speed up your 'git-hub' experience.
 
 ...
       a="$(prompt "Would you like to turn this setting on? [Yn]")"
-      [ "$a" == y ] && write-config-value json-lib json-perl.bash ||
+      [[ $a == y ]] && write-config-value json-lib json-perl.bash ||
         die "Can't write-config-value use-auth false"
     else
       cat <<...

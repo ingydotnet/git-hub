@@ -9,7 +9,7 @@ set -e
 command:open() {
   local options=()
   "$raw_output" && options+=(--raw)
-  [ -n "$remote_name" ] && options+=(--remote "$remote_name")
+  [[ -n $remote_name ]] && options+=(--remote "$remote_name")
 
   set -- "${command_arguments[@]}"
 
@@ -27,13 +27,13 @@ get-browser() {
     return
   fi
 
-  if [ "$(uname)" == "Darwin" ]; then
+  if [[ $(uname) == Darwin ]]; then
     browser="open"
     return
   fi
 
   for browser in x-www-browser sensible-browser firefox chromium-browser; do
-    [ -n "$(type $browser)" ] && return
+    [[ -n $(type $browser) ]] && return
   done
 
   die <<...

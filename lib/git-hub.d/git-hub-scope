@@ -12,7 +12,7 @@ ok:scopes() {
   local i=0 scopes scope
   while true; do
     scope="$(JSON.get -s "/scopes/$i" - 2>/dev/null || echo '')"
-    [ -z "$scope" ] && break
+    [[ -z $scope ]] && break
     scopes+=("$scope")
     let i=i+1
   done
@@ -26,7 +26,7 @@ ok:scopes() {
 
   out
   out "The current scopes for token-id:$token_id are:"
-  if [ ${#scopes[@]} -eq 0 ]; then
+  if [[ ${#scopes[@]} -eq 0 ]]; then
     out --None--
   else
     for scope in "${scopes[@]}"; do

@@ -3,7 +3,7 @@ set -e
 source json.bash
 
 get-var json-lib
-if [ -n "$json_lib" ]; then
+if [[ -n $json_lib ]]; then
   source "$json_lib"
 fi
 
@@ -14,15 +14,15 @@ fi
 # Format a JSON object from an input list of key/value pairs.
 json-dump-object() {
   local json='{' key= value=
-  while [ $# -gt 0 ]; do
-    if [[ "$2" =~ (^[\[\{]|^(null|true|false)$|^[0-9]+$) ]]; then
+  while [[ $# -gt 0 ]]; do
+    if [[ $2 =~ (^[\[\{]|^(null|true|false)$|^[0-9]+$) ]]; then
       json="$json\"$1\":$2"
     else
       json-escape "$2" value
       json="$json\"$1\":\"$value\""
     fi
     shift; shift || true
-    if [ $# -gt 0 ]; then
+    if [[ $# -gt 0 ]]; then
       json="$json,"
     fi
   done
@@ -41,10 +41,10 @@ json-escape() {
 
 json-dump-array() {
   local json='['
-  while [ $# -gt 0 ]; do
+  while [[ $# -gt 0 ]]; do
     json="$json\"$1\""
     shift
-    if [ $# -gt 0 ]; then
+    if [[ $# -gt 0 ]]; then
       json="$json,"
     fi
   done
@@ -59,12 +59,12 @@ json-dump-object-pairs() {
   for ((i = 0; i < ${#pairs[@]}; i = i+2)); do
     local value="${pairs[$((i+1))]}"
     value="${value//\"/\\\"}"
-    if [[ "$value" =~ $regex ]]; then
+    if [[ $value =~ $regex ]]; then
       json="$json\"${pairs[$i]}\":$value"
     else
       json="$json\"${pairs[$i]}\":\"$value\""
     fi
-    if [ $((${#pairs[@]} - $i)) -gt 2 ]; then
+    if [[ $((${#pairs[@]} - $i)) -gt 2 ]]; then
       json="$json,"
     fi
   done
@@ -75,7 +75,7 @@ json-dump-object-pairs() {
 pretty-json-list() {
   local num="$(JSON.cache | tail -n1 | cut -d '/' -f2)"
   declare -a keys=("$@")
-  if [[ -z "$num" ]]; then
+  if [[ -z $num ]]; then
       num=-1
   fi
 
@@ -86,14 +86,14 @@ pretty-json-list() {
       local key="${keys[$j]}"
       local key="${key//__/\/}"
       local value="$(JSON.get "/$i/$key" - || true)"
-      if [ -n "$value" ]; then
+      if [[ -n $value ]]; then
         printf "    \"%s\": %s" "$key" "$value"
         [[ $(($j+1)) -lt ${#keys[@]} ]] && printf ','
         printf "\n"
       fi
     done
     printf '  }'
-    if [ $i -lt $num ]; then
+    if [[ $i -lt $num ]]; then
       echo ,
     else
       echo
@@ -110,7 +110,7 @@ pretty-json-object() {
     local key="${keys[$i]}"
     local key="${key//__/\/}"
     local value="$(JSON.get "/$key" - || true)"
-    if [ -n "$value" ]; then
+    if [[ -n $value ]]; then
       printf "    \"%s\": %s" "$key" "$value"
       [[ $(($i+1)) -lt ${#keys[@]} ]] && printf ','
       printf "\n"
@@ -122,11 +122,11 @@ pretty-json-object() {
 json-var-list() {
   local fields="$@"
   while IFS='\n' read -r line; do
-    [[ -z "$line" ]] && break
-    if [[ "$line" =~ ^$key_prefix/([0-9]+)/([^\	]+)\	(.*) ]]; then
+    [[ -z $line ]] && break
+    if [[ $line =~ ^$key_prefix/([0-9]+)/([^\	]+)\	(.*) ]]; then
       local value="${BASH_REMATCH[3]}"
       # XXX This should use `JSON.get -a`
-      [ "$value" == null ] && value=''
+      [[ $value == null ]] && value=''
       value="${value#\"}"
       value="${value%\"}"
       value="${value//\\n/$'\n'}"

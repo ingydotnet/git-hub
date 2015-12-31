@@ -10,10 +10,10 @@ command:url() {
   set -- "${command_arguments[@]}"
 
   local path= line=
-  if inside-git-repo && [ $# -gt 0 ] && [ -e "$1" ]; then
+  if inside-git-repo && [[ $# -gt 0 && -e $1 ]]; then
     path="$1"
     path="${path%/}"
-    [ -n "$2" ] && line="$2"
+    [[ -n $2 ]] && line="$2"
     command_arguments=()
   fi
 
@@ -21,9 +21,9 @@ command:url() {
   branch="$(git rev-parse --abbrev-ref HEAD)"
   url="https://github.com/$owner/$repo/tree/$branch"
 
-  if [ -n "$path" ]; then
+  if [[ -n $path ]]; then
     url+="/$path"
-    if [ -n "$line" ]; then
+    if [[ -n $line ]]; then
       url+="#L$line"
     fi
   fi

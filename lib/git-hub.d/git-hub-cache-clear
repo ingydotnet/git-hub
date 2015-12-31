@@ -4,7 +4,7 @@ set -e
 
 command:cache-clear() {
   a="$(prompt "Delete all of '$GIT_HUB_CACHE'? [yN]")"
-  if [ "$a" == y ]; then
+  if [[ $a == y ]]; then
     rm -fr "$GIT_HUB_CACHE"
     msg_ok="'$GIT_HUB_CACHE' deleted."
   else

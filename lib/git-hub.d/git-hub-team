@@ -43,7 +43,7 @@ command:team-repo-add() {
   get-args team_id repo
   api-get "/teams/$team_id"
   local org="$(JSON.get -a "/organization/login" -)"
-  if [ -n "$org" ]; then
+  if [[ -n $org ]]; then
     api-put "/teams/$team_id/repos/$org/$repo"
     msg_ok="'$org/$repo' is added to team (id) '$team_id'"
   else

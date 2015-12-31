@@ -42,7 +42,7 @@ command:repo-get() {
     return
   }
   local value="$(JSON.get -a "/$key" -)"
-  if [ -n "$value" ]; then
+  if [[ -n $value ]]; then
     msg_ok="$value"
   else
     msg_fail="Couldn't get value for '$key'"
@@ -55,7 +55,7 @@ command:repo-edit() {
   get-args '?owner:get-user/repo:get-repo' %pairs
   local adds=(name "$repo")
   for (( i = 0; i < ${#pairs[@]}; i = i + 2 )); do
-    if [ "${pairs[$i]}" == name ]; then
+    if [[ ${pairs[$i]} == name ]]; then
       adds=()
       break
     fi
@@ -69,7 +69,7 @@ command:repo-new() {
   require-auth
   get-args '?org:get-user/repo:get-repo'
   local login=$(get-login)
-  if [ "$org" == "$login" ]; then
+  if [[ $org == $login ]]; then
     api-post "/user/repos" "$(json-dump-object name "$repo")"
   else
     api-post "/orgs/$org/repos" "$(json-dump-object name "$repo")"
@@ -81,7 +81,7 @@ command:repo-new() {
 command:repo-delete() {
   require-auth
   get-args 'owner/repo'
-  if [ "$owner/$repo" == "ingydotnet/git-hub" ]; then
+  if [[ $owner/$repo == ingydotnet/git-hub ]]; then
     die "Won't delete ingydotnet/git-hub. That's suicide!!"
   fi
   api-delete "/repos/$owner/$repo"

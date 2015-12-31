@@ -4,13 +4,13 @@ source test/setup
 
 use Test::More
 
-if [ -n "$ALL_TESTS" ]; then
+if [[ -n $ALL_TESTS ]]; then
   ALL_TESTS=($ALL_TESTS)
 else
   ALL_TESTS=()
   for dir in $TEST_DIR/*/run.bash; do
     dir="$(dirname "$dir")"
-    if [ ! -e "$dir/skip:${OSTYPE/[0-9]*/}" ]; then
+    if [[ ! -e $dir/skip:${OSTYPE/[0-9]*/} ]]; then
       ALL_TESTS+=("$dir")
     fi
   done
@@ -22,7 +22,7 @@ main() {
 
 
     # XXX Bug in _repos commands since internal pager removed
-    [[ "$test_dir" =~ _repos ]] && continue
+    [[ $test_dir =~ _repos ]] && continue
 
 
     export GIT_HUB_CACHE="$test_dir"

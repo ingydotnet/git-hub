@@ -21,7 +21,7 @@ command:token-new() {
   get-args '?note'
   local json
   local scopes='"scopes":["user","repo","gist"]'
-  if [ -n "$note" ]; then
+  if [[ -n $note ]]; then
     json-escape "$note" escaped_note
     json="{$scopes,"'"note":"'"$escaped_note"'"}'
   else
@@ -34,7 +34,7 @@ command:token-new() {
 
 ok:token-new() {
   local token="$(JSON.get -s "/token" -)"
-  [ -n "$token" ] || error "can't figure out token value"
+  [[ -n $token ]] || error "can't figure out token value"
   local id="$(JSON.get -n "/id" -)"
   local note="$(JSON.get -s "/note" -)"
   local name="$(JSON.get "/app/name" -)"
@@ -47,8 +47,8 @@ ok:token-new() {
 }
 
 status-401:token-new() {
-  if [ -z "$GIT_HUB_2FA_OTP" ]; then
-    if [ -n "$(grep "X-GitHub-OTP: required;" "$command_header_file")" ]; then
+  if [[ -z $GIT_HUB_2FA_OTP ]]; then
+    if [[ -n $(grep "X-GitHub-OTP: required;" "$command_header_file") ]]; then
       export GIT_HUB_2FA_OTP="$(
         prompt "Enter your 2-Factor-Auth code: "
       )"
@@ -73,7 +73,7 @@ command:token-get() {
     return
   }
   local value="$(JSON.get -a "/$key" -)"
-  if [ -n "$value" ]; then
+  if [[ -n $value ]]; then
     msg_ok="$value"
   else
     msg_fail="Couldn't get value for '$key'"

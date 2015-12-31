@@ -16,16 +16,16 @@ Run 'git hub info' for more detailed information.
 command:info() {
   local sha1= user= owner= repo= remote= branch=
   get-default-remote-name
-  if [[ "$0" =~ ^(.+)/lib/git-hub$ ]]; then
+  if [[ $0 =~ ^(.+)/lib/git-hub$ ]]; then
     sha1="$(cd ${BASH_REMATCH[1]}; git rev-parse --short HEAD)"
   else
     sha1=n/a
   fi
-  user="$(get-user || true)";   [ -n "$user" ] || user=n/a
-  owner="$(get-owner || true)"; [ -n "$owner" ] || owner=n/a
-  repo="$(get-repo || true)";   [ -n "$repo" ] || repo=n/a
+  user="$(get-user || true)";   [[ -n $user ]] || user=n/a
+  owner="$(get-owner || true)"; [[ -n $owner ]] || owner=n/a
+  repo="$(get-repo || true)";   [[ -n $repo ]] || repo=n/a
   get-remote-name && remote="$value" || remote=n/a
-  get-branch-name; [ -n "$branch_name" ] && branch="$branch_name" || branch=n/a
+  get-branch-name; [[ -n $branch_name ]] && branch="$branch_name" || branch=n/a
 
   cat <<...
 Version:  $GIT_HUB_VERSION
@@ -73,7 +73,7 @@ local env=(
 )
 for e in ${env[@]}; do
   var="GIT_HUB_$e"
-  if [ -n "${!var}" ]; then
+  if [[ -n ${!var} ]]; then
     printf "%-25s %s\n" "$var" "${!var}"
   fi
 done

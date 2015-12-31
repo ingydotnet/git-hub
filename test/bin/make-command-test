@@ -28,7 +28,7 @@ assert-env() {
   export GIT_HUB_TEST_COLS=80
   export GIT_HUB_TEST_LINES=24
 
-  [ -z "$GIT_DIR" ] && die "GIT_DIR must be set"
+  [[ -z $GIT_DIR ]] && die "GIT_DIR must be set"
   [[ $GIT_DIR =~ test/repo/[-_a-zA-Z0-9]+/?$ ]] ||
     die 'Invalid value for $GIT_DIR'
   [[ -d $GIT_DIR ]] ||
@@ -38,7 +38,7 @@ assert-env() {
 }
 
 make-command() {
-  [ $# -ne 1 ] && die "usage: GIT_DIR=... make-command-test 'git hub command'"
+  [[ $# -ne 1 ]] && die "usage: GIT_DIR=... make-command-test 'git hub command'"
   TEST_CASE_CMD="$@"
 }
 
@@ -63,7 +63,7 @@ run-command() {
 
 clean-json() {
   for o in $TEST_CASE_PATH/*/out; do
-    if [ -s "$o" ]; then
+    if [[ -s $o ]]; then
       $TEST_BIN/clean-json.rb $o
     fi
   done
@@ -71,7 +71,7 @@ clean-json() {
 
 clean-head() {
   for h in $TEST_CASE_PATH/*/head; do
-    if [ -s "$h" ]; then
+    if [[ -s $h ]]; then
       $TEST_BIN/clean-head.rb $h
     fi
   done

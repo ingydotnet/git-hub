@@ -9,7 +9,7 @@ api-call() {
   command_output_file="$GIT_HUB_CACHE/$command_sha1/out"
   command_error_file="$GIT_HUB_CACHE/$command_sha1/err"
 
-  if [ -s "$command_output_file" ]; then
+  if [[ -s $command_output_file ]]; then
     JSON__cache="$(cat $command_output_file | JSON.load)"
     $show_output && cat $command_output_file >&2
     $show_json && JSON.cache >&2

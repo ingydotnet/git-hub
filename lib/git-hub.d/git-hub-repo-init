@@ -5,10 +5,10 @@ set -e
 command:repo-init() {
   get-args "dir:'.'"
   local need_init=true need_repo=true need_remote=true
-  if [ -d "$dir" ]; then
-    if [ -d "$dir/.git" ]; then
+  if [[ -d $dir ]]; then
+    if [[ -d $dir/.git ]]; then
       need_init=false
-      if [ -n "$(GIT_DIR="$dir/.git" git remote)" ]; then
+      if [[ -n $(GIT_DIR="$dir/.git" git remote) ]]; then
         need_repo=false
         need_remote=false
       fi

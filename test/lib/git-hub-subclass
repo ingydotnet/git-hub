@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 
 interactive() {
-  [ -n "$GIT_HUB_TEST_INTERACTIVE" ] && return 0
+  [[ -n $GIT_HUB_TEST_INTERACTIVE ]] && return 0
 
-  if [ -t 0 -a -t 1 ]; then
+  if [[ -t 0 && -t 1 ]]; then
     return 0
   else
     return 1
@@ -16,12 +16,12 @@ prompt() {
 }
 
 read-config-value() {
-  if [ -n "$GIT_HUB_TEST_MAKE" ]; then
-    if [ "$1" == login ]; then
+  if [[ -n $GIT_HUB_TEST_MAKE ]]; then
+    if [[ $1 == login ]]; then
       value=aocole
       return
     fi
-    if [ "$1" == use-auth ]; then
+    if [[ $1 == use-auth ]]; then
       value=
     fi
   fi
