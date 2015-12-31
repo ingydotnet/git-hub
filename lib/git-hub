@@ -19,7 +19,7 @@ set -e
 
 GIT_HUB_VERSION=0.1.4
 
-OPTIONS_SPEC="\
+GETOPT_SPEC="\
 git hub <command> <options> <arguments>
 
 The most commonly used commands:
@@ -1078,7 +1078,7 @@ get-opts() {
 
   rc=0
   parsed="$(
-    echo "$OPTIONS_SPEC" |
+    echo "$GETOPT_SPEC" |
     git rev-parse --parseopt -- "$@"
   )" || rc=$?
   if [[ $rc -eq 0 ]]; then

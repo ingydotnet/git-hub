@@ -355,7 +355,7 @@ interactions from the command line. They are installed by default.
   List the repos for a user or organization. List is returned in order of
   recent activity.
 
-- `repo [<repo>]`
+- `repo [<owner>/<repo>]`
   Show basic information about a specific repository. The `--raw` and
   `--json` options show the data in different formats than normal output.
 
@@ -625,6 +625,15 @@ If you used `make install` method, then run this again (after `git pull`):
 The `git hub` command supports `<TAB>`-based command completion. If you don't
 use the `init` script (see Installation, above), you'll need to enable this
 manually to use it.
+
+You can complete subcommands, options and repository names:
+
+    git hub <TAB>
+    git hub -<TAB>
+    git hub issues username/<TAB>
+
+The number of repositories to complete is limited to 50 by default. You can
+change that by setting `GIT_HUB_COMPLETE_FETCH_LIMIT`.
 
 == In Bash
 

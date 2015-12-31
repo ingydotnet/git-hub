@@ -61,7 +61,7 @@ pr-list              pr-list [<owner>/<repo>]
 pr-merge             pr-merge [<owner>/<repo>] <issue-id-number>
 pr-new               pr-new [<issue-id-number>] [<options>]
 pr-queue             pr-queue [<user>] [--count=#] [--all]
-repo                 repo [<repo>]
+repo                 repo [<owner>/<repo>]
 repo-delete          repo-delete <owner>/<repo>
 repo-edit            repo-edit [<owner>/]<repo> <key-value-pair>...
 repo-get             repo-get <owner>/<repo> <data-key>
@@ -643,7 +643,7 @@ help:pr-queue() {
 help:repo() {
     cat <<'...'
 
-  Usage: git hub repo [<repo>]
+  Usage: git hub repo [<owner>/<repo>]
 
   Show basic information about a specific repository. The `--raw` and
   `--json` options show the data in different formats than normal output.
