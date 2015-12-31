@@ -5,10 +5,13 @@ set -e
 command:orgs() {
   get-args user:get-user
   local title="Organizations for User '$user':"
+  local url="/users/$user/orgs"
+  if [[ $user == $login ]]; then
+    url="/user/orgs"
+  fi
+  url+="?per_page=PER_PAGE"
   msg_fail="Can't find Organizations for User '$user'"
-  report-list \
-    "/users/$user/orgs?per_page=PER_PAGE" \
-    login
+  report-list "$url" login
 }
 
 command:org() {
