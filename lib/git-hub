@@ -111,31 +111,31 @@ run-command() {
     if can "ok:$command"; then
       "ok:$command"
     else
-      if [ "$msg_ok" != '0' ]; then
+      if [[ $msg_ok != 0 ]]; then
         say "${msg_ok:-"'git hub $command' command successful"}"
       fi
     fi
   else
     local status_msg="msg_$status_code"
-    if [ -n "${!status_msg}" ]; then
+    if [[ -n ${!status_msg} ]]; then
       nay "${!status_msg}"
-    elif [ -n "$status_code" ] && can "status-$status_code:$command"; then
+    elif [[ -n $status_code ]] && can "status-$status_code:$command"; then
       "status-$status_code:$command"
-    elif [ -n "$msg_fail" ]; then
+    elif [[ -n $msg_fail ]]; then
       nay "$msg_fail"
     elif can "fail:$command"; then
       "fail-$command"
     else
       local msg="Error: 'git hub $command' command failed"
-      ! "$verbose_output" && [ -n "$status_code" ] &&
+      ! "$verbose_output" && [[ -n $status_code ]] &&
         msg+=": $status_code"
       nay "$msg"
     fi
-    if "$verbose_output" && [ -n "$ERROR" ]; then
+    if "$verbose_output" && [[ -n $ERROR ]]; then
       nay
-      [ -n "$status_code" ] &&
+      [[ -n $status_code ]] &&
         nay "API status code: $status_code\n"
-      [ -n "$ERROR" ] &&
+      [[ -n $ERROR ]] &&
         nay "API error output:\n$ERROR\n"
       nay "See files in: $GIT_HUB_CACHE/$command_sha1/"
     fi
@@ -146,7 +146,7 @@ run-command() {
 run-each() {
   local i line before=() after=() seen=false
   for ((i = 1; i <= $#; i++)); do
-    if [[ "${!i}" =~ ^[-=]$ ]]; then
+    if [[ ${!i} =~ ^[-=]$ ]]; then
       seen=true
     elif ! "$seen"; then
       before+=( "${!i}" )
@@ -175,7 +175,7 @@ run-each() {
 command:help() {
   source-ext help-functions.bash
   local cmd="${command_arguments[0]}"
-  if [ -n "$cmd" ]; then
+  if [[ -n $cmd ]]; then
     if can "help:$cmd"; then
       "help:$cmd"
       echo
@@ -234,9 +234,9 @@ api-call() {
   if "$verbose_output"; then
     local cc="${curl_command[@]}"
     if ! "$show_token"; then
-      [ -n "$api_token" ] &&
+      [[ -n $api_token ]] &&
         cc="${cc/token $api_token/token ********}"
-      [ -n "$GIT_HUB_PASSWORD" ] &&
+      [[ -n $GIT_HUB_PASSWORD ]] &&
         cc="${cc/$login:$GIT_HUB_PASSWORD/$login:********}"
     fi
     echo "$cc"$'\n' >&2
@@ -248,7 +248,7 @@ api-call() {
     return 0
   elif "$repeat_command"; then
     # Use the cache
-    [ -e "$command_header_file" ] ||
+    [[ -e $command_header_file ]] ||
       error "-R flag not valid. Command not previously run."
     if "$verbose_output"; then
       echo "Using API Cache: $GIT_HUB_CACHE/$command_sha1"$'\n' >&2
@@ -269,7 +269,7 @@ api-call() {
 
   "$show_headers" && cat "$command_header_file" >&2
 
-  if [ -s "$command_output_file" ]; then
+  if [[ -s $command_output_file ]]; then
     JSON__cache="$(cat "$command_output_file" | JSON.load)"
     "$show_output" && cat "$command_output_file" >&2
     "$show_json" && JSON.cache >&2
@@ -287,7 +287,7 @@ format-curl-command() {
   local url="$2"
   local data="$3"
 
-  [[ "$url" =~ [a-zA-Z0-9]/(/|$) ]] &&
+  [[ $url =~ [a-zA-Z0-9]/(/|$) ]] &&
     error "API url '$url' looks suspiciously wrong"
 
   "$use_auth" && require-auth 1
@@ -296,30 +296,30 @@ format-curl-command() {
   # Cheap trick to make github pretty-print the JSON output.
   "$show_output" && user_agent="curl-$user_agent"
 
-  [[ "$url" =~ ^https?: ]] || url="$GIT_HUB_API_URI$url"
+  [[ $url =~ ^https?: ]] || url="$GIT_HUB_API_URI$url"
 
   curl_command=(
     curl
       --request "$action"
     "$url"
   )
-  [ -n "$data" ] || [ "$action" = "PUT" ] && curl_command+=(-d "$data")
-  if [ -n "$basic_auth" ]; then
+  [[ -n $data ]] || [[ $action = PUT ]] && curl_command+=(-d "$data")
+  if [[ -n "$basic_auth" ]]; then
     local login="$(get-login)"
-    if [ -n "$GIT_HUB_PASSWORD" ]; then
+    if [[ -n $GIT_HUB_PASSWORD ]]; then
       curl_command+=(-u "$login:$GIT_HUB_PASSWORD")
     else
       curl_command+=(-u "$login")
     fi
-    if [ -n "$GIT_HUB_2FA_OTP" ]; then
+    if [[ -n $GIT_HUB_2FA_OTP ]]; then
       curl_command+=(--header "X-GitHub-OTP: $GIT_HUB_2FA_OTP")
     fi
-  elif [ -n "$api_token" ]; then
+  elif [[ -n $api_token ]]; then
     curl_command+=(--header "Authorization: token $api_token")
   fi
 
   local sha1seed="${curl_command[@]}"
-  [ -n "$api_token" ] && [ -n "$GIT_HUB_TEST_MAKE" ] &&
+  [[ -n $api_token ]] && [[ -n $GIT_HUB_TEST_MAKE ]] &&
     sha1seed="${sha1seed/$api_token/0123456789abcdef0123456789abcdef01234567}"
   # echo "$sha1seed" >> sha1seed
   "$show_output" && sha1seed+=' -O'
@@ -329,11 +329,11 @@ format-curl-command() {
   command_error_file="$GIT_HUB_CACHE/$command_sha1/err"
 
   if ! "$no_cache" &&
-    [[ ! "$url" =~ hooks$ ]] &&
-    [ -e "$command_header_file" ]
+    [[ ! $url =~ hooks$ ]] &&
+    [[ -e $command_header_file ]]
   then
     etag="$(grep -Em1 '^ETag:' "$command_header_file" | tr -d '\r')"
-    if [ -n "$etag" ]; then
+    if [[ -n $etag ]]; then
       curl_command+=(--header "${etag/ETag/If-None-Match}")
     fi
   fi
@@ -350,7 +350,7 @@ format-curl-command() {
 cache-response-files() {
   grep -E '^Status: 304' "$GIT_HUB_CACHE/head" &> /dev/null || {
     for f in head out err; do
-      [ -e "$GIT_HUB_CACHE/$f" ] &&
+      [[ -e $GIT_HUB_CACHE/$f ]] &&
         cp "$GIT_HUB_CACHE/$f" "$cache_dir"
     done
   }
@@ -358,9 +358,9 @@ cache-response-files() {
 
 check-api-call-status() {
   OK=$1
-  if [ ! -f "$command_header_file" ]; then
+  if [[ ! -f $command_header_file ]]; then
     ERROR="$(head -n1 $command_error_file)"
-    if [ $OK == 6 ]; then
+    if [[ $OK == 6 ]]; then
       ERROR+=$'\n'$'\n'"Check your internet connection."
       verbose_output=true
     fi
@@ -370,7 +370,7 @@ check-api-call-status() {
     grep -E 'HTTP/1.1 [2-9]' $command_header_file |
     head -n1 | cut -d ' ' -f2
   )"
-  [[ "$status_code" =~ ^[0-9]{3}$ ]] ||
+  [[ $status_code =~ ^[0-9]{3}$ ]] ||
     die "Can't get the status code from $command_header_file"
   case "$status_code" in
     200|201|202|204)
@@ -379,7 +379,7 @@ check-api-call-status() {
     403)
       OK=1
       ERROR="$(JSON.get -s '/message' -)"
-      if [[ "$ERROR" =~ rate\ limit\ exceeded ]]; then
+      if [[ $ERROR =~ rate\ limit\ exceeded ]]; then
         ERROR="$ERROR Try the --use-auth option."
       fi
       local width=81
@@ -399,15 +399,15 @@ OK() { return $OK; }
 # Config management:
 #------------------------------------------------------------------------------
 check-config() {
-  [ -e "$GIT_HUB_CONFIG" ] || config-not-setup
+  [[ -e $GIT_HUB_CONFIG ]] || config-not-setup
   read-config-value login && login="$value" || login=
-  if [ -z "$login" ]; then
+  if [[ -z $login ]]; then
     config-not-setup
   fi
 }
 
 dump-config() {
-  [ ! -e "$GIT_HUB_CONFIG" ] && config-not-setup
+  [[ ! -e $GIT_HUB_CONFIG ]] && config-not-setup
   say "Your git-hub config file (at $GIT_HUB_CONFIG):\n"
   cat "$GIT_HUB_CONFIG" || return 1
 }
@@ -421,7 +421,7 @@ read-config-value() {
     # TODO Remove after a few months.
     git config -f $GIT_HUB_CONFIG "git-hub.$1" "$value"
     git config -f $GIT_HUB_CONFIG --unset "github.$1"
-    if [ -z "$(git config -f $GIT_HUB_CONFIG --get-regex github)" ]; then
+    if [[ -z $(git config -f $GIT_HUB_CONFIG --get-regex github) ]]; then
       git config -f $GIT_HUB_CONFIG --remove-section github 2> /dev/null || true
     fi
 
@@ -445,24 +445,24 @@ get-args() {
   local specs=("$@")
   local args=("${command_arguments[@]}")
 
-  while [ ${#specs[@]} -gt 0 ]; do
+  while [[ ${#specs[@]} -gt 0 ]]; do
     local optional=false
     local spec="${specs[0]}"
     local arg="${args[0]}"
-    if [[ "$spec" =~ ^\? ]]; then
+    if [[ $spec =~ ^\? ]]; then
       optional=true
       spec="${spec#\?}"
-      if [[ "$spec" =~ / ]] &&
-        [[ ! "$spec" =~ : ]] &&
-        [[ ! "$arg" =~ / ]]
+      if [[ $spec =~ / ]] &&
+        [[ ! $spec =~ : ]] &&
+        [[ ! $arg =~ / ]]
       then
         specs=("${specs[@]:1}")
         continue
       fi
-      if [ ${#args[@]} -lt ${#specs[@]} ] &&
-        [[ ! "${specs[1]}" =~ ^\? ]]
+      if [[ ${#args[@]} -lt ${#specs[@]} ]] &&
+        [[ ! ${specs[1]} =~ ^\? ]]
       then
-        if [[ "$spec" =~ : ]]; then
+        if [[ $spec =~ : ]]; then
           arg=''
           spec-assign
         else
@@ -472,10 +472,10 @@ get-args() {
         spec-assign
         args=("${args[@]:1}")
       fi
-    elif [[ "$spec" =~ ^-- ]]; then
+    elif [[ $spec =~ ^-- ]]; then
       keyword-assign
     else
-      if [ ${#args[@]} -eq 0 ]; then
+      if [[ ${#args[@]} -eq 0 ]]; then
         spec-assign
       else
         spec-assign
@@ -484,7 +484,7 @@ get-args() {
     fi
     specs=("${specs[@]:1}")
   done
-  if [ ${#args[@]} -gt 0 ]; then
+  if [[ ${#args[@]} -gt 0 ]]; then
     error "unknown argument(s) '${args[*]}'"
   fi
 }
@@ -493,16 +493,16 @@ keyword-assign() {
   local kargs=(${args[@]})
   args=()
   for ((i = 0; i < ${#kargs[@]}; i++)); do
-    if [ "${kargs[$i]}" == "$spec" ]; then
+    if [[ ${kargs[$i]} == $spec ]]; then
       i=$((i + 1))
       local var="${spec#--}"
       local val="${kargs[$i]}"
-      [ "$val" == '@' ] && val="$login"
+      [[ $val == @ ]] && val="$login"
       printf -v "$var" "$val"
-    elif [[ "${kargs[$i]}" =~ ^$spec=(.*) ]]; then
+    elif [[ ${kargs[$i]} =~ ^$spec=(.*) ]]; then
       local var="${spec#--}"
       local val="${BASH_REMATCH[1]}"
-      [ "$val" == '@' ] && val="$login"
+      [[ $val == @ ]] && val="$login"
       printf -v "$var" "$val"
     else
       args+=("${kargs[$i]}")
@@ -511,28 +511,28 @@ keyword-assign() {
 }
 
 spec-assign() {
-  [[ "$spec" =~ / ]] && slash-assign && return
-  [[ "$spec" =~ ^% ]] && hash-assign && return
-  [[ "$spec" =~ ^@ ]] && array-assign && return
+  [[ $spec =~ / ]] && slash-assign && return
+  [[ $spec =~ ^% ]] && hash-assign && return
+  [[ $spec =~ ^@ ]] && array-assign && return
   local spec="$spec"
   local arg="$arg"
-  [ "$arg" == '@' ] && arg="$login"
+  [[ $arg == @ ]] && arg="$login"
   local var="${spec/:*/}"
-  [[ "$spec" =~ : ]] && spec="${spec#$var:}" || spec=
-  if [ -z "$arg" ]; then
+  [[ $spec =~ : ]] && spec="${spec#$var:}" || spec=
+  if [[ -z $arg ]]; then
     for func in ${spec/:/ }; do
-      if [ "$func" == empty ]; then
+      if [[ $func == empty ]]; then
         printf -v "$var" ""
         return
-      elif [[ "$func" =~ ^\'(.*)\'$ ]]; then
+      elif [[ $func =~ ^\'(.*)\'$ ]]; then
         printf -v "$var" "${BASH_REMATCH[1]}"
         return
       fi
       arg="$($func)"
-      [ -n "$arg" ] && break
+      [[ -n $arg ]] && break
     done
   fi
-  if [ -n "$arg" ]; then
+  if [[ -n $arg ]]; then
     printf -v "$var" "$arg"
   else
     error "can't find a value for '$var'"
@@ -543,7 +543,7 @@ slash-assign() {
   local spec1="${spec/\/*/}"
   local spec2="${spec#$spec1/}"
   local arg1= arg2=
-  if [[ "$arg" =~ / ]]; then
+  if [[ $arg =~ / ]]; then
     local arg1="${arg/\/*/}"
     local arg2="${arg#$arg1/}"
   elif "$optional"; then
@@ -561,7 +561,7 @@ slash-assign() {
 }
 
 hash-assign() {
-  if [ $(( ${#args[@]} % 2)) -eq 1 ]; then
+  if [[ $(( ${#args[@]} % 2)) -eq 1 ]]; then
     error "odd number of items for key/value pairs"
   fi
   local spec="${spec#%}"
@@ -588,7 +588,7 @@ get-login() {
 
 get-owner() {
   local owner="$(git config github.owner)"
-  if [ -n "$owner" ]; then
+  if [[ -n $owner ]]; then
     echo "$owner"
     return 0
   fi
@@ -605,13 +605,13 @@ get-gist() {
 
 get-remote-name() {
   value=
-  [ -n "$remote_name" ] && value="$remote_name" && return
+  [[ -n $remote_name ]] && value="$remote_name" && return
   value="$(get-default-remote-name)"
-  [ -n "$value" ] && return 0 || return 1
+  [[ -n $value ]] && return 0 || return 1
 }
 
 get-default-remote-name() {
-  [ -n "$remote_name" ] && return
+  [[ -n $remote_name ]] && return
   local owner="$(get-repo-config owner)"
   local repo="$(get-repo-config repo)"
   remote_name="$(
@@ -624,12 +624,12 @@ get-default-remote-name() {
 }
 
 get-branch-name() {
-  [ -n "$branch_name" ] && return
+  [[ -n $branch_name ]] && return
   branch_name="$(git rev-parse --abbrev-ref HEAD)"
 }
 
 get-parent-owner-repo() {
-  [ -n "$parent_owner_repo" ] && return
+  [[ -n $parent_owner_repo ]] && return
   get-parent-remote-name
   local remote_name="$parent_remote_name"
   local parent_owner="$(get-repo-config owner)"
@@ -638,7 +638,7 @@ get-parent-owner-repo() {
 }
 
 get-parent-remote-name() {
-  [ -n "$parent_remote_name" ] && return
+  [[ -n $parent_remote_name ]] && return
   local owner="$(get-owner)"
   local repo="$(get-repo)"
   api-get "/repos/$owner/$repo"
@@ -646,7 +646,7 @@ get-parent-remote-name() {
     abort "Repo '$owner/$repo' not found"
   }
   local value="$(JSON.get -a "/parent/full_name" -)"
-  if [ -z "$value" ]; then
+  if [[ -z $value ]]; then
     # parent for PR is self
     get-default-remote-name
     parent_remote_name="$remote_name"
@@ -656,7 +656,7 @@ get-parent-remote-name() {
 }
 
 get-parent-base() {
-  [ -n "$parent_base" ] && return
+  [[ -n $parent_base ]] && return
   get-parent-owner-repo
   parent_base="$(git hub repo-get $parent_owner_repo default_branch)"
 }
@@ -664,7 +664,7 @@ get-parent-base() {
 get-repo-config() {
   local login="$(get-login)"
   local remote="$remote_name"
-  [ -n "$remote" ] && remote="^$remote"$'\t'
+  [[ -n $remote ]] && remote="^$remote"$'\t'
   urls=($(
     git remote -v 2> /dev/null |
     grep "$remote" |
@@ -675,13 +675,13 @@ get-repo-config() {
     for url in "${urls[@]}"; do
       url="${url% (fetch)}"
       url="${url% (push)}"
-      [[ "$url" =~ .*://(.*) ]] &&
+      [[ $url =~ .*://(.*) ]] &&
         url="${BASH_REMATCH[1]}"
-      if [[ "$1" == owner ]] || [[ "$1" == "repo" ]]; then
+      if [[ $1 == owner ]] || [[ $1 == repo ]]; then
         local re1="^[^:/]*[:/]($x)/(.*)\.git$"
         local re2="^[^:/]*[:/]($x)/(.*)$"
-        if [[ "$url" =~ $re1 ]] || [[ "$url" =~ $re2 ]]; then
-          if [ "$1" == owner ]; then
+        if [[ $url =~ $re1 ]] || [[ $url =~ $re2 ]]; then
+          if [[ $1 == owner ]]; then
             echo "${BASH_REMATCH[1]}"
           else
             echo "${BASH_REMATCH[2]}"
@@ -692,7 +692,7 @@ get-repo-config() {
         # gist
         local re1="^[^:/]*[:/]([0-9a-f]*)\.git$"
         local re2="^[^:/]*[:/]([0-9a-f]*)$"
-        if [[ "$url" =~ $re1 ]] || [[ "$url" =~ $re2 ]]; then
+        if [[ $url =~ $re1 ]] || [[ $url =~ $re2 ]]; then
           echo "${BASH_REMATCH[1]}"
           return 0
         fi
@@ -703,14 +703,14 @@ get-repo-config() {
 }
 
 require-auth() {
-  [ -z "$api_token" ] && get-var api-token
-  if [ "$api_token" == XXX ]; then
+  [[ -z $api_token ]] && get-var api-token
+  if [[ $api_token == XXX ]]; then
     api_token=
-    [ -n "$1" ] && return
+    [[ -n $1 ]] && return
     echo "This command requires an API token in your config, but you have that disabled."
     exit 0
   fi
-  [ -z "$api_token" ] && need-api-token
+  [[ -z $api_token ]] && need-api-token
   true
 }
 
@@ -720,10 +720,10 @@ basic-auth() {
 
 check-token-id() {
   local id="$1"
-  [ ${#id} -eq 40 ] &&
+  [[ ${#id} -eq 40 ]] &&
     error "'$command' requires a *token-id*, not a *token-value*."
   local regex='^[0-9]+$'
-  [[ "$id" =~ $regex ]] ||
+  [[ $id =~ $regex ]] ||
     error "'$id' is invalid token-id. Must be an integer value."
   true
 }
@@ -748,10 +748,10 @@ report-list-process() {
   local line_max=$terminal_cols
   local per_page=100
   if ! $json_output; then
-    [ $per_page -gt $list_max ] && per_page=$list_max
+    [[ $per_page -gt $list_max ]] && per_page=$list_max
   fi
   url="${url/PER_PAGE/$per_page}"
-  [ -n "$title" ] && say "$title"
+  [[ -n $title ]] && say "$title"
   local list_counter=1
   while true; do
     api-get "$url"
@@ -761,12 +761,12 @@ report-list-process() {
     fi
     OK || return 0
     json-var-list "${fields[@]}"
-    if [ -n "$key_prefix" ]; then
+    if [[ -n $key_prefix ]]; then
       local page_size="$(JSON.cache | grep "^$key_prefix" | tail -n1 | cut -d '/' -f3)"
     else
       local page_size="$(JSON.cache | tail -n1 | cut -d '/' -f2)"
     fi
-    [ -z "$page_size" ] && say '--None--' && break
+    [[ -z $page_size ]] && say '--None--' && break
     local counter=0
     for ((ii = 0; ii <= page_size && counter < list_max; ii++)); do
       local -a values=()
@@ -780,7 +780,7 @@ report-list-process() {
       else
         default-format-entry $list_counter "${values[@]}"
       fi
-      if [ -n "$output_line" ]; then
+      if [[ -n $output_line ]]; then
         if interactive; then
           out "$output_line" | cut -c 1-$line_max
         else
@@ -789,25 +789,25 @@ report-list-process() {
       fi
       let counter=counter+1
       let list_counter=list_counter+1
-      [ -n "$list_size" ] && [ $list_counter -gt $list_size ] && return
+      [[ -n $list_size ]] && [[ $list_counter -gt $list_size ]] && return
     done
     url=$(get-next-page-url)
     # out "list_counter=$list_counter list_max=$list_max page_size=$page_size ii=$ii url=$url"
     # list_counter=401 list_max=400 page_size=99 ii=100 url=https
-    if [ $list_counter -gt $list_max ]; then
-      if [ -n "$url" -o $ii -lt $page_size ]; then
+    if [[ $list_counter -gt $list_max ]]; then
+      if [[ -n $url || $ii -lt $page_size ]]; then
         echo '*** More content available: Use --all or --count='
         break
       fi
     fi
-    [ -n "$url" ] || break
+    [[ -n $url ]] || break
   done
 }
 
 get-next-page-url() {
   local regexp='Link: <(https:[^>]+)>; rel="next"'
-  [[ -e "$command_header_file" ]] &&
-    [[ "$(< "$command_header_file")" =~ $regexp ]] &&
+  [[ -e $command_header_file ]] &&
+    [[ $(< "$command_header_file") =~ $regexp ]] &&
     echo "${BASH_REMATCH[1]}"
   true
 }
@@ -830,11 +830,11 @@ normalize-multiline-text-output() {
       local start=false blank=false para=false code=false output=''
       IFS=''
       while read -r line; do
-        if [[ "$line" =~ [^[:space:]] ]]; then
+        if [[ $line =~ [^[:space:]] ]]; then
           if "$blank" && "$start"; then
             output+=$'\n'
           fi
-          if [[ "$line" =~ ^\  ]]; then
+          if [[ $line =~ ^\  ]]; then
             output+="$indent$line"$'\n'
             code=true para=false
           else
@@ -851,7 +851,7 @@ normalize-multiline-text-output() {
           blank=true
         fi
       done
-      if [ -n "$output" ] && ! "$code"; then
+      if [[ -n $output ]] && ! "$code"; then
         output+=$'\n'
       fi
       echo -n "$output"
@@ -879,7 +879,7 @@ report-data-process() {
     json-prune-hash "${fields[@]}"
     for field in "${fields[@]}"; do
       local skip="skip_field_$field"
-      [ -n "${!skip}" ] && continue
+      [[ -n ${!skip} ]] && continue
       report-value "$field"
     done
     ! "$raw_output" && echo
@@ -890,18 +890,18 @@ report-value() {
   local key="${1//__/\/}"
   local value="$(JSON.get -a "/$key" -)"
   local label="$key"
-  if [ "$key" == created_at ]; then
+  if [[ $key == created_at ]]; then
     value="${value%T*}"
-  elif [ "$key" == updated_at ]; then
+  elif [[ $key == updated_at ]]; then
     value="${value%T*}"
-  elif [ "$key" == pushed_at ]; then
+  elif [[ $key == pushed_at ]]; then
     value="${value/T/ }"
     value="${value/Z/}"
   fi
   if ! "$raw_output"; then
     local var="label_$1"
     label="${!var}"
-    if [ -z "$label" ]; then
+    if [[ -z $label ]]; then
       label="$1"
       label="${label/__*/}"
       label="$(echo "$label" | tr '_' ' ')"
@@ -914,14 +914,14 @@ report-value() {
       label="${label% }"
     fi
   fi
-  if [ -n "$label" -a -n "$value" ]; then
+  if [[ -n $label && -n $value ]]; then
     if "$raw_output"; then
       printf "%s\t%s\n" "$label" "$value"
     else
       value="${value%%\\n}"
-      if [ ${#value} -ge 80 ] ||
-         [[ "$value" =~ \\n ]] ||
-         [ "$label" == Description ]
+      if [[ ${#value} -ge 80 ]] ||
+         [[ $value =~ \\n ]] ||
+         [[ $label == Description ]]
       then
         echo "$label:"
         normalize-multiline-text-output "$value" " "
@@ -946,12 +946,12 @@ label_number='ID #'
 # Initial setup functions:
 #------------------------------------------------------------------------------
 init-env() {
-  [ -z "$HOME" ] && die "Cannot determine HOME directory"
+  [[ -z $HOME ]] && die "Cannot determine HOME directory"
 
   pager_in_use=false
   sha1sum=sha1sum
   shopt_opt='shopt -s nullglob globstar'
-  if [[ "$OSTYPE" =~ ^darwin|^freebsd ]]; then
+  if [[ $OSTYPE =~ ^darwin|^freebsd ]]; then
     sha1sum=shasum
     shopt_opt='shopt -s nullglob'
   fi
@@ -963,7 +963,7 @@ init-env() {
   : "${GIT_HUB_EXT_PATH:=$GIT_HUB_EXEC_PATH/git-hub.d}"
   : "${GIT_HUB_PLUGIN_PATH:=${GIT_HUB_EXEC_PATH%lib}plugin}"
 
-  if [ -z "$GIT_HUB_PLUGIN_LIBS" ]; then
+  if [[ -z $GIT_HUB_PLUGIN_LIBS ]]; then
     GIT_HUB_PLUGIN_LIBS="$(
       $shopt_opt
       set -- $GIT_HUB_PLUGIN_PATH/*/lib
@@ -979,15 +979,15 @@ init-env() {
   [[ $GIT_HUB_EDITOR =~ ^g?vim?$ ]] && GIT_HUB_EDITOR+=' +1'
 
   : "${GIT_HUB_PAGER:=${PAGER:-less}}"
-  [ "$GIT_HUB_PAGER" == less ] && GIT_HUB_PAGER='less -FRX'
+  [[ $GIT_HUB_PAGER == less ]] && GIT_HUB_PAGER='less -FRX'
 
-  if [ -z "$GIT_HUB_MSG_FILE" ]; then
+  if [[ -z $GIT_HUB_MSG_FILE ]]; then
     GIT_HUB_MSG_FILE="$(git rev-parse --git-dir 2>/dev/null || true)"
-    [ -z "$GIT_HUB_MSG_FILE" ] && GIT_HUB_MSG_FILE=/tmp
+    [[ -z $GIT_HUB_MSG_FILE ]] && GIT_HUB_MSG_FILE=/tmp
     GIT_HUB_MSG_FILE+=/GIT_HUB_EDIT_MSG
   fi
 
-  [ -d "$GIT_HUB_EXT_PATH" ] ||
+  [[ -d $GIT_HUB_EXT_PATH ]] ||
     die "Hmm... git-hub does not seem to be properly installed"
   true
 }
@@ -1006,8 +1006,8 @@ init-vars() {
 run-for-each() {
   local elem
   for elem in "$@"; do
-    [ "$elem" == '=' ] && split_words=true
-    [[ "$elem" =~ ^[-=]$ ]] && return 0
+    [[ $elem == '=' ]] && split_words=true
+    [[ $elem =~ ^[-=]$ ]] && return 0
   done
   return 1
 }
@@ -1048,27 +1048,27 @@ assert-env-var() {
   local var
   for var in $@; do
     var="GIT_HUB_$var"
-    [ -n "${!var}" ] ||
+    [[ -n ${!var} ]] ||
       abort "'$var' is not set"
   done
 }
 
 get-opts() {
-  [ $# -eq 0 ] && set -- --help
+  [[ $# -eq 0 ]] && set -- --help
 
   # TODO This is a hack for per-command args. We need to make this be closer
   # to the commands that need them.
   local args=() need_var=
   for arg; do
-    if [ -n "$need_var" ]; then
+    if [[ -n $need_var ]]; then
       printf -v "$need_var" "$arg"
       need_var=
-    elif [[ "$arg" =~ ^--parent(=.*)?$ ]]; then
+    elif [[ $arg =~ ^--parent(=.*)?$ ]]; then
       set-var parent_remote "${BASH_REMATCH[1]#=}"
-      [ -n "${BASH_REMATCH[1]#=}" ] || need_var=parent_remote
-    elif [[ "$arg" =~ ^--base(=.*)?$ ]]; then
+      [[ -n ${BASH_REMATCH[1]#=} ]] || need_var=parent_remote
+    elif [[ $arg =~ ^--base(=.*)?$ ]]; then
       set-var parent_base "${BASH_REMATCH[1]#=}"
-      [ -n "${BASH_REMATCH[1]#=}" ] || need_var=parent_base
+      [[ -n ${BASH_REMATCH[1]#=} ]] || need_var=parent_base
     else
       args+=("$arg")
     fi
@@ -1081,14 +1081,14 @@ get-opts() {
     echo "$OPTIONS_SPEC" |
     git rev-parse --parseopt -- "$@"
   )" || rc=$?
-  if [ $rc -eq 0 ]; then
+  if [[ $rc -eq 0 ]]; then
     eval "$parsed"
   else
     eval "$parsed" | $GIT_HUB_PAGER
     exit $rc
   fi
 
-  while [ $# -gt 0 ]; do
+  while [[ $# -gt 0 ]]; do
     local option="$1"; shift
     case "$option" in
       -c)
@@ -1147,14 +1147,14 @@ get-opts() {
     esac
   done
 
-  [ -z "$list_size" ] && ! interactive && list_size="$Infinity"
+  [[ -z $list_size ]] && ! interactive && list_size="$Infinity"
 
   command="$1"; shift
   command_arguments=("$@")
 
-  [[ "$command" == "setup" ]] ||
-  [[ "$command" = "config" ]] ||
-  [[ "$command" = "config-unset" ]] ||
+  [[ $command == setup ]] ||
+  [[ $command == config ]] ||
+  [[ $command == config-unset ]] ||
   ! (callable-or-source "$command") ||
     check-config
 
@@ -1162,14 +1162,14 @@ get-opts() {
 }
 
 interactive() {
-  if [ -n "$interactive" ]; then
+  if [[ -n $interactive ]]; then
     if $interactive; then
       return 0
     else
       return 1
     fi
   fi
-  if [ -t 0 -a -t 1 ]; then
+  if [[ -t 0 && -t 1 ]]; then
     return 0
   else
     return 1
@@ -1177,7 +1177,7 @@ interactive() {
 }
 
 osx() {
-  if [ "$(uname)" == Darwin ]; then
+  if [[ $(uname) == Darwin ]]; then
     return 0
   else
     return 1
@@ -1186,7 +1186,7 @@ osx() {
 }
 
 pipeline() {
-  if [ -t 0 -a -t 1 ]; then
+  if [[ -t 0 && -t 1 ]]; then
     return 1
   else
     return 0
@@ -1196,7 +1196,7 @@ pipeline() {
 set-var() {
   local name="$1"
   local value="$2"
-  if [ "$value" == '@' ]; then
+  if [[ $value == @ ]]; then
     login="$(git config -f "$GIT_HUB_CONFIG" github.login || echo '')"
     value="$login"
   fi
@@ -1205,10 +1205,10 @@ set-var() {
 
 get-var() {
   local var="${1//-/_}"
-  [ -n "${!var}" ] && return
+  [[ -n ${!var} ]] && return
   local env="GIT_HUB_$(echo "$var" | tr 'a-z' 'A-Z')"
   printf -v "$var" "${!env}"
-  [ -n "${!var}" ] && return
+  [[ -n ${!var} ]] && return
   read-config-value "$1" || true
   printf -v "$var" "$value"
   true
@@ -1217,8 +1217,8 @@ get-var() {
 get-var-bool() {
   get-var "$1"
   local var="${1//-/_}"
-  [ -z "${!var}" ] && printf -v "$var" false
-  [ "${!var}" != false ] && printf -v "$var" true
+  [[ -z ${!var} ]] && printf -v "$var" false
+  [[ ${!var} != false ]] && printf -v "$var" true
   true
 }
 
@@ -1307,11 +1307,11 @@ editor-title-body() {
   local line
   body=''
   title="$(head -n1 "$GIT_HUB_MSG_FILE")"
-  if [[ ! "$title" =~ [^[:space:]] || "$title" =~ ^\# ]]; then
+  if [[ ! $title =~ [^[:space:]] || $title =~ ^\# ]]; then
     abort "no title provided"
   fi
   line="$(head -n2 "$GIT_HUB_MSG_FILE" | tail -n1)"
-  if [[ ! "$line" =~ ^\s*$ ]] && [[ ! "$line" =~ ^\# ]]; then
+  if [[ ! $line =~ ^\s*$ ]] && [[ ! $line =~ ^\# ]]; then
     error "malformed message in '$GIT_HUB_MSG_FILE'"
   fi
   local count=0
@@ -1319,7 +1319,7 @@ editor-title-body() {
   IFS=''
   while read -r line; do
     [[ $((count++)) -lt 2 ]] && continue
-    [[ "$line" =~ ^\# ]] && break
+    [[ $line =~ ^\# ]] && break
     body+="$line"$'\n'
   done < "$GIT_HUB_MSG_FILE"
   IFS="$ifs"
@@ -1336,7 +1336,7 @@ editor-comment() {
   local ifs="$IFS"
   IFS=''
   while read -r line; do
-    [[ "$line" =~ ^\# ]] && break
+    [[ $line =~ ^\# ]] && break
     body+="$line"$'\n'
   done < "$GIT_HUB_MSG_FILE"
   IFS="$ifs"
@@ -1355,28 +1355,28 @@ editor-comment-state() {
   local ifs="$IFS"
   IFS=''
   while read -r line; do
-    [[ "$line" =~ ^\# ]] && break
+    [[ $line =~ ^\# ]] && break
     if $started; then
-      if [[ "$line" =~ ^title:\ +(.*) ]]; then
+      if [[ $line =~ ^title:\ +(.*) ]]; then
         title="${BASH_REMATCH[1]}"
-      elif [[ "$line" =~ ^state:\ +(.*) ]]; then
+      elif [[ $line =~ ^state:\ +(.*) ]]; then
         state="${BASH_REMATCH[1]}"
-      elif [[ "$line" =~ ^assignee:\ +(.*) ]]; then
+      elif [[ $line =~ ^assignee:\ +(.*) ]]; then
         assignee="${BASH_REMATCH[1]}"
-      elif [[ "$line" =~ ^milestone:\ +(.*) ]]; then
+      elif [[ $line =~ ^milestone:\ +(.*) ]]; then
         milestone="${BASH_REMATCH[1]}"
       fi
     else
-      if [[ "$line" == '---' ]]; then
+      if [[ $line == '---' ]]; then
         started=true
-      elif [ -n "$comment" ] || [[ "$line" =~ [^[:space:]] ]]; then
+      elif [[ -n $comment || $line =~ [^[:space:]] ]]; then
         comment+="$line"$'\n'
       fi
     fi
   done < "$GIT_HUB_MSG_FILE"
   IFS="$ifs"
 
-  if [[ ! "$title" =~ [^[:space:]] ]]; then
+  if [[ ! $title =~ [^[:space:]] ]]; then
     abort "no title provided."
   fi
 }
@@ -1392,7 +1392,7 @@ execute-clone-cmd() {
     cmd+=' --config user.name="'$value'"'
   fi
 
-  if [ -n "$branch_name" ]; then
+  if [[ -n $branch_name ]]; then
     cmd+=" --branch $branch_name"
   fi
 
@@ -1416,7 +1416,7 @@ execute-clone-cmd() {
     fi
   ) || OK=1
   if OK; then
-    if [ -n "$dir" ]; then
+    if [[ -n $dir ]]; then
       say "$repo cloned into $dir"
     else
       say "$repo cloned"
@@ -1462,10 +1462,10 @@ prompt() {
     0) msg="${prompt_msg:-Press <ENTER> to continue, or <CTL>-C to exit.}" ;;
     1)
       msg="$1"
-      if [[ "$msg" =~ \[yN\] ]]; then
+      if [[ $msg =~ \[yN\] ]]; then
         default=n
         yn=true
-      elif [[ "$msg" =~ \[Yn\] ]]; then
+      elif [[ $msg =~ \[Yn\] ]]; then
         default=y
         yn=true
       fi
@@ -1476,7 +1476,7 @@ prompt() {
       ;;
     *) die "Invalid usage of prompt" ;;
   esac
-  if [[ "$msg" =~ [Pp]assword ]]; then
+  if [[ $msg =~ [Pp]assword ]]; then
     password=true
     msg=$'\n'"$msg"
   fi
@@ -1486,16 +1486,16 @@ prompt() {
     else
       read -p "$msg" answer
     fi
-    [ $# -eq 0 ] && return 0
-    [ -n "$answer" -o -n "$default" ] && break
+    [[ $# -eq 0 ]] && return 0
+    [[ -n $answer || -n $default ]] && break
   done
   if "$yn"; then
-    [[ "$answer" =~ ^[yY] ]] && echo y && return 0
-    [[ "$answer" =~ ^[nN] ]] && echo n && return 0
+    [[ $answer =~ ^[yY] ]] && echo y && return 0
+    [[ $answer =~ ^[nN] ]] && echo n && return 0
     echo "$default"
     return 0
   fi
-  if [ -n "$answer" ]; then
+  if [[ -n $answer ]]; then
     echo "$answer"
   else
     echo "$default"
@@ -1525,7 +1525,7 @@ assert-inside-git-repo() {
 }
 
 assert-repo-top-level() {
-  [ "$(git rev-parse --git-dir)" == '.git' ] ||
+  [[ $(git rev-parse --git-dir) == .git ]] ||
     abort "not at top level directory of repo"
 }
 
@@ -1547,18 +1547,18 @@ inside-git-repo() {
 #------------------------------------------------------------------------------
 # Test overrides:
 #------------------------------------------------------------------------------
-if [ -n "$GIT_HUB_TEST_RUN" ]; then
+if [[ -n $GIT_HUB_TEST_RUN ]]; then
   source git-hub-test-run
 fi
 
-if [ -n "$GIT_HUB_TEST_MAKE" ]; then
+if [[ -n $GIT_HUB_TEST_MAKE ]]; then
   source git-hub-subclass
 fi
 
 #------------------------------------------------------------------------------
 # Begin at the end!
 #------------------------------------------------------------------------------
-[ "${BASH_SOURCE[0]}" == "$0" ] && main "$@"
+[[ ${BASH_SOURCE[0]} == $0 ]] && main "$@"
 
 true
 
