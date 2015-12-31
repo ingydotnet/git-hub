@@ -72,7 +72,7 @@ main() {
   local OK=0 RERUN=false split_words=false
   init-env
   local Infinity=9999999
-  local command command_arguments command_sha1 api_token
+  local command command_arguments command_sha1 api_token formatted_command
   local command_header_file command_output_file command_error_file
   local user org owner repo pairs fields title list_size remote_name
   local msg_ok msg_fail status_code ERROR
@@ -319,10 +319,13 @@ format-curl-command() {
   fi
 
   local sha1seed="${curl_command[@]}"
-  [[ -n $api_token ]] && [[ -n $GIT_HUB_TEST_MAKE ]] &&
+  [[ -n $api_token && -n $GIT_HUB_TEST_MAKE ]] &&
     sha1seed="${sha1seed/$api_token/0123456789abcdef0123456789abcdef01234567}"
   # echo "$sha1seed" >> sha1seed
   "$show_output" && sha1seed+=' -O'
+  formatted_command="$sha1seed"
+  [[ -n $api_token ]] &&
+    formatted_command="${formatted_command/$api_token/****}"
   command_sha1="$(echo "$sha1seed" | $sha1sum | cut -d ' ' -f1)"
   command_header_file="$GIT_HUB_CACHE/$command_sha1/head"
   command_output_file="$GIT_HUB_CACHE/$command_sha1/out"
@@ -339,21 +342,26 @@ format-curl-command() {
   fi
   curl_command+=(
     --user-agent "$user_agent"
-    --dump-header "$GIT_HUB_CACHE/head"
-    --output "$GIT_HUB_CACHE/out"
-    --stderr "$GIT_HUB_CACHE/err"
+    --dump-header "$GIT_HUB_CACHE/head-$$"
+    --output "$GIT_HUB_CACHE/out-$$"
+    --stderr "$GIT_HUB_CACHE/err-$$"
     --silent
     --show-error
   )
 }
 
 cache-response-files() {
-  grep -E '^Status: 304' "$GIT_HUB_CACHE/head" &> /dev/null || {
+  if grep -E '^Status: 304' "$GIT_HUB_CACHE/head-$$" &> /dev/null; then
+    rm -f "$GIT_HUB_CACHE/"{head,out,err}-$$
+  else
     for f in head out err; do
-      [[ -e $GIT_HUB_CACHE/$f ]] &&
-        cp "$GIT_HUB_CACHE/$f" "$cache_dir"
+      if [[ -e $GIT_HUB_CACHE/$f-$$ ]]; then
+        mv "$GIT_HUB_CACHE/$f-$$" "$cache_dir/$f"
+        ln -fs "$cache_dir/$f" "$GIT_HUB_CACHE/$f"
+      fi
     done
-  }
+    ln -fs "$formatted_command" "$cache_dir/cmd"
+  fi
 }
 
 check-api-call-status() {
