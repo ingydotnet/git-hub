@@ -573,6 +573,12 @@ GitHub authentication tokens.
 - `config-unset <config-key>`
   Unset a config key. Removes the key from the `~/.git-hub/config` file.
 
+- `config-list`
+  Will list your current configuration like `git config --list`
+
+- `config-keys`
+  Output all possible configuration keys
+
 - `tokens`
   List all the API tokens for your GitHub account. Use the `--raw` option
   to print the token IDs and descriptions, but not the actual token values.
