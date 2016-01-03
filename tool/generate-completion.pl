@@ -121,6 +121,11 @@ _git-hub() {
                 _arguments "2:Repos:()"
             fi
         ;;
+        config|config-unset)
+            local config_keys
+            IFS=\$'\\n' set -A config_keys `git hub config-keys`
+            compadd -X "Config keys:" \$config_keys
+        ;;
         help)
             compadd @$list
         ;;

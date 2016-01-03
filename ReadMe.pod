@@ -1077,7 +1077,7 @@ ideas.
 
 =head1 Copyright & License
 
-Copyright 2013-2015. Ingy döt Net.
+Copyright 2013-2016. Ingy döt Net.
 
 The MIT License (MIT)
 
