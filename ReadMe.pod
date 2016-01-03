@@ -722,6 +722,14 @@ currently supported: C<login>, C<api-token>, C<use-auth>, and C<json-lib>.
 
 Unset a config key. Removes the key from the C<~/.git-hub/config> file.
 
+=item C<config-list>
+
+Will list your current configuration like C<git config --list>
+
+=item C<config-keys>
+
+Output all possible configuration keys
+
 =item C<tokens>
 
 List all the API tokens for your GitHub account. Use the C<--raw> option to

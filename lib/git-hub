@@ -412,6 +412,27 @@ dump-config() {
   cat "$GIT_HUB_CONFIG" || return 1
 }
 
+list-config-values() {
+  git config -f $GIT_HUB_CONFIG --list
+}
+
+list-possible-config-keys() {
+  cat <<EOM
+api-token
+browser
+github-email
+github-name
+json-lib
+list-size
+login
+no-cache
+quiet-output
+show-token
+use-auth
+verbose-output
+EOM
+}
+
 read-config-value() {
   value=
   value="$(git config -f $GIT_HUB_CONFIG "git-hub.$1")" || {
