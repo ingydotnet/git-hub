@@ -75,7 +75,7 @@ bash+:die() {
   [[ $msg =~ $trailing_newline_re ]] && exit 1
 
   local c=($(caller ${DIE_STACK_LEVEL:-${2:-0}}))
-  [[ ${#c[@]} -eq 2 ]] &&
+  (( ${#c[@]} == 2 )) &&
     msg=" at line %d of %s" ||
     msg=" at line %d in %s of %s"
   printf "$msg\n" ${c[@]} >&2
