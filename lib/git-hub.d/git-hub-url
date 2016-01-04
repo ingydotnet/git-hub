@@ -9,6 +9,8 @@ set -e
 command:url() {
   set -- "${command_arguments[@]}"
 
+  local pwd=`git rev-parse --show-prefix`
+  pwd=${pwd%/}
   local path= line=
   if inside-git-repo && [[ $# -gt 0 && -e $1 ]]; then
     path="$1"
@@ -20,6 +22,16 @@ command:url() {
   get-args '?owner:get-user/repo:get-repo'
   branch="$(git rev-parse --abbrev-ref HEAD)"
   url="https://github.com/$owner/$repo/tree/$branch"
+
+  if [[ $path == "." ]]; then
+    path=""
+  fi
+
+  if [[ -n $pwd && -n $path ]]; then
+    path="$pwd/$path"
+  elif [[ -n $pwd ]]; then
+    path=$pwd
+  fi
 
   if [[ -n $path ]]; then
     url+="/$path"
