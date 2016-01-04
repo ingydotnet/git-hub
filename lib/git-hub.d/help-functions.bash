@@ -11,6 +11,8 @@ clone                clone ([<owner>/]<repo> [<directory>])...
 collabs              collabs [<owner>/<repo>]
 comment              comment [<owner>/<repo>] <issue-id-number>
 config               config [<config-key> [<config-value>]]
+config-keys          config-keys
+config-list          config-list
 config-unset         config-unset <config-key>
 follow               follow <user>...
 followers            followers [<user>]
@@ -152,6 +154,24 @@ help:config() {
   With With one argument (a key), print the current value of the config key.
   With two arguments (key value), set the value of the config key. 4 keys are
   currently supported: `login`, `api-token`, `use-auth`, and `json-lib`.
+...
+}
+
+help:config-keys() {
+    cat <<'...'
+
+  Usage: git hub config-keys
+
+  Output all possible configuration keys
+...
+}
+
+help:config-list() {
+    cat <<'...'
+
+  Usage: git hub config-list
+
+  Will list your current configuration like `git config --list`
 ...
 }
 

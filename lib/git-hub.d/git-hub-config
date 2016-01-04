@@ -23,4 +23,14 @@ command:config-unset() {
   msg_ok="Config key 'git-hub.$config_key' removed"
 }
 
+command:config-list() {
+  list-config-values
+  msg_ok=0
+}
+
+command:config-keys() {
+  list-possible-config-keys
+  msg_ok=0
+}
+
 # vim: set lisp:
