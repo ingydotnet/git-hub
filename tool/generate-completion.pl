@@ -108,7 +108,7 @@ _git-hub() {
     print join '|', @$repo_cmds;
     print <<"...";
 )
-            if [[ \$line[2] =~ "^(\\w+)/(.*)" ]];
+            if [[ \$line[2] =~ "^((\\w|-)+)/(.*)" ]];
             then
                 local username="\$match[1]"
                 if [[ "\$username" != "\$__git_hub_lastusername" ]];
