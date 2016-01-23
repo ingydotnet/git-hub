@@ -6,6 +6,6 @@
 [subrepo]
 	remote = git@github.com:ingydotnet/json-bash.git
 	branch = master
-	commit = b11860573a08035d95bd490bdeee1246d17e59df
-	parent = aa7cc829634d5fd6263e96c4e0a5f5660ddfa8bf
-	cmdver = 0.2.1
+	commit = 798c50d6c53ae32b472e1ee4d3db02c316c6a352
+	parent = 998213836f449e2dc14105086e56656a8380efd7
+	cmdver = 0.3.0

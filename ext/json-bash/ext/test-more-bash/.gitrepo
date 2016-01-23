@@ -6,6 +6,6 @@
 [subrepo]
 	remote = git@github.com:ingydotnet/test-more-bash.git
 	branch = master
-	commit = 5a16e75da4f4ffb45ac44db1ced576fc7fb615b8
-	parent = 16e72e40cec66b09119de1972545d0f550139076
-	cmdver = 0.2.0
+	commit = 496b86b44fc11ba85c4304ab5f8410d9c46fa8c9
+	parent = 00cfd8154437baab0deb1a7bd286c1e4eaefa9ba
+	cmdver = 0.3.0
