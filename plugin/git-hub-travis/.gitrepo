@@ -6,6 +6,6 @@
 [subrepo]
 	remote = git@github.com:ingydotnet/git-hub-travis
 	branch = master
-	commit = 8d337347ebf909d4f2b76b6a4cc678107ac8c0db
-	parent = 499bfc9d601713d3a7a44b71abeea513069af658
+	commit = 328f645d10ff0d2e5f5e8894d29794409708c468
+	parent = a875187b88907921573363fa7da5ca48e32a6686
 	cmdver = 0.3.0
