@@ -6,7 +6,7 @@ abstract: The Git command for GitHub
 homepage: http://bpan.org/package/git-hub/
 
 license: MIT
-copyright: 2013-2015
+copyright: 2013-2016
 author:
   name: Ingy döt Net
   email: ingy@ingy.net
