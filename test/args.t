@@ -72,7 +72,7 @@ run-test-error \
   # none
 
 run-test-error \
-  "unknown argument(s) 'xxx yyy'" \
+  "unknown argument\(s) 'xxx yyy'" \
   "?user:get-login" \
   fred xxx yyy
 

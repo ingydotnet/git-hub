@@ -449,7 +449,8 @@ get-args() {
     local optional=false
     local spec="${specs[0]}"
     local arg="${args[0]}"
-    if [[ $spec =~ ^\? ]]; then
+    local re='^\?'
+    if [[ $spec =~ $re ]]; then
       optional=true
       spec="${spec#\?}"
       if [[ $spec =~ / ]] &&
