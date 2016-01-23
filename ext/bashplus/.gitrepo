@@ -6,6 +6,6 @@
 [subrepo]
 	remote = git@github.com:ingydotnet/bashplus.git
 	branch = master
-	commit = 7fe0b93c0919deb7b5aecf2cb666ab85562210d5
-	parent = 72b1cb80d07e8b79f55a54c25e31017526ecd5a5
+	commit = 8254f9fb48c1d841326434a1005b2a61f42ff7ed
+	parent = e58ffdf3f1c342c2dc86eaf45c14625ca255b7bb
 	cmdver = 0.3.0
