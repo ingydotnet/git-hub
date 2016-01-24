@@ -1,6 +1,6 @@
 # json.bash - JSON Loader/Dumper for Bash
 #
-# Copyright (c) 2013-2015 Ingy döt Net
+# Copyright (c) 2013-2016 Ingy döt Net
 
 JSON_VERSION=0.0.2
 

@@ -1,4 +1,4 @@
 ---
-- version: 0.0.1
-  date:
-  changes:
+version: 0.0.2
+date:    Sun Jan 24 07:36:36 PST 2016
+changes: First official tagged release. Originally written in August 2013.

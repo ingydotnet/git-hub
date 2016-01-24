@@ -1,12 +1,12 @@
-=meta: 0.0.1
+=meta: 0.0.2
 
 name: json
-version: 0.0.1
+version: 0.0.2
 abstract: JSON for Bash
 homepage: http://bpan.org/package/json/
 
 license: MIT
-copyright: 2013-2015
+copyright: 2013-2016
 author:
   name: Ingy döt Net
   email: ingy@ingy.net
@@ -20,7 +20,7 @@ requires:
 test:
   cmd: make test
   requires:
-    test-more: 0.0.1
+    test-more: 0.0.3
 install:
   cmd: make install
 
