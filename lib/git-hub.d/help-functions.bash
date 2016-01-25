@@ -57,12 +57,13 @@ org-get              org-get <org> <data-key>
 org-members          org-members <org>
 org-repos            org-repos <org>
 orgs                 orgs [<user>]
+pr-created           pr-created [<user>] [--all]
 pr-diff              pr-diff [<owner>/<repo>] <issue-id-number>
 pr-fetch             pr-fetch [<owner>/<repo>] <issue-id-number>
 pr-list              pr-list [<owner>/<repo>]
 pr-merge             pr-merge [<owner>/<repo>] <issue-id-number>
 pr-new               pr-new [<issue-id-number>] [<options>]
-pr-queue             pr-queue [<user>] [--count=#] [--all]
+pr-queue             pr-queue [<user>] [--all]
 repo                 repo [<repo>]
 repo-delete          repo-delete <owner>/<repo>
 repo-edit            repo-edit [<owner>/]<repo> <key-value-pair>...
@@ -592,6 +593,17 @@ help:orgs() {
 ...
 }
 
+help:pr-created() {
+    cat <<'...'
+
+  Usage: git hub pr-created [<user>] [--all]
+
+  Show a list of Pull Requests the user created, for all repos. Shows the open
+  PRs for any repo that has them. The `--all` option says to show closed as
+  well as open PRs. Results are sorted by date of creation.
+...
+}
+
 help:pr-diff() {
     cat <<'...'
 
@@ -648,15 +660,11 @@ help:pr-new() {
 help:pr-queue() {
     cat <<'...'
 
-  Usage: git hub pr-queue [<user>] [--count=#] [--all]
+  Usage: git hub pr-queue [<user>] [--all]
 
   Show a user's Pull Request queue, for all repos. Shows the open PRs for any
-  repo that has them. The `--count` option tells how many repos to check. The
-  `--all` option says to show closed as well as open PRs.
-
-  Note: this command makes more API calls than most other commands and thus
-  runs slower. You might want to tee the output to a file, if you need to get
-  back to this data a lot.
+  repo that has them. The `--all` option says to show closed as well as
+  open PRs. Results are sorted by date of creation.
 ...
 }
 

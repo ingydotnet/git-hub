@@ -589,15 +589,17 @@ Fetches a pull request to a local C<review/$number> branch
 
 Merge and close a pull request.
 
-=item C<< pr-queue [<user>] [--count=#] [--all] >>
+=item C<< pr-queue [<user>] [--all] >>
 
 Show a user's Pull Request queue, for all repos. Shows the open PRs for any
-repo that has them. The C<--count> option tells how many repos to check. The
-C<--all> option says to show closed as well as open PRs.
+repo that has them. The C<--all> option says to show closed as well as open
+PRs. Results are sorted by date of creation.
 
-Note: this command makes more API calls than most other commands and thus runs
-      slower. You might want to tee the output to a file, if you need to get
-      back to this data a lot.
+=item C<< pr-created [<user>] [--all] >>
+
+Show a list of Pull Requests the user created, for all repos. Shows the open
+PRs for any repo that has them. The C<--all> option says to show closed as
+well as open PRs. Results are sorted by date of creation.
 
 =item C<notify-list [--all]>
 

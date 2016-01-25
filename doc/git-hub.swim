@@ -468,14 +468,15 @@ interactions from the command line. They are installed by default.
 - `pr-merge [<owner>/<repo>] <issue-id-number>`
   Merge and close a pull request.
 
-- `pr-queue [<user>] [--count=#] [--all]`
+- `pr-queue [<user>] [--all]`
   Show a user's Pull Request queue, for all repos. Shows the open PRs for any
-  repo that has them. The `--count` option tells how many repos to check. The
-  `--all` option says to show closed as well as open PRs.
+  repo that has them. The `--all` option says to show closed as well as
+  open PRs. Results are sorted by date of creation.
 
-  Note: this command makes more API calls than most other commands and thus
-  runs slower. You might want to tee the output to a file, if you need to get
-  back to this data a lot.
+- `pr-created [<user>] [--all]`
+  Show a list of Pull Requests the user created, for all repos. Shows the open
+  PRs for any repo that has them. The `--all` option says to show closed as
+  well as open PRs. Results are sorted by date of creation.
 
 - `notify-list [--all]`
   List your recent /unread/ user notifications. To list your /read/

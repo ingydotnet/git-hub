@@ -150,20 +150,39 @@ command:pr-merge() {
 
 command:pr-queue() {
   get-args '?user:get-user'
-  local option1= option2=
-  [[ -n $count_option ]] && option1=" --count=$count_option"
-  $do_all && option2=" --all"
+  local state="state:open";
+  "$do_all" && state=""
+  local key_prefix=/items
+  report-list \
+    "/search/issues?q=type:pr+$state+user:$user;per_page=PER_PAGE" \
+    "number state title user/login created_at updated_at html_url"
+}
 
-  for repo in `git hub repos $user -r$option1`; do
-    local pulls="`git hub pr-list $repo$option2`"
-    if [[ ! $pulls =~ --None-- ]]; then
-      echo
-      echo "$pulls"
-    fi
-  done
-  set +x
+command:pr-created() {
+  get-args '?user:get-user'
+  local state="state:open";
+  "$do_all" && state=""
+  local key_prefix=/items
+  report-list \
+    "/search/issues?q=type:pr+$state+author:$user;per_page=PER_PAGE" \
+    "number state title user/login created_at updated_at html_url"
+}
 
-  msg_ok=0
+format-entry:pr-queue() {
+    _list-pr-queue "$@"
+}
+
+format-entry:pr-created() {
+    _list-pr-queue "$@"
+}
+
+_list-pr-queue() {
+    local number=$2 state=$3 title=$4 creator=$5 created=$6 updated=$7 url=$8
+    local repo=$url
+    repo="${repo#https\:\/\/github\.com\/}"
+    repo="${repo%\/pull\/[[:digit:]]*}"
+    printf "%s\n#%-3d %-8s %s\n     @%-12s Created: %s  Updated: %s\n     %s\n\n" \
+      "$repo" "$number" "($state)" "$title" "$creator" "${created/T*/}" "${updated/T*/}" "$url"
 }
 
 # vim: set ft=sh lisp:
