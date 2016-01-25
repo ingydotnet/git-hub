@@ -441,6 +441,7 @@ list-possible-config-keys() {
 api-token
 browser
 color
+force-cache
 github-email
 github-name
 json-lib
