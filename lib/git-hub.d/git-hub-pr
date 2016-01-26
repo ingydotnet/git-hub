@@ -158,6 +158,11 @@ command:pr-list-from() {
   pr-search-query "$@"
 }
 
+command:pr-involves() {
+  local search_uri='/search/issues?q=type:pr+$state+involves:$user;per_page=PER_PAGE'
+  pr-search-query "$@"
+}
+
 pr-search-query() {
   get-args '?user:get-user'
   local state="state:open";
@@ -174,6 +179,10 @@ format-entry:pr-queue() {
 }
 
 format-entry:pr-list-from() {
+    _list-pr-queue "$@"
+}
+
+format-entry:pr-involves() {
     _list-pr-queue "$@"
 }
 

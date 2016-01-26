@@ -559,6 +559,10 @@ Show a user's Pull Request queue, for all repos. Shows the open PRs for any repo
 .el .IP "\f(CWpr\-list\-from [<user>] [\-\-all]\fR" 4
 .IX Item "pr-list-from [<user>] [--all]"
 Show a list of Pull Requests the user created, for all repos. Shows the open PRs for any repo that has them. The \f(CW\*(C`\-\-all\*(C'\fR option says to show closed as well as open PRs. Results are sorted by date of creation.
+.ie n .IP """pr\-involves [<user>] [\-\-all]""" 4
+.el .IP "\f(CWpr\-involves [<user>] [\-\-all]\fR" 4
+.IX Item "pr-involves [<user>] [--all]"
+Show a list of Pull Requests the user is involved in. ie Pull Requests that were created by, assigned to, mention, or were commented on by that user. Shows the open PRs for any repo that has them.  The \f(CW\*(C`\-\-all\*(C'\fR option says to show closed as well as open PRs. Results are sorted by date of creation.
 .ie n .IP """notify\-list [\-\-all]""" 4
 .el .IP "\f(CWnotify\-list [\-\-all]\fR" 4
 .IX Item "notify-list [--all]"

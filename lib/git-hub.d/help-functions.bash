@@ -59,6 +59,7 @@ org-repos            org-repos <org>
 orgs                 orgs [<user>]
 pr-diff              pr-diff [<owner>/<repo>] <issue-id-number>
 pr-fetch             pr-fetch [<owner>/<repo>] <issue-id-number>
+pr-involves          pr-involves [<user>] [--all]
 pr-list              pr-list [<owner>/<repo>]
 pr-list-from         pr-list-from [<user>] [--all]
 pr-merge             pr-merge [<owner>/<repo>] <issue-id-number>
@@ -608,6 +609,18 @@ help:pr-fetch() {
   Usage: git hub pr-fetch [<owner>/<repo>] <issue-id-number>
 
   Fetches a pull request to a local `review/$number` branch
+...
+}
+
+help:pr-involves() {
+    cat <<'...'
+
+  Usage: git hub pr-involves [<user>] [--all]
+
+  Show a list of Pull Requests the user is involved in. ie Pull Requests that
+  were created by, assigned to, mention, or were commented on by that user.
+  Shows the open PRs for any repo that has them.  The `--all` option says to
+  show closed as well as open PRs. Results are sorted by date of creation.
 ...
 }
 

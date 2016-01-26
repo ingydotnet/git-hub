@@ -478,6 +478,12 @@ interactions from the command line. They are installed by default.
   PRs for any repo that has them. The `--all` option says to show closed as
   well as open PRs. Results are sorted by date of creation.
 
+- `pr-involves [<user>] [--all]`
+  Show a list of Pull Requests the user is involved in. ie Pull Requests that
+  were created by, assigned to, mention, or were commented on by that user.
+  Shows the open PRs for any repo that has them.  The `--all` option says to
+  show closed as well as open PRs. Results are sorted by date of creation.
+
 - `notify-list [--all]`
   List your recent /unread/ user notifications. To list your /read/
   notifications as well, use the `--all` option.

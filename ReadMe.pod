@@ -601,6 +601,13 @@ Show a list of Pull Requests the user created, for all repos. Shows the open
 PRs for any repo that has them. The C<--all> option says to show closed as
 well as open PRs. Results are sorted by date of creation.
 
+=item C<< pr-involves [<user>] [--all] >>
+
+Show a list of Pull Requests the user is involved in. ie Pull Requests that
+were created by, assigned to, mention, or were commented on by that user.
+Shows the open PRs for any repo that has them. The C<--all> option says to
+show closed as well as open PRs. Results are sorted by date of creation.
+
 =item C<notify-list [--all]>
 
 List your recent I<unread> user notifications. To list your I<read>
