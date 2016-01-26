@@ -149,23 +149,24 @@ command:pr-merge() {
 }
 
 command:pr-queue() {
-  get-args '?user:get-user'
-  local state="state:open";
-  "$do_all" && state=""
-  local key_prefix=/items
-  report-list \
-    "/search/issues?q=type:pr+$state+user:$user;per_page=PER_PAGE" \
-    "number state title user/login created_at updated_at html_url"
+  local search_uri='/search/issues?q=type:pr+$state+user:$user;per_page=PER_PAGE'
+  pr-search-query "$@"
 }
 
 command:pr-list-from() {
+  local search_uri='/search/issues?q=type:pr+$state+author:$user;per_page=PER_PAGE'
+  pr-search-query "$@"
+}
+
+pr-search-query() {
   get-args '?user:get-user'
   local state="state:open";
   "$do_all" && state=""
   local key_prefix=/items
-  report-list \
-    "/search/issues?q=type:pr+$state+author:$user;per_page=PER_PAGE" \
-    "number state title user/login created_at updated_at html_url"
+  local search_fields="number state title user/login created_at updated_at html_url"
+  search_uri="${search_uri/\$user/$user}"
+  search_uri="${search_uri/\$state/$state}"
+  report-list "$search_uri" "$search_fields"
 }
 
 format-entry:pr-queue() {
