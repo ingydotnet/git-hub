@@ -153,7 +153,7 @@ command:pr-queue() {
   pr-search-query "$@"
 }
 
-command:pr-list-from() {
+command:pr-created() {
   local search_uri='/search/issues?q=type:pr+$state+author:$user;per_page=PER_PAGE'
   pr-search-query "$@"
 }
@@ -178,7 +178,7 @@ format-entry:pr-queue() {
     _list-pr-queue "$@"
 }
 
-format-entry:pr-list-from() {
+format-entry:pr-created() {
     _list-pr-queue "$@"
 }
 

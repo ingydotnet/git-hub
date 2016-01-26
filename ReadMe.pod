@@ -595,7 +595,7 @@ Show a user's Pull Request queue, for all repos. Shows the open PRs for any
 repo that has them. The C<--all> option says to show closed as well as open
 PRs. Results are sorted by date of creation.
 
-=item C<< pr-list-from [<user>] [--all] >>
+=item C<< pr-created [<user>] [--all] >>
 
 Show a list of Pull Requests the user created, for all repos. Shows the open
 PRs for any repo that has them. The C<--all> option says to show closed as
