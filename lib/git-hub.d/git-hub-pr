@@ -187,12 +187,17 @@ format-entry:pr-involves() {
 }
 
 _list-pr-queue() {
-    local number=$2 state=$3 title=$4 creator=$5 created=$6 updated=$7 url=$8
-    local repo=$url
-    repo="${repo#https\:\/\/github\.com\/}"
-    repo="${repo%\/pull\/[[:digit:]]*}"
+  local number=$2 state=$3 title=$4 creator=$5 created=$6 updated=$7 url=$8
+  local repo=$url
+  repo="${repo#https\:\/\/github\.com\/}"
+  repo="${repo%\/pull\/[[:digit:]]*}"
+
+  if "$raw_output"; then
+    echo "$repo" "$number"
+  else
     printf "%s\n#%-3d %-8s %s\n     @%-12s Created: %s  Updated: %s\n     %s\n\n" \
       "$repo" "$number" "($state)" "$title" "$creator" "${created/T*/}" "${updated/T*/}" "$url"
+  fi
 }
 
 # vim: set ft=sh lisp:
