@@ -3,6 +3,7 @@
 source test/setup
 
 use Test::More
+shopt -s compat31&>/dev/null||:
 
 # use git-hub
 source git-hub
