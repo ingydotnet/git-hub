@@ -158,7 +158,7 @@ command:pr-queue() {
     "number state title user/login created_at updated_at html_url"
 }
 
-command:pr-created() {
+command:pr-list-from() {
   get-args '?user:get-user'
   local state="state:open";
   "$do_all" && state=""
@@ -172,7 +172,7 @@ format-entry:pr-queue() {
     _list-pr-queue "$@"
 }
 
-format-entry:pr-created() {
+format-entry:pr-list-from() {
     _list-pr-queue "$@"
 }
 

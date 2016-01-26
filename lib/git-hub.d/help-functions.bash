@@ -57,10 +57,10 @@ org-get              org-get <org> <data-key>
 org-members          org-members <org>
 org-repos            org-repos <org>
 orgs                 orgs [<user>]
-pr-created           pr-created [<user>] [--all]
 pr-diff              pr-diff [<owner>/<repo>] <issue-id-number>
 pr-fetch             pr-fetch [<owner>/<repo>] <issue-id-number>
 pr-list              pr-list [<owner>/<repo>]
+pr-list-from         pr-list-from [<user>] [--all]
 pr-merge             pr-merge [<owner>/<repo>] <issue-id-number>
 pr-new               pr-new [<issue-id-number>] [<options>]
 pr-queue             pr-queue [<user>] [--all]
@@ -593,17 +593,6 @@ help:orgs() {
 ...
 }
 
-help:pr-created() {
-    cat <<'...'
-
-  Usage: git hub pr-created [<user>] [--all]
-
-  Show a list of Pull Requests the user created, for all repos. Shows the open
-  PRs for any repo that has them. The `--all` option says to show closed as
-  well as open PRs. Results are sorted by date of creation.
-...
-}
-
 help:pr-diff() {
     cat <<'...'
 
@@ -628,6 +617,17 @@ help:pr-list() {
   Usage: git hub pr-list [<owner>/<repo>]
 
   List the pull requests for a repo.
+...
+}
+
+help:pr-list-from() {
+    cat <<'...'
+
+  Usage: git hub pr-list-from [<user>] [--all]
+
+  Show a list of Pull Requests the user created, for all repos. Shows the open
+  PRs for any repo that has them. The `--all` option says to show closed as
+  well as open PRs. Results are sorted by date of creation.
 ...
 }
 

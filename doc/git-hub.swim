@@ -473,7 +473,7 @@ interactions from the command line. They are installed by default.
   repo that has them. The `--all` option says to show closed as well as
   open PRs. Results are sorted by date of creation.
 
-- `pr-created [<user>] [--all]`
+- `pr-list-from [<user>] [--all]`
   Show a list of Pull Requests the user created, for all repos. Shows the open
   PRs for any repo that has them. The `--all` option says to show closed as
   well as open PRs. Results are sorted by date of creation.
