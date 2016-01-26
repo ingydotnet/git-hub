@@ -1,0 +1,59 @@
+---
+version: tba
+date: tba
+changes:
+- url: correct path also when not in top level directory
+- Changed pr-queue to use the search API making it faster
+- Added pr-created, pr-involves
+- members command accepts --raw option
+- Content typed into the editor will be preserved for later in case
+  of an error
+- Added config-list, config-keys
+- Improved bash completion
+- fork: fix url for forked repo
+- pr-new: fix --parent bug
+- deprecate `init`, switch to `.rc`
+- new commands: search-repo, search-user, search-issues
+---
+version: 0.1.5.12
+date: 2015-12-31
+changes:
+- orgs lists private orgs now also
+- Added gist commands
+- Input checks improved
+- Completion fix
+- Bash fixes
+---
+version: 0.1.5.09
+date: 2015-09-30
+changes:
+- Support Two-factor authentication
+- Allow to configure github-{email,name} for cloning
+- Doc fixes
+- Bash fixes
+- Completion fix
+---
+version: 0.1.5.06
+date: 2015-06-30
+changes:
+- Fix for windows (issue #161)
+- Config directory only readable by user
+- Pipe help to pager
+- Improved zsh completion
+- Doc fixes
+---
+version: 0.1.5
+date:    2015-01-07
+changes:
+- New CPAN release for 2015
+---
+version: 0.1.4
+date:    2014-09-04
+changes:
+- Lots of improvement
+- pull-* commands are now pr-*
+---
+version: 0.1.0
+date:    2014-07-28
+changes:
+- First version
