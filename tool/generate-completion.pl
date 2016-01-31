@@ -8,6 +8,8 @@ sub main {
     my $input2 = do { local $/; <> };
     my ($options_spec) = $input2 =~ m/ ^ OPTIONS_SPEC="\\ $ (.*?) ^ " $/xsm;
     $options_spec =~ s/.*Options:\n--//s;
+
+    my %functions;
     my @options;
     for my $line (split m/\n/, $options_spec) {
         next unless $line =~ m/\S/;
@@ -17,7 +19,21 @@ sub main {
             $arg = 1;
         }
         my @keys = split m/,/, $key;
-        push @options, { keys => \@keys, arg => $arg, desc => $desc };
+        my $function_name;
+        if ($key eq "remote") {
+            $function_name = "_git-hub-complete-remote";
+            my $function = {
+                name => $function_name,
+                command => "git remote",
+            };
+            $functions{ $key } = $function;
+        }
+        push @options, {
+            keys => \@keys,
+            arg => $arg,
+            desc => $desc,
+            function_name => $function_name,
+        };
     }
 
     $input =~ s/.*?\n= Commands\n//s;
@@ -41,19 +57,21 @@ sub main {
     @list = sort @list;
 
     if ($cmd eq "bash") {
-        generate_bash(\@list, \@repo_cmds, \@options);
+        generate_bash(\@list, \@repo_cmds, \@options, \%functions);
     }
     else {
-        generate_zsh(\@list, \@repo_cmds, \@options);
+        generate_zsh(\@list, \@repo_cmds, \@options, \%functions);
     }
 }
 
 sub generate_zsh {
-    my ($list, $repo_cmds, $options) = @_;
+    my ($list, $repo_cmds, $options, $functions) = @_;
+
     my $options_string = '';
     for my $opt (@$options) {
         my $keys = $opt->{keys};
         my $desc = $opt->{desc};
+        my $function = $opt->{function_name};
         $desc =~ s/'/'"'"'/g;
         # examples:
         #'(-c --count)'{-c,--count}'[Number of list items to show]:count' \
@@ -61,6 +79,12 @@ sub generate_zsh {
         my $arg = '';
         if ($opt->{arg}) {
             $arg = ":$keys->[0]";
+        }
+        else {
+            $arg .= ":";
+        }
+        if ($function) {
+            $arg .= ":$function";
         }
         my @keystrings = map { (length $_ > 1 ? "--" : "-") . $_ } @$keys;
         if (@$keys == 1) {
@@ -72,6 +96,22 @@ sub generate_zsh {
                 (join ' ', @keystrings), (join ',', @keystrings), $desc, $arg;
         }
     }
+
+    my $function_list = '';
+    for my $key (sort keys %$functions) {
+        my $function = $functions->{ $key };
+        my $name = $function->{name};
+        my $cmd = $function->{command};
+        my $body = <<"...";
+$name() {
+    local dynamic_comp
+    IFS=\$'\\n' set -A  dynamic_comp `$cmd`
+    compadd -X "$key:" \$dynamic_comp
+}
+...
+        $function_list .= "$body\n";
+    }
+
     print <<'...';
 #compdef git-hub -P git\ ##hub
 #description perform GitHub operations
@@ -135,11 +175,13 @@ _git-hub() {
 
 }
 
+$function_list
 ...
 }
 
 sub generate_bash {
-    my ($list, $repo_cmds, $options) = @_;
+    my ($list, $repo_cmds, $options, $functions) = @_;
+
     my $options_string = '';
     for my $opt (@$options) {
         my $keys = $opt->{keys};
@@ -152,6 +194,24 @@ sub generate_bash {
             $options_string .= " $key$arg";
         }
     }
+
+    my @function_list;
+    for my $key (sort keys %$functions) {
+        my $function = $functions->{ $key };
+        my $name = $function->{name};
+        my $cmd = $function->{command};
+        my $body = <<"...";
+[[ \$last == "--$key" || \$cur =~ ^--$key= ]]; then
+            local dynamic_comp=`$cmd`
+            __gitcomp "\$dynamic_comp" "" "\${cur##--$key=}"
+            return
+...
+        push @function_list, $body;
+    }
+    my $indent = " " x 8;
+    my $function_list = "${indent}if "
+        . join ("\n${indent}elsif ", @function_list)
+        . "${indent}fi";
 
     print <<"...";
 #!bash
@@ -175,6 +235,10 @@ _git_hub() {
 
     else
 
+        # dynamic completions
+        local last=\${COMP_WORDS[ \$COMP_CWORD-1 ]}
+
+$function_list
 
         case "\$cur" in
 

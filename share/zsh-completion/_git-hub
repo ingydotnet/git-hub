@@ -15,27 +15,27 @@ _git-hub() {
     _arguments -s \
         '1: :->subcmd' \
         '2: :->repo' \
-        '-h[Show the command summary]' \
-        '--help[Browse the complete '"'"'git-hub'"'"' documentation]' \
-        '--remote[Remote name (like '"'"'origin'"'"')]:remote' \
+        '-h[Show the command summary]:' \
+        '--help[Browse the complete '"'"'git-hub'"'"' documentation]:' \
+        '--remote[Remote name (like '"'"'origin'"'"')]:remote:_git-hub-complete-remote' \
         '--branch[Branch name (like '"'"'master'"'"')]:branch' \
         '--org[GitHub organization name]:org' \
         '(-c --count)'{-c,--count}'[Number of list items to show]:c' \
-        '(-a --all)'{-a,--all}'[Show all list items]' \
-        '(-q --quiet)'{-q,--quiet}'[Show minimal output]' \
-        '(-v --verbose)'{-v,--verbose}'[Show verbose output]' \
-        '(-r --raw)'{-r,--raw}'[Show output data in a raw form]' \
-        '(-j --json)'{-j,--json}'[Show output data in JSON]' \
-        '(-A --use-auth)'{-A,--use-auth}'[Force the use of authentication. (Get around rate limits)]' \
-        '(-C --no-cache)'{-C,--no-cache}'[Don'"'"'t use cached responses.]' \
+        '(-a --all)'{-a,--all}'[Show all list items]:' \
+        '(-q --quiet)'{-q,--quiet}'[Show minimal output]:' \
+        '(-v --verbose)'{-v,--verbose}'[Show verbose output]:' \
+        '(-r --raw)'{-r,--raw}'[Show output data in a raw form]:' \
+        '(-j --json)'{-j,--json}'[Show output data in JSON]:' \
+        '(-A --use-auth)'{-A,--use-auth}'[Force the use of authentication. (Get around rate limits)]:' \
+        '(-C --no-cache)'{-C,--no-cache}'[Don'"'"'t use cached responses.]:' \
         '--token[Explicitly specify the GitHub v3 API Authentication Token]:token' \
-        '(-d --dryrun)'{-d,--dryrun}'[Check arguments but don'"'"'t actually run the API command]' \
-        '-T[Show (don'"'"'t hide) API token in the verbose output]' \
-        '-O[Debug - Show response output]' \
-        '-H[Debug - Show reponse headers]' \
-        '-J[Debug - Show parsed JSON response]' \
-        '-R[Debug - Repeat last command without contacting server]' \
-        '-x[Debug - Turn on Bash trace (set -x) output]' \
+        '(-d --dryrun)'{-d,--dryrun}'[Check arguments but don'"'"'t actually run the API command]:' \
+        '-T[Show (don'"'"'t hide) API token in the verbose output]:' \
+        '-O[Debug - Show response output]:' \
+        '-H[Debug - Show reponse headers]:' \
+        '-J[Debug - Show parsed JSON response]:' \
+        '-R[Debug - Repeat last command without contacting server]:' \
+        '-x[Debug - Turn on Bash trace (set -x) output]:' \
         && ret=0
 
     case $state in
@@ -71,4 +71,11 @@ _git-hub() {
     esac
 
 }
+
+_git-hub-complete-remote() {
+    local dynamic_comp
+    IFS=$'\n' set -A  dynamic_comp `git remote`
+    compadd -X "remote:" $dynamic_comp
+}
+
 
