@@ -19,6 +19,14 @@ _git_hub() {
 
     else
 
+        # dynamic completions
+        local last=${COMP_WORDS[ $COMP_CWORD-1 ]}
+
+        if [[ $last == "--remote" || $cur =~ ^--remote= ]]; then
+            local dynamic_comp=`git remote`
+            __gitcomp "$dynamic_comp" "" "${cur##--remote=}"
+            return
+        fi
 
         case "$cur" in
 
