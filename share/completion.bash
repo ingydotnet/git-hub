@@ -28,8 +28,12 @@ _git_hub() {
         ;;
 
         *)
-            if [[ $subcommand = help ]]; then
+            if [[ $subcommand == help ]]; then
                 __gitcomp "$subcommands"
+            elif [[ $subcommand == "config" || $subcommand == "config-unset" ]]; then
+                local config_keys
+                config_keys=`git hub config-keys`
+                __gitcomp "$config_keys"
             fi
         ;;
 
