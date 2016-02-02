@@ -684,6 +684,23 @@ Create an (almost) empty gist and clone it
 
 This will create a gist with a file '.gitignore'
 
+=item C<< search-repo <query> >>
+
+ Search for repositories.
+
+ By default it searches in the repository name, but you can change that: C<search-
+ repo "libyaml in:description">. For more information, see the search
+ documentation at L<https://developer.github.com/v3/search/#search-
+ repositories>
+
+=item C<< search-user <query> >>
+
+ Search for users.
+
+ By default it searches in the login field, but you can change that: C<search-
+ user "wall in:fullname">. For more information, see the search documentation
+ at L<https://developer.github.com/v3/search/#search-users>
+
 =back
 
 =head2 Plugin Commands

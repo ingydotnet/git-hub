@@ -2,20 +2,43 @@
 
 set -e
 
-command:search() {
+command:search-repo() {
   get-args query
+  if [[ ! $query =~ (^| )in: ]]; then
+    query+=" in:name"
+  fi
   query="${query// /%20}"
   local key_prefix=/items
   report-list \
-    "/search/repositories?q=$query;sort=stars;per_page=PER_PAGE" \
+    "/search/repositories?q=$query;per_page=PER_PAGE" \
     'full_name stargazers_count'
 }
 
-format-entry:search() {
+format-entry:search-repo() {
   if "$raw_output"; then
     echo "$2"
   else
     printf "%d) %-40s (%d stars)\n" "$1" "$2" "$3"
+  fi
+}
+
+command:search-user() {
+  get-args query
+  if [[ ! $query =~ (^| )in: ]]; then
+    query+=" in:login"
+  fi
+  query="${query// /%20}"
+  local key_prefix=/items
+  report-list \
+    "/search/users?q=$query;per_page=PER_PAGE" \
+    'login'
+}
+
+format-entry:search-user() {
+  if "$raw_output"; then
+    echo "$2"
+  else
+    printf "%d) %-40s\n" "$1" "$2"
   fi
 }
 

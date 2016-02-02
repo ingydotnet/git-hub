@@ -75,6 +75,8 @@ repos                repos [<user>]
 scope-add            scope-add <api-token-id> <scope-name>...
 scope-remove         scope-remove <api-token-id> <scope-name>...
 scopes               scopes <api-token-id>
+search-repo          search-repo <query>
+search-user          search-user <query>
 setup                setup
 star                 star [<owner>/<repo>]
 starred              starred [<user>]
@@ -780,6 +782,34 @@ help:scopes() {
   List the scopes assigned to your API token, and also list all the possible
   scope values that you can assign. Use the `--raw` option to just list the
   scopes.
+...
+}
+
+help:search-repo() {
+    cat <<'...'
+
+  Usage: git hub search-repo <query>
+
+   Search for repositories.
+
+   By default it searches in the repository name, but you can change that:
+   `search-repo "libyaml in:description"`. For more information, see
+   the search documentation at
+   [https://developer.github.com/v3/search/#search-repositories]
+...
+}
+
+help:search-user() {
+    cat <<'...'
+
+  Usage: git hub search-user <query>
+
+   Search for users.
+
+   By default it searches in the login field, but you can change that:
+   `search-user "wall in:fullname"`. For more information, see
+   the search documentation at
+   [https://developer.github.com/v3/search/#search-users]
 ...
 }
 
