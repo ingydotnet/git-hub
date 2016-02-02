@@ -12,6 +12,12 @@ _git-hub() {
     typeset -A opt_args
     local curcontext="$curcontext" state line context
 
+    local update_policy
+    zstyle -s ":completion:$curcontext:" cache-policy update_policy
+    if [[ -z "$update_policy" ]]; then
+        zstyle ":completion:$curcontext:" cache-policy _git_hub_caching_policy
+    fi
+
     _arguments -s \
         '1: :->subcmd' \
         '2: :->repo' \
@@ -49,19 +55,76 @@ _git-hub() {
     repo)
         case $line[1] in
         clone|collabs|comment|fork|forks|issue|issue-close|issue-edit|issue-new|issue-resolve|issues|open|pr-diff|pr-fetch|pr-list|pr-merge|repo|repo-delete|repo-edit|repo-get|star|stars|trust|unstar|untrust|unwatch|url|watch|watchers)
-            if [[ $line[2] =~ "^((\w|-)+)/(.*)" ]];
+            [[ "$line[2]" =~ ^- ]] && return;
+            local repo_to_complete="$line[2]"
+            if [[ "$repo_to_complete" =~ "^@/?$" || \
+                "$repo_to_complete" =~ "^@/(.*)" || \
+                "$repo_to_complete" =~ "^/?([a-z0-9_-]*)$" ]];
             then
+                local login=`git hub config login`
+                compadd -U -S '' "$login/$match[1]"
+                return
+            elif [[ "$repo_to_complete" =~ "^@.+/" ]]; then
+                repo_to_complete="${repo_to_complete/\@}"
+                compadd -U -S '' "$repo_to_complete"
+                return
+            fi
+
+            if [[ "$repo_to_complete" =~ "^@([a-z0-9_][a-z0-9_-]*)$" ]];
+            then
+                local users
                 local username="$match[1]"
-                if [[ "$username" != "$__git_hub_lastusername" ]];
-                then
-                    __git_hub_lastusername=$username
-                    IFS=$'\n' set -A  __git_hub_reponames `git hub repos $username --raw`
+
+                if [[ "$#username" -lt 2 ]]; then
+                    compadd -x "Users (type at least two characters)"
+                    return
                 fi
-                compadd -X "Repos:" $__git_hub_reponames
+
+                local _git_hub_cached_users
+                local cache_key="git-hub-search-user-$username"
+                if _cache_invalid $cache_key || ! _retrieve_cache $cache_key ; then
+                    users=( $( git hub search-user "$username in:login" --raw --count 100 | tr '[:upper:]' '[:lower:]' | sed -e 's/^/@/' ) )
+                    _git_hub_cached_users=("${users[@]}")
+                    _store_cache $cache_key _git_hub_cached_users
+                else
+                    users=("${_git_hub_cached_users[@]}")
+                fi
+
+                if [[ ${#users[@]} -eq 1 ]]; then
+                    local user="$users[1]"
+                    user="${user/\@/}"
+                    compadd -S / -U -X "Users:" "$user"
+                else
+                    compadd -U -X "Users:" $users
+                fi
+
             else
-                _arguments "2:Repos:()"
+                local username reponame
+                if [[ "$repo_to_complete" =~ "^([a-z0-9_][a-z0-9_-]+)/([a-zA-Z0-9_.-]*)" ]];
+                then
+                    local username="$match[1]"
+                    local reponame="$match[2]"
+                else
+                    # git hub repo foobar<TAB>
+                    username=`git hub config login`
+                    reponame="$repo_to_complete"
+                fi
+                local reponames
+
+                local _git_hub_cached_repos
+                local cache_key="git-hub-search-repo-$username/repo-$reponame"
+                if _cache_invalid $cache_key || ! _retrieve_cache $cache_key ; then
+                    IFS=$'\n' set -A reponames `git hub search-repo "$reponame user:$username in:name fork:true" --raw --count 100`
+                    _git_hub_cached_repos=("${reponames[@]}")
+                    _store_cache $cache_key _git_hub_cached_repos
+                else
+                    reponames=("${_git_hub_cached_repos[@]}")
+                fi
+
+                compadd -X "Repos:" $reponames
             fi
         ;;
+
         config|config-unset)
             local config_keys
             IFS=$'\n' set -A config_keys `git hub config-keys`
@@ -82,4 +145,12 @@ _git-hub-complete-remote() {
     compadd -X "remote:" $dynamic_comp
 }
 
+
+_git_hub_caching_policy() {
+    local -a oldp
+    # older than 20 minutes
+    oldp=( "$1"(mm+20) )
+    (( $#oldp )) && return 0
+    return 1
+}
 

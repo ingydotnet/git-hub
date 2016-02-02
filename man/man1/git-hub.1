@@ -762,8 +762,48 @@ If you used \f(CW\*(C`make install\*(C'\fR method, then run this again (after \f
 .SH "Command Completion"
 .IX Header "Command Completion"
 The \f(CW\*(C`git hub\*(C'\fR command supports \f(CW\*(C`<TAB>\*(C'\fR\-based command completion. If you don't use the \f(CW\*(C`.rc\*(C'\fR script (see Installation, above), you'll need to enable this manually to use it.
-.SS "In Bash"
+.PP
+Completion is supported for subcommands, options and config keys.
+.PP
+.Vb 4
+\&      git hub <TAB>
+\&      git hub pr\-list \-\-<TAB>
+\&      git hub config <TAB>
+\&      git hub help <TAB>
+.Ve
+.PP
+Additionally, user/repo names can be completed, but note that there might be some cases where this will not offer all possible names.
+.PP
+The reason is the search is restricted to 100 items, and a search cannot be anchored to the start of a string, so an \s-1API\s0 call might return 100 results, but you will only see those starting with the prefix you typed.
+.SS "Completing repository names"
+.IX Subsection "Completing repository names"
+.Vb 5
+\&      git hub repo <TAB>          shortcut for your\-login/<TAB>
+\&      git hub repo @<TAB>         shortcut for your\-login/<TAB>
+\&      git hub repo foo<TAB>       shortcut for your\-login/foo<TAB>
+\&      git hub repo user/<TAB>     complete repos of \*(Aquser\*(Aq
+\&      git hub repo user/foo<TAB>  complete repos of \*(Aquser\*(Aq starting with foo
+.Ve
+.SS "Completing user names as part of the full repository name"
+.IX Subsection "Completing user names as part of the full repository name"
+For completing usernames, you have to type a \f(CW\*(C`@\*(C'\fR and at least two characters.
+.PP
+\&\f(CW\*(C`git hub repo @in<TAB>\*(C'\fR
+.PP
+The \f(CW\*(C`@\*(C'\fR will automatically go away if there is only one matching user, or if you add a \f(CW\*(C`/\*(C'\fR after it.
+.PP
+.Vb 2
+\&      git hub repo @ingyd<TAB>         \-> git hub repo ingydotnet/
+\&      git hub repo @ingydotnet/<TAB>   \-> git hub repo ingydotnet/
+.Ve
+.SS "Completing user names for commands like follow, user, trust"
+.IX Subsection "Completing user names for commands like follow, user, trust"
+This is not supported yet.
+.SS "Enabling completion"
+.IX Subsection "Enabling completion"
+\fIIn Bash\fR
 .IX Subsection "In Bash"
+.PP
 If your Bash setup does not already provide command completion for Git, you'll need to enable that first:
 .PP
 .Vb 1
@@ -795,12 +835,20 @@ Once Git completion is enabled (whether you needed to do that manually or not), 
 .Vb 1
 \&    source /path/to/git\-hub/share/completion.bash
 .Ve
-.SS "In zsh"
+.PP
+\fIIn zsh\fR
 .IX Subsection "In zsh"
+.PP
 In the Z shell (zsh), you can manually enable \f(CW\*(C`git\-hub\*(C'\fR completion by adding the following line to your \f(CW\*(C`~/.zshrc\*(C'\fR, \fBbefore\fR the \f(CW\*(C`compinit\*(C'\fR function is called:
 .PP
 .Vb 1
 \&    fpath=(\*(Aq/path/to/git\-hub/share/zsh\-completion\*(Aq $fpath)
+.Ve
+.PP
+You might want to enable caching (the cache is invalidated after 20 minutes):
+.PP
+.Vb 1
+\&      zstyle \*(Aq:completion:*\*(Aq use\-cache on
 .Ve
 .SH "Plugins"
 .IX Header "Plugins"

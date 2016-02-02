@@ -843,7 +843,47 @@ The C<git hub> command supports C<< <TAB> >>-based command completion. If you
 don't use the C<.rc> script (see Installation, above), you'll need to enable
 this manually to use it.
 
-=head2 In Bash
+Completion is supported for subcommands, options and config keys.
+
+      git hub <TAB>
+      git hub pr-list --<TAB>
+      git hub config <TAB>
+      git hub help <TAB>
+
+Additionally, user/repo names can be completed, but note that there might be
+some cases where this will not offer all possible names.
+
+The reason is the search is restricted to 100 items, and a search cannot be
+anchored to the start of a string, so an API call might return 100 results,
+but you will only see those starting with the prefix you typed.
+
+=head2 Completing repository names
+
+      git hub repo <TAB>          shortcut for your-login/<TAB>
+      git hub repo @<TAB>         shortcut for your-login/<TAB>
+      git hub repo foo<TAB>       shortcut for your-login/foo<TAB>
+      git hub repo user/<TAB>     complete repos of 'user'
+      git hub repo user/foo<TAB>  complete repos of 'user' starting with foo
+
+=head2 Completing user names as part of the full repository name
+
+For completing usernames, you have to type a C<@> and at least two characters.
+
+C<< git hub repo @in<TAB> >>
+
+The C<@> will automatically go away if there is only one matching user, or if
+you add a C</> after it.
+
+      git hub repo @ingyd<TAB>         -> git hub repo ingydotnet/
+      git hub repo @ingydotnet/<TAB>   -> git hub repo ingydotnet/
+
+=head2 Completing user names for commands like follow, user, trust
+
+This is not supported yet.
+
+=head2 Enabling completion
+
+=head3 In Bash
 
 If your Bash setup does not already provide command completion for Git, you'll
 need to enable that first:
@@ -879,13 +919,17 @@ not), you can turn on C<git-hub> completion with a command like this:
 
     source /path/to/git-hub/share/completion.bash
 
-=head2 In zsh
+=head3 In zsh
 
 In the Z shell (zsh), you can manually enable C<git-hub> completion by
 adding the following line to your C<~/.zshrc>, B<before> the C<compinit>
 function is called:
 
     fpath=('/path/to/git-hub/share/zsh-completion' $fpath)
+
+You might want to enable caching (the cache is invalidated after 20 minutes):
+
+      zstyle ':completion:*' use-cache on
 
 =head1 Plugins
 
