@@ -794,22 +794,22 @@ Do everything from the command line:
 
   $ mkdir foo
   $ cd foo
+  $ git hub repo-init
   $ echo 'The new foo' > README
-  $ git init
   $ git add README
   $ git commit -m 'First commit'
-  $ git hub new foo
-  $ git hub repo foo      # Get repo info including the remote address
-  $ git remote add origin <new-remote-address>
   $ git push origin master
   $ git hub repo-edit \
       description  'The new foo' \
       homepage     http://example.com
   $ git hub repo
 
+The name of the repo will be the directory name.
 Note that on the last two commands you don't need to set the `<repo>` because it
 can be gleaned from the remote. Also on the `edit` command notice how you can
 specify multiple key/value pairs.
+
+To just create a new github repo without cloning it, use `git hub repo-new`.
 
 == Example 2. Commands from within a repo
 
