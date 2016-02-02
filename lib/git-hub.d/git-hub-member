@@ -5,11 +5,13 @@ set -e
 command:members() {
   require-auth
   get-args team_id
+  local args=()
+  "$raw_output" && args+=(-r)
   if [[ ! $team_id =~ ^[0-9]+$ ]]; then
-    git hub org-members "$team_id"
+    git hub org-members "${args[@]}" "$team_id"
     return
   else
-    git hub team-members "$team_id"
+    git hub team-members "${args[@]}" "$team_id"
   fi
 }
 
