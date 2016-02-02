@@ -102,6 +102,7 @@ run-command() {
   get-opts "$@"
   assert-env
 
+  local cleanup_msg_file
   callable-or-source "$command" ||
     error "unknown 'git hub' command '$command'"
   "command:$command" "$@"
@@ -114,6 +115,10 @@ run-command() {
       if [[ $msg_ok != 0 ]]; then
         say "${msg_ok:-"'git hub $command' command successful"}"
       fi
+    fi
+    # successful, delete the tmp file
+    if [[ -n "$cleanup_msg_file" ]]; then
+      rm -f $GIT_HUB_MSG_FILE
     fi
   else
     local status_msg="msg_$status_code"
@@ -1323,16 +1328,67 @@ prompt-to-run-setup() {
 #------------------------------------------------------------------------------
 # Reusable helper functions:
 #------------------------------------------------------------------------------
-editor-title-body() {
-  rm -f "$GIT_HUB_MSG_FILE"
 
-  echo "$1" > "$GIT_HUB_MSG_FILE"
+init-msg-file() {
+  cleanup_msg_file=1
+  local body="$1
+#
+# Command: $command $command_arguments"
+  if [[ -f $GIT_HUB_MSG_FILE ]]; then
+    local last_line=`tail -1 $GIT_HUB_MSG_FILE`
+    if [[ $last_line =~ ^#[[:space:]]Command:[[:space:]](.*) ]]; then
+      local last_cmd="git hub ${BASH_REMATCH[1]}"
+      local date=`date -r $GIT_HUB_MSG_FILE`
+      echo -n "
+$GIT_HUB_MSG_FILE still exists, previous command probably wasn't successful.
+The command was: '$last_cmd'
+Date: $date
+You can reuse or delete the old file.
+(a)bort, (r)euse or (d)elete? "
+      local action
+      read action
+
+      case $action in
+
+        r)
+          # remove all comment lines
+          sed -i -e '/^#.*$/d' $GIT_HUB_MSG_FILE
+          echo "$body" | sed -e '/^$/d' >> "$GIT_HUB_MSG_FILE"
+        ;;
+        d)
+          rm -f "$GIT_HUB_MSG_FILE"
+          echo "$body" > "$GIT_HUB_MSG_FILE"
+        ;;
+        *)
+          exit 0 # or 1?
+        ;;
+
+      esac
+    else
+      echo "$body" > "$GIT_HUB_MSG_FILE"
+    fi
+  else
+    echo "$body" > "$GIT_HUB_MSG_FILE"
+  fi
+
+}
+
+delete-empty-msg-file() {
+  local content=`grep -v '^#' $GIT_HUB_MSG_FILE | grep -v '^$'`
+  if [[ -z "$content" ]]; then
+    rm $GIT_HUB_MSG_FILE
+  fi
+}
+
+editor-title-body() {
+  init-msg-file "$1"
 
   $GIT_HUB_EDITOR "$GIT_HUB_MSG_FILE"
   local line
   body=''
   title="$(head -n1 "$GIT_HUB_MSG_FILE")"
   if [[ ! $title =~ [^[:space:]] || $title =~ ^\# ]]; then
+    delete-empty-msg-file
     abort "no title provided"
   fi
   line="$(head -n2 "$GIT_HUB_MSG_FILE" | tail -n1)"
@@ -1351,9 +1407,7 @@ editor-title-body() {
 }
 
 editor-comment() {
-  rm -f "$GIT_HUB_MSG_FILE"
-
-  echo "$1" > "$GIT_HUB_MSG_FILE"
+  init-msg-file "$1"
 
   $GIT_HUB_EDITOR "$GIT_HUB_MSG_FILE"
   local line
@@ -1364,15 +1418,14 @@ editor-comment() {
     [[ $line =~ ^\# ]] && break
     body+="$line"$'\n'
   done < "$GIT_HUB_MSG_FILE"
+  delete-empty-msg-file
   IFS="$ifs"
 }
 
 editor-comment-state() {
-  rm -f "$GIT_HUB_MSG_FILE"
+  init-msg-file "$1"
 
   comment= title= state= assignee= milestone=
-
-  echo "$1" > "$GIT_HUB_MSG_FILE"
 
   $GIT_HUB_EDITOR "$GIT_HUB_MSG_FILE"
   local line started=false
@@ -1402,6 +1455,7 @@ editor-comment-state() {
   IFS="$ifs"
 
   if [[ ! $title =~ [^[:space:]] ]]; then
+    delete-empty-msg-file
     abort "no title provided."
   fi
 }
