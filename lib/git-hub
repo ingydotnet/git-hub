@@ -1339,31 +1339,44 @@ init-msg-file() {
     if [[ $last_line =~ ^#[[:space:]]Command:[[:space:]](.*) ]]; then
       local last_cmd="git hub ${BASH_REMATCH[1]}"
       local date=`date -r $GIT_HUB_MSG_FILE`
-      echo -n "
-$GIT_HUB_MSG_FILE still exists, previous command probably wasn't successful.
-The command was: '$last_cmd'
-Date: $date
-You can reuse or delete the old file.
-(a)bort, (r)euse or (d)elete? "
-      local action
-      read action
+      local prompt="(r)euse, (s)how, (d)elete, (a)bort?"
+      echo "
+Found existing $GIT_HUB_MSG_FILE from:
 
-      case $action in
+  command: '$last_cmd'
+  date:    $date
+"
+      while true
+      do
+        echo -n "$prompt "
+        local action
+        read action
 
-        r)
-          # remove all comment lines
-          sed -i -e '/^#.*$/d' $GIT_HUB_MSG_FILE
-          echo "$body" | sed -e '/^$/d' >> "$GIT_HUB_MSG_FILE"
-        ;;
-        d)
-          rm -f "$GIT_HUB_MSG_FILE"
-          echo "$body" > "$GIT_HUB_MSG_FILE"
-        ;;
-        *)
-          exit 0 # or 1?
-        ;;
+        case $action in
 
-      esac
+          r)
+            # remove all comment lines
+            sed -i -e '/^#.*$/d' $GIT_HUB_MSG_FILE
+            echo "$body" | sed -e '/^$/d' >> "$GIT_HUB_MSG_FILE"
+            break
+          ;;
+          d)
+            rm -f "$GIT_HUB_MSG_FILE"
+            echo "$body" > "$GIT_HUB_MSG_FILE"
+            break
+          ;;
+          s)
+              echo
+              head $GIT_HUB_MSG_FILE | grep -v '^#'
+              echo
+          ;;
+          *)
+            exit 0 # or 1?
+          ;;
+
+        esac
+      done
+
     else
       echo "$body" > "$GIT_HUB_MSG_FILE"
     fi
