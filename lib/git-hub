@@ -1331,9 +1331,11 @@ prompt-to-run-setup() {
 
 init-msg-file() {
   cleanup_msg_file=1
+  local commandline="$command"
+  [[ -n $command_arguments ]] && commandline="$commandline $command_arguments"
   local body="$1
 #
-# Command: $command $command_arguments"
+# Command: $commandline"
   if [[ -f $GIT_HUB_MSG_FILE ]]; then
     local last_line=`tail -1 $GIT_HUB_MSG_FILE`
     if [[ $last_line =~ ^#[[:space:]]Command:[[:space:]](.*) ]]; then
