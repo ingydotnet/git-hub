@@ -128,6 +128,17 @@ cache). The value (if any) is written to stdout.
 
 See FLAGS below for an explanation of the flag options.
 
+=item C<< JSON.keys <key-path> [<linear-var-name>] >>
+
+This function takes a key path and returns the keys of the corresponding
+object, one per line. If the key is not found or the value of the key is not
+an object, it will return nothing.
+
+=item C<< JSON.object <key-path> [<linear-var-name>] >>
+
+This function takes a key path and returns the corresponding object. If the
+key is not found, it will return nothing.
+
 =item C<< JSON.put [-s|-b|-n|-z] <key-path> <new-value> [<linear-var-name>] >>
 
 This function adds a path/value pair to the linear tree. If the path already

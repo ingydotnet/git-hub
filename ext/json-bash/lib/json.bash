@@ -68,6 +68,44 @@ JSON.get() {
   esac
 }
 
+JSON.keys() {
+  if [[ $# -gt 2 ]]; then
+    JSON.die 'Usage: JSON.keys <key-path> [<tree-var>]'
+  fi
+  JSON.object "$@" |
+    cut -f1 |
+    sed "s/^\///; s/\/.*//" |
+    sort -u
+}
+
+JSON.object() {
+  case $# in
+    1)
+      JSON._object "$@"
+      ;;
+    2)
+      if [ "$2" == '-' ]; then
+        echo "$JSON__cache" | JSON._object "$@"
+      else
+        echo "${!2}" | JSON._object "$@"
+      fi
+      ;;
+    *)
+    JSON.die 'Usage: JSON.object <key-path> [<tree-var>]' ;;
+  esac
+}
+
+JSON._object() {
+  local key=$1
+  if [[ -n $key && $key != "/" ]]; then
+    key=${key/\//\\/}
+    grep -E "^$key/" |
+    sed "s/^$key//"
+  else
+    cat
+  fi
+}
+
 JSON.put() {
   set -o pipefail
   if [[ $# -gt 0 && $1 =~ ^-([snbz])$ ]]; then

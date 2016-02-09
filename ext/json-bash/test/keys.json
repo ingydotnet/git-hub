@@ -1,0 +1,14 @@
+{
+    "description": "description of gist",
+    "files": {
+        "file1.txt": {
+            "type": "text/plain",
+            "content": "two\nlines"
+        },
+        "file 2.txt": {
+            "type": "text/plain",
+            "content": "two\nlines"
+        }
+
+    }
+}
