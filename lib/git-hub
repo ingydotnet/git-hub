@@ -102,6 +102,7 @@ run-command() {
   get-opts "$@"
   assert-env
 
+  local cleanup_msg_file
   callable-or-source "$command" ||
     error "unknown 'git hub' command '$command'"
   "command:$command" "$@"
@@ -114,6 +115,10 @@ run-command() {
       if [[ $msg_ok != 0 ]]; then
         say "${msg_ok:-"'git hub $command' command successful"}"
       fi
+    fi
+    # successful, delete the tmp file
+    if [[ -n "$cleanup_msg_file" ]]; then
+      rm -f $GIT_HUB_MSG_FILE
     fi
   else
     local status_msg="msg_$status_code"
@@ -1323,16 +1328,88 @@ prompt-to-run-setup() {
 #------------------------------------------------------------------------------
 # Reusable helper functions:
 #------------------------------------------------------------------------------
-editor-title-body() {
-  rm -f "$GIT_HUB_MSG_FILE"
 
-  echo "$1" > "$GIT_HUB_MSG_FILE"
+init-msg-file() {
+  cleanup_msg_file=1
+  local commandline="$command"
+  [[ -n $command_arguments ]] && commandline="$commandline $command_arguments"
+  local body="$1
+#
+# Command: $commandline"
+  if [[ -f $GIT_HUB_MSG_FILE ]]; then
+    local last_line=`tail -1 $GIT_HUB_MSG_FILE`
+    if [[ $last_line =~ ^#[[:space:]]Command:[[:space:]](.*) ]]; then
+      local last_cmd="git hub ${BASH_REMATCH[1]}"
+      local date
+      if osx; then
+        local epoch=`stat -f "%m" $GIT_HUB_MSG_FILE`
+        date=`date -r $epoch`
+      else
+        date=`date -r $GIT_HUB_MSG_FILE`
+      fi
+      local prompt="(r)euse, (s)how, (d)elete, (a)bort?"
+      echo "
+Found existing $GIT_HUB_MSG_FILE from:
+
+  command: '$last_cmd'
+  date:    $date
+"
+      while true
+      do
+        echo -n "$prompt "
+        local action
+        read action
+
+        case $action in
+
+          r)
+            # remove all comment lines
+            sed -i -e '/^#.*$/d' $GIT_HUB_MSG_FILE
+            echo "$body" | sed -e '/^$/d' >> "$GIT_HUB_MSG_FILE"
+            break
+          ;;
+          d)
+            rm -f "$GIT_HUB_MSG_FILE"
+            echo "$body" > "$GIT_HUB_MSG_FILE"
+            break
+          ;;
+          s)
+              echo
+              head $GIT_HUB_MSG_FILE | grep -v '^#'
+              echo
+          ;;
+          *)
+            exit 0 # or 1?
+          ;;
+
+        esac
+      done
+
+    else
+      echo "$body" > "$GIT_HUB_MSG_FILE"
+    fi
+  else
+    echo "$body" > "$GIT_HUB_MSG_FILE"
+  fi
+
+}
+
+delete-empty-msg-file() {
+  local content=`grep -v '^#' $GIT_HUB_MSG_FILE | grep -v '^$'`
+  if [[ -z "$content" ]]; then
+    rm $GIT_HUB_MSG_FILE
+  fi
+}
+
+editor-title-body() {
+  init-msg-file "$1"
 
   $GIT_HUB_EDITOR "$GIT_HUB_MSG_FILE"
   local line
   body=''
   title="$(head -n1 "$GIT_HUB_MSG_FILE")"
   if [[ ! $title =~ [^[:space:]] || $title =~ ^\# ]]; then
+    delete-empty-msg-file
     abort "no title provided"
   fi
   line="$(head -n2 "$GIT_HUB_MSG_FILE" | tail -n1)"
@@ -1351,9 +1428,7 @@ editor-title-body() {
 }
 
 editor-comment() {
-  rm -f "$GIT_HUB_MSG_FILE"
-
-  echo "$1" > "$GIT_HUB_MSG_FILE"
+  init-msg-file "$1"
 
   $GIT_HUB_EDITOR "$GIT_HUB_MSG_FILE"
   local line
@@ -1364,15 +1439,14 @@ editor-comment() {
     [[ $line =~ ^\# ]] && break
     body+="$line"$'\n'
   done < "$GIT_HUB_MSG_FILE"
+  delete-empty-msg-file
   IFS="$ifs"
 }
 
 editor-comment-state() {
-  rm -f "$GIT_HUB_MSG_FILE"
+  init-msg-file "$1"
 
   comment= title= state= assignee= milestone=
-
-  echo "$1" > "$GIT_HUB_MSG_FILE"
 
   $GIT_HUB_EDITOR "$GIT_HUB_MSG_FILE"
   local line started=false
@@ -1402,6 +1476,7 @@ editor-comment-state() {
   IFS="$ifs"
 
   if [[ ! $title =~ [^[:space:]] ]]; then
+    delete-empty-msg-file
     abort "no title provided."
   fi
 }
