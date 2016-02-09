@@ -1335,10 +1335,11 @@ init-msg-file() {
   [[ -n $command_arguments ]] && commandline="$commandline $command_arguments"
   local body="$1
 #
-# Command: $commandline"
+# ---
+# command: $commandline"
   if [[ -f $GIT_HUB_MSG_FILE ]]; then
     local last_line=`tail -1 $GIT_HUB_MSG_FILE`
-    if [[ $last_line =~ ^#[[:space:]]Command:[[:space:]](.*) ]]; then
+    if [[ $last_line =~ ^#[[:space:]]command:[[:space:]](.*) ]]; then
       local last_cmd="git hub ${BASH_REMATCH[1]}"
       local date
       if osx; then
