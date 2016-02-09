@@ -1340,7 +1340,13 @@ init-msg-file() {
     local last_line=`tail -1 $GIT_HUB_MSG_FILE`
     if [[ $last_line =~ ^#[[:space:]]Command:[[:space:]](.*) ]]; then
       local last_cmd="git hub ${BASH_REMATCH[1]}"
-      local date=`date -r $GIT_HUB_MSG_FILE`
+      local date
+      if osx; then
+        local epoch=`stat -f "%m" $GIT_HUB_MSG_FILE`
+        date=`date -r $epoch`
+      else
+        date=`date -r $GIT_HUB_MSG_FILE`
+      fi
       local prompt="(r)euse, (s)how, (d)elete, (a)bort?"
       echo "
 Found existing $GIT_HUB_MSG_FILE from:
