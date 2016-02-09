@@ -1374,7 +1374,6 @@ Found existing $GIT_HUB_MSG_FILE from:
             break
           ;;
           s)
-              echo
               head $GIT_HUB_MSG_FILE | grep -v '^#'
               echo
           ;;
