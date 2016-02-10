@@ -5,6 +5,9 @@ changes:
 - url: correct path also when not in top level directory
 - Changed pr-queue to use the search API making it faster
 - Added pr-created, pr-involves
+- members command accepts --raw option
+- Content typed into the editor will be preserved for later in case
+  of an error
 - Added config-list, config-keys
 - Improved bash completion
 ---
