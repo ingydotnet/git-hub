@@ -97,7 +97,7 @@ command:pr-list() {
   title="Pull requests for '$owner/$repo' (state=$state):"
 
   report-list \
-    "/repos/$owner/$repo/pulls?state=$state;sort=updated;per_page=PER_PAGE" \
+    "/repos/$owner/$repo/pulls?state=$state;sort=updated;direction=desc;per_page=PER_PAGE" \
     'number state title user/login created_at updated_at head/label base/label'
 }
 
