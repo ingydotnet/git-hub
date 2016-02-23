@@ -424,7 +424,9 @@ list-config-values() {
 list-possible-config-keys() {
   cat <<EOM
 api-token
+api-uri
 browser
+editor
 github-email
 github-name
 json-lib
@@ -1002,8 +1004,16 @@ init-env() {
   fi
 
   : "${GIT_HUB_USER_DIR:=$HOME/.git-hub}"
-  : "${GIT_HUB_CONFIG:=$GIT_HUB_USER_DIR/config}"
-  : "${GIT_HUB_CACHE:=$GIT_HUB_USER_DIR/cache}"
+  if [[ -z $GIT_HUB_CONFIG_DIR && -n $GIT_HUB_ROOT ]]; then
+    GIT_HUB_CONFIG_DIR="$GIT_HUB_ROOT"
+  fi
+  if [[ -n $GIT_HUB_CONFIG_DIR && -d $GIT_HUB_CONFIG_DIR && -w $GIT_HUB_CONFIG_DIR ]]; then
+    : "${GIT_HUB_CONFIG:=$GIT_HUB_CONFIG_DIR/config}"
+    : "${GIT_HUB_CACHE:=$GIT_HUB_CONFIG_DIR/cache}"
+  else
+    : "${GIT_HUB_CONFIG:=$GIT_HUB_USER_DIR/config}"
+    : "${GIT_HUB_CACHE:=$GIT_HUB_USER_DIR/cache}"
+  fi
 
   : "${GIT_HUB_EDITOR:=${EDITOR:-vim}}"
   [[ $GIT_HUB_EDITOR =~ ^g?vim?$ ]] && GIT_HUB_EDITOR+=' +1'
