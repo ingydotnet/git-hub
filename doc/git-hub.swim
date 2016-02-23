@@ -804,10 +804,10 @@ Do everything from the command line:
       homepage     http://example.com
   $ git hub repo
 
-The name of the repo will be the directory name.
-Note that on the last two commands you don't need to set the `<repo>` because it
-can be gleaned from the remote. Also on the `edit` command notice how you can
-specify multiple key/value pairs.
+The `repo-init` command will create a new GitHub repository using the
+directory name as the repo name. Note that on the last two commands you don't
+need to set the `<repo>` because it can be gleaned from the remote. Also on
+the `edit` command notice how you can specify multiple key/value pairs.
 
 To just create a new github repo without cloning it, use `git hub repo-new`.
 
