@@ -720,6 +720,7 @@ get-repo-config() {
 
 require-auth() {
   [[ -z $api_token ]] && get-var api-token
+  read-token-from-netrc
   if [[ $api_token == XXX ]]; then
     api_token=
     [[ -n $1 ]] && return
@@ -1142,6 +1143,7 @@ get-opts() {
       -C) no_cache=true ;;
       --token)
         api_token="$1"
+        read-token-from-netrc
         shift
         ;;
       -d) dry_run=true ;;
@@ -1315,6 +1317,12 @@ prompt-to-run-setup() {
 #------------------------------------------------------------------------------
 # Reusable helper functions:
 #------------------------------------------------------------------------------
+
+read-token-from-netrc() {
+  if [[ $api_token == '.netrc' ]]; then
+    api_token=`perl -MNet::Netrc -le 'print Net::Netrc->lookup("api.github.com", $user)->password' `
+  fi
+}
 
 init-msg-file() {
   cleanup_msg_file=1
