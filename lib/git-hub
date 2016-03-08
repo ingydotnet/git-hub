@@ -1094,8 +1094,8 @@ get-opts() {
       printf -v "$need_var" "$arg"
       need_var=
     elif [[ $arg =~ ^--parent(=.*)?$ ]]; then
-      set-var parent_remote "${BASH_REMATCH[1]#=}"
-      [[ -n ${BASH_REMATCH[1]#=} ]] || need_var=parent_remote
+      set-var parent_remote_name "${BASH_REMATCH[1]#=}"
+      [[ -n ${BASH_REMATCH[1]#=} ]] || need_var=parent_remote_name
     elif [[ $arg =~ ^--base(=.*)?$ ]]; then
       set-var parent_base "${BASH_REMATCH[1]#=}"
       [[ -n ${BASH_REMATCH[1]#=} ]] || need_var=parent_base
