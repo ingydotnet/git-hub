@@ -44,14 +44,19 @@ command:issues() {
 
   report-list \
     "/repos/$owner/$repo/issues?state=$state;sort=updated;direction=desc;per_page=PER_PAGE" \
-    'number updated_at state user/login title'
+    'number updated_at state user/login title html_url'
 }
 
 format-entry:issues() {
+  local number=$2 updated=$3 state=$4 creator=$5 title=$6 url=$7
   if "$raw_output"; then
-    echo "$2"
+    local repo="${url#https\:\/\/github\.com\/}"
+    repo="${repo%\/pull\/[[:digit:]]*}"
+    repo="${repo%\/issues\/[[:digit:]]*}"
+    printf "$repo\t$number\n"
   else
-    printf "#%-3d (%s) %-6s @%-16s %s\n" "$2" "${3/T*/}" "$4" "$5" "$6"
+    printf "#%-3d (%s) %-6s @%-16s %s\n" \
+      "$number" "${updated/T*/}" "$state" "$creator" "$title"
   fi
 }
 
