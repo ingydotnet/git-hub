@@ -52,10 +52,10 @@ get the source code from GitHub:
 
   git clone https://github.com/ingydotnet/git-hub /path/to/git-hub
 
-The first installation method is preferred: `source` the `init` file. Just add
+The first installation method is preferred: `source` the `.rc` file. Just add
 a line like this one to your shell startup script:
 
-  source /path/to/git-hub/init
+  source /path/to/git-hub/.rc
 
 That will modify your `PATH` and `MANPATH`, and also enable command completion.
 
@@ -636,7 +636,7 @@ If you used `make install` method, then run this again (after `git pull`):
 = Command Completion
 
 The `git hub` command supports `<TAB>`-based command completion. If you don't
-use the `init` script (see Installation, above), you'll need to enable this
+use the `.rc` script (see Installation, above), you'll need to enable this
 manually to use it.
 
 == In Bash
