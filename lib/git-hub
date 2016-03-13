@@ -440,18 +440,7 @@ EOM
 
 read-config-value() {
   value=
-  value="$(git config -f $GIT_HUB_CONFIG "git-hub.$1")" || {
-    value="$(git config -f $GIT_HUB_CONFIG "github.$1")" || return 1
-
-    # This auto-migrates github to git-hub. Added 2014/08/11.
-    # TODO Remove after a few months.
-    git config -f $GIT_HUB_CONFIG "git-hub.$1" "$value"
-    git config -f $GIT_HUB_CONFIG --unset "github.$1"
-    if [[ -z $(git config -f $GIT_HUB_CONFIG --get-regex github) ]]; then
-      git config -f $GIT_HUB_CONFIG --remove-section github 2> /dev/null || true
-    fi
-
-  }
+  value="$(git config -f $GIT_HUB_CONFIG "git-hub.$1")" || return 1
 }
 
 write-config-value() {
