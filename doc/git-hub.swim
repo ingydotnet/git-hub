@@ -126,7 +126,7 @@ command. Long form commands that require an argument can use '=' or not:
 - `--token=<api-token>`
   Set or override the api-token required by the command. This value can also
   come from the `GIT_HUB_API_TOKEN` environment variable. Usually this value
-  comes from your `~/.git-hub/config` file.
+  comes from your `git-hub` config file. See "Configuration and Environment".
 
 - `-d` `--dryrun`
   Don't actually make the API call. This option turns on verbose mode.
@@ -173,9 +173,8 @@ The `git hub` command gets its input values from these sources (in this
 order):
 
 * Commandline *arguments* (see specific command, below).
-* Environment variables of the form `GIT_HUB_VARIABLE_NAME`.
-* The `./.git/config` file. (The repo you are issuing commands from)
-* The `~/.git-hub/config` file.
+* The `git hub config` command which gets values from a variety of config file
+  locations or environment variables. See "Configuration and Environment".
 
 Most of the commands described below have arguments. This section defines each
 of the argument types. Note that argument values that are strings containing
@@ -596,10 +595,25 @@ These commands are for editing your `git-hub` config file and managing your
 GitHub authentication tokens.
 
 - `config [<config-key> [<config-value>]]`
-  With no args, this command will print the contents of `~/.git-hub/config`.
-  With With one argument (a key), print the current value of the config key.
-  With two arguments (key value), set the value of the config key. 4 keys are
-  currently supported: `login`, `api-token`, `use-auth`, and `json-lib`.
+  With no args, this command will print the contents of your `git-hub` config
+  file(s). With With one argument (a key), print the current value of the
+  config key. With two arguments (key value), set the value of the config key.
+
+  The following config locations are checked for a read operation:
+
+  * Environment variables of the form `GIT_HUB_VARIABLE_NAME`.
+  * `git config --local git-hub.$var_name`. (Per repository)
+  * `git config -f $GIT_HUB_ROOT/config ...`. (Per `git-hub` install)
+  * `git config -f ~/.git-hub/config`. (Per `git-hub` user)
+  * `git config --global git-hub.$var_name`. (Per machine user)
+  * `git config --system git-hub.$var_name`. (Per machine user)
+
+  One of the following locations will be written to:
+
+  * `git config -f $GIT_HUB_ROOT/config ...`
+  * `git config -f ~/.git-hub/config`
+
+
 
 - `config-unset <config-key>`
   Unset a config key. Removes the key from the `~/.git-hub/config` file.
