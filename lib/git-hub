@@ -410,7 +410,6 @@ OK() { return $OK; }
 # Config management:
 #------------------------------------------------------------------------------
 check-config() {
-  [[ -e $GIT_HUB_CONFIG ]] || config-not-setup
   read-config-value login && login="$value" || login=
   if [[ -z $login ]]; then
     config-not-setup
@@ -446,17 +445,24 @@ EOM
 }
 
 read-config-value() {
-  value=
-  value="$(git config -f $GIT_HUB_CONFIG "git-hub.$1")" || return 1
+  local var="GIT_HUB_$(echo "${1//-/_}" | tr 'a-z' 'A-Z')"
+  value="${!var}"
+  [[ -n $value ]] ||
+  value="$(git config --local "git-hub.$1")" ||
+  value="$(git config -f "$GIT_HUB_CONFIG" "git-hub.$1")" ||
+  value="$(git config -f ~/.git-hub/config "git-hub.$1")" ||
+  value="$(git config --global "git-hub.$1")" ||
+  value="$(git config --system "git-hub.$1")" ||
+  return 1
 }
 
 write-config-value() {
-  git config -f $GIT_HUB_CONFIG "git-hub.$1" "$2" || return 1
+  git config -f "$GIT_HUB_CONFIG" "git-hub.$1" "$2" || return 1
 }
 
 delete-config-value() {
-  git config -f $GIT_HUB_CONFIG --unset "git-hub.$1" || {
-    git config -f $GIT_HUB_CONFIG --unset "github.$1" || return 1
+  git config -f "$GIT_HUB_CONFIG" --unset "git-hub.$1" || {
+    git config -f "$GIT_HUB_CONFIG" --unset "github.$1" || return 1
   }
 }
 
