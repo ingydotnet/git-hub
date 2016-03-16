@@ -73,7 +73,12 @@ json-dump-object-pairs() {
 }
 
 pretty-json-list() {
-  local num="$(JSON.cache | tail -n1 | cut -d '/' -f2)"
+  local num
+  if [[ -n "$key_prefix" ]]; then
+    num="$(JSON.object "$key_prefix" - | tail -n1 | cut -d '/' -f2)"
+  else
+    num="$(JSON.cache | tail -n1 | cut -d '/' -f2)"
+  fi
   declare -a keys=("$@")
   if [[ -z $num ]]; then
       num=-1
@@ -85,7 +90,7 @@ pretty-json-list() {
     for (( j = 0; j < ${#keys[@]}; j++)); do
       local key="${keys[$j]}"
       local key="${key//__/\/}"
-      local value="$(JSON.get "/$i/$key" - || true)"
+      local value="$(JSON.get "$key_prefix/$i/$key" - || true)"
       if [[ -n $value ]]; then
         printf "    \"%s\": %s" "$key" "$value"
         [[ $(($j+1)) -lt ${#keys[@]} ]] && printf ','
