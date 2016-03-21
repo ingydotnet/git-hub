@@ -75,6 +75,7 @@ repos                repos [<user>]
 scope-add            scope-add <api-token-id> <scope-name>...
 scope-remove         scope-remove <api-token-id> <scope-name>...
 scopes               scopes <api-token-id>
+search-issues        search-issues <query>
 search-repo          search-repo <query>
 search-user          search-user <query>
 setup                setup
@@ -785,17 +786,29 @@ help:scopes() {
 ...
 }
 
+help:search-issues() {
+    cat <<'...'
+
+  Usage: git hub search-issues <query>
+
+
+  Search for issues and pull requests.
+  For more information, see the search documentation at
+  [https://developer.github.com/v3/search/#search-users]
+...
+}
+
 help:search-repo() {
     cat <<'...'
 
   Usage: git hub search-repo <query>
 
-   Search for repositories.
+  Search for repositories.
 
-   By default it searches in the repository name, but you can change that:
-   `search-repo "libyaml in:description"`. For more information, see
-   the search documentation at
-   [https://developer.github.com/v3/search/#search-repositories]
+  By default it searches in the repository name, but you can change that:
+  `search-repo "libyaml in:description"`. For more information, see
+  the search documentation at
+  [https://developer.github.com/v3/search/#search-repositories]
 ...
 }
 
@@ -804,12 +817,12 @@ help:search-user() {
 
   Usage: git hub search-user <query>
 
-   Search for users.
+  Search for users.
 
-   By default it searches in the login field, but you can change that:
-   `search-user "wall in:fullname"`. For more information, see
-   the search documentation at
-   [https://developer.github.com/v3/search/#search-users]
+  By default it searches in the login field, but you can change that:
+  `search-user "wall in:fullname"`. For more information, see
+  the search documentation at
+  [https://developer.github.com/v3/search/#search-users]
 ...
 }
 
