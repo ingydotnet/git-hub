@@ -12,11 +12,16 @@ command:setup() {
   exit 0
 }
 
+center() {
+  local line="$@"
+  printf "%*s\n" $(( (${#line} + 80) / 2)) "$line"
+}
+
 setup:intro() {
   clear
   cat <<...
 
-                        The 'git hub' Setup Tool
+`center "The 'git hub' Setup Tool"`
 
 This dialog will walk you through the steps involved in creating or updating
 the configuration needed by the 'git hub' command. It should only take a
@@ -33,7 +38,7 @@ setup:login() {
   clear
   cat <<...
 
-                        Step #1 - Login ID
+`center "Step #1 - Login ID"`
 
 The 'git hub' command needs to know your GitHub login id.
 
@@ -68,7 +73,7 @@ setup:api-token() {
   clear
   cat <<...
 
-                        Step #2 - API Token
+`center "Step #2 - API Token"`
 
 More advanced commands require an authentication token (with the appropriate
 scopes added).
@@ -86,7 +91,7 @@ Verify that this is the correct token, If not, we will generate a new token
 for you and put it in the config file.
 
 ...
-    a="$(prompt "Is this the correct token? [Yn]")"
+    a="$(prompt "Is this the correct token? [Yn] ")"
     [[ $a == y ]] && return
   fi
   cat <<...
@@ -120,47 +125,10 @@ The password will not be stored after the commands finish running.
 }
 
 setup:use-auth() {
-  clear
-  cat <<...
-
-                        Step #3 - Use Authentication
-
-Many commands don't require you to send your authentication token, but there
-are a couple reasons why you might want to send it anyway.
-
-1) Some information about users and repositories is only provided for
-   authenticated requests.
-
-2) GitHub only allows 60 unauthenticated calls per hour, as opposed to 5000
-   for authenticated calls. For this reason it is preferable to always
-   authenticate.
-
-There is a config option called 'use-auth' that you can set to always send the
-authentication token.
-
-...
-  read-config-value use-auth && auth="$value" || auth=
-  if [[ -z $auth ]]; then
-    a="$(prompt "Would you like to turn this option on? [Yn]")"
-    [[ $a == n ]] && return
-  elif [[ $auth == false ]]; then
-    echo 'You have this option turned off.'
-    echo
-    a="$(prompt "Would you like to turn this option on? [yN]")"
-  else
-    write-config-value use-auth true ||
-      die "Can't write-config-value use-auth true"
-    echo 'You already have this option turned on.'
-    echo
-    a="$(prompt "Would you like to keep this option on? [Yn]")"
-  fi
-  if [[ $a == y ]]; then
-    write-config-value use-auth true ||
-      die "Can't write-config-value use-auth true"
-  else
-    write-config-value use-auth false ||
-      die "Can't write-config-value use-auth false"
-  fi
+  local auth
+  read-config-value use-auth && auth="$value" || auth=true
+  write-config-value use-auth "$auth" ||
+    die "Can't write-config-value use-auth $auth"
 }
 
 setup:json-perl() {
@@ -177,7 +145,7 @@ setup:json-perl() {
 
   cat <<...
 
-                        Step #4 - Faster JSON
+`center "Step #3 - Faster JSON"`
 
 The 'git-hub' command is written entirely in Bash. The Bash JSON utility it
 uses can be slow.
@@ -191,8 +159,16 @@ requires Perl and the JSON::MaybeXS modules for Perl.
 You already have this option set to '$set'.
 
 ...
-    prompt
-  elif [[ $perl == OK ]]; then
+    a="$(prompt "Do you want to keep this value? [Yn] ")"
+
+    if [[ $a == y ]]; then
+      return
+    else
+      delete-config-value json-lib ||
+        die "Can't delete-config-value json-lib"
+    fi
+  fi
+  if [[ $perl == OK ]]; then
     if [[ $perl_json_pp == OK ]] ||
        [[ $perl_json == OK ]] ||
        [[ $perl_json_maybexs == OK ]]
@@ -201,9 +177,14 @@ You already have this option set to '$set'.
 You seem to have the prerequisites to speed up your 'git-hub' experience.
 
 ...
-      a="$(prompt "Would you like to turn this setting on? [Yn]")"
-      [[ $a == y ]] && write-config-value json-lib json-perl.bash ||
-        die "Can't write-config-value use-auth false"
+      a="$(prompt "Would you like to turn this setting on? [Yn] ")"
+      if [[ $a == y ]]; then
+        write-config-value json-lib json-perl.bash ||
+          die "Can't write-config-value json-lib json-perl.bash"
+      else
+        delete-config-value json-lib ||
+          die "Can't delete-config-value json-lib"
+      fi
     else
       cat <<...
 You seem to have Perl, but none of the 'JSON::MaybeXS', 'JSON' or 'JSON::PP'
