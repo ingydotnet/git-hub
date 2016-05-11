@@ -79,9 +79,12 @@ main() {
   local count_option do_all=false use_auth no_cache
   local quiet_output verbose_output
   local raw_output=false json_output=false interactive=
+  local stdout_terminal= stderr_terminal=
   local show_output=false show_headers=false show_json=false
   local dry_run=false show_token repeat_command=false
   local terminal_lines terminal_cols
+
+  init_terminal
   if run-for-each "$@"; then
     pager_in_use=true
     run-each "$@" | $GIT_HUB_PAGER
@@ -113,6 +116,7 @@ run-command() {
       "ok:$command"
     else
       if [[ $msg_ok != 0 ]]; then
+#        msg_ok=`colorize "$msg_ok" GREEN`
         say "${msg_ok:-"'git hub $command' command successful"}"
       fi
     fi
@@ -127,6 +131,7 @@ run-command() {
     elif [[ -n $status_code ]] && can "status-$status_code:$command"; then
       "status-$status_code:$command"
     elif [[ -n $msg_fail ]]; then
+      msg_fail=`colorize_error "$msg_fail" ERROR`
       nay "$msg_fail"
     elif can "fail:$command"; then
       "fail-$command"
@@ -134,6 +139,7 @@ run-command() {
       local msg="Error: 'git hub $command' command failed"
       ! "$verbose_output" && [[ -n $status_code ]] &&
         msg+=": $status_code"
+      msg=`colorize_error "$msg" ERROR`
       nay "$msg"
     fi
     if "$verbose_output" && [[ -n $ERROR ]]; then
@@ -425,6 +431,7 @@ list-possible-config-keys() {
   cat <<EOM
 api-token
 browser
+color
 github-email
 github-name
 json-lib
@@ -940,11 +947,13 @@ report-value() {
          [[ $value =~ \\n ]] ||
          [[ $label == Description ]]
       then
-        echo "$label:"
+        echo "$(colorize "$label:" LABEL)"
         normalize-multiline-text-output "$value" " "
         echo "$text"
       else
-        printf "%-15s %s\n" "$label" "$value"
+        label="$(printf "%-15s" "$label")"
+        label="$(colorize "$label" LABEL)"
+        echo "$label $value"
       fi
     fi
   fi
@@ -1018,6 +1027,23 @@ init-vars() {
   get-var-bool quiet-output
   get-var-bool verbose-output
   get-var-bool show-token
+  init-colors
+}
+
+init-colors() {
+  get-var color
+  if [[ -z "$color" ]]; then
+    color="$(git config color.ui)" || color=""
+  fi
+  [[ -z "$color" ]] && return
+  if [[ "$color" == "false" || "$color" == "off" || "$color" == "no" ]]; then
+    color="never"
+    return
+  fi
+  if [[ "$color" == "true" || "$color" == "on" || "$color" == "yes" ]]; then
+    color="auto"
+    return
+  fi
 }
 
 run-for-each() {
@@ -1535,9 +1561,55 @@ out-() { echo -en "$@" >&1; }
 err() { echo -e "$@" >&2; }
 err-() { echo -en "$@" >&2; }
 
+declare GIT_HUB_COLOR_BOLD='\e[1m'
+declare GIT_HUB_COLOR_RED='\e[31m'
+declare GIT_HUB_COLOR_REPO="$GIT_HUB_COLOR_RED"
+declare GIT_HUB_COLOR_ERROR="$GIT_HUB_COLOR_RED$GIT_HUB_COLOR_BOLD"
+declare GIT_HUB_COLOR_GREEN='\e[32m'
+declare GIT_HUB_COLOR_LABEL="$GIT_HUB_COLOR_GREEN"
+declare GIT_HUB_COLOR_CYAN='\e[36m'
+declare GIT_HUB_COLOR_DATE="$GIT_HUB_COLOR_CYAN"
+declare GIT_HUB_COLOR_PURPLE='\e[35m'
+declare GIT_HUB_COLOR_LOGIN="$GIT_HUB_COLOR_PURPLE"
+declare GIT_HUB_COLOR_YELLOW='\e[33m'
+declare GIT_HUB_COLOR_DARKGRAY='\e[90m'
+declare GIT_HUB_COLOR_YELLOWBOLD="$GIT_HUB_COLOR_YELLOW$GIT_HUB_COLOR_BOLD"
+declare GIT_HUB_COLOR_GREENBOLD="$GIT_HUB_COLOR_GREEN$GIT_HUB_COLOR_BOLD"
+declare NO_COLOR='\033[0m'
+
+colorize() {
+  local msg=$1
+  local colorize="GIT_HUB_COLOR_$2"
+  if [[ $stdout_terminal && $color == "auto" || $color == "always" ]]; then
+    echo -e "${!colorize}$msg${NO_COLOR}"
+  else
+    echo "$msg"
+  fi
+}
+
+colorize_error() {
+  local msg=$1
+  local colorize="GIT_HUB_COLOR_$2"
+  if [[ $stderr_terminal && $color == "auto" || $color == "always" ]]; then
+    echo -e "${!colorize}$msg${NO_COLOR}"
+  else
+    echo "$msg"
+  fi
+}
+
+init_terminal() {
+  if [[ -t 1 ]]; then
+    stdout_terminal=1
+  fi
+  if [[ -t 2 ]]; then
+    stderr_terminal=1
+  fi
+}
+
 error() {
   local msg="Error: $1" usage=
   source-ext help-functions.bash
+  msg=`colorize_error "$msg" ERROR`
   if can "help:$command"; then
     msg=$'\n'"$msg"$'\n'"$("help:$command")"$'\n'
   fi
@@ -1592,6 +1664,49 @@ prompt() {
     echo "$default"
   fi
 }
+
+format-markdown() {
+  local line
+  local state=0
+  while IFS=$'\r\n' read -r line; do
+    if [[ "$line" =~ ^\ *\`\`\` ]]; then
+
+      if (( $state )); then
+        state=0
+        line="$(colorize "$line" DARKGRAY)"
+      else
+        state=1
+      fi
+    fi
+    if (( $state )); then
+      line="$(colorize "$line" DARKGRAY)"
+    fi
+    echo "$line"
+  done <<< "$1"
+}
+
+color-table-row() {
+  local args=("$@")
+  local line= i
+  for ((i = 0; i < ${#args[@]}; i=i+3)); do
+    local format="${args[$i]}"
+    local item_color="${args[$i+1]}"
+    local content="${args[$i+2]}"
+    if [[ -n "$format" ]]; then
+      content="$( printf "$format" "$content" )"
+    fi
+    if [[ -n "$item_color" ]]; then
+      content="$( colorize "$content" "$item_color" )"
+    fi
+    if [[ -n "$line" ]]; then
+      line="$line $content"
+    else
+      line="$content"
+    fi
+  done
+  echo "$line"
+}
+
 
 callable-or-source() {
   if can "command:$1"; then

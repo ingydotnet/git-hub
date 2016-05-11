@@ -807,6 +807,12 @@ is stale, you may want to try these options:
 * Run `git hub config no-cache true` to never use the cache.
 * Run `git hub cache-clear` to erase all the cached values.
 
+= Colors
+
+You can have colored output. By default git-hub will look for
+`git config color.ui`, but you can change that by setting
+`git hub config color`. It accepts the same values as git itself.
+
 = Examples
 
 The following sections show lots of interesting ways to use `git hub`. Let

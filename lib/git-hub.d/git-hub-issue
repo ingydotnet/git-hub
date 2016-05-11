@@ -55,8 +55,15 @@ format-entry:issues() {
     repo="${repo%\/issues\/[[:digit:]]*}"
     printf "$repo\t$number\n"
   else
-    printf "#%-3d (%s) %-6s @%-16s %s\n" \
-      "$number" "${updated/T*/}" "$state" "$creator" "$title"
+#    printf "#%-3d (%s) %-6s @%-16s %s\n" \
+#      "$number" "${updated/T*/}" "$state" "$creator" "$title"
+    local updated="${updated/T*/}"
+    color-table-row \
+      "#%-3d" BOLD "$number" \
+      ""      DATE "($updated)" \
+      "%-6s"  "" "$state" \
+      "%-17s" LOGIN "$creator" \
+      ""      "" "$title"
   fi
 }
 
@@ -99,9 +106,15 @@ ok:issue() {
 write-issue() {
   report-data
 
+  # TODO
+  # how to get /body without report-data printing it
+  # local description="$(JSON.get -s /body -)"
+  # description="$(printf "$description")"
+  # description="$(format-markdown "$description")"
+  # echo "$description"
   local comments="$(JSON.get -n /comments -)"
   if [[ $comments -gt 0 ]]; then
-    echo Comments:
+    echo $( colorize Comments: LABEL )
     command=comments
     report-list \
       "/repos/$owner/$repo/issues/$number/comments?sort=updated;per_page=PER_PAGE" \
@@ -110,9 +123,18 @@ write-issue() {
 }
 
 format-entry:comments() {
-  printf "%d) %-14s (%s)\n" "$1" "$2" "${3/T*/}"
+  local number="$1"
+  local creator="$2"
+  local created="${3/T*/}"
+
+    color-table-row \
+      "%d)"   LABEL "$number" \
+      "%-14s" LOGIN "$creator" \
+      ""      DATE "($created)"
+
   local text
   normalize-multiline-text-output "$4" " "
+  text="$(format-markdown "$text")"
   echo "$text"
   echo
   :
