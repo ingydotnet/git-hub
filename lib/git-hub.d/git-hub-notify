@@ -22,7 +22,14 @@ format-entry:notify-list() {
   else
     local url="${7/api\./}"
     url="${url/repos\//}"
-    printf -v output_line "%2d) %s  (%s)\n      %s) unread=%s (%s) %s" \
-      "$1" "$2" "$3" "${4%T*}" "$5" "$6" "$url"
+    color-table-row \
+      "%2d)" LABEL "$1" \
+      "" "" "$2" \
+      " (%s)" YELLOW "$3"
+    color-table-row \
+      "      %s)" DATE "${4%T*}" \
+      "unread=%s" YELLOW "$5" \
+      "(%s)" LABEL "$6" \
+      "" "" "$url"
   fi
 }

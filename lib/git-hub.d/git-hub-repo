@@ -4,17 +4,23 @@ set -e
 
 command:repos() {
   get-args owner:get-user
-  title="Repos for '$owner':"
+  title="$(colorize "Repos for '$owner':" LABEL)"
   report-list \
     "/users/$owner/repos?sort=pushed;per_page=PER_PAGE" \
     'pushed_at full_name description'
 }
 
 format-entry:repos() {
+  local number="$1" pushed_at="$2" name="$3" desc="$4"
+  pushed_at="${pushed_at/T*}"
   if "$raw_output"; then
     out "$3"
   else
-    printf -v output_line "%d) (%s)  %-30s %s" "$1" "${2/T*}" "$3" "$4"
+    color-table-row \
+      "%d)"  LABEL "$number" \
+      "(%s) " DATE "$pushed_at" \
+      "%-30s" REPO "$name" \
+      "" ""   "$desc"
   fi
 }
 

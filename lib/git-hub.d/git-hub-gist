@@ -14,7 +14,11 @@ format-entry:gists() {
   if "$raw_output"; then
     out "$2"
   else
-    printf -v output_line "%d) %s %-20s" "$1" "$2" "$3"
+    local out="$(color-table-row \
+      "%d)"   LABEL "$1" \
+      ""      RED "$2" \
+      "%-20s" "" "$3")"
+    printf "$out\n"
   fi
 }
 

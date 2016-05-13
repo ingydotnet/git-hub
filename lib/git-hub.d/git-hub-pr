@@ -110,10 +110,18 @@ format-entry:pr-list() {
     repo="${repo%\/pull\/[[:digit:]]*}"
     printf "$repo\t$number\n"
   else
-    printf "#%-3d %-8s %s\n     @%-12s Created: %s  Updated: %s\n     %s\n" \
-      "$number" "($state)" "$title" \
-      "$creator" "${created/T*/}" \
-      "${updated/T*/}" "$head → $base"
+    color-table-row \
+      "#%-3d" LABEL "$number" \
+      "%-8s"  YELLOW "($state)" \
+      ""      "" "$title"
+    color-table-row \
+      "     @%-12s" LOGIN "$creator" \
+      ""            "" "Created: " \
+      ""            DATE "${created/T*}" \
+      ""            "" "Updated:" \
+      "%s"          DATE "${updated/T*}"
+    color-table-row \
+      "     %s" "" "$head → $base"
   fi
 }
 
@@ -202,8 +210,19 @@ _list-pr-queue() {
   if "$raw_output"; then
     printf "$repo\t$number\n"
   else
-    printf "%s\n#%-3d %-8s %s\n     @%-12s Created: %s  Updated: %s\n     %s\n\n" \
-      "$repo" "$number" "($state)" "$title" "$creator" "${created/T*/}" "${updated/T*/}" "$url"
+      echo "$(colorize "$repo" REPO)"
+      color-table-row \
+        "#%-3d" LABEL "$number" \
+        "%-8s" YELLOW "($state)" \
+        "" "" "$title"
+      color-table-row \
+        "     @%-12s" LOGIN "$creator" \
+        "" "" "Created:" \
+        "" DATE "${created/T*/}" \
+        "" "" " Updated:" \
+        "" DATE "${updated/T*/}"
+      color-table-row \
+        "     %s" "" "$url"
   fi
 }
 

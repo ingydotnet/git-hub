@@ -19,7 +19,10 @@ format-entry:search-repo() {
   if "$raw_output"; then
     echo "$repo"
   else
-    printf "%d) %-40s (%d stars)\n" "$number" "$repo" "$stars"
+    color-table-row \
+      "%d)"        LABEL "$number" \
+      "%-40s"      "" "$repo" \
+      "(%d stars)" YELLOW "$stars"
   fi
 }
 
@@ -40,7 +43,7 @@ format-entry:search-user() {
   if "$raw_output"; then
     echo "$login"
   else
-    printf "%d) %-40s\n" "$number" "$login"
+    printf "%s %-40s\n" "$(colorize "$number)" LABEL)" "$login"
   fi
 }
 
@@ -59,7 +62,10 @@ format-entry:search-issues() {
   if "$raw_output"; then
     printf "$url\t$number\n"
   else
-    printf "%5s %-40s %s\n" "#$number" "$url" "$title"
+    color-table-row \
+      "%5s"   LABEL "#$number" \
+      "%-40s" REPO "$url" \
+      ""      "" "$title"
   fi
 }
 

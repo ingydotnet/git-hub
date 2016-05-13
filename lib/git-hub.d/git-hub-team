@@ -26,7 +26,10 @@ format-entry:teams() {
   if "$raw_output"; then
     out "$3"
   else
-    printf -v output_line "%2d) %-12s (ID %s)" "$1" "$2" "$3"
+    color-table-row \
+      "%2d)"    LABEL "$1" \
+      "%-12s"   "" "$2" \
+      "(ID %s)" YELLOW "$3"
   fi
 }
 

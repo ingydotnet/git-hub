@@ -13,7 +13,10 @@ format-entry:forks() {
   if "$raw_output"; then
     out "$3"
   else
-    printf "%d) (%s)  %-30s\n" "$1" "${2/T*/}" "$3"
+    color-table-row \
+      "%d)"   LABEL "$1" \
+      "(%s)"  DATE "${2/T*/}" \
+      "%-30s" "" "$3"
   fi
 }
 

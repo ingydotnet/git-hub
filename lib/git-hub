@@ -840,7 +840,7 @@ default-format-entry() {
   if "$raw_output"; then
     out "$2"
   else
-    printf "%d) %s\n" "$1" "$2"
+    printf "%s %s\n" "$(colorize "$1)" LABEL)" "$2"
   fi
 }
 
