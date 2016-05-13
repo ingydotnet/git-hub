@@ -86,18 +86,23 @@ pretty-json-list() {
 
   echo '['
   for (( i = 0; i <= $num; i++)); do
-    echo '  {'
+    local first_line=1
+    echo -n '  {'
     for (( j = 0; j < ${#keys[@]}; j++)); do
       local key="${keys[$j]}"
       local key="${key//__/\/}"
       local value="$(JSON.get "$key_prefix/$i/$key" - || true)"
       if [[ -n $value ]]; then
+        if (( $first_line )); then
+          echo ""
+        else
+          echo ","
+        fi
         printf "    \"%s\": %s" "$key" "$value"
-        [[ $(($j+1)) -lt ${#keys[@]} ]] && printf ','
-        printf "\n"
+        first_line=0
       fi
     done
-    printf '  }'
+    echo -n $'\n''  }'
     if [[ $i -lt $num ]]; then
       echo ,
     else
@@ -110,18 +115,23 @@ pretty-json-list() {
 pretty-json-object() {
   declare -a keys=("$@")
 
-  echo '{'
+  local first_line=1
+  echo -n '{'
   for (( i = 0; i < ${#keys[@]}; i++)); do
     local key="${keys[$i]}"
     local key="${key//__/\/}"
     local value="$(JSON.get "/$key" - || true)"
     if [[ -n $value ]]; then
+      if (( $first_line )); then
+        echo ""
+      else
+        echo ","
+      fi
       printf "    \"%s\": %s" "$key" "$value"
-      [[ $(($i+1)) -lt ${#keys[@]} ]] && printf ','
-      printf "\n"
+      first_line=0
     fi
   done
-  echo '}'
+  echo $'\n''}'
 }
 
 json-var-list() {
