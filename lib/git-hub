@@ -951,7 +951,7 @@ report-value() {
 }
 
 label_blog='Web Site'
-label_watchers='Stars'
+label_stargazers_count='Stars'
 label_homepage='Web Site'
 label_html_url='GitHub Page'
 label_ssh_url='Remote URL'
