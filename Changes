@@ -10,6 +10,10 @@ changes:
   of an error
 - Added config-list, config-keys
 - Improved bash completion
+- fork: fix url for forked repo
+- pr-new: fix --parent bug
+- deprecate `init`, switch to `.rc`
+- new commands: search-repo, search-user, search-issues
 ---
 version: 0.1.5.12
 date: 2015-12-31
