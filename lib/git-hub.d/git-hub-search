@@ -43,7 +43,7 @@ format-entry:search-user() {
   if "$raw_output"; then
     echo "$login"
   else
-    printf "%s %-40s\n" "$(colorize "$number)" LABEL)" "$login"
+    printf "%s %-40s\n" "$(colorize LABEL "$number)" )" "$login"
   fi
 }
 

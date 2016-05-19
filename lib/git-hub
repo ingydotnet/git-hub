@@ -116,7 +116,7 @@ run-command() {
       "ok:$command"
     else
       if [[ $msg_ok != 0 ]]; then
-#        msg_ok=`colorize "$msg_ok" GREEN`
+#        msg_ok=`colorize GREEN "$msg_ok" `
         say "${msg_ok:-"'git hub $command' command successful"}"
       fi
     fi
@@ -131,7 +131,7 @@ run-command() {
     elif [[ -n $status_code ]] && can "status-$status_code:$command"; then
       "status-$status_code:$command"
     elif [[ -n $msg_fail ]]; then
-      msg_fail=`colorize_error "$msg_fail" ERROR`
+      msg_fail="$(colorize_error ERROR "$msg_fail" )"
       nay "$msg_fail"
     elif can "fail:$command"; then
       "fail-$command"
@@ -139,7 +139,7 @@ run-command() {
       local msg="Error: 'git hub $command' command failed"
       ! "$verbose_output" && [[ -n $status_code ]] &&
         msg+=": $status_code"
-      msg=`colorize_error "$msg" ERROR`
+      msg="$(colorize_error ERROR "$msg" )"
       nay "$msg"
     fi
     if "$verbose_output" && [[ -n $ERROR ]]; then
@@ -840,7 +840,7 @@ default-format-entry() {
   if "$raw_output"; then
     out "$2"
   else
-    printf "%s %s\n" "$(colorize "$1)" LABEL)" "$2"
+    printf "%s %s\n" "$(colorize LABEL "$1)" )" "$2"
   fi
 }
 
@@ -947,12 +947,12 @@ report-value() {
          [[ $value =~ \\n ]] ||
          [[ $label == Description ]]
       then
-        echo "$(colorize "$label:" LABEL)"
+        echo "$(colorize LABEL "$label:" )"
         normalize-multiline-text-output "$value" " "
         echo "$text"
       else
         label="$(printf "%-15s" "$label")"
-        label="$(colorize "$label" LABEL)"
+        label="$(colorize LABEL "$label" )"
         echo "$label $value"
       fi
     fi
@@ -1578,8 +1578,8 @@ declare GIT_HUB_COLOR_GREENBOLD="$GIT_HUB_COLOR_GREEN$GIT_HUB_COLOR_BOLD"
 declare NO_COLOR='\033[0m'
 
 colorize() {
-  local msg=$1
-  local colorize="GIT_HUB_COLOR_$2"
+  local colorize="GIT_HUB_COLOR_$1"
+  local msg=$2
   if [[ $stdout_terminal && $color == "auto" || $color == "always" ]]; then
     echo -e "${!colorize}$msg${NO_COLOR}"
   else
@@ -1588,8 +1588,8 @@ colorize() {
 }
 
 colorize_error() {
-  local msg=$1
-  local colorize="GIT_HUB_COLOR_$2"
+  local colorize="GIT_HUB_COLOR_$1"
+  local msg=$2
   if [[ $stderr_terminal && $color == "auto" || $color == "always" ]]; then
     echo -e "${!colorize}$msg${NO_COLOR}"
   else
@@ -1609,7 +1609,7 @@ init_terminal() {
 error() {
   local msg="Error: $1" usage=
   source-ext help-functions.bash
-  msg=`colorize_error "$msg" ERROR`
+  msg="$(colorize_error ERROR "$msg" )"
   if can "help:$command"; then
     msg=$'\n'"$msg"$'\n'"$("help:$command")"$'\n'
   fi
@@ -1673,13 +1673,13 @@ format-markdown() {
 
       if (( $state )); then
         state=0
-        line="$(colorize "$line" DARKGRAY)"
+        line="$(colorize DARKGRAY "$line" )"
       else
         state=1
       fi
     fi
     if (( $state )); then
-      line="$(colorize "$line" DARKGRAY)"
+      line="$(colorize DARKGRAY "$line" )"
     fi
     echo "$line"
   done <<< "$1"
@@ -1696,7 +1696,7 @@ color-table-row() {
       content="$( printf "$format" "$content" )"
     fi
     if [[ -n "$item_color" ]]; then
-      content="$( colorize "$content" "$item_color" )"
+      content="$( colorize "$item_color" "$content" )"
     fi
     if [[ -n "$line" ]]; then
       line="$line $content"

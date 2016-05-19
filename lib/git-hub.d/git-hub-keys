@@ -14,7 +14,7 @@ format-entry:keys() {
     out "$2"
   else
     say "Public SSH keys for '$owner':"
-    printf "%s %s\n" "$(colorize "$1)" LABEL)" "$2"
+    printf "%s %s\n" "$(colorize LABEL "$1)" )" "$2"
   fi
 }
 

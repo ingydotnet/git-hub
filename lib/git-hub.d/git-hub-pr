@@ -210,7 +210,7 @@ _list-pr-queue() {
   if "$raw_output"; then
     printf "$repo\t$number\n"
   else
-      echo "$(colorize "$repo" REPO)"
+      echo "$(colorize REPO "$repo" )"
       color-table-row \
         "#%-3d" LABEL "$number" \
         "%-8s" YELLOW "($state)" \

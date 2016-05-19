@@ -114,7 +114,7 @@ write-issue() {
   # echo "$description"
   local comments="$(JSON.get -n /comments -)"
   if [[ $comments -gt 0 ]]; then
-    echo $( colorize Comments: LABEL )
+    echo $( colorize LABEL Comments: )
     command=comments
     report-list \
       "/repos/$owner/$repo/issues/$number/comments?sort=updated;per_page=PER_PAGE" \
