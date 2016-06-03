@@ -670,6 +670,9 @@ help:pr-new() {
   default branch of the default remote itself. Use `--remote`, `--branch`,
   `--parent`, and `--base` options to change the default source remote, source
   branch, target remote and target branch (respectively).
+
+  This command will open an editor like `git commit` does. To avoid that you
+  can pipe text into the command.
 ...
 }
 

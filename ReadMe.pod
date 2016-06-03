@@ -577,6 +577,9 @@ default branch of the default remote itself. Use C<--remote>, C<--branch>, C<--
 parent>, and C<--base> options to change the default source remote, source
 branch, target remote and target branch (respectively).
 
+This command will open an editor like C<git commit> does. To avoid that you
+can pipe text into the command.
+
 =item C<< pr-diff [<owner>/<repo>] <issue-id-number> >>
 
 Show the diff for a pull request.

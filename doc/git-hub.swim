@@ -459,6 +459,9 @@ interactions from the command line. They are installed by default.
   `--parent`, and `--base` options to change the default source remote, source
   branch, target remote and target branch (respectively).
 
+  This command will open an editor like `git commit` does. To avoid that you
+  can pipe text into the command.
+
 - `pr-diff [<owner>/<repo>] <issue-id-number>`
   Show the diff for a pull request.
 
