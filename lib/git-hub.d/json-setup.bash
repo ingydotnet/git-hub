@@ -137,7 +137,7 @@ json-var-list() {
       value="${value//\\n/$'\n'}"
       value="${value//\\t/$'\t'}"
       value="${value//\\\"/\"}"
-      value="${value//\\\\/$back}"
+      value="${value//\\\\/\\}"
       key="${BASH_REMATCH[2]}_${BASH_REMATCH[1]}"
       key="${key//\//__}"
       printf -v "$key" "%s" "$value"

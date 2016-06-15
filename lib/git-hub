@@ -787,7 +787,7 @@ report-list-process() {
       for field in "${fields[@]}"; do
         var="${field//\//__}"_"$ii"
         values+=("${!var}")
-        # unset as soon as we don't need it aymore; otherwise it might be
+        # unset as soon as we don't need it anymore; otherwise it might be
         # leftover when calling api-call and json-var-list more than once
         unset -v $var
       done
