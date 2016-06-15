@@ -763,9 +763,7 @@ report-list-process() {
   local list_max=${list_size:-1000}
   local line_max=$terminal_cols
   local per_page=100
-  if ! $json_output; then
-    [[ $per_page -gt $list_max ]] && per_page=$list_max
-  fi
+  [[ $per_page -gt $list_max ]] && per_page=$list_max
   url="${url/PER_PAGE/$per_page}"
   [[ -n $title ]] && say "$title"
   local list_counter=1
