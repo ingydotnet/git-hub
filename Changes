@@ -2,6 +2,7 @@
 version: tba
 date: tba
 changes:
+- Remove `init` for good. Use `.rc` now.
 - url: correct path also when not in top level directory
 - Changed pr-queue to use the search API making it faster
 - Added pr-created, pr-involves
