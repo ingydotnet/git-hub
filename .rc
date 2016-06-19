@@ -21,5 +21,6 @@
 export GIT_HUB_ROOT="$(cd "$(dirname $GIT_HUB_ROOT)"; pwd)"
 
 export PATH="$GIT_HUB_ROOT/lib:$PATH"
-export MANPATH="$GIT_HUB_ROOT/man:$MANPATH"
+export MANPATH="$GIT_HUB_ROOT/man:${MANPATH-}"
+
 source "$GIT_HUB_ROOT/share/enable-completion.sh"
