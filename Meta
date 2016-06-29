@@ -30,5 +30,5 @@ install: make bpan-install
 
 devel:
   git: git@github.org:ingydotnet/git-hub.git
-  irc: irc.freenode.net/git-commands
+  irc: irc.freenode.net/gitcommands
   bug: https://github.com/ingydotnet/git-hub/issues/
