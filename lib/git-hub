@@ -1032,9 +1032,6 @@ init-vars() {
 
 init-colors() {
   get-var color
-  if [[ -z "$color" ]]; then
-    color="$(git config color.ui)" || color=""
-  fi
   [[ -z "$color" ]] && return
   if [[ "$color" == "false" || "$color" == "off" || "$color" == "no" ]]; then
     color="never"

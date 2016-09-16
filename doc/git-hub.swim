@@ -809,9 +809,9 @@ is stale, you may want to try these options:
 
 = Colors
 
-You can have colored output. By default git-hub will look for
-`git config color.ui`, but you can change that by setting
-`git hub config color`. It accepts the same values as git itself.
+You can have colored output. You can activate that by setting
+`git hub config color auto`. It accepts the same values as
+`git config color.ui` itself.
 
 = Examples
 
