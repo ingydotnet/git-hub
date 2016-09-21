@@ -985,6 +985,11 @@ is stale, you may want to try these options:
 
 =back
 
+=head1 Colors
+
+You can have colored output. You can activate that by setting C<git hub config
+color auto>. It accepts the same values as C<git config color.ui> itself.
+
 =head1 Examples
 
 The following sections show lots of interesting ways to use C<git hub>. Let

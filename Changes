@@ -18,6 +18,7 @@ changes:
 - Bug fixes for --json output
 - The value for --remote can now be tab completed
 - Replace legacy field 'watchers' to 'stargazers_count' in --json output
+- Add support for colored output
 ---
 version: 0.1.5.12
 date: 2015-12-31
