@@ -1039,6 +1039,7 @@ init-colors() {
   fi
   if [[ "$color" == "true" || "$color" == "on" || "$color" == "yes" ]]; then
     color="auto"
+    shopt -s xpg_echo
     return
   fi
 }
@@ -1558,21 +1559,21 @@ out-() { echo -en "$@" >&1; }
 err() { echo -e "$@" >&2; }
 err-() { echo -en "$@" >&2; }
 
-declare GIT_HUB_COLOR_BOLD='\e[1m'
-declare GIT_HUB_COLOR_RED='\e[31m'
+declare GIT_HUB_COLOR_BOLD='\x1b[1m'
+declare GIT_HUB_COLOR_RED='\x1b[31m'
 declare GIT_HUB_COLOR_REPO="$GIT_HUB_COLOR_RED"
 declare GIT_HUB_COLOR_ERROR="$GIT_HUB_COLOR_RED$GIT_HUB_COLOR_BOLD"
-declare GIT_HUB_COLOR_GREEN='\e[32m'
+declare GIT_HUB_COLOR_GREEN='\x1b[32m'
 declare GIT_HUB_COLOR_LABEL="$GIT_HUB_COLOR_GREEN"
-declare GIT_HUB_COLOR_CYAN='\e[36m'
+declare GIT_HUB_COLOR_CYAN='\x1b[36m'
 declare GIT_HUB_COLOR_DATE="$GIT_HUB_COLOR_CYAN"
-declare GIT_HUB_COLOR_PURPLE='\e[35m'
+declare GIT_HUB_COLOR_PURPLE='\x1b[35m'
 declare GIT_HUB_COLOR_LOGIN="$GIT_HUB_COLOR_PURPLE"
-declare GIT_HUB_COLOR_YELLOW='\e[33m'
-declare GIT_HUB_COLOR_DARKGRAY='\e[90m'
+declare GIT_HUB_COLOR_YELLOW='\x1b[33m'
+declare GIT_HUB_COLOR_DARKGRAY='\x1b[90m'
 declare GIT_HUB_COLOR_YELLOWBOLD="$GIT_HUB_COLOR_YELLOW$GIT_HUB_COLOR_BOLD"
 declare GIT_HUB_COLOR_GREENBOLD="$GIT_HUB_COLOR_GREEN$GIT_HUB_COLOR_BOLD"
-declare NO_COLOR='\033[0m'
+declare NO_COLOR='\x1b[0m'
 
 colorize() {
   local colorize="GIT_HUB_COLOR_$1"
