@@ -691,7 +691,7 @@ get-repo-config() {
   urls=($(
     git remote -v 2> /dev/null |
     grep "$remote" |
-    grep 'github\.com' |
+    grep "$re_uri" |
     grep -v '^subrepo/'
   ))
   for x in "$login" '.*'; do
@@ -1028,6 +1028,19 @@ init-vars() {
   get-var-bool verbose-output
   get-var-bool show-token
   init-colors
+  http_uri="${GIT_HUB_API_URI:-https://api.github.com}"
+  if [[ $http_uri =~ ^(https?://[^/]+) ]]; then
+    http_uri="${BASH_REMATCH[1]}"
+  fi
+  clone_uri="$http_uri/"
+  if [[ $clone_uri == "https://api.github.com/" ]]; then
+    clone_uri="git@github.com:"
+  fi
+  re_uri="${clone_uri#git@}"
+  re_uri="${re_uri#https://}"
+  re_uri="${re_uri#http://}"
+  re_uri="${re_uri//\./\\.}"
+  re_uri="${re_uri%/}"
 }
 
 init-colors() {

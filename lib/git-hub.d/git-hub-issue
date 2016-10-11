@@ -50,7 +50,7 @@ command:issues() {
 format-entry:issues() {
   local number=$2 updated=$3 state=$4 creator=$5 title=$6 url=$7
   if "$raw_output"; then
-    local repo="${url#https\:\/\/github\.com\/}"
+    local repo="${url#$http_uri/}"
     repo="${repo%\/pull\/[[:digit:]]*}"
     repo="${repo%\/issues\/[[:digit:]]*}"
     printf "$repo\t$number\n"

@@ -127,7 +127,7 @@ command:clone() {
 
   owner_repo="$owner/$repo"
 
-  url="git@github.com:$owner_repo"
+  url="$clone_uri$owner_repo"
   local cmd="git clone --recursive $url $dir"
   execute-clone-cmd "$cmd"
 }

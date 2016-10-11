@@ -44,7 +44,7 @@ command:fork() {
     inside-git-repo &&
     [[ -z $GIT_HUB_TEST_RUN ]]
   then
-    url="git@github.com:$repo_name.git"
+    url="$clone_uri$repo_name.git"
     git remote add "$remote_name" "$url"
     say "git remote add $remote_name $url"
   fi
