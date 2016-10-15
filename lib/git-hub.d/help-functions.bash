@@ -28,7 +28,7 @@ gist-fork            gist-fork <gist-id>
 gist-get             gist-get <gist-id> <data-key>
 gist-init            gist-init (public|secret) <description>
 gist-new             gist-new (public|secret) <description> <files...>
-gist-star            gist-star <gist-id>`
+gist-star            gist-star <gist-id>
 gist-unstar          gist-unstar <gist-id>
 gists                gists [<user>]
 git-hub-travis       git-hub-travis
@@ -322,7 +322,7 @@ help:gist-new() {
 help:gist-star() {
     cat <<'...'
 
-  Usage: git hub gist-star <gist-id>`
+  Usage: git hub gist-star <gist-id>
 
   Add your *star* to a gist.
 ...

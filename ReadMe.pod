@@ -657,7 +657,7 @@ Get a specific data value for a particular gist.
 Set specific meta-data fields of a gist to new values. You list the parameters
 as key/value pairs.
 
-=item C<< gist-star <gist-id> >>`
+=item C<< gist-star <gist-id> >>
 
 Add your B<star> to a gist.
 

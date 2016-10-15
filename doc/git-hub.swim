@@ -522,7 +522,7 @@ interactions from the command line. They are installed by default.
   Set specific meta-data fields of a gist to new values. You list the
   parameters as key/value pairs.
 
-- `gist-star <gist-id>``
+- `gist-star <gist-id>`
   Add your *star* to a gist.
 
 - `gist-unstar <gist-id>`
