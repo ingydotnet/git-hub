@@ -1,8 +1,10 @@
 # Make sure we have 'git' and it works OK:
+ifeq ($(NO_GIT_CHECK),)
 ifeq ($(shell which git),)
     $(error 'git' is not installed on this system)
 endif
 GITVER ?= $(word 3,$(shell git --version))
+endif
 
 NAME = git-hub
 LIB = lib
