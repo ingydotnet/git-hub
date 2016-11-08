@@ -16,15 +16,13 @@ EXTS = $(shell find $(EXT) -type f) \
 	$(shell find $(EXT) -type l)
 SHARE = share
 
-# XXX Make these vars look like git.git/Makefile style
-PREFIX ?= /usr/local
 # XXX Using sed for now. Would like to use bash or make syntax.
 # If GIT_EXEC_PATH is set, `git --exec-path` will contain that appended to the
 # front. We just want the path where git is actually installed:
 INSTALL_LIB ?= $(shell git --exec-path | sed 's/.*://')
 INSTALL_CMD ?= $(INSTALL_LIB)/$(NAME)
 INSTALL_EXT ?= $(INSTALL_LIB)/$(NAME).d
-INSTALL_MAN1 ?= $(PREFIX)/share/man/man1
+INSTALL_MAN1 ?= $(shell git --man-path | sed 's/.*://')/man1
 
 ##
 # User targets:
