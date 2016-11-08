@@ -47,25 +47,25 @@ endif
 
 install: install-lib install-doc
 
-install-lib: $(INSTALL_EXT)
-	install -C -m 0755 $(LIBS) $(INSTALL_LIB)/
-	install -d -m 0755 $(INSTALL_EXT)/
-	install -C -m 0755 $(EXTS) $(INSTALL_EXT)/
+install-lib: $(DESTDIR)$(INSTALL_EXT)
+	install -C -m 0755 $(LIBS) $(DESTDIR)$(INSTALL_LIB)/
+	install -d -m 0755 $(DESTDIR)$(INSTALL_EXT)/
+	install -C -m 0755 $(EXTS) $(DESTDIR)$(INSTALL_EXT)/
 
 install-doc:
-	install -d -m 0755 $(INSTALL_MAN1)
-	install -C -m 0644 $(MAN) $(INSTALL_MAN1)
+	install -d -m 0755 $(DESTDIR)$(INSTALL_MAN1)
+	install -C -m 0644 $(MAN) $(DESTDIR)$(INSTALL_MAN1)
 
 uninstall: uninstall-lib uninstall-doc
 
 uninstall-lib:
-	rm -f $(INSTALL_CMD)
-	rm -fr $(INSTALL_EXT)
+	rm -f $(DESTDIR)$(INSTALL_CMD)
+	rm -fr $(DESTDIR)$(INSTALL_EXT)
 
 uninstall-doc:
-	rm -f $(INSTALL_MAN1)/$(NAME).1
+	rm -f $(DESTDIR)$(INSTALL_MAN1)/$(NAME).1
 
-$(INSTALL_EXT):
+$(DESTDIR)$(INSTALL_EXT):
 	mkdir -p $@
 
 clean purge:
