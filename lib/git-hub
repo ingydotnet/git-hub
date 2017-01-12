@@ -63,14 +63,12 @@ x           Debug - Turn on Bash trace (set -x) output
 
 # source bash+ :std
 SELFFILE="$BASH_SOURCE"
-while [ -h "$SELFFILE" ]; do
+while [[ -h $SELFFILE ]]; do
   SELFDIR=$(cd -P "$(dirname "$SELFFILE")" && pwd -P)
   SELFFILE=$(readlink "$SELFFILE")
-  if [ "${SELFFILE:0:1}" != "/" ]; then
-    SELFFILE="$SELFDIR/$SELFFILE"
-  fi
+  [[ ${SELFFILE:0:1} == / ]] || SELFFILE="$SELFDIR/$SELFFILE"
 done
-SELFDIR=$(cd -P $(dirname "$SELFFILE") && pwd -P)
+SELFDIR=$(cd -P "$(dirname "$SELFFILE")" && pwd -P)
 source "$SELFDIR/git-hub.d/bash+.bash"
 bash+:import :std can
 
