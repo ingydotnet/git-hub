@@ -82,7 +82,12 @@ your other git commands, do this instead:
 
     make install        # Possibly with 'sudo'
 
-This method does not account for upgrading and command completion yet.
+To install to a place of your choice:
+
+    DESTDIR=/place/of/your/choice make install
+
+The C<make install> method does not account for upgrading and command
+completion yet.
 
 See "Upgrading" and "Command Completion" below.
 
