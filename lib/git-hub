@@ -272,19 +272,36 @@ api-call() {
       echo "Using API Cache: $GIT_HUB_CACHE/$command_sha1"$'\n' >&2
     fi
     rc=0
-  elif  "$force_cache" && [[ -e "$command_output_file" ]]; then
-    rc=0
   else
-    local cache_dir="$GIT_HUB_CACHE/$command_sha1"
-    mkdir -p "$cache_dir"
-    # Actually run the curl command!
-    (
-      set +e
-      # set -x  # for debugging the real command
-      "${curl_command[@]}"
-    )
-    rc=$?
-    cache-response-files
+
+    local expired=1
+    local fetched="$GIT_HUB_CACHE/$command_sha1/fetched"
+    if [[ "$force_cache" && -f "$fetched" ]]; then
+      local force_cache_expire="${GIT_HUB_FORCE_CACHE_EXPIRE:-30}"
+      local mtime="$(date -r "$fetched" +%s)"
+      local now="$(date +%s)"
+      if [[ $(($mtime + $force_cache_expire)) -gt "$now" ]]; then
+        expired=0
+      fi
+    fi
+    if [[ $expired -ne 0 ]]; then
+      local cache_dir="$GIT_HUB_CACHE/$command_sha1"
+      mkdir -p "$cache_dir"
+      # Actually run the curl command!
+      (
+        set +e
+        # set -x  # for debugging the real command
+        "${curl_command[@]}"
+      )
+      rc=$?
+      # update timestamp every time for cache (if github returns 304 files
+      # won't be touched)
+      touch "$fetched"
+      cache-response-files
+    else
+      rc=0
+    fi
+
   fi
 
   "$show_headers" && cat "$command_header_file" >&2
