@@ -621,7 +621,7 @@ get-owner() {
     echo "$owner"
     return 0
   fi
-  get-repo-config owner
+  get-repo-config-owner
 }
 
 get-repo() {
@@ -641,7 +641,7 @@ get-remote-name() {
 
 get-default-remote-name() {
   [[ -n $remote_name ]] && return
-  local owner="$(get-repo-config owner)"
+  local owner="$(get-repo-config-owner)"
   local repo="$(get-repo-config repo)"
   remote_name="$(
     git remote -v |
@@ -727,6 +727,28 @@ get-repo-config() {
         fi
       fi
     done
+  done
+  return 1
+}
+
+get-repo-config-owner() {
+  urls=($(
+    git config --get-regex '^remote\..*\.url$' 2> /dev/null |
+    grep 'github\.com' |
+    grep -v '^subrepo/' |
+    cut -d' ' -f2
+  ))
+  for url in "${urls[@]}"; do
+    url="${url% (fetch)}"
+    url="${url% (push)}"
+    [[ $url =~ .*://(.*) ]] &&
+      url="${BASH_REMATCH[1]}"
+    local re1="^[^:/]*[:/](.*)/(.*)\.git$"
+    local re2="^[^:/]*[:/](.*)/(.*)$"
+    if [[ $url =~ $re1 ]] || [[ $url =~ $re2 ]]; then
+      echo "${BASH_REMATCH[1]}"
+      return 0
+    fi
   done
   return 1
 }
