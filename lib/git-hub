@@ -735,7 +735,7 @@ get-repo-config-owner() {
   urls=($(
     git config --get-regex '^remote\..*\.url$' 2> /dev/null |
     grep 'github\.com' |
-    grep -v '^subrepo/' |
+    grep -v '^remote\.subrepo/' |
     cut -d' ' -f2
   ))
   for url in "${urls[@]}"; do
