@@ -100,7 +100,7 @@ command. Long form commands that require an argument can use '=' or not:
   as documented.
 
 - `-r`, `--raw`
-  For commands the produce lists, just list the raw data. For commands that
+  For commands that produce lists, just list the raw data. For commands that
   produce reports, show the raw storage keys, rather than the human friendly
   ones. You will need the raw keys to edit/change values.
 
