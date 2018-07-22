@@ -857,7 +857,7 @@ report-list-process() {
 }
 
 get-next-page-url() {
-  local regexp='Link: <(https:[^>]+)>; rel="next"'
+  local regexp='Link: .*<(https:[^>]+)>; rel="next"'
   [[ -e $command_header_file ]] &&
     [[ $(< "$command_header_file") =~ $regexp ]] &&
     echo "${BASH_REMATCH[1]}"
