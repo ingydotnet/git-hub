@@ -5,9 +5,15 @@ set -e
 command:repos() {
   get-args owner:get-user
   title="$(colorize LABEL "Repos for '$owner':" )"
-  report-list \
-    "/users/$owner/repos?sort=pushed;per_page=PER_PAGE" \
-    'pushed_at full_name description'
+  if [[ "$(get-login)" == "$owner" ]];then
+    report-list \
+      "/user/repos?affiliation=owner;sort=pushed;per_page=PER_PAGE" \
+      'pushed_at full_name description'
+  else
+    report-list \
+      "/users/$owner/repos?sort=pushed;per_page=PER_PAGE" \
+      'pushed_at full_name description'
+  fi
 }
 
 format-entry:repos() {
