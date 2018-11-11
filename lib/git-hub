@@ -1441,8 +1441,15 @@ delete-empty-msg-file() {
 }
 
 editor-title-body() {
-  if pipeline; then
+  if [[ -n $GIT_HUB_MSG ]]; then
+    echo "$GIT_HUB_MSG" > "$GIT_HUB_MSG_FILE"
+    [[ $GIT_HUB_MSG_FILE =~ $'\n'. ]] ||
+      echo >> "$GIT_HUB_MSG_FILE"
+
+  elif pipeline; then
     cat > "$GIT_HUB_MSG_FILE"
+    echo >> "$GIT_HUB_MSG_FILE"
+
   else
     init-msg-file "$1"
     $GIT_HUB_EDITOR "$GIT_HUB_MSG_FILE"
