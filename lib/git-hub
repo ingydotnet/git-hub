@@ -33,32 +33,36 @@ See 'git hub help' for more help.
 
 Options:
 --
-h           Show the command summary
-help        Browse the complete 'git-hub' documentation
+h               Show the command summary
+help            Browse the complete 'git-hub' documentation
  
-remote=     Remote name (like 'origin')
-branch=     Branch name (like 'master')
-org=        GitHub organization name
+remote=         Remote name (like 'origin')
+branch=         Branch name (like 'master')
+sha=            Commit SHA
+merge-method=   Which method to merge (merge, squash, rebase)
+commit-title=   Commit title
+commit-message= Commit message
+org=            GitHub organization name
  
-c,count=    Number of list items to show
-a,all       Show all list items
+c,count=        Number of list items to show
+a,all           Show all list items
  
-q,quiet     Show minimal output
-v,verbose   Show verbose output
-r,raw       Show output data in a raw form
-j,json      Show output data in JSON
+q,quiet         Show minimal output
+v,verbose       Show verbose output
+r,raw           Show output data in a raw form
+j,json          Show output data in JSON
  
-A,use-auth  Force the use of authentication. (Get around rate limits)
-C,no-cache  Don't use cached responses.
-token=      Explicitly specify the GitHub v3 API Authentication Token
-d,dryrun    Check arguments but don't actually run the API command
-T           Show (don't hide) API token in the verbose output
+A,use-auth      Force the use of authentication. (Get around rate limits)
+C,no-cache      Don't use cached responses.
+token=          Explicitly specify the GitHub v3 API Authentication Token
+d,dryrun        Check arguments but don't actually run the API command
+T               Show (don't hide) API token in the verbose output
  
-O           Debug - Show response output
-H           Debug - Show reponse headers
-J           Debug - Show parsed JSON response
-R           Debug - Repeat last command without contacting server
-x           Debug - Turn on Bash trace (set -x) output
+O               Debug - Show response output
+H               Debug - Show reponse headers
+J               Debug - Show parsed JSON response
+R               Debug - Repeat last command without contacting server
+x               Debug - Turn on Bash trace (set -x) output
 "
 
 # source bash+ :std
@@ -89,6 +93,7 @@ main() {
   local show_output=false show_headers=false show_json=false
   local dry_run=false show_token repeat_command=false
   local terminal_lines terminal_cols
+  local commit_sha commit_title commit_message merge_method
 
   init_terminal
   if run-for-each "$@"; then
@@ -1179,6 +1184,22 @@ get-opts() {
         ;;
       --branch)
         set-var branch_name "$1"
+        shift
+        ;;
+      --sha)
+        set-var commit_sha "$1"
+        shift
+        ;;
+      --merge-method)
+        set-var merge_method "$1"
+        shift
+        ;;
+      --commit-title)
+        set-var commit_title "$1"
+        shift
+        ;;
+      --commit-message)
+        set-var commit_message "$1"
         shift
         ;;
 

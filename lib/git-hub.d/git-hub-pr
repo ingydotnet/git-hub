@@ -163,8 +163,21 @@ command:pr-fetch() {
 
 command:pr-merge() {
   get-args '?owner:get-owner/repo:get-repo' number '?message'
-  # TODO Support merge message
-  local json='{}'
+  local json_list=()
+  if [[ -n "$commit_sha" ]]; then
+    json_list=("${json_list[@]}" "sha" "$commit_sha")
+  fi
+  if [[ -n "$merge_method" ]]; then
+    json_list=("${json_list[@]}" "merge_method" "$merge_method")
+  fi
+  if [[ -n "$commit_title" ]]; then
+    json_list=("${json_list[@]}" "commit_title" "$commit_title")
+  fi
+  if [[ -n "$commit_message" ]]; then
+    json_list=("${json_list[@]}" "commit_message" "$commit_message")
+  fi
+
+  IFS='' json="$( json-dump-object ${json_list[*]} )"
   api-put "/repos/$owner/$repo/pulls/$number/merge" "$json"
 }
 
