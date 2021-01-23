@@ -384,7 +384,7 @@ check-api-call-status() {
     return
   fi
   status_code="$(
-    grep -E 'HTTP/1.1 [2-9]' $command_header_file |
+    grep -E '^HTTP/(1\.1|2) [2-9]' $command_header_file |
     head -n1 | cut -d ' ' -f2
   )"
   [[ $status_code =~ ^[0-9]{3}$ ]] ||
