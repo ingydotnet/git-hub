@@ -98,21 +98,26 @@ command:pr-list() {
 
   report-list \
     "/repos/$owner/$repo/pulls?state=$state;sort=updated;direction=desc;per_page=PER_PAGE" \
-    'number state title user/login created_at updated_at head/label base/label html_url'
+    'number state title user/login created_at updated_at head/label base/label html_url draft'
 }
 
 format-entry:pr-list() {
   local number=$2 state=$3 title=$4 creator=$5 created=$6 updated=$7
-  local head=$8 base=$9 url=${10}
+  local head=$8 base=$9 url=${10} draft=${11} statecolor=YELLOW
   if "$raw_output"; then
     local repo=$url
     repo="${url#https\:\/\/github\.com\/}"
     repo="${repo%\/pull\/[[:digit:]]*}"
     printf "$repo\t$number\n"
   else
+
+    if $draft; then
+      state="$state/draft"
+      statecolor=DARKGRAY
+    fi
     color-table-row \
       "#%-3d" LABEL "$number" \
-      "%-8s"  YELLOW "($state)" \
+      "%-8s"  $statecolor "($state)" \
       ""      "" "$title"
     color-table-row \
       "     @%-12s" LOGIN "$creator" \

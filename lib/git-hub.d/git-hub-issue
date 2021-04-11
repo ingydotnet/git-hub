@@ -86,6 +86,7 @@ ok:issue() {
     html_url
     user__login
     state
+    draft
     assignee__login
     milestone__title
     created_at body
