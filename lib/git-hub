@@ -1404,7 +1404,7 @@ Found existing $GIT_HUB_MSG_FILE from:
 
           r)
             # remove all comment lines
-            sed -i -e '/^#.*$/d' $GIT_HUB_MSG_FILE
+            sed -i -n '/^#/q;p' $GIT_HUB_MSG_FILE
             echo "$body" | sed -e '/^$/d' >> "$GIT_HUB_MSG_FILE"
             break
           ;;
