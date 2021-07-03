@@ -683,6 +683,7 @@ following locations (or somewhere else that we don't know about):
 * `/usr/share/bash-completion/completions/git`
 * `/opt/local/share/bash-completion/completions/git`
 * `/usr/local/etc/bash_completion.d/git`
+* `/usr/local/opt/git/share/git-core/contrib/completion`
 * `~/.homebrew/etc/bash_completion.d/git`
 
 In case you can't find any of these, this repository contains a copy of the
