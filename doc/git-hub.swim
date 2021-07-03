@@ -476,6 +476,12 @@ interactions from the command line. They are installed by default.
 - `pr-merge [<owner>/<repo>] <issue-id-number>`
   Merge and close a pull request.
 
+  It supports the following options:
+  * `--sha`
+  * `--merge-method`
+  * `--commit-title`
+  * `--commit-message`
+
 - `pr-queue [<user>] [--all]`
   Show a user's Pull Request queue, for all repos. Shows the open PRs for any
   repo that has them. The `--all` option says to show closed as well as
