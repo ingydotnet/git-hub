@@ -18,7 +18,7 @@
   GIT_HUB_ROOT="$BASH_SOURCE"
 [[ $GIT_HUB_ROOT =~ ^/ ]] ||
   GIT_HUB_ROOT="$PWD/$GIT_HUB_ROOT"
-export GIT_HUB_ROOT="$(cd "$(dirname $GIT_HUB_ROOT)"; pwd)"
+export GIT_HUB_ROOT="$(\cd "$(dirname $GIT_HUB_ROOT)"; pwd)"
 
 export PATH="$GIT_HUB_ROOT/lib:$PATH"
 export MANPATH="$GIT_HUB_ROOT/man:${MANPATH-}"
