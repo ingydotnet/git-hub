@@ -19,6 +19,10 @@ _git-hub() {
         '--help[Browse the complete '"'"'git-hub'"'"' documentation]:' \
         '--remote[Remote name (like '"'"'origin'"'"')]:remote:_git-hub-complete-remote' \
         '--branch[Branch name (like '"'"'master'"'"')]:branch' \
+        '--sha[Commit SHA]:sha' \
+        '--merge-method[Which method to merge (merge, squash, rebase)]:merge-method' \
+        '--commit-title[Commit title]:commit-title' \
+        '--commit-message[Commit message]:commit-message' \
         '--org[GitHub organization name]:org' \
         '(-c --count)'{-c,--count}'[Number of list items to show]:c' \
         '(-a --all)'{-a,--all}'[Show all list items]:' \

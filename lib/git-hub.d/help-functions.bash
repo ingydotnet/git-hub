@@ -653,6 +653,12 @@ help:pr-merge() {
   Usage: git hub pr-merge [<owner>/<repo>] <issue-id-number>
 
   Merge and close a pull request.
+
+  It supports the following options:
+  * `--sha`
+  * `--merge-method`
+  * `--commit-title`
+  * `--commit-message`
 ...
 }
 
