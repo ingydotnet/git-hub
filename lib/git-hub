@@ -37,12 +37,12 @@ h               Show the command summary
 help            Browse the complete 'git-hub' documentation
  
 remote=         Remote name (like 'origin')
-branch=         Branch name (like 'master')
+branch=         Branch name (like 'main')
 sha=            Commit SHA
-merge-method=   Which method to merge (merge, squash, rebase)
-commit-title=   Commit title
-commit-message= Commit message
 org=            GitHub organization name
+method=         Which method to merge (merge, squash, rebase)
+title=          Commit title
+msg=            Commit message
  
 c,count=        Number of list items to show
 a,all           Show all list items
@@ -1190,15 +1190,15 @@ get-opts() {
         set-var commit_sha "$1"
         shift
         ;;
-      --merge-method)
+      --method)
         set-var merge_method "$1"
         shift
         ;;
-      --commit-title)
+      --title)
         set-var commit_title "$1"
         shift
         ;;
-      --commit-message)
+      --msg)
         set-var commit_message "$1"
         shift
         ;;

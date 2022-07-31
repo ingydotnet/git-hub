@@ -18,12 +18,12 @@ _git-hub() {
         '-h[Show the command summary]:' \
         '--help[Browse the complete '"'"'git-hub'"'"' documentation]:' \
         '--remote[Remote name (like '"'"'origin'"'"')]:remote:_git-hub-complete-remote' \
-        '--branch[Branch name (like '"'"'master'"'"')]:branch' \
+        '--branch[Branch name (like '"'"'main'"'"')]:branch' \
         '--sha[Commit SHA]:sha' \
-        '--merge-method[Which method to merge (merge, squash, rebase)]:merge-method' \
-        '--commit-title[Commit title]:commit-title' \
-        '--commit-message[Commit message]:commit-message' \
         '--org[GitHub organization name]:org' \
+        '--method[Which method to merge (merge, squash, rebase)]:method' \
+        '--title[Commit title]:title' \
+        '--msg[Commit message]:msg' \
         '(-c --count)'{-c,--count}'[Number of list items to show]:c' \
         '(-a --all)'{-a,--all}'[Show all list items]:' \
         '(-q --quiet)'{-q,--quiet}'[Show minimal output]:' \
