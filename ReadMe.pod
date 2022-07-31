@@ -905,6 +905,8 @@ following locations (or somewhere else that we don't know about):
 
 =item * C</usr/local/etc/bash_completion.d/git>
 
+=item * C</usr/local/opt/git/share/git-core/contrib/completion>
+
 =item * C<~/.homebrew/etc/bash_completion.d/git>
 
 =back
