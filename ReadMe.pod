@@ -319,7 +319,7 @@ If you would rather do the steps by hand, see L<#Configuration-Commands> below.
 =item C<upgrade>
 
 Upgrade the C<git-hub> installation to the latest version. Note: you need to
-be running 'git-hub' from the source repo, and be on the master branch for
+be running 'git-hub' from the source repo, and be on the main branch for
 this to work.
 
 =item C<< user [<user>] >>
@@ -1062,7 +1062,7 @@ Do everything from the command line:
     $ echo 'The new foo' > README
     $ git add README
     $ git commit -m 'First commit'
-    $ git push origin master
+    $ git push origin main
     $ git hub repo-edit \
         description  'The new foo' \
         homepage     http://example.com
