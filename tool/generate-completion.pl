@@ -233,6 +233,9 @@ _git-hub() {
         help)
             compadd @$list
         ;;
+        *)
+            _files
+        ;;
         esac
     ;;
     esac
