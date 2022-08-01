@@ -54,7 +54,7 @@ _git-hub() {
     ;;
     repo)
         case $line[1] in
-        clone|collabs|comment|fork|forks|issue|issue-close|issue-edit|issue-new|issue-resolve|issues|open|pr-diff|pr-fetch|pr-list|pr-merge|repo|repo-delete|repo-edit|repo-get|star|stars|trust|unstar|untrust|unwatch|url|watch|watchers)
+        clone|collabs|comment|fork|forks|issue|issue-close|issue-edit|issue-new|issue-resolve|issues|pr-diff|pr-fetch|pr-list|pr-merge|repo|repo-delete|repo-edit|repo-get|star|stars|trust|unstar|untrust|unwatch|watch|watchers)
             [[ "$line[2]" =~ ^- ]] && return;
             local repo_to_complete="$line[2]"
             if [[ "$repo_to_complete" =~ "^@/?$" || \

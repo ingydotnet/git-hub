@@ -49,6 +49,7 @@ sub main {
             or die "Bad usage: '$text'";
         (my $name = $usage) =~ s/ .*//;
         push @list, $name;
+        next if $name =~ m/^(open|url)$/; # arg can also be a local file
         if ($usage =~ m#\Q$name\E \(?\[?(<owner>/)?\]?<repo>#) {
             push @repo_cmds, $name;
         }

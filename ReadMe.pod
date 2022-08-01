@@ -230,8 +230,7 @@ Most of the commands described below have arguments. This section defines each
 of the argument types. Note that argument values that are strings containing
 whitespace need to be quoted.
 
-Argument variable names are always indicated by angle brackets, like: C<<
-<variable> >>. Arguments listed in square brackets are optional and arguments
+Argument variable names are always indicated by angle brackets, like: C<<<variable> >>. Arguments listed in square brackets are optional and arguments
 followed by C<...> indicate that more than one is allowed.
 
 =over
@@ -577,8 +576,7 @@ issue instead of creating a new one.
 
 If the default remote is a fork, the pull request will target the default
 branch of the parent repository. Otherwise the pull request will target the
-default branch of the default remote itself. Use C<--remote>, C<--branch>, C<--
-parent>, and C<--base> options to change the default source remote, source
+default branch of the default remote itself. Use C<--remote>, C<--branch>, C<--parent>, and C<--base> options to change the default source remote, source
 branch, target remote and target branch (respectively).
 
 This command will open an editor like C<git commit> does. To avoid that you
@@ -709,8 +707,7 @@ This will create a gist with a file '.gitignore'
 
 Search for repositories.
 
-By default it searches in the repository name, but you can change that: C<search-
-repo "libyaml in:description">. For more information, see the search
+By default it searches in the repository name, but you can change that: C<search-repo "libyaml in:description">. For more information, see the search
 documentation at
 L<https://developer.github.com/v3/search/#search-repositories>
 
@@ -718,8 +715,7 @@ L<https://developer.github.com/v3/search/#search-repositories>
 
 Search for users.
 
-By default it searches in the login field, but you can change that: C<search-
-user "wall in:fullname">. For more information, see the search documentation
+By default it searches in the login field, but you can change that: C<search-user "wall in:fullname">. For more information, see the search documentation
 at L<https://developer.github.com/v3/search/#search-users>
 
 =item C<< search-issues <query> >>
@@ -1000,8 +996,7 @@ these commands (the C<git hub setup> command automates this):
 
 You can also see all your tokens on the web at L<thispage|https://github.com/settings/applications>.
 
-You can specify your API token to C<git hub> on the commandline with C<--
-token=...> or in the C<GIT_HUB_API_TOKEN> environment variable, but the
+You can specify your API token to C<git hub> on the commandline with C<--token=...> or in the C<GIT_HUB_API_TOKEN> environment variable, but the
 easiest thing to do is just set it in the git-hub config.
 
 Certain token B<scopes> are required for various GitHub API operations. Make
@@ -1050,8 +1045,7 @@ is stale, you may want to try these options:
 
 =head1 Colors
 
-You can have colored output. You can activate that by setting C<git hub config
-color auto>. It accepts the same values as C<git config color.ui> itself.
+You can have colored output. You can activate that by setting C<git hub configcolor auto>. It accepts the same values as C<git config color.ui> itself.
 
 =head1 Examples
 
@@ -1108,11 +1102,9 @@ Assume your current working directory is not a GitHub repo:
     $ # etc...
 
 The C<git hub> command tries to be environmentally aware. If you are in a
-GitHub cloned repo directory, and you don't specify C<< <user> >> or C<<
-<owner> >> or C<< <repo> >> for a command that needs them, then they will be
+GitHub cloned repo directory, and you don't specify C<< <user> >> or C<<<owner> >> or C<< <repo> >> for a command that needs them, then they will be
 pulled from the remote url. Otherwise, if you don't specify a C<< <user> >> it
-will use the one (presumably yours) that you set with the C<git hub config
-login ...> command.
+will use the one (presumably yours) that you set with the C<git hub configlogin ...> command.
 
 =head2 Example 3. Building Complex Commands
 
