@@ -3,8 +3,8 @@
 command:upgrade() {
   local path="$0"
   local branch="$(git rev-parse --abbrev-ref HEAD)"
-  if [[ $branch != master ]]; then
-    error "git-hub repo is not on the 'master' branch"
+  if [[ $branch != main ]]; then
+    error "git-hub repo is not on the 'main' branch"
   fi
   if [[ $path =~ ^/ && $path =~ ^(.*/git-hub)/lib/git-hub$ ]]; then
     (
