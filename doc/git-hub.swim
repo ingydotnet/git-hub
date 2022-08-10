@@ -473,6 +473,9 @@ interactions from the command line. They are installed by default.
 - `pr-fetch [<owner>/<repo>] <issue-id-number>`
   Fetches a pull request to a local `review/$number` branch
 
+- `pr-fetch-fork [<owner>/<repo>] <issue-id-number>`
+  Adds the remote url from the PR author and fetches the corresponding branch
+
 - `pr-merge [<owner>/<repo>] <issue-id-number>`
   Merge and close a pull request.
 
