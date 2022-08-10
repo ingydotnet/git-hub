@@ -161,6 +161,33 @@ command:pr-fetch() {
   msg_ok=0
 }
 
+command:pr-fetch-fork() {
+  local pr_user pr_branch fork_url
+  get-args '?owner:get-owner/repo:get-repo' number
+  assert-inside-git-repo
+  api-get "/repos/$owner/$repo/pulls/$number"
+  pr_user=$(JSON.get -s /user/login -)
+  pr_branch=$(JSON.get -s /head/ref -)
+  fork_url=$(JSON.get -s /head/repo/ssh_url -)
+
+  if [[ -n $(git remote | grep -E "^$pr_user$") ]]; then
+    echo "Remote $pr_user already exists"
+  else
+    git remote add "$pr_user" "$fork_url" ||
+        error "can't add remote $pr_user $fork_url"
+  fi
+
+  full_branch=$pr_user/$pr_branch
+  if [[ -n $(git branch | grep -E "^$full_branch$") ]]; then
+    echo "Branch $full_branch already exists"
+  else
+    git fetch "$pr_user" "$pr_branch" ||
+        error "can't fetch PR $full_branch"
+  fi
+  say "Fetched PR $number into $full_branch"
+  msg_ok=0
+}
+
 command:pr-merge() {
   get-args '?owner:get-owner/repo:get-repo' number '?message'
   local json_list=()
